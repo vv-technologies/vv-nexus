@@ -130,6 +130,7 @@ body { background:#04040a; color:#fff; font-family:-apple-system,sans-serif; hei
     <div class="tab on"  id="t-setup"   onclick="sw('setup')">⚙️<br>SETUP</div>
     <div class="tab"     id="t-chat"    onclick="sw('chat')">💬<br>CHAT</div>
     <div class="tab"     id="t-sandbox" onclick="sw('sandbox')">🛠<br>SANDBOX</div>
+    <div class="tab"     id="t-deploy"  onclick="sw('deploy')">🚀<br>DEPLOY</div>
 </div>
 
 <!-- ══ SCREEN: SETUP ══ -->
@@ -166,13 +167,32 @@ body { background:#04040a; color:#fff; font-family:-apple-system,sans-serif; hei
     </div>
 
     <div class="setup-card">
-        <div class="card-title">REPO ACTIV (target deploy)</div>
+        <div class="card-title">REPO ACTIV (target principal)</div>
         <div class="pills" id="repo-pills">
             <div class="pill on"  onclick="selRepo('ceo.html',this)">ceo.html</div>
             <div class="pill"     onclick="selRepo('vv-team',this)">vv-team</div>
             <div class="pill"     onclick="selRepo('vv-technologies',this)">vv-technologies</div>
             <div class="pill"     onclick="selRepo('vvhi',this)">vvhi</div>
         </div>
+    </div>
+
+    <div class="setup-card">
+        <div class="card-title">🔄 MIRROR REPOS (push simultan)</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.25);margin-bottom:10px;">Selectează repo-urile care primesc Mirror Push simultan cu cel principal.</div>
+        <div class="pills" id="mirror-pills">
+            <div class="pill" onclick="toggleMirror('ceo.html',this)">ceo.html</div>
+            <div class="pill" onclick="toggleMirror('vv-team',this)">vv-team</div>
+            <div class="pill" onclick="toggleMirror('vv-technologies',this)">vv-technologies</div>
+            <div class="pill" onclick="toggleMirror('vvhi',this)">vvhi</div>
+        </div>
+    </div>
+
+    <div class="setup-card">
+        <div class="card-title">🔍 VV SCOT — GOOGLE SEARCH</div>
+        <label style="display:flex;align-items:center;gap:12px;cursor:pointer;padding:4px 0;">
+            <input type="checkbox" id="scot-cb" style="width:20px;height:20px;accent-color:#D4AF37;flex-shrink:0;cursor:pointer;">
+            <span style="font-size:12px;color:rgba(255,255,255,0.4);line-height:1.6;">Activează VV Scot — Gemini caută pe Google înainte să răspundă. Date reale, nu halucinații.<br><span style="color:rgba(255,255,255,0.2);font-size:11px;">Necesită Gemini 2.0 Flash (deja setat)</span></span>
+        </label>
     </div>
 
     <button class="btn-save" onclick="doSave()">
@@ -231,6 +251,44 @@ body { background:#04040a; color:#fff; font-family:-apple-system,sans-serif; hei
 </div>
 </div>
 
+<!-- ══ SCREEN: DEPLOY ══ -->
+<div class="screen" id="s-deploy">
+<div class="setup">
+
+    <div class="setup-card">
+        <div class="card-title">🚀 DEPLOY RAPID</div>
+        <div id="deploy-repos-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px;">
+            <div style="color:rgba(255,255,255,0.25);font-size:12px;text-align:center;padding:10px;">Configurează GitHub în SETUP.</div>
+        </div>
+        <button onclick="doBigPush()" style="width:100%;padding:16px;background:rgba(52,199,89,0.12);border:1px solid rgba(52,199,89,0.25);border-radius:14px;color:#34c759;font-size:14px;font-weight:800;cursor:pointer;min-height:52px;letter-spacing:0.5px;-webkit-appearance:none;">
+            ⬆ PUSH PE REPO PRIMAR
+        </button>
+        <button id="btn-mirror-all" onclick="doMirrorAll()" style="display:none;width:100%;margin-top:10px;padding:16px;background:rgba(10,132,255,0.1);border:1px solid rgba(10,132,255,0.22);border-radius:14px;color:#0A84FF;font-size:14px;font-weight:800;cursor:pointer;min-height:52px;letter-spacing:0.5px;-webkit-appearance:none;">
+            🔄 MIRROR PUSH — TOATE REPO-URILE
+        </button>
+    </div>
+
+    <div class="setup-card">
+        <div class="card-title">👻 VV GHOST — ROLLBACK</div>
+        <div id="ghost-info" style="font-size:12px;color:rgba(255,255,255,0.25);margin-bottom:12px;">Niciun backup creat încă. Fă un push pentru a crea primul Ghost.</div>
+        <button onclick="doRollback()" style="width:100%;padding:13px;background:rgba(255,149,0,0.08);border:1px solid rgba(255,149,0,0.2);border-radius:12px;color:#ff9500;font-size:12px;font-weight:700;cursor:pointer;min-height:44px;-webkit-appearance:none;">
+            ↩ RESTAUREAZĂ VERSIUNEA ANTERIOARĂ
+        </button>
+    </div>
+
+    <div class="setup-card">
+        <div class="card-title">🧬 VV LOGIC DNA — MEMORIA SISTEMULUI</div>
+        <div id="dna-list" style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px;">
+            <div style="color:rgba(255,255,255,0.2);font-size:12px;text-align:center;padding:8px;">Nicio decizie înregistrată.</div>
+        </div>
+        <button onclick="exportDNA()" style="width:100%;padding:12px;background:rgba(212,175,55,0.07);border:1px solid rgba(212,175,55,0.18);border-radius:12px;color:#D4AF37;font-size:12px;font-weight:700;cursor:pointer;min-height:44px;-webkit-appearance:none;">
+            📥 EXPORTĂ VV_Logic_DNA.json
+        </button>
+    </div>
+
+</div>
+</div>
+
 <script>
 // ================================================================
 // VV NEXUS — versiune simplă, robustă pe Safari iOS
@@ -239,10 +297,14 @@ body { background:#04040a; color:#fff; font-family:-apple-system,sans-serif; hei
 var G = {
     gk: '', gt: '', gu: '',
     repo: 'ceo.html',
+    mirrors: [],
+    scotOn: false,
     msgs: [],
     busy: false,
     lastCode: null,
-    lastFile: null
+    lastFile: null,
+    dna: [],
+    ghost: null
 };
 
 var VV_CTX = `Ești VV NEXUS — asistentul AI personal al Arhitectului (fondatorul VV Technologies).
@@ -277,12 +339,21 @@ Răspunde MEREU în română. Cod funcțional din prima.`;
     G.gt   = lsG('nx_gt')   || '';
     G.gu   = lsG('nx_gu')   || '';
     G.repo = lsG('nx_repo') || 'ceo.html';
+    G.scotOn = lsG('nx_scot') === '1';
+    try { G.mirrors = JSON.parse(lsG('nx_mirrors') || '[]'); } catch(_) { G.mirrors = []; }
+    try { G.dna = JSON.parse(lsG('nx_dna') || '[]'); } catch(_) { G.dna = []; }
+    try { G.ghost = JSON.parse(lsG('nx_ghost') || 'null'); } catch(_) { G.ghost = null; }
 
     // Populăm câmpurile Settings
     if (G.gk) document.getElementById('f-gk').value = G.gk;
     if (G.gt) document.getElementById('f-gt').value = G.gt;
     if (G.gu) document.getElementById('f-gu').value = G.gu;
     syncRepoPills();
+    syncMirrorPills();
+    if (G.scotOn) { var scb = document.getElementById('scot-cb'); if(scb) scb.checked = true; }
+    renderDNA();
+    renderDeployScreen();
+    updateGhostInfo();
 
     if (G.gk) {
         dotOn(true);
@@ -312,13 +383,13 @@ function lsS(k,v) { try { localStorage.setItem(k,v); } catch(e) {} }
 
 // ── TAB SWITCHING ─────────────────────────────────────────────
 function sw(id) {
-    ['setup','chat','sandbox'].forEach(function(t) {
+    ['setup','chat','sandbox','deploy'].forEach(function(t) {
         document.getElementById('s-'+t).classList.toggle('on', t===id);
         document.getElementById('t-'+t).classList.toggle('on', t===id);
     });
-    // Ascunde/arată input bar
     var inp = document.querySelector('.inp');
     if (inp) inp.style.display = (id==='chat') ? 'block' : 'none';
+    if (id === 'deploy') { renderDeployScreen(); renderDNA(); updateGhostInfo(); }
 }
 
 // ── REPO SELECTION ────────────────────────────────────────────
@@ -334,6 +405,20 @@ function syncRepoPills() {
     });
 }
 
+function syncMirrorPills() {
+    document.querySelectorAll('#mirror-pills .pill').forEach(function(p) {
+        p.classList.toggle('on', G.mirrors.indexOf(p.textContent.trim()) > -1);
+    });
+}
+
+function toggleMirror(name, el) {
+    var idx = G.mirrors.indexOf(name);
+    if (idx > -1) G.mirrors.splice(idx, 1);
+    else G.mirrors.push(name);
+    el.classList.toggle('on', G.mirrors.indexOf(name) > -1);
+    lsS('nx_mirrors', JSON.stringify(G.mirrors));
+}
+
 // ── SAVE SETTINGS ─────────────────────────────────────────────
 function doSave() {
     var gk = document.getElementById('f-gk').value.trim();
@@ -347,10 +432,14 @@ function doSave() {
     }
 
     G.gk = gk; G.gt = gt; G.gu = gu;
+    G.scotOn = document.getElementById('scot-cb') ? document.getElementById('scot-cb').checked : false;
     lsS('nx_gk', gk);
     lsS('nx_gt', gt);
     lsS('nx_gu', gu);
     lsS('nx_repo', G.repo);
+    lsS('nx_scot', G.scotOn ? '1' : '0');
+    lsS('nx_mirrors', JSON.stringify(G.mirrors));
+    renderDeployScreen();
 
     dotOn(true);
     hdrStatus('online');
@@ -427,22 +516,22 @@ async function callAI() {
     G.msgs.forEach(function(m) { contents.push(m); });
 
     try {
+        var reqBody = {
+            contents: contents,
+            generationConfig: { temperature: 0.7, maxOutputTokens: 8192 },
+            safetySettings: [
+                { category: 'HARM_CATEGORY_HARASSMENT',        threshold: 'BLOCK_NONE' },
+                { category: 'HARM_CATEGORY_HATE_SPEECH',       threshold: 'BLOCK_NONE' },
+                { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_NONE' },
+                { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_NONE' }
+            ]
+        };
+        // VV Scot — Google Search Grounding
+        if (G.scotOn) { reqBody.tools = [{ googleSearch: {} }]; }
+
         var r = await fetch(
-            'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' + G.gk,
-            {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    contents: contents,
-                    generationConfig: { temperature: 0.7, maxOutputTokens: 8192 },
-                    safetySettings: [
-                        { category: 'HARM_CATEGORY_HARASSMENT',        threshold: 'BLOCK_NONE' },
-                        { category: 'HARM_CATEGORY_HATE_SPEECH',       threshold: 'BLOCK_NONE' },
-                        { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_NONE' },
-                        { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_NONE' }
-                    ]
-                })
-            }
+            'https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=' + G.gk,
+            { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(reqBody) }
         );
 
         if (!r.ok) {
@@ -502,6 +591,10 @@ function processReply(text) {
     }
 
     addMsg('a', text, fn, codes.length > 0);
+
+    // DNA — logăm decizia
+    var lastCmd = G.msgs.length >= 2 ? G.msgs[G.msgs.length - 2].parts[0].text : '';
+    addDNA(lastCmd.substring(0, 80), fn || '—', codes.length > 0);
 }
 
 function guessFile(text) {
@@ -589,6 +682,9 @@ async function pushFile(fileName, btn) {
     btn.disabled = true;
     btn.textContent = 'SE TRIMITE...';
 
+    // Ghost backup înainte de orice push
+    saveGhost(fileName, G.lastCode);
+
     var url = 'https://api.github.com/repos/' + G.gu + '/' + G.repo + '/contents/' + fileName;
 
     try {
@@ -621,6 +717,8 @@ async function pushFile(fileName, btn) {
         btn.textContent = '✓ DEPLOIAT!';
         btn.style.background = 'rgba(52,199,89,0.2)';
         toast('🚀 ' + fileName + ' → ' + G.repo, 'g');
+        addDNA('DEPLOY ' + fileName, G.repo, true);
+        renderDeployScreen();
 
     } catch(err) {
         btn.disabled = false;
@@ -703,6 +801,129 @@ function toast(msg, type) {
         setTimeout(function() { t.remove(); }, 300);
     }, 3000);
 }
+
+// ── MIRROR PUSH ────────────────────────────────────────────────
+async function ghPush(repoName, fileName, code) {
+    var url = 'https://api.github.com/repos/' + G.gu + '/' + repoName + '/contents/' + fileName;
+    var sha = null;
+    try {
+        var gr = await fetch(url, { headers: { 'Authorization': 'Bearer ' + G.gt, 'Accept': 'application/vnd.github+json' } });
+        if (gr.ok) { var fd = await gr.json(); sha = fd.sha; }
+    } catch(_) {}
+    var body = { message: 'VV NEXUS · ' + fileName + ' · ' + new Date().toLocaleString('ro-RO'), content: btoa(unescape(encodeURIComponent(code))) };
+    if (sha) body.sha = sha;
+    var pr = await fetch(url, { method: 'PUT', headers: { 'Authorization': 'Bearer ' + G.gt, 'Accept': 'application/vnd.github+json', 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    if (!pr.ok) { var e = await pr.json().catch(function(){return{}}); throw new Error(e.message || 'HTTP ' + pr.status); }
+    return true;
+}
+
+async function doBigPush() {
+    if (!G.lastCode) { toast('Niciun cod. Du-te la CHAT și generează ceva.', 'r'); return; }
+    var fn = G.lastFile || prompt('Numele fișierului (ex: vv-beta-app.js):');
+    if (!fn) return;
+    saveGhost(fn, G.lastCode);
+    try {
+        await ghPush(G.repo, fn, G.lastCode);
+        toast('🚀 ' + fn + ' → ' + G.repo, 'g');
+        addDNA('BIG PUSH ' + fn, G.repo, true);
+        renderDeployScreen();
+    } catch(e) { toast('Eroare: ' + e.message, 'r'); }
+}
+
+async function doMirrorAll() {
+    if (!G.lastCode || !G.mirrors.length) { toast('Niciun cod sau mirror nesetat.', 'r'); return; }
+    var fn = G.lastFile || prompt('Fișierul target:');
+    if (!fn) return;
+    var ok = 0;
+    var allRepos = [G.repo].concat(G.mirrors.filter(function(r) { return r !== G.repo; }));
+    for (var i = 0; i < allRepos.length; i++) {
+        try { await ghPush(allRepos[i], fn, G.lastCode); ok++; } catch(_) {}
+    }
+    toast('🔄 Mirror: ' + ok + '/' + allRepos.length + ' repo-uri', ok === allRepos.length ? 'g' : 'o');
+    addDNA('MIRROR ALL ' + fn, allRepos.join(', '), true);
+    renderDeployScreen();
+}
+
+// ── VV GHOST ───────────────────────────────────────────────────
+function saveGhost(fileName, code) {
+    G.ghost = { fileName: fileName, code: code, ts: Date.now() };
+    lsS('nx_ghost', JSON.stringify(G.ghost));
+    updateGhostInfo();
+}
+
+function updateGhostInfo() {
+    var el = document.getElementById('ghost-info');
+    if (!el) return;
+    if (G.ghost) {
+        el.textContent = 'Backup: ' + G.ghost.fileName + ' · ' + new Date(G.ghost.ts).toLocaleString('ro-RO', {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+        el.style.color = 'rgba(255,149,0,0.6)';
+    } else {
+        el.textContent = 'Niciun backup. Fă primul push pentru a crea Ghost.';
+        el.style.color = 'rgba(255,255,255,0.2)';
+    }
+}
+
+async function doRollback() {
+    if (!G.ghost) { toast('Niciun backup disponibil.', 'r'); return; }
+    if (!confirm('Restaurezi ' + G.ghost.fileName + ' la versiunea din ' + new Date(G.ghost.ts).toLocaleString('ro-RO') + '?')) return;
+    try {
+        await ghPush(G.repo, G.ghost.fileName, G.ghost.code);
+        toast('↩ Rollback complet: ' + G.ghost.fileName, 'o');
+        addDNA('ROLLBACK ' + G.ghost.fileName, G.repo, true);
+    } catch(e) { toast('Eroare rollback: ' + e.message, 'r'); }
+}
+
+// ── VV LOGIC DNA ───────────────────────────────────────────────
+function addDNA(cmd, target, ok) {
+    G.dna.unshift({ ts: Date.now(), cmd: cmd, target: target, ok: ok });
+    if (G.dna.length > 50) G.dna = G.dna.slice(0, 50);
+    lsS('nx_dna', JSON.stringify(G.dna));
+    renderDNA();
+}
+
+function renderDNA() {
+    var el = document.getElementById('dna-list');
+    if (!el) return;
+    if (!G.dna.length) {
+        el.innerHTML = '<div style="color:rgba(255,255,255,0.2);font-size:12px;text-align:center;padding:8px;">Nicio decizie înregistrată.</div>';
+        return;
+    }
+    el.innerHTML = G.dna.slice(0, 8).map(function(e) {
+        return '<div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:12px;">'
+            + '<span style="color:rgba(255,255,255,0.2);font-family:monospace;font-size:10px;flex-shrink:0;">' + new Date(e.ts).toLocaleString('ro-RO',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}) + '</span>'
+            + '<span style="color:rgba(255,255,255,0.5);">' + (e.ok ? '✓' : '✗') + ' ' + esc(e.cmd) + '</span>'
+            + '</div>';
+    }).join('');
+}
+
+function exportDNA() {
+    var data = JSON.stringify({ version: '1.0', exported: new Date().toISOString(), entries: G.dna }, null, 2);
+    var blob = new Blob([data], { type: 'application/json' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = 'VV_Logic_DNA.json'; a.click();
+    URL.revokeObjectURL(url);
+    toast('DNA exportat ✅', 'g');
+}
+
+// ── DEPLOY SCREEN ──────────────────────────────────────────────
+function renderDeployScreen() {
+    var el = document.getElementById('deploy-repos-list');
+    if (!el || !G.gu) return;
+    var allRepos = [G.repo].concat(G.mirrors.filter(function(r) { return r !== G.repo; }));
+    el.innerHTML = allRepos.map(function(r) {
+        var isPrimary = r === G.repo;
+        return '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.05);">'
+            + '<div><span style="font-family:monospace;font-size:12px;color:rgba(255,255,255,0.6);">' + G.gu + '/' + r + '</span>'
+            + (isPrimary ? '<span style="margin-left:8px;font-size:9px;color:rgba(212,175,55,0.5);letter-spacing:1px;font-weight:700;">PRIMAR</span>' : '<span style="margin-left:8px;font-size:9px;color:rgba(10,132,255,0.5);letter-spacing:1px;font-weight:700;">MIRROR</span>')
+            + '</div>'
+            + '<span style="font-size:11px;color:rgba(52,199,89,0.5);font-weight:700;">GATA</span>'
+            + '</div>';
+    }).join('');
+    var mirrorBtn = document.getElementById('btn-mirror-all');
+    if (mirrorBtn) mirrorBtn.style.display = G.mirrors.length > 0 ? 'block' : 'none';
+}
+
 </script>
 </body>
 </html>
