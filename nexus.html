@@ -165,9 +165,9 @@ background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='htt
 .qab.scot:hover{background:rgba(10,132,255,.08);color:var(--blue)}
 
 /* SETTINGS OVERLAY */
-.so{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);z-index:10000;align-items:flex-end;justify-content:center}
-.so.open{display:flex}
-.sp{background:rgba(7,7,15,.98);border:1px solid var(--bdr);border-radius:28px 28px 0 0;padding:26px 20px calc(40px + env(safe-area-inset-bottom,0px));width:100%;max-width:700px;animation:sUp .35s cubic-bezier(.16,1,.3,1);max-height:92vh;overflow-y:auto}
+.so{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);z-index:10000;align-items:flex-end;justify-content:center;-webkit-transform:translateZ(0);transform:translateZ(0)}
+.so.open{display:flex !important}
+.sp{background:rgba(7,7,15,.98);border:1px solid var(--bdr);border-radius:28px 28px 0 0;padding:26px 20px calc(40px + env(safe-area-inset-bottom,0px));width:100%;max-width:700px;animation:sUp .35s cubic-bezier(.16,1,.3,1);max-height:92vh;overflow-y:auto;pointer-events:all;position:relative;z-index:10001}
 @keyframes sUp{from{transform:translateY(100%);opacity:0}to{transform:translateY(0);opacity:1}}
 .sh{width:36px;height:4px;background:var(--bdr);border-radius:2px;margin:0 auto 22px}
 .st{font-family:'Syne',sans-serif;font-size:17px;font-weight:900;margin-bottom:6px}
@@ -269,8 +269,13 @@ background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='htt
             <div class="sdot" id="sdot"></div>
             <div class="bic" id="scot-ind" title="VV Scot Status" style="font-size:11px;letter-spacing:.5px">🔍</div>
             <div class="bic" onclick="clrChat()" title="Reset Chat">🗑</div>
-            <div class="bic" onclick="opo()" title="Settings">⚙️</div>
+            <div class="bic" onclick="opo()" title="Settings" id="btn-settings" style="min-height:44px;min-width:44px;">⚙️</div>
         </div>
+    </div>
+    <!-- Banner setup — vizibil când nu e cheie -->
+    <div id="setup-banner" style="display:none;background:rgba(212,175,55,0.12);border-bottom:1px solid rgba(212,175,55,0.25);padding:10px 16px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;gap:10px;">
+        <span style="font-size:12px;color:rgba(212,175,55,0.8);">⚙️ Introdu cheia Gemini API pentru a activa NEXUS</span>
+        <button onclick="opo()" style="padding:8px 16px;background:rgba(212,175,55,0.2);border:1px solid rgba(212,175,55,0.35);border-radius:10px;color:#D4AF37;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;min-height:36px;font-family:inherit;">CONFIGUREAZĂ</button>
     </div>
 
     <!-- TAB BAR — 4 Zone -->
@@ -496,7 +501,14 @@ FORMAT RĂSPUNS:
     renderDNA();
     renderDeployRepos();
 
-    if(N.gk){ dot('on'); hideEmpty(); sysMsg('NEXUS God Mode online · Repo: '+N.repo+(N.scotOn?' · 🔍 VV Scot activ':'')); }
+    if(N.gk){
+        dot('on'); hideEmpty();
+        sysMsg('NEXUS God Mode online · Repo: '+N.repo+(N.scotOn?' · 🔍 VV Scot activ':''));
+    } else {
+        // Prima vizită sau fără cheie — deschidem automat Settings după 300ms
+        showBanner();
+        setTimeout(function(){ opo(); }, 300);
+    }
 
     var ta = document.getElementById('cmd-in');
     ta.addEventListener('input', function(){ this.style.height='auto'; this.style.height=Math.min(this.scrollHeight,120)+'px'; });
@@ -510,6 +522,8 @@ function lsD(k){ try{localStorage.removeItem(k);}catch(e){} }
 // ── STATUS & UI ───────────────────────────────────────────────
 function dot(s){ var d=document.getElementById('sdot'); d.className='sdot'+(s?' '+s:''); }
 function hideEmpty(){ var e=document.getElementById('empty-state'); if(e) e.style.display='none'; }
+function showBanner(){ var b=document.getElementById('setup-banner'); if(b) b.style.display='flex'; }
+function hideBanner(){ var b=document.getElementById('setup-banner'); if(b) b.style.display='none'; }
 
 function updateScotUI(){
     var ind=document.getElementById('scot-ind');
@@ -558,7 +572,7 @@ function sav(){
     lsS('nx_gk',gk); lsS('nx_gt',gt); lsS('nx_gu',gu);
     lsS('nx_repo',N.repo); lsS('nx_scot',N.scotOn?'1':'0');
     lsS('nx_mirrors',JSON.stringify(N.mirrors));
-    clo(); dot('on'); hideEmpty(); updateScotUI(); renderDeployRepos();
+    clo(); dot('on'); hideEmpty(); hideBanner(); updateScotUI(); renderDeployRepos();
     var info=' · Repo: '+N.repo+(N.scotOn?' · 🔍 Scot ON':'')+(N.mirrors.length?' · Mirror: '+N.mirrors.join(', '):'');
     sysMsg('NEXUS configurat'+info);
     toast('✅ NEXUS activat!','g');
