@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>VV NEXUS · God Mode</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne+Mono&family=Syne:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+    --bg:    #03030a;
+    --panel: #07070f;
+    --gold:  #D4AF37;
+    --gd:    rgba(212,175,55,0.12);
+    --gb:    rgba(212,175,55,0.22);
+    --blue:  #0A84FF;
+    --green: #34c759;
+    --red:   #ff3b30;
+    --ora:   #ff9500;
+    --glass: rgba(255,255,255,0.04);
+    --bdr:   rgba(255,255,255,0.07);
+    --text:  rgba(255,255,255,0.85);
+    --muted: rgba(255,255,255,0.3);
+    --dim:   rgba(255,255,255,0.12);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;overflow:hidden}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;
+background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");opacity:.4}
+
+.shell{display:flex;flex-direction:column;height:100dvh;max-width:700px;margin:0 auto;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}
+
+/* HEADER */
+.hdr{display:flex;align-items:center;justify-content:space-between;padding:11px 15px;border-bottom:1px solid var(--bdr);flex-shrink:0;background:var(--panel)}
+.logo{display:flex;align-items:center;gap:10px}
+.lmark{width:34px;height:34px;background:var(--gd);border:1px solid var(--gb);border-radius:9px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:900;font-size:12px;color:var(--gold);letter-spacing:-0.5px}
+.lname{font-family:'Syne',sans-serif;font-weight:900;font-size:14px;letter-spacing:2px}
+.lsub{font-size:9px;color:var(--muted);letter-spacing:2px}
+.hr{display:flex;align-items:center;gap:7px}
+.sdot{width:7px;height:7px;border-radius:50%;background:var(--muted);transition:all .3s}
+.sdot.on{background:var(--green);box-shadow:0 0 6px var(--green)}
+.sdot.bsy{background:var(--gold);box-shadow:0 0 6px var(--gold);animation:pulse 1s infinite}
+.sdot.err{background:var(--red);box-shadow:0 0 6px var(--red)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.bic{width:32px;height:32px;background:var(--glass);border:1px solid var(--bdr);border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;color:var(--muted);transition:all .2s}
+.bic:hover{border-color:rgba(255,255,255,.15);color:#fff}
+.bic.active{background:var(--gd);border-color:var(--gb);color:var(--gold)}
+
+/* TAB BAR (4 zone) */
+.tabbar{display:flex;background:var(--panel);border-bottom:1px solid var(--bdr);flex-shrink:0}
+.tab{flex:1;padding:10px 6px;text-align:center;cursor:pointer;font-size:10px;font-weight:700;letter-spacing:1.5px;font-family:'Syne',sans-serif;color:var(--muted);border-bottom:2px solid transparent;transition:all .2s;min-height:40px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+.tab .tab-icon{font-size:14px}
+.tab.active{color:var(--gold);border-bottom-color:var(--gold)}
+.tab:hover{color:rgba(255,255,255,.6)}
+
+/* ZONES */
+.zone{display:none;flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.zone.active{display:flex;flex-direction:column}
+.zone::-webkit-scrollbar{width:2px}
+.zone::-webkit-scrollbar-thumb{background:var(--bdr);border-radius:2px}
+
+/* ZONE 1: COMMAND (Chat) */
+#z-command{padding:12px;gap:10px}
+.msg{display:flex;flex-direction:column;gap:3px;animation:mIn .25s cubic-bezier(.16,1,.3,1) both}
+@keyframes mIn{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+.msg.user{align-items:flex-end}
+.msg.ai{align-items:flex-start}
+.msg.sys{align-items:center}
+.mwho{font-size:9px;letter-spacing:2px;font-weight:700;color:var(--muted);padding:0 4px;font-family:'Syne',sans-serif}
+.msg.user .mwho{color:rgba(212,175,55,.5)}
+.msg.ai   .mwho{color:rgba(10,132,255,.5)}
+.mbub{max-width:90%;padding:11px 14px;border-radius:15px;font-size:13px;line-height:1.65;white-space:pre-wrap;word-break:break-word}
+.msg.user .mbub{background:rgba(212,175,55,.09);border:1px solid rgba(212,175,55,.2);border-bottom-right-radius:4px}
+.msg.ai   .mbub{background:rgba(10,132,255,.07);border:1px solid rgba(10,132,255,.17);border-bottom-left-radius:4px}
+.msg.sys  .mbub{background:var(--glass);border:1px solid var(--bdr);border-radius:9px;color:var(--muted);font-size:11px;text-align:center;max-width:100%;font-family:'Syne Mono',monospace}
+.mbub code{font-family:'Syne Mono',monospace;font-size:11px;background:rgba(0,0,0,.3);padding:2px 5px;border-radius:4px;color:var(--gold)}
+.mbub pre{background:rgba(0,0,0,.35);border:1px solid var(--bdr);border-radius:9px;padding:11px;margin-top:7px;overflow-x:auto;font-family:'Syne Mono',monospace;font-size:11px;color:rgba(255,255,255,.7);white-space:pre}
+.mbub strong{color:rgba(255,255,255,.9);font-weight:500}
+
+/* SCOT BADGE */
+.scot-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;background:rgba(10,132,255,.1);border:1px solid rgba(10,132,255,.2);border-radius:20px;font-size:10px;color:rgba(10,132,255,.8);font-weight:700;letter-spacing:1px;margin-bottom:6px}
+
+/* DEPLOY CARD */
+.dc{background:rgba(52,199,89,.06);border:1px solid rgba(52,199,89,.2);border-radius:13px;padding:13px 15px;margin-top:7px;max-width:90%}
+.dc-title{font-size:9px;color:rgba(52,199,89,.6);letter-spacing:2px;font-weight:700;margin-bottom:7px;font-family:'Syne',sans-serif}
+.dc-path{font-family:'Syne Mono',monospace;font-size:10px;color:rgba(255,255,255,.5);margin-bottom:9px;padding:5px 9px;background:rgba(0,0,0,.2);border-radius:6px;word-break:break-all}
+.dc-btns{display:flex;gap:7px}
+.btn-push{flex:1;padding:10px;background:rgba(52,199,89,.14);border:1px solid rgba(52,199,89,.28);border-radius:9px;color:var(--green);font-weight:700;font-size:11px;cursor:pointer;letter-spacing:1px;font-family:'Syne',sans-serif;transition:all .2s;min-height:38px}
+.btn-push:hover{background:rgba(52,199,89,.22)}
+.btn-push:disabled{opacity:.35;pointer-events:none}
+.btn-push.mirror{background:rgba(10,132,255,.1);border-color:rgba(10,132,255,.25);color:var(--blue)}
+.btn-push.self{background:rgba(212,175,55,.1);border-color:rgba(212,175,55,.2);color:var(--gold)}
+
+/* TYPING */
+.typing{display:none;align-items:center;gap:4px;padding:10px 13px;background:rgba(10,132,255,.06);border:1px solid rgba(10,132,255,.14);border-radius:13px;border-bottom-left-radius:3px;width:fit-content;margin:0 12px 5px}
+.typing span{width:5px;height:5px;border-radius:50%;background:rgba(10,132,255,.5);animation:tdot 1.2s infinite}
+.typing span:nth-child(2){animation-delay:.2s}
+.typing span:nth-child(3){animation-delay:.4s}
+@keyframes tdot{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-4px)}}
+
+/* ZONE 2: SANDBOX */
+#z-sandbox{padding:14px;gap:10px}
+.sandbox-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.sandbox-title{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;color:var(--muted);letter-spacing:2px}
+.sandbox-file{font-family:'Syne Mono',monospace;font-size:10px;color:rgba(212,175,55,.5);padding:3px 8px;background:var(--gd);border-radius:6px;border:1px solid var(--gb)}
+.code-editor{flex:1;background:rgba(0,0,0,.4);border:1px solid var(--bdr);border-radius:14px;padding:14px;font-family:'Syne Mono',monospace;font-size:12px;color:rgba(255,255,255,.75);outline:none;resize:none;line-height:1.6;min-height:200px;-webkit-appearance:none}
+.code-editor:focus{border-color:rgba(212,175,55,.25)}
+.sandbox-actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn-sb{padding:11px 16px;border-radius:11px;font-weight:700;font-size:12px;cursor:pointer;letter-spacing:0.5px;transition:all .2s;min-height:44px;font-family:'Syne',sans-serif;flex:1}
+.btn-sb.gold{background:var(--gd);border:1px solid var(--gb);color:var(--gold)}
+.btn-sb.green{background:rgba(52,199,89,.1);border:1px solid rgba(52,199,89,.25);color:var(--green)}
+.btn-sb.blue{background:rgba(10,132,255,.1);border:1px solid rgba(10,132,255,.25);color:var(--blue)}
+.btn-sb.red{background:rgba(255,59,48,.1);border:1px solid rgba(255,59,48,.2);color:var(--red)}
+
+/* ZONE 3: VALIDATION */
+#z-validation{padding:14px;gap:12px}
+.val-section{background:var(--glass);border:1px solid var(--bdr);border-radius:14px;padding:16px}
+.val-title{font-family:'Syne',sans-serif;font-size:10px;font-weight:700;color:var(--muted);letter-spacing:2.5px;margin-bottom:12px}
+.diff-line{font-family:'Syne Mono',monospace;font-size:11px;padding:3px 8px;border-radius:4px;line-height:1.6}
+.diff-line.add{background:rgba(52,199,89,.08);color:rgba(52,199,89,.8)}
+.diff-line.rem{background:rgba(255,59,48,.08);color:rgba(255,59,48,.7)}
+.diff-line.ctx{color:rgba(255,255,255,.3)}
+.val-actions{display:flex;gap:8px}
+.btn-val{flex:1;padding:14px;border-radius:12px;font-weight:800;font-size:13px;cursor:pointer;letter-spacing:0.5px;min-height:48px;font-family:'Syne',sans-serif;transition:all .2s}
+.btn-val.approve{background:rgba(52,199,89,.12);border:1px solid rgba(52,199,89,.28);color:var(--green)}
+.btn-val.reject{background:rgba(255,59,48,.1);border:1px solid rgba(255,59,48,.2);color:var(--red)}
+
+/* ZONE 4: DEPLOY */
+#z-deploy{padding:14px;gap:12px}
+.deploy-stat{background:var(--glass);border:1px solid var(--bdr);border-radius:14px;padding:16px}
+.ds-title{font-family:'Syne',sans-serif;font-size:10px;font-weight:700;color:var(--muted);letter-spacing:2.5px;margin-bottom:14px}
+.ds-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.ds-row:last-child{border-bottom:none;padding-bottom:0}
+.ds-repo{font-family:'Syne Mono',monospace;font-size:12px;color:rgba(255,255,255,.65)}
+.ds-status{font-size:11px;font-weight:700;letter-spacing:1px}
+.ds-status.ok{color:var(--green)}
+.ds-status.pend{color:var(--muted)}
+.ds-status.err{color:var(--red)}
+.btn-big-push{width:100%;padding:18px;background:rgba(52,199,89,.12);border:1px solid rgba(52,199,89,.28);border-radius:16px;color:var(--green);font-weight:900;font-size:15px;cursor:pointer;letter-spacing:1px;font-family:'Syne',sans-serif;min-height:58px;transition:all .2s}
+.btn-big-push:hover{background:rgba(52,199,89,.2)}
+.btn-big-push:disabled{opacity:.35;pointer-events:none}
+.btn-big-push.mirror-all{background:rgba(10,132,255,.1);border-color:rgba(10,132,255,.25);color:var(--blue)}
+.dna-card{background:rgba(212,175,55,.05);border:1px solid rgba(212,175,55,.15);border-radius:14px;padding:16px}
+.dna-entry{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:12px}
+.dna-entry:last-child{border-bottom:none;padding-bottom:0}
+.dna-ts{font-family:'Syne Mono',monospace;font-size:10px;color:var(--muted);flex-shrink:0}
+.dna-cmd{color:rgba(255,255,255,.6);flex:1}
+
+/* INPUT */
+.inp-area{padding:10px 14px calc(10px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--bdr);background:var(--panel);flex-shrink:0}
+.inp-row{display:flex;gap:8px;align-items:flex-end}
+.cmd-in{flex:1;background:rgba(255,255,255,.05);border:1px solid var(--bdr);border-radius:14px;padding:12px 14px;color:#fff;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;resize:none;max-height:120px;min-height:46px;line-height:1.5;transition:border-color .2s;-webkit-appearance:none}
+.cmd-in::placeholder{color:rgba(255,255,255,.2)}
+.cmd-in:focus{border-color:rgba(212,175,55,.3)}
+.btn-send{width:46px;height:46px;background:var(--gd);border:1px solid var(--gb);border-radius:13px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;color:var(--gold);transition:all .2s;flex-shrink:0;font-weight:bold}
+.btn-send:hover{background:rgba(212,175,55,.2)}
+.btn-send:disabled{opacity:.3;pointer-events:none}
+
+/* QUICK ACTIONS */
+.qa{display:flex;gap:6px;padding:7px 14px 4px;overflow-x:auto;flex-shrink:0;scrollbar-width:none}
+.qa::-webkit-scrollbar{display:none}
+.qab{padding:6px 12px;background:var(--glass);border:1px solid var(--bdr);border-radius:8px;font-size:11px;color:var(--muted);cursor:pointer;white-space:nowrap;transition:all .2s;flex-shrink:0;min-height:32px}
+.qab:hover{border-color:rgba(255,255,255,.15);color:#fff}
+.qab.scot{border-color:rgba(10,132,255,.2);color:rgba(10,132,255,.6)}
+.qab.scot:hover{background:rgba(10,132,255,.08);color:var(--blue)}
+
+/* SETTINGS OVERLAY */
+.so{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);z-index:10000;align-items:flex-end;justify-content:center}
+.so.open{display:flex}
+.sp{background:rgba(7,7,15,.98);border:1px solid var(--bdr);border-radius:28px 28px 0 0;padding:26px 20px calc(40px + env(safe-area-inset-bottom,0px));width:100%;max-width:700px;animation:sUp .35s cubic-bezier(.16,1,.3,1);max-height:92vh;overflow-y:auto}
+@keyframes sUp{from{transform:translateY(100%);opacity:0}to{transform:translateY(0);opacity:1}}
+.sh{width:36px;height:4px;background:var(--bdr);border-radius:2px;margin:0 auto 22px}
+.st{font-family:'Syne',sans-serif;font-size:17px;font-weight:900;margin-bottom:6px}
+.ss{font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.6}
+.sec-box{display:flex;align-items:flex-start;gap:10px;padding:11px 13px;background:rgba(52,199,89,.04);border:1px solid rgba(52,199,89,.12);border-radius:12px;margin-bottom:18px;font-size:11px;color:rgba(52,199,89,.65);line-height:1.65}
+.sl{font-size:9px;color:var(--muted);letter-spacing:2.5px;font-weight:700;font-family:'Syne',sans-serif;margin-bottom:6px;display:block}
+.sl span{color:rgba(212,175,55,.5)}
+.si{width:100%;background:rgba(255,255,255,.05);border:1px solid var(--bdr);border-radius:12px;padding:12px 15px;color:#fff;font-size:13px;font-family:'Syne Mono',monospace;outline:none;-webkit-appearance:none;letter-spacing:1px;transition:border-color .2s;margin-bottom:4px}
+.si::placeholder{color:rgba(255,255,255,.15);font-family:'DM Sans',sans-serif;letter-spacing:0}
+.si:focus{border-color:rgba(212,175,55,.3)}
+.s-hint{font-size:10px;color:var(--dim);line-height:1.6;margin-bottom:14px}
+.rpills{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px}
+.rpill{padding:7px 13px;background:var(--glass);border:1px solid var(--bdr);border-radius:20px;font-size:11px;color:var(--muted);cursor:pointer;transition:all .2s;font-family:'Syne Mono',monospace}
+.rpill.on{background:var(--gd);border-color:var(--gb);color:var(--gold)}
+.rpill.mirror{border-color:rgba(10,132,255,.2);color:rgba(10,132,255,.5)}
+.rpill.mirror.on{background:rgba(10,132,255,.1);border-color:rgba(10,132,255,.3);color:var(--blue)}
+.btn-sv{width:100%;padding:16px;background:rgba(255,255,255,.93);color:#000;border:none;border-radius:14px;font-family:'Syne',sans-serif;font-weight:800;font-size:14px;letter-spacing:1px;cursor:pointer;min-height:52px;transition:all .2s;margin-top:4px}
+.btn-sv:hover{background:#fff}
+.btn-clr{width:100%;padding:12px;background:transparent;color:rgba(255,59,48,.5);border:1px solid rgba(255,59,48,.15);border-radius:12px;font-size:12px;cursor:pointer;margin-top:8px;min-height:44px;transition:all .2s}
+.btn-clr:hover{border-color:rgba(255,59,48,.3);color:var(--red)}
+
+/* TOAST */
+.nxt{position:fixed;bottom:calc(80px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);z-index:99999;padding:11px 20px;border-radius:14px;font-size:12px;font-weight:600;white-space:nowrap;max-width:90vw;text-align:center;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);animation:tIn .3s cubic-bezier(.16,1,.3,1)}
+@keyframes tIn{from{opacity:0;transform:translateX(-50%) translateY(8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+.nxt.g{background:rgba(52,199,89,.15);border:1px solid rgba(52,199,89,.3);color:var(--green)}
+.nxt.r{background:rgba(255,59,48,.15);border:1px solid rgba(255,59,48,.3);color:var(--red)}
+.nxt.b{background:rgba(10,132,255,.15);border:1px solid rgba(10,132,255,.3);color:var(--blue)}
+.nxt.o{background:rgba(212,175,55,.15);border:1px solid rgba(212,175,55,.3);color:var(--gold)}
+
+/* EMPTY STATE */
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;padding:30px 20px;text-align:center;gap:12px}
+.empty-logo{width:56px;height:56px;background:var(--gd);border:1px solid var(--gb);border-radius:16px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:900;font-size:18px;color:var(--gold)}
+.empty-title{font-family:'Syne',sans-serif;font-weight:900;font-size:19px}
+.empty-text{font-size:13px;color:var(--muted);line-height:1.75;max-width:300px}
+.btn-setup{padding:13px 24px;background:var(--gd);border:1px solid var(--gb);border-radius:14px;color:var(--gold);font-weight:700;font-size:13px;cursor:pointer;letter-spacing:1px;font-family:'Syne',sans-serif;min-height:44px;transition:all .2s}
+.btn-setup:hover{background:rgba(212,175,55,.2)}
+</style>
+</head>
+<body>
+
+<!-- SETTINGS -->
+<div class="so" id="so" onclick="if(event.target===this)clo()">
+<div class="sp">
+    <div class="sh"></div>
+    <div class="st">⚙️ NEXUS Config</div>
+    <div class="ss">Cheile tale rămân EXCLUSIV în browserul acestui dispozitiv. Protocol Aegis activ.</div>
+    <div class="sec-box">🔒 <span>Toate cheile trăiesc în <strong>localStorage</strong> pe acest dispozitiv. Ștergerea browserului le șterge. Nu sunt trimise nicăieri.</span></div>
+
+    <label class="sl" for="gk">GEMINI API KEY <span>*</span></label>
+    <input type="password" id="gk" class="si" placeholder="AIzaSy..." autocomplete="off" autocorrect="off" spellcheck="false">
+    <div class="s-hint">aistudio.google.com → Get API Key → Create (gratuit). Activează <strong style="color:rgba(255,255,255,.4)">Grounded Search</strong> dacă vrei VV Scot live.</div>
+
+    <label class="sl" for="gt">GITHUB TOKEN <span>*</span></label>
+    <input type="password" id="gt" class="si" placeholder="ghp_..." autocomplete="off" autocorrect="off" spellcheck="false">
+    <div class="s-hint">Settings → Developer settings → Fine-grained tokens → Contents: Read &amp; Write pe toate repo-urile VV.</div>
+
+    <label class="sl" for="gu">GITHUB USERNAME</label>
+    <input type="text" id="gu" class="si" placeholder="vv-technologies" autocomplete="off">
+
+    <label class="sl">REPO PRIMAR (target principal)</label>
+    <div class="rpills" id="rp">
+        <div class="rpill on"  onclick="sr('ceo.html',this)">ceo.html</div>
+        <div class="rpill"     onclick="sr('vv-team',this)">vv-team</div>
+        <div class="rpill"     onclick="sr('vv-technologies',this)">vv-technologies</div>
+        <div class="rpill"     onclick="sr('vvhi',this)">vvhi</div>
+    </div>
+
+    <label class="sl" style="margin-top:12px">MIRROR REPOS (push simultan, selectează mai multe)</label>
+    <div class="rpills" id="mp">
+        <div class="rpill mirror" onclick="tm(this,'ceo.html')">ceo.html</div>
+        <div class="rpill mirror" onclick="tm(this,'vv-team')">vv-team</div>
+        <div class="rpill mirror" onclick="tm(this,'vv-technologies')">vv-technologies</div>
+        <div class="rpill mirror" onclick="tm(this,'vvhi')">vvhi</div>
+    </div>
+    <div class="s-hint">Selectează repo-urile pentru Mirror Push simultan. Lasă neselectate pentru push normal.</div>
+
+    <label class="sl">VV SCOT — GOOGLE SEARCH</label>
+    <label style="display:flex;align-items:center;gap:10px;padding:12px 14px;background:rgba(10,132,255,.05);border:1px solid rgba(10,132,255,.12);border-radius:12px;margin-bottom:4px;cursor:pointer">
+        <input type="checkbox" id="scot-on" style="accent-color:var(--blue);width:16px;height:16px;flex-shrink:0">
+        <span style="font-size:12px;color:rgba(255,255,255,.5);line-height:1.6">Activează VV Scot (Google Search Grounding). Fiecare comandă va fi validată cu date reale de pe web înainte de procesare.</span>
+    </label>
+    <div class="s-hint" style="margin-bottom:16px">Necesită Gemini 1.5 Pro sau 1.5 Flash cu Search activat în AI Studio.</div>
+
+    <button class="btn-sv" onclick="sav()">SALVEAZĂ ȘI ACTIVEAZĂ NEXUS</button>
+    <button class="btn-clr" onclick="clr()">Șterge toate cheile — Aegis Reset</button>
+</div>
+</div>
+
+<!-- SHELL -->
+<div class="shell">
+
+    <!-- HEADER -->
+    <div class="hdr">
+        <div class="logo">
+            <div class="lmark">VV</div>
+            <div><div class="lname">NEXUS</div><div class="lsub">GOD MODE</div></div>
+        </div>
+        <div class="hr">
+            <div class="sdot" id="sdot"></div>
+            <div class="bic" id="scot-ind" title="VV Scot Status" style="font-size:11px;letter-spacing:.5px">🔍</div>
+            <div class="bic" onclick="clrChat()" title="Reset Chat">🗑</div>
+            <div class="bic" onclick="opo()" title="Settings">⚙️</div>
+        </div>
+    </div>
+
+    <!-- TAB BAR — 4 Zone -->
+    <div class="tabbar">
+        <div class="tab active" id="tab-command"    onclick="swTab('command')">
+            <span class="tab-icon">⚡</span>COMMAND
+        </div>
+        <div class="tab" id="tab-sandbox"   onclick="swTab('sandbox')">
+            <span class="tab-icon">🛠</span>SANDBOX
+        </div>
+        <div class="tab" id="tab-validation" onclick="swTab('validation')">
+            <span class="tab-icon">🔬</span>VALIDATE
+        </div>
+        <div class="tab" id="tab-deploy"    onclick="swTab('deploy')">
+            <span class="tab-icon">🚀</span>DEPLOY
+        </div>
+    </div>
+
+    <!-- ── ZONE 1: COMMAND ── -->
+    <div class="zone active" id="z-command">
+        <div class="qa" id="qa">
+            <div class="qab scot" onclick="qc('🔍 VV Scot: verifică pe Google care sunt cele mai populare aplicații de urban intelligence din Europa și cum se compară cu VV.')">🔍 Scot Research</div>
+            <div class="qab" onclick="qc('Analizează codul VV Beta și identifică toate bug-urile potențiale sau locurile unde performanța pe iPhone X poate fi îmbunătățită.')">🔍 Bug Scan</div>
+            <div class="qab" onclick="qc('Ce feature nou ar adăuga cea mai multă valoare pentru primii 50 de utilizatori din București? Gândește-te la retenție.')">💡 Next Feature</div>
+            <div class="qab" onclick="qc('Generează rezumatul tehnic complet al arhitecturii VV actuale, cu toate sistemele implementate.')">📋 Arhitectură</div>
+            <div class="qab" onclick="qc('Care sunt pașii concreți pentru lansarea VV Beta la primii 20 de utilizatori din București această săptămână?')">🚀 Launch Plan</div>
+            <div class="qab" onclick="qc('Modifică-ți propriul cod (nexus.html) și adaugă un nou buton rapid în bara de Quick Actions cu textul pe care urmează să-l specific.')">🔄 Self-Evolve</div>
+        </div>
+
+        <!-- Chat messages -->
+        <div style="flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px;-webkit-overflow-scrolling:touch" id="chat">
+            <!-- Empty state -->
+            <div class="empty" id="empty-state">
+                <div class="empty-logo">VV</div>
+                <div class="empty-title">NEXUS God Mode</div>
+                <div class="empty-text">
+                    Asistentul tău AI cu mâini.<br>
+                    Comandă în română.<br>
+                    Cod în Sandbox. Deploy pe GitHub.
+                </div>
+                <button class="btn-setup" onclick="opo()">⚙️ CONFIGUREAZĂ</button>
+            </div>
+        </div>
+
+        <!-- Typing -->
+        <div class="typing" id="typing"><span></span><span></span><span></span></div>
+    </div>
+
+    <!-- ── ZONE 2: SANDBOX ── -->
+    <div class="zone" id="z-sandbox">
+        <div style="padding:14px;display:flex;flex-direction:column;gap:10px;flex:1">
+            <div class="sandbox-header">
+                <div class="sandbox-title">ATELIERUL DE COD</div>
+                <div class="sandbox-file" id="sb-file">—</div>
+            </div>
+            <textarea class="code-editor" id="code-editor"
+                placeholder="Codul generat de NEXUS apare aici. Poți edita manual înainte de deploy."
+                spellcheck="false" autocorrect="off" autocapitalize="off"></textarea>
+            <div class="sandbox-actions">
+                <button class="btn-sb gold" onclick="sendToValidation()">🔬 VALIDEAZĂ</button>
+                <button class="btn-sb green" onclick="pushFromSandbox()">🚀 PUSH DIRECT</button>
+                <button class="btn-sb blue" onclick="copyCode()">📋 COPIAZĂ</button>
+                <button class="btn-sb red" onclick="clearSandbox()">✕ CURĂȚĂ</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── ZONE 3: VALIDATION ── -->
+    <div class="zone" id="z-validation">
+        <div style="padding:14px;display:flex;flex-direction:column;gap:12px;flex:1">
+            <div class="val-section">
+                <div class="val-title">PREVIEW MODIFICĂRI</div>
+                <div id="diff-view" style="font-size:12px;line-height:1.7">
+                    <div style="color:var(--muted);font-size:12px;text-align:center;padding:20px">Niciun cod în validare. Trimite din Sandbox.</div>
+                </div>
+            </div>
+            <div class="val-section">
+                <div class="val-title">VV GHOST — BACKUP ÎNAINTE DE DEPLOY</div>
+                <div id="ghost-info" style="font-size:12px;color:var(--muted);margin-bottom:12px">Niciun backup creat încă.</div>
+                <button style="width:100%;padding:11px;background:rgba(255,149,0,.1);border:1px solid rgba(255,149,0,.2);border-radius:10px;color:var(--ora);font-size:12px;font-weight:700;cursor:pointer;min-height:44px" onclick="restoreGhost()">
+                    ↩ RESTAUREAZĂ VERSIUNEA ANTERIOARĂ
+                </button>
+            </div>
+            <div class="val-actions">
+                <button class="btn-val approve" onclick="approveAndDeploy()">✓ APROBĂ &amp; DEPLOY</button>
+                <button class="btn-val reject"  onclick="rejectCode()">✕ RESPINGE</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── ZONE 4: DEPLOY ── -->
+    <div class="zone" id="z-deploy">
+        <div style="padding:14px;display:flex;flex-direction:column;gap:12px;flex:1">
+
+            <div class="deploy-stat">
+                <div class="ds-title">STATUS REPO-URI</div>
+                <div id="deploy-repos">
+                    <div style="color:var(--muted);font-size:12px;text-align:center;padding:16px">Configurează repo-urile în Settings.</div>
+                </div>
+            </div>
+
+            <button class="btn-big-push" id="btn-mirror-push" onclick="mirrorPush()">
+                ⬆ PUSH PE REPO PRIMAR
+            </button>
+            <button class="btn-big-push mirror-all" id="btn-mirror-all" onclick="mirrorPushAll()" style="display:none">
+                🔄 MIRROR PUSH — TOATE REPO-URILE SELECTATE
+            </button>
+
+            <div class="dna-card">
+                <div class="val-title" style="margin-bottom:12px">🧬 VV_LOGIC_DNA — MEMORIA SISTEMULUI</div>
+                <div id="dna-list" style="display:flex;flex-direction:column;gap:4px">
+                    <div style="color:var(--muted);font-size:12px;text-align:center;padding:10px">Nicio decizie înregistrată.</div>
+                </div>
+                <button style="width:100%;margin-top:12px;padding:10px;background:rgba(212,175,55,.06);border:1px solid rgba(212,175,55,.15);border-radius:10px;color:rgba(212,175,55,.5);font-size:11px;cursor:pointer;min-height:40px" onclick="exportDNA()">
+                    📥 EXPORTĂ VV_Logic_DNA.json
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- INPUT (vizibil doar în Command zone) -->
+    <div class="inp-area" id="inp-area">
+        <div class="inp-row">
+            <textarea class="cmd-in" id="cmd-in" placeholder="Dă o comandă lui NEXUS..." rows="1"
+                autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
+            <button class="btn-send" id="btn-send" onclick="send()">↑</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// ================================================================
+// VV NEXUS GOD MODE
+// Motor: Gemini 1.5 Flash + Search Grounding (VV Scot)
+// Mâini: GitHub API (Push, Mirror, Self-Evolution)
+// Memorie: DNA + Ghost Rollback (localStorage)
+// ================================================================
+
+var N = {
+    gk:'', gt:'', gu:'',
+    repo:'ceo.html',
+    mirrors:[],
+    scotOn:false,
+    msgs:[],
+    busy:false,
+    lastCode:null,
+    lastFile:null,
+    dna:[],
+    ghost:null
+};
+
+// Context VV complet
+var CTX = `Ești VV NEXUS — asistentul AI personal al Arhitectului VV Technologies.
+
+PROIECT VV — ARHITECTURĂ COMPLETĂ:
+VV Beta: aplicație web P2P urban intelligence, GitHub Pages (vv-technologies.github.io/ceo.html)
+VV TEAM: panou CEO (vv-technologies.github.io/vv-team)
+Stack: HTML + CSS + Vanilla JS + Firebase Firestore/Auth (project: vv-ep-beta)
+Total: ~9.700 linii în 13 fișiere
+
+FIȘIERE PRINCIPALE:
+• index.html — HTML VV Beta
+• vv-beta-app.js — logica JS VV Beta (2.500+ linii)
+• vv-beta-style.css — stiluri VV Beta
+• vv-team.html — HTML panou CEO
+• vv-team-logic.js — logica CEO + VVhi integrat (946 linii)
+• vv-team-style.css — stiluri CEO
+• firestore.rules — securitate Firestore
+• vv-hybrid-univers-final.html — site marketing
+
+DESIGN SYSTEM VV:
+• BG: #050507 | Gold: #D4AF37 | Green: #34c759 | Blue: #0A84FF | Red: #ff3b30
+• Glassmorphism dark, backdrop-filter:blur(20px+)
+• Border: rgba(255,255,255,0.08) | Glass bg: rgba(255,255,255,0.04)
+• Font: -apple-system (system font iOS)
+• iPhone X: env(safe-area-inset-*), min-height:44px pe interactive elements
+
+REGULI CRITICE:
+• NU alert() — folosește showCEOToast() sau showToast()
+• Firebase: .set({},{merge:true}) NU .update() (evită "No document")
+• Inbox: NU where()+orderBy() fără index — sortează client-side
+• switchSection() — O SINGURĂ definiție
+• VVhi.logApproval() și VVhi.logRejection() după fiecare decizie CEO
+• GDPR: toate imaginile -webkit-user-select:none
+
+SISTEME IMPLEMENTATE:
+• Remote Config (system/app_config): versioning, maintenance, push updates
+• GC la login CEO: șterge poze > 5 zile (GDPR)
+• Intelligence Inbox: rejection_dsa, warning, ban_notice, reward, support_resolved
+• Talent Pool CRM: new→contacted→hired/rejected + note CEO
+• Harta CEO (Leaflet 1.9.4): markeri live, counter azi
+• VVhi Shadow Mode: dataset AI, GDPR compliant, fire-and-forget async
+• DSA Reject: 6 motive, notificare inbox auto
+• Careers: manifest "filtrul de adevăr al lumii", formular GDPR
+
+SELF-EVOLUTION:
+Când Arhitectul cere modificarea lui nexus.html, generează codul modificat complet
+și marchează cu [DEPLOY:nexus.html] pentru Self-Evolution Push.
+
+SEARCH GROUNDING (VV Scot):
+Când prefixul 🔍 VV Scot apare în comandă, încearcă să folosești date reale.
+Marchează sursele ca [Scot: sursa] în răspuns.
+
+FORMAT RĂSPUNS:
+• Specifică fișierul țintă: "Adaugă în vv-beta-app.js"
+• Marchează [DEPLOY:filename.js] la final pentru GitHub Bridge
+• Răspunde MEREU în română
+• Cod funcțional din prima`;
+
+// ── INIT ──────────────────────────────────────────────────────
+(function(){
+    N.gk   = ls('nx_gk')||'';
+    N.gt   = ls('nx_gt')||'';
+    N.gu   = ls('nx_gu')||'';
+    N.repo = ls('nx_repo')||'ceo.html';
+    N.scotOn = ls('nx_scot')==='1';
+    try { N.dna = JSON.parse(ls('nx_dna')||'[]'); } catch(_){ N.dna=[]; }
+    try { var sm = JSON.parse(ls('nx_mirrors')||'[]'); N.mirrors = Array.isArray(sm)?sm:[]; } catch(_){ N.mirrors=[]; }
+
+    syncPills();
+    syncMirrorPills();
+    updateScotUI();
+    renderDNA();
+    renderDeployRepos();
+
+    if(N.gk){ dot('on'); hideEmpty(); sysMsg('NEXUS God Mode online · Repo: '+N.repo+(N.scotOn?' · 🔍 VV Scot activ':'')); }
+
+    var ta = document.getElementById('cmd-in');
+    ta.addEventListener('input', function(){ this.style.height='auto'; this.style.height=Math.min(this.scrollHeight,120)+'px'; });
+    ta.addEventListener('keydown', function(e){ if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); send(); } });
+})();
+
+function ls(k){ try{return localStorage.getItem(k);}catch(e){return null;} }
+function lsS(k,v){ try{localStorage.setItem(k,v);}catch(e){} }
+function lsD(k){ try{localStorage.removeItem(k);}catch(e){} }
+
+// ── STATUS & UI ───────────────────────────────────────────────
+function dot(s){ var d=document.getElementById('sdot'); d.className='sdot'+(s?' '+s:''); }
+function hideEmpty(){ var e=document.getElementById('empty-state'); if(e) e.style.display='none'; }
+
+function updateScotUI(){
+    var ind=document.getElementById('scot-ind');
+    if(ind){ ind.className='bic'+(N.scotOn?' active':''); ind.title='VV Scot: '+(N.scotOn?'ACTIV':'INACTIV'); }
+}
+
+// ── TAB SWITCHING ─────────────────────────────────────────────
+function swTab(id){
+    ['command','sandbox','validation','deploy'].forEach(function(t){
+        document.getElementById('tab-'+t).classList.toggle('active',t===id);
+        document.getElementById('z-'+t).classList.toggle('active',t===id);
+    });
+    var inp = document.getElementById('inp-area');
+    inp.style.display = id==='command' ? 'block' : 'none';
+}
+
+// ── SETTINGS ─────────────────────────────────────────────────
+function opo(){ document.getElementById('so').classList.add('open'); populateSett(); }
+function clo(){ document.getElementById('so').classList.remove('open'); }
+
+function populateSett(){
+    if(N.gk)  document.getElementById('gk').value=N.gk;
+    if(N.gt)  document.getElementById('gt').value=N.gt;
+    if(N.gu)  document.getElementById('gu').value=N.gu;
+    document.getElementById('scot-on').checked=N.scotOn;
+    syncPills(); syncMirrorPills();
+}
+
+function sr(name,el){ document.querySelectorAll('#rp .rpill').forEach(function(p){p.classList.remove('on');}); el.classList.add('on'); N.repo=name; }
+function tm(el,name){
+    el.classList.toggle('on');
+    var idx=N.mirrors.indexOf(name);
+    if(idx>-1) N.mirrors.splice(idx,1);
+    else N.mirrors.push(name);
+}
+function syncPills(){ document.querySelectorAll('#rp .rpill').forEach(function(p){p.classList.toggle('on',p.textContent.trim()===N.repo);}); }
+function syncMirrorPills(){ document.querySelectorAll('#mp .rpill').forEach(function(p){p.classList.toggle('on',N.mirrors.includes(p.textContent.trim()));}); }
+
+function sav(){
+    var gk=document.getElementById('gk').value.trim();
+    var gt=document.getElementById('gt').value.trim();
+    var gu=document.getElementById('gu').value.trim();
+    if(!gk){toast('Cheia Gemini e obligatorie.','r');return;}
+    N.gk=gk; N.gt=gt; N.gu=gu;
+    N.scotOn=document.getElementById('scot-on').checked;
+    lsS('nx_gk',gk); lsS('nx_gt',gt); lsS('nx_gu',gu);
+    lsS('nx_repo',N.repo); lsS('nx_scot',N.scotOn?'1':'0');
+    lsS('nx_mirrors',JSON.stringify(N.mirrors));
+    clo(); dot('on'); hideEmpty(); updateScotUI(); renderDeployRepos();
+    var info=' · Repo: '+N.repo+(N.scotOn?' · 🔍 Scot ON':'')+(N.mirrors.length?' · Mirror: '+N.mirrors.join(', '):'');
+    sysMsg('NEXUS configurat'+info);
+    toast('✅ NEXUS activat!','g');
+}
+
+function clr(){
+    if(!confirm('Ștergi toate cheile? (Aegis Reset)')) return;
+    ['nx_gk','nx_gt','nx_gu','nx_repo','nx_scot','nx_mirrors'].forEach(lsD);
+    N.gk=N.gt=N.gu=''; N.scotOn=false; N.mirrors=[];
+    ['gk','gt','gu'].forEach(function(id){document.getElementById(id).value='';});
+    document.getElementById('scot-on').checked=false;
+    clo(); dot(''); updateScotUI();
+    toast('Aegis Reset complet.','b');
+}
+
+// ── SEND COMMAND ──────────────────────────────────────────────
+async function send(){
+    if(N.busy) return;
+    var ta=document.getElementById('cmd-in');
+    var txt=ta.value.trim();
+    if(!txt) return;
+    if(!N.gk){opo();toast('Configurează cheia Gemini.','o');return;}
+    addMsg('user',txt); ta.value=''; ta.style.height='auto';
+    hideEmpty();
+    N.msgs.push({role:'user',parts:[{text:txt}]});
+    await callGemini();
+}
+
+function qc(text){ document.getElementById('cmd-in').value=text; send(); }
+
+// ── GEMINI API + VV SCOT ──────────────────────────────────────
+async function callGemini(){
+    N.busy=true; dot('bsy'); showTyp(true);
+    document.getElementById('btn-send').disabled=true;
+
+    var contents=[
+        {role:'user',  parts:[{text:CTX+'\n\n---\nSESIUNE DE LUCRU:'}]},
+        {role:'model', parts:[{text:'Am înțeles contextul VV complet. Sunt NEXUS God Mode, gata de comenzi. Știu arhitectura, regulile de cod și toate sistemele. Aștept.'}]}
+    ];
+    N.msgs.forEach(function(m){contents.push(m);});
+
+    // Construim request-ul Gemini
+    var reqBody = {
+        contents: contents,
+        generationConfig: { temperature:0.7, maxOutputTokens:8192 },
+        safetySettings:[
+            {category:'HARM_CATEGORY_HARASSMENT',        threshold:'BLOCK_NONE'},
+            {category:'HARM_CATEGORY_HATE_SPEECH',       threshold:'BLOCK_NONE'},
+            {category:'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold:'BLOCK_NONE'},
+            {category:'HARM_CATEGORY_DANGEROUS_CONTENT', threshold:'BLOCK_NONE'}
+        ]
+    };
+
+    // VV Scot — activăm Search Grounding dacă e on
+    if(N.scotOn){
+        reqBody.tools = [{ googleSearch:{} }];
+    }
+
+    try {
+        var model = N.scotOn ? 'gemini-1.5-pro-latest' : 'gemini-1.5-flash';
+        var resp = await fetch(
+            'https://generativelanguage.googleapis.com/v1beta/models/'+model+':generateContent?key='+N.gk,
+            { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(reqBody) }
+        );
+
+        if(!resp.ok){
+            var e=await resp.json().catch(function(){return{};});
+            var m=(e.error&&e.error.message)||('HTTP '+resp.status);
+            if(resp.status===400) m='Cheie API invalidă — verifică Settings ⚙️';
+            if(resp.status===429) m='Limită Gemini depășită. Încearcă în câteva minute.';
+            if(resp.status===403) m='Fără acces. Generează cheie nouă din AI Studio.';
+            throw new Error(m);
+        }
+
+        var data=await resp.json();
+        var txt=data.candidates?.[0]?.content?.parts?.[0]?.text;
+        if(!txt) throw new Error('Răspuns gol de la Gemini.');
+
+        // Verificăm dacă Scot a folosit search
+        var usedSearch = data.candidates?.[0]?.groundingMetadata?.searchEntryPoint !== undefined;
+
+        N.msgs.push({role:'model',parts:[{text:txt}]});
+        showTyp(false);
+        processReply(txt, usedSearch);
+
+    } catch(err){
+        showTyp(false);
+        addMsg('ai','⚠️ '+err.message);
+        dot('err');
+        setTimeout(function(){if(N.gk)dot('on');},3000);
+    } finally {
+        N.busy=false;
+        document.getElementById('btn-send').disabled=false;
+    }
+}
+
+// ── PROCESS REPLY ─────────────────────────────────────────────
+function processReply(text, usedSearch){
+    var dm=text.match(/\[DEPLOY:\s*([^\]]+)\]/);
+    var fn=dm?dm[1].trim():null;
+
+    var codeRx=/```(?:\w+)?\n([\s\S]*?)```/g;
+    var codes=[],m;
+    while((m=codeRx.exec(text))!==null) codes.push(m[1]);
+
+    if(codes.length){
+        N.lastCode=codes[codes.length-1];
+        N.lastFile=fn||guessFn(text);
+        // Trimitem automat în Sandbox
+        document.getElementById('code-editor').value=N.lastCode;
+        document.getElementById('sb-file').textContent=N.lastFile||'cod.js';
+    }
+
+    addMsg('ai', text, fn, codes.length>0, usedSearch);
+    dot('on');
+
+    // Salvăm în DNA
+    var lastCmd=N.msgs.length>=2?N.msgs[N.msgs.length-2].parts[0].text:'';
+    addDNA(lastCmd, fn||'—', codes.length>0);
+}
+
+function guessFn(text){
+    var m=text.match(/(?:în|în fișierul|adaugă în|modifică)\s+([a-z\-]+\.(?:js|html|css))/i);
+    return m?m[1]:null;
+}
+
+// ── MESSAGES ─────────────────────────────────────────────────
+function addMsg(role, text, deployFn, hasCode, usedSearch){
+    var chat=document.getElementById('chat');
+
+    if(role==='sys'){
+        var d=document.createElement('div');
+        d.className='msg sys';
+        d.innerHTML='<div class="mbub">'+esc(text)+'</div>';
+        chat.appendChild(d); scrB(); return;
+    }
+
+    var w=document.createElement('div');
+    w.className='msg '+role;
+    w.innerHTML='<div class="mwho">'+(role==='user'?'ARHITECT':'NEXUS')+'</div>';
+
+    if(usedSearch){
+        var sb=document.createElement('div');
+        sb.className='scot-badge';
+        sb.innerHTML='🔍 VV SCOT — date live';
+        w.appendChild(sb);
+    }
+
+    var b=document.createElement('div');
+    b.className='mbub';
+    b.innerHTML=fmt(text);
+    w.appendChild(b);
+
+    if(hasCode && N.gt && N.gu){
+        var fn=deployFn||N.lastFile||'fișier.js';
+        var dc=document.createElement('div');
+        dc.className='dc';
+        var mirrorBtns='';
+        if(N.mirrors.length>0){
+            mirrorBtns='<button class="btn-push mirror" onclick="dplMirror(\''+fn+'\',this)">🔄 MIRROR PUSH ('+N.mirrors.length+')</button>';
+        }
+        var isSelf=(fn==='nexus.html');
+        dc.innerHTML='<div class="dc-title">🚀 GITHUB BRIDGE</div>'
+            +'<div class="dc-path">→ '+N.gu+'/'+N.repo+'/'+fn+'</div>'
+            +'<div class="dc-btns">'
+            +'<button class="btn-push'+(isSelf?' self':'')" onclick="dpl(\''+fn+'\',this)">'+(isSelf?'🔄 SELF-EVOLVE':'⬆ PUSH')+'</button>'
+            +(mirrorBtns)
+            +'</div>';
+        w.appendChild(dc);
+    }
+
+    chat.appendChild(w); scrB();
+}
+
+function sysMsg(text){ addMsg('sys',text); }
+
+function fmt(t){
+    var h=esc(t);
+    h=h.replace(/```(?:\w+)?\n([\s\S]*?)```/g,function(_,c){return '<pre>'+c+'</pre>';});
+    h=h.replace(/`([^`]+)`/g,'<code>$1</code>');
+    h=h.replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>');
+    h=h.replace(/\n/g,'<br>');
+    return h;
+}
+function esc(t){ return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// ── GITHUB PUSH ───────────────────────────────────────────────
+async function ghPush(repoName, fileName, code, commitMsg){
+    var url='https://api.github.com/repos/'+N.gu+'/'+repoName+'/contents/'+fileName;
+    var sha=null;
+    try{
+        var gr=await fetch(url,{headers:{'Authorization':'Bearer '+N.gt,'Accept':'application/vnd.github+json','User-Agent':N.gu+'-nexus'}});
+        if(gr.ok){var fd=await gr.json();sha=fd.sha;}
+    }catch(_){}
+
+    var body={message:commitMsg||('VV NEXUS · '+fileName+' · '+new Date().toLocaleString('ro-RO')),content:btoa(unescape(encodeURIComponent(code)))};
+    if(sha) body.sha=sha;
+
+    var pr=await fetch(url,{method:'PUT',headers:{'Authorization':'Bearer '+N.gt,'Accept':'application/vnd.github+json','Content-Type':'application/json','User-Agent':N.gu+'-nexus'},body:JSON.stringify(body)});
+    if(!pr.ok){
+        var ej=await pr.json().catch(function(){return{};});
+        var em=ej.message||'HTTP '+pr.status;
+        if(em.includes('Bad credentials')) em='Token GitHub invalid.';
+        if(em.includes('Not Found'))       em='Repo "'+repoName+'" negăsit sau token fără acces.';
+        throw new Error(em);
+    }
+    return true;
+}
+
+async function dpl(fileName, btn){
+    if(!N.lastCode){toast('Niciun cod disponibil.','r');return;}
+    if(!N.gt||!N.gu){opo();toast('Configurează GitHub.','o');return;}
+    btn.disabled=true; btn.textContent='SE TRIMITE...';
+    // Ghost backup
+    saveGhost(fileName, N.lastCode);
+    try{
+        await ghPush(N.repo, fileName, N.lastCode);
+        btn.textContent='✓ OK!'; btn.style.color='var(--green)';
+        toast('🚀 '+fileName+' → '+N.repo,'g');
+        sysMsg('✓ Deploy: '+fileName+' → '+N.gu+'/'+N.repo);
+        addDNA('DEPLOY '+fileName, N.repo, true);
+    }catch(e){
+        btn.disabled=false; btn.textContent='⬆ PUSH';
+        toast('Eroare: '+e.message,'r');
+    }
+}
+
+async function dplMirror(fileName, btn){
+    if(!N.lastCode||!N.mirrors.length){toast('Niciun mirror configurat.','r');return;}
+    btn.disabled=true; btn.textContent='MIRROR...';
+    var ok=0, fail=[];
+    for(var i=0;i<N.mirrors.length;i++){
+        try{ await ghPush(N.mirrors[i], fileName, N.lastCode); ok++; }
+        catch(e){ fail.push(N.mirrors[i]+': '+e.message); }
+    }
+    btn.textContent='🔄 MIRROR ('+ok+'/'+N.mirrors.length+')';
+    if(fail.length) toast('Parțial: '+fail[0],'o');
+    else{ toast('🔄 Mirror complet — '+ok+' repo-uri','b'); addDNA('MIRROR '+fileName, N.mirrors.join(', '), true); }
+}
+
+// ── SANDBOX ACTIONS ───────────────────────────────────────────
+function sendToValidation(){
+    var code=document.getElementById('code-editor').value.trim();
+    if(!code){toast('Sandboxul e gol.','r');return;}
+    N.lastCode=code;
+    renderDiff(code);
+    swTab('validation');
+    toast('Cod trimis la validare.','b');
+}
+
+function pushFromSandbox(){
+    var code=document.getElementById('code-editor').value.trim();
+    if(!code){toast('Sandboxul e gol.','r');return;}
+    N.lastCode=code;
+    var fn=document.getElementById('sb-file').textContent;
+    if(!fn||fn==='—') fn=prompt('Numele fișierului (ex: vv-beta-app.js):');
+    if(!fn) return;
+    N.lastFile=fn;
+    saveGhost(fn, code);
+    ghPush(N.repo, fn, code).then(function(){
+        toast('🚀 '+fn+' deploiat!','g');
+        sysMsg('✓ Sandbox push: '+fn+' → '+N.repo);
+        addDNA('SANDBOX PUSH '+fn, N.repo, true);
+    }).catch(function(e){ toast('Eroare: '+e.message,'r'); });
+}
+
+function copyCode(){
+    var code=document.getElementById('code-editor').value;
+    if(!code){toast('Nimic de copiat.','r');return;}
+    navigator.clipboard.writeText(code).then(function(){toast('Cod copiat.','g');}).catch(function(){toast('Copy manual (select all).','o');});
+}
+
+function clearSandbox(){
+    document.getElementById('code-editor').value='';
+    document.getElementById('sb-file').textContent='—';
+    N.lastCode=null; N.lastFile=null;
+    toast('Sandbox curățat.','b');
+}
+
+// ── VALIDATION ────────────────────────────────────────────────
+function renderDiff(code){
+    var dv=document.getElementById('diff-view');
+    var lines=code.split('\n').slice(0,30);
+    dv.innerHTML=lines.map(function(l,i){
+        return '<div class="diff-line add">+ '+esc(l)+'</div>';
+    }).join('')+(code.split('\n').length>30?'<div class="diff-line ctx">... ('+(code.split('\n').length-30)+' linii în plus)</div>':'');
+}
+
+function approveAndDeploy(){
+    if(!N.lastCode){toast('Niciun cod de aprobat.','r');return;}
+    var fn=N.lastFile||prompt('Fișierul target:');
+    if(!fn) return;
+    saveGhost(fn, N.lastCode);
+    ghPush(N.repo, fn, N.lastCode).then(function(){
+        toast('✅ Aprobat și deploiat: '+fn,'g');
+        sysMsg('✓ Validat & Deploy: '+fn+' → '+N.repo);
+        addDNA('APPROVE '+fn, N.repo, true);
+        swTab('deploy');
+        renderDeployRepos();
+    }).catch(function(e){ toast('Eroare deploy: '+e.message,'r'); });
+}
+
+function rejectCode(){
+    N.lastCode=null; N.lastFile=null;
+    document.getElementById('diff-view').innerHTML='<div style="color:var(--muted);font-size:12px;text-align:center;padding:20px">Cod respins. Revino la Command.</div>';
+    toast('Cod respins. Sandbox curățat.','o');
+    swTab('command');
+}
+
+// ── VV GHOST — ROLLBACK ───────────────────────────────────────
+function saveGhost(fileName, code){
+    N.ghost={fileName:fileName, code:code, ts:Date.now()};
+    lsS('nx_ghost', JSON.stringify(N.ghost));
+    var gi=document.getElementById('ghost-info');
+    if(gi) gi.textContent='Backup: '+fileName+' · '+ new Date(N.ghost.ts).toLocaleString('ro-RO',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+}
+
+function restoreGhost(){
+    var raw=ls('nx_ghost');
+    if(!raw){toast('Niciun backup disponibil.','r');return;}
+    try{
+        var g=JSON.parse(raw);
+        if(!confirm('Restaurezi '+g.fileName+' la versiunea din '+new Date(g.ts).toLocaleString('ro-RO')+'?')) return;
+        N.lastCode=g.code; N.lastFile=g.fileName;
+        document.getElementById('code-editor').value=g.code;
+        document.getElementById('sb-file').textContent=g.fileName;
+        ghPush(N.repo, g.fileName, g.code, 'VV Ghost Rollback: '+g.fileName).then(function(){
+            toast('↩ Rollback complet: '+g.fileName,'o');
+            sysMsg('↩ Ghost Rollback: '+g.fileName+' restaurat pe '+N.repo);
+        }).catch(function(e){ toast('Eroare rollback: '+e.message,'r'); });
+    }catch(e){ toast('Ghost corupt.','r'); }
+}
+
+// ── DEPLOY ZONE ───────────────────────────────────────────────
+function renderDeployRepos(){
+    var el=document.getElementById('deploy-repos');
+    if(!N.gu&&!N.gt){ el.innerHTML='<div style="color:var(--muted);font-size:12px;text-align:center;padding:16px">Configurează GitHub în Settings.</div>'; return; }
+    var repos=[N.repo].concat(N.mirrors.filter(function(r){return r!==N.repo;}));
+    el.innerHTML=repos.map(function(r){
+        return '<div class="ds-row"><div class="ds-repo">'+N.gu+'/'+r+'</div><div class="ds-status pend" id="st-'+r.replace('.','_')+'">GATA</div></div>';
+    }).join('');
+    var mb=document.getElementById('btn-mirror-all');
+    if(mb) mb.style.display=N.mirrors.length>0?'block':'none';
+}
+
+async function mirrorPush(){
+    if(!N.lastCode){toast('Niciun cod. Du-te în Command.','r');return;}
+    var fn=N.lastFile||prompt('Fișierul target:');
+    if(!fn) return;
+    var stEl=document.getElementById('st-'+N.repo.replace('.','_'));
+    if(stEl){stEl.textContent='PUSH...';stEl.className='ds-status';}
+    try{
+        await ghPush(N.repo, fn, N.lastCode);
+        if(stEl){stEl.textContent='✓ OK';stEl.className='ds-status ok';}
+        toast('🚀 '+fn+' → '+N.repo,'g');
+        addDNA('MIRROR PUSH '+fn, N.repo, true);
+    }catch(e){
+        if(stEl){stEl.textContent='EROARE';stEl.className='ds-status err';}
+        toast('Eroare: '+e.message,'r');
+    }
+}
+
+async function mirrorPushAll(){
+    if(!N.lastCode){toast('Niciun cod disponibil.','r');return;}
+    var fn=N.lastFile||prompt('Fișierul target:');
+    if(!fn) return;
+    var allRepos=[N.repo].concat(N.mirrors.filter(function(r){return r!==N.repo;}));
+    var ok=0;
+    for(var i=0;i<allRepos.length;i++){
+        var r=allRepos[i];
+        var st=document.getElementById('st-'+r.replace('.','_'));
+        if(st){st.textContent='PUSH...';st.className='ds-status';}
+        try{
+            await ghPush(r,fn,N.lastCode);
+            if(st){st.textContent='✓ OK';st.className='ds-status ok';}
+            ok++;
+        }catch(e){
+            if(st){st.textContent='ERR';st.className='ds-status err';}
+        }
+    }
+    toast('🔄 Mirror Push complet: '+ok+'/'+allRepos.length+' repo-uri','b');
+    sysMsg('🔄 Mirror Push '+fn+': '+ok+'/'+allRepos.length+' repo-uri ✓');
+    addDNA('MIRROR ALL '+fn, allRepos.join(', '), true);
+}
+
+// ── VV LOGIC DNA ──────────────────────────────────────────────
+function addDNA(cmd, target, success){
+    var entry={ts:Date.now(), cmd:cmd.substring(0,80), target:target, ok:success};
+    N.dna.unshift(entry);
+    if(N.dna.length>50) N.dna=N.dna.slice(0,50);
+    lsS('nx_dna', JSON.stringify(N.dna));
+    renderDNA();
+}
+
+function renderDNA(){
+    var el=document.getElementById('dna-list');
+    if(!el) return;
+    if(!N.dna.length){ el.innerHTML='<div style="color:var(--muted);font-size:12px;text-align:center;padding:10px">Nicio decizie înregistrată.</div>'; return; }
+    el.innerHTML=N.dna.slice(0,8).map(function(e){
+        return '<div class="dna-entry">'
+            +'<div class="dna-ts">'+new Date(e.ts).toLocaleString('ro-RO',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})+'</div>'
+            +'<div class="dna-cmd">'+(e.ok?'✓':'✗')+' '+esc(e.cmd)+'</div>'
+            +'</div>';
+    }).join('');
+}
+
+function exportDNA(){
+    var data=JSON.stringify({version:'1.0',exported:new Date().toISOString(),entries:N.dna},null,2);
+    var blob=new Blob([data],{type:'application/json'});
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement('a'); a.href=url; a.download='VV_Logic_DNA.json'; a.click();
+    URL.revokeObjectURL(url);
+    toast('DNA exportat.','g');
+}
+
+// ── UTILS ─────────────────────────────────────────────────────
+function showTyp(s){ var t=document.getElementById('typing'); t.style.display=s?'flex':'none'; if(s)scrB(); }
+function scrB(){ var c=document.getElementById('chat'); setTimeout(function(){c.scrollTop=c.scrollHeight;},60); }
+function clrChat(){
+    if(!confirm('Ștergi istoricul?')) return;
+    N.msgs=[]; N.lastCode=null; N.lastFile=null;
+    document.getElementById('chat').innerHTML='';
+    if(N.gk) sysMsg('Chat curățat · NEXUS gata.');
+    else document.getElementById('chat').innerHTML='<div class="empty" id="empty-state"><div class="empty-logo">VV</div><div class="empty-title">NEXUS God Mode</div><div class="empty-text">Dă comenzi în română.<br>Cod în Sandbox. Deploy pe GitHub.</div><button class="btn-setup" onclick="opo()">⚙️ CONFIGUREAZĂ</button></div>';
+}
+
+function toast(msg,type){
+    var old=document.getElementById('nx-t'); if(old) old.remove();
+    var t=document.createElement('div'); t.id='nx-t'; t.className='nxt '+(type||'g'); t.textContent=msg;
+    document.body.appendChild(t);
+    setTimeout(function(){t.style.opacity='0';t.style.transition='opacity .3s';setTimeout(function(){t.remove();},300);},3000);
+}
+</script>
+</body>
+</html>
