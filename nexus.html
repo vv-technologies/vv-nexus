@@ -35,6 +35,13 @@ body { background:#04040a; color:#fff; font-family:-apple-system,sans-serif; hei
 .field-label { font-size:11px; color:rgba(255,255,255,0.4); letter-spacing:1px; margin-bottom:6px; display:block; }
 .field-input { width:100%; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); border-radius:12px; padding:14px; color:#fff; font-size:14px; outline:none; -webkit-appearance:none; margin-bottom:14px; font-family:-apple-system,sans-serif; }
 .field-input::placeholder { color:rgba(255,255,255,0.2); }
+.field-input:-webkit-autofill,
+.field-input:-webkit-autofill:hover,
+.field-input:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0 100px #0d0d1a inset !important;
+    -webkit-text-fill-color: #ffffff !important;
+    caret-color: #ffffff;
+}
 .field-input:focus { border-color:rgba(212,175,55,0.4); }
 .field-hint { font-size:11px; color:rgba(255,255,255,0.2); line-height:1.6; margin-top:-10px; margin-bottom:14px; }
 .btn-save { width:100%; padding:16px; background:#fff; color:#000; border:none; border-radius:14px; font-size:15px; font-weight:800; cursor:pointer; letter-spacing:0.5px; min-height:52px; -webkit-appearance:none; }
@@ -147,7 +154,7 @@ body { background:#04040a; color:#fff; font-family:-apple-system,sans-serif; hei
         <label class="field-label" for="f-gk">GEMINI API KEY *</label>
         <input type="password" id="f-gk" class="field-input"
             placeholder="AIzaSy..."
-            autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+            autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore>
         <div class="field-hint">
             Obții cheia GRATUIT de la aistudio.google.com → Get API Key → Create API Key
         </div>
@@ -160,7 +167,7 @@ body { background:#04040a; color:#fff; font-family:-apple-system,sans-serif; hei
         <label class="field-label" for="f-gt">GITHUB TOKEN (pentru deploy)</label>
         <input type="password" id="f-gt" class="field-input"
             placeholder="ghp_..."
-            autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+            autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore>
         <div class="field-hint">
             GitHub → Settings → Developer settings → Fine-grained tokens → Contents: Read &amp; Write
         </div>
@@ -193,8 +200,38 @@ body { background:#04040a; color:#fff; font-family:-apple-system,sans-serif; hei
         <div class="card-title">🔍 VV SCOT — GOOGLE SEARCH</div>
         <label style="display:flex;align-items:center;gap:12px;cursor:pointer;padding:4px 0;">
             <input type="checkbox" id="scot-cb" style="width:20px;height:20px;accent-color:#D4AF37;flex-shrink:0;cursor:pointer;">
-            <span style="font-size:12px;color:rgba(255,255,255,0.4);line-height:1.6;">Activează VV Scot — Gemini caută pe Google înainte să răspundă. Date reale, nu halucinații.<br><span style="color:rgba(255,255,255,0.2);font-size:11px;">Necesită Gemini 2.0 Flash (deja setat)</span></span>
+            <span style="font-size:12px;color:rgba(255,255,255,0.4);line-height:1.6;">Activează VV Scot — Gemini caută pe Google înainte să răspundă. Date reale, nu halucinații.</span>
         </label>
+    </div>
+
+    <div class="setup-card">
+        <div class="card-title">✂️ PATCH MODE — CHIRURGIE PRECISĂ</div>
+        <label style="display:flex;align-items:center;gap:12px;cursor:pointer;padding:4px 0;">
+            <input type="checkbox" id="patch-cb" checked style="width:20px;height:20px;accent-color:#34c759;flex-shrink:0;cursor:pointer;">
+            <span style="font-size:12px;color:rgba(255,255,255,0.4);line-height:1.6;">
+                <strong style="color:rgba(255,255,255,0.7);">Recomandat ON.</strong> NEXUS modifică doar porțiunea de cod necesară, nu rescrie tot fișierul. Economisește tokeni și reduce erorile.<br>
+                <span style="color:rgba(255,255,255,0.2);font-size:11px;">OFF = generează fișierul complet (mai lent, mai mulți tokeni)</span>
+            </span>
+        </label>
+    </div>
+
+    <div class="setup-card">
+        <div class="card-title">🌍 MULTI-SITE MODE</div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.3);margin-bottom:12px;line-height:1.6;">
+            NEXUS poate lucra pe orice site sau aplicație, nu doar VV. Adaugă un proiect nou și schimbă contextul instant.
+        </div>
+        <div id="projects-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:rgba(212,175,55,0.06);border:1px solid rgba(212,175,55,0.15);border-radius:10px;">
+                <div>
+                    <div style="font-size:12px;font-weight:700;color:#fff;">VV Beta + TEAM</div>
+                    <div style="font-size:10px;color:rgba(255,255,255,0.3);">vv-technologies.github.io</div>
+                </div>
+                <div style="font-size:10px;color:#D4AF37;font-weight:700;letter-spacing:1px;">ACTIV</div>
+            </div>
+        </div>
+        <button onclick="addProject()" style="width:100%;padding:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:12px;color:rgba(255,255,255,0.4);font-size:12px;cursor:pointer;min-height:44px;-webkit-appearance:none;">
+            + ADAUGĂ PROIECT NOU
+        </button>
     </div>
 
     <button class="btn-save" onclick="doSave()">
@@ -306,7 +343,9 @@ var G = {
     lastCode: null,
     lastFile: null,
     dna: [],
-    ghost: null
+    ghost: null,
+    patchMode: true,
+    projects: []
 };
 
 var VV_CTX = `Ești VV NEXUS — asistentul AI personal al Arhitectului (fondatorul VV Technologies).
@@ -345,6 +384,8 @@ Răspunde MEREU în română. Cod funcțional din prima.`;
     try { G.mirrors = JSON.parse(lsG('nx_mirrors') || '[]'); } catch(_) { G.mirrors = []; }
     try { G.dna = JSON.parse(lsG('nx_dna') || '[]'); } catch(_) { G.dna = []; }
     try { G.ghost = JSON.parse(lsG('nx_ghost') || 'null'); } catch(_) { G.ghost = null; }
+    G.patchMode = lsG('nx_patch') !== '0'; // default ON
+    try { G.projects = JSON.parse(lsG('nx_projects') || '[]'); } catch(_) { G.projects = []; }
 
     // Populăm câmpurile Settings
     if (G.gk) document.getElementById('f-gk').value = G.gk;
@@ -353,6 +394,8 @@ Răspunde MEREU în română. Cod funcțional din prima.`;
     syncRepoPills();
     syncMirrorPills();
     if (G.scotOn) { var scb = document.getElementById('scot-cb'); if(scb) scb.checked = true; }
+    var pcb = document.getElementById('patch-cb'); if(pcb) pcb.checked = G.patchMode;
+    renderProjects();
     renderDNA();
     renderDeployScreen();
     updateGhostInfo();
@@ -435,6 +478,8 @@ function doSave() {
 
     G.gk = gk; G.gt = gt; G.gu = gu;
     G.scotOn = document.getElementById('scot-cb') ? document.getElementById('scot-cb').checked : false;
+    G.patchMode = document.getElementById('patch-cb') ? document.getElementById('patch-cb').checked : true;
+    lsS('nx_patch', G.patchMode ? '1' : '0');
     lsS('nx_gk', gk);
     lsS('nx_gt', gt);
     lsS('nx_gu', gu);
@@ -511,11 +556,18 @@ async function callAI() {
     showTyping(true);
     document.getElementById('btn-go').disabled = true;
 
+    // Patch Mode — trimitem context redus pentru economie tokeni
+    var ctxToSend = G.patchMode
+        ? 'Ești VV NEXUS. Patch Mode activ — modifică DOAR porțiunea cerută, nu rescrie tot.\n' + VV_CTX
+        : VV_CTX;
+
     var contents = [
-        { role: 'user',  parts: [{ text: VV_CTX + '\n\n--- SESIUNE DE LUCRU:' }] },
-        { role: 'model', parts: [{ text: 'Am înțeles contextul VV complet. Sunt NEXUS, gata de comenzi.' }] }
+        { role: 'user',  parts: [{ text: ctxToSend + '\n\n--- SESIUNE:' }] },
+        { role: 'model', parts: [{ text: 'NEXUS gata. ' + (G.patchMode ? 'Patch Mode ON — modific doar ce e necesar.' : 'Full mode activ.') }] }
     ];
-    G.msgs.forEach(function(m) { contents.push(m); });
+    // Limităm istoricul la ultimele 6 mesaje pentru economie tokeni
+    var recentMsgs = G.msgs.slice(-6);
+    recentMsgs.forEach(function(m) { contents.push(m); });
 
     try {
         var reqBody = {
@@ -924,6 +976,68 @@ function renderDeployScreen() {
     }).join('');
     var mirrorBtn = document.getElementById('btn-mirror-all');
     if (mirrorBtn) mirrorBtn.style.display = G.mirrors.length > 0 ? 'block' : 'none';
+}
+
+
+// ── MULTI-SITE / PROIECTE ─────────────────────────────────────
+function addProject() {
+    var name = prompt('Numele proiectului (ex: Blog Personal, Shop XYZ):');
+    if (!name) return;
+    var repo = prompt('Repo GitHub (ex: my-blog):');
+    if (!repo) return;
+    var url  = prompt('URL site (ex: mysite.github.io) — opțional:') || '';
+    var desc = prompt('Scurtă descriere (ex: Site prezentare firma):') || '';
+
+    G.projects.push({ name: name, repo: repo, url: url, desc: desc, ts: Date.now() });
+    lsS('nx_projects', JSON.stringify(G.projects));
+    renderProjects();
+    // Adăugăm repo-ul în lista de repo pills
+    toast(name + ' adăugat ✅', 'g');
+}
+
+function switchProject(idx) {
+    var p = G.projects[idx];
+    if (!p) return;
+    G.repo = p.repo;
+    lsS('nx_repo', p.repo);
+    syncRepoPills();
+    renderProjects();
+    toast('Proiect activ: ' + p.name, 'b');
+    // Informăm AI-ul despre schimbarea de proiect
+    if (G.msgs.length > 0) G.msgs = []; // reset context la schimbare proiect
+    sw('chat');
+    addSys('Proiect schimbat: ' + p.name + ' (' + p.repo + '). Context resetat.');
+}
+
+function removeProject(idx) {
+    if (!confirm('Ștergi proiectul ' + G.projects[idx].name + '?')) return;
+    G.projects.splice(idx, 1);
+    lsS('nx_projects', JSON.stringify(G.projects));
+    renderProjects();
+}
+
+function renderProjects() {
+    var el = document.getElementById('projects-list');
+    if (!el) return;
+    var html = '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:rgba(212,175,55,0.06);border:1px solid rgba(212,175,55,0.15);border-radius:10px;margin-bottom:6px;">'
+        + '<div><div style="font-size:12px;font-weight:700;color:#fff;">VV Beta + TEAM</div>'
+        + '<div style="font-size:10px;color:rgba(255,255,255,0.3);">vv-technologies.github.io</div></div>'
+        + '<div style="font-size:10px;color:#D4AF37;font-weight:700;letter-spacing:1px;">' + (G.repo === 'ceo.html' || G.repo === 'vv-team' ? 'ACTIV' : '') + '</div>'
+        + '</div>';
+
+    G.projects.forEach(function(p, i) {
+        var isActive = G.repo === p.repo;
+        html += '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:' + (isActive ? 'rgba(10,132,255,0.08)' : 'rgba(255,255,255,0.03)') + ';border:1px solid ' + (isActive ? 'rgba(10,132,255,0.2)' : 'rgba(255,255,255,0.08)') + ';border-radius:10px;margin-bottom:6px;cursor:pointer;" onclick="switchProject(' + i + ')">'
+            + '<div><div style="font-size:12px;font-weight:700;color:#fff;">' + esc(p.name) + '</div>'
+            + '<div style="font-size:10px;color:rgba(255,255,255,0.3);">' + esc(p.repo) + (p.url ? ' · ' + esc(p.url) : '') + '</div></div>'
+            + '<div style="display:flex;gap:8px;align-items:center;">'
+            + (isActive ? '<span style="font-size:10px;color:#0A84FF;font-weight:700;">ACTIV</span>' : '')
+            + '<span onclick="event.stopPropagation();removeProject(' + i + ')" style="font-size:16px;color:rgba(255,59,48,0.4);cursor:pointer;padding:4px;">✕</span>'
+            + '</div>'
+            + '</div>';
+    });
+
+    el.innerHTML = html;
 }
 
 </script>
