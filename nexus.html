@@ -540,6 +540,16 @@ function quickSend(txt) {
 async function callAI() {
     G.busy = true;
     setOnline(false);
+    // Safety timeout — deblochează după 30s dacă ceva pică
+    var _safetyTimer = setTimeout(function() {
+        if (G.busy) {
+            G.busy = false;
+            document.getElementById('typing').style.display = 'none';
+            document.getElementById('btn-send').disabled = false;
+            setOnline(true);
+            addMsg('ai', '⚠️ Timeout — încearcă din nou.');
+        }
+    }, 30000);
     document.getElementById('hdr-txt').textContent = 'procesează...';
     document.getElementById('typing').style.display = 'block';
     document.getElementById('btn-send').disabled = true;
@@ -594,6 +604,7 @@ async function callAI() {
     } catch(err) {
         addMsg('ai', '⚠️ ' + err.message);
     } finally {
+        clearTimeout(_safetyTimer);
         G.busy = false;
         document.getElementById('typing').style.display = 'none';
         document.getElementById('btn-send').disabled = false;
