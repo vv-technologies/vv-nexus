@@ -279,6 +279,10 @@ label {
         <input type="password" id="inp-gk" placeholder="AIzaSy..."
             autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false">
         <div class="hint">aistudio.google.com → Get API Key → Create (gratuit)</div>
+        <button class="btn btn-gold" onclick="autoDiscoverModel()" id="btn-discover">
+            🔍 AUTO-DETECTEAZĂ MODELUL OPTIM
+        </button>
+        <div id="model-status" class="hint" style="text-align:center;"></div>
 
         <label>GITHUB USERNAME</label>
         <input type="text" id="inp-gu" placeholder="vv-technologies" autocomplete="off">
@@ -391,6 +395,7 @@ label {
 var G = {
     gk: '', gt: '', gu: '',
     repo: 'ceo.html',
+    model: 'gemini-1.5-flash',
     msgs: [],
     busy: false,
     lastCode: null,
@@ -404,7 +409,8 @@ var CTX = 'Ești VV NEXUS — asistentul AI personal al fondatorului VV Technolo
     G.gk   = store('get', 'nx_gk')   || '';
     G.gt   = store('get', 'nx_gt')   || '';
     G.gu   = store('get', 'nx_gu')   || '';
-    G.repo = store('get', 'nx_repo') || 'ceo.html';
+    G.repo  = store('get', 'nx_repo')  || 'ceo.html';
+    G.model = store('get', 'nx_model') || 'gemini-1.5-flash';
 
     if (G.gk) {
         document.getElementById('inp-gk').value = G.gk;
@@ -546,7 +552,7 @@ async function callAI() {
 
     try {
         var r = await fetch(
-            'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' + G.gk,
+            'https://generativelanguage.googleapis.com/v1beta/models/' + G.model + ':generateContent?key=' + G.gk,
             {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -800,6 +806,63 @@ function importSeed(input) {
     };
     reader.readAsText(file);
     input.value = '';
+}
+
+
+// ── AUTO-DISCOVERY MODEL ─────────────────────────────────────
+async function autoDiscoverModel() {
+    var gk = document.getElementById('inp-gk').value.trim() || G.gk;
+    if (!gk) { toast('Introdu cheia Gemini mai întâi.', 'o'); return; }
+
+    var btn = document.getElementById('btn-discover');
+    var statusEl = document.getElementById('model-status');
+    btn.textContent = '⏳ Verifică modele disponibile...';
+    btn.disabled = true;
+    statusEl.textContent = '';
+
+    try {
+        var r = await fetch(
+            'https://generativelanguage.googleapis.com/v1beta/models?key=' + gk
+        );
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        var data = await r.json();
+        var models = data.models || [];
+
+        // Căutăm cel mai bun model flash disponibil
+        var flashModels = models.filter(function(m) {
+            return m.name && m.name.toLowerCase().includes('flash') &&
+                   m.supportedGenerationMethods &&
+                   m.supportedGenerationMethods.indexOf('generateContent') > -1;
+        });
+
+        if (!flashModels.length) {
+            // Fallback la orice model care suportă generateContent
+            flashModels = models.filter(function(m) {
+                return m.supportedGenerationMethods &&
+                       m.supportedGenerationMethods.indexOf('generateContent') > -1;
+            });
+        }
+
+        if (!flashModels.length) throw new Error('Niciun model găsit pentru cheia ta.');
+
+        // Sortăm după nume descrescător ca să luăm cel mai nou
+        flashModels.sort(function(a, b) { return b.name.localeCompare(a.name); });
+        var best = flashModels[0].name.replace('models/', '');
+
+        G.model = best;
+        store('set', 'nx_model', best);
+        statusEl.textContent = '✅ Model detectat: ' + best;
+        statusEl.style.color = '#34c759';
+        toast('✅ ' + best, 'g');
+
+    } catch(err) {
+        statusEl.textContent = '⚠️ ' + err.message;
+        statusEl.style.color = '#ff3b30';
+        toast('Eroare: ' + err.message, 'r');
+    } finally {
+        btn.textContent = '🔍 AUTO-DETECTEAZĂ MODELUL OPTIM';
+        btn.disabled = false;
+    }
 }
 
 </script>
