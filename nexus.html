@@ -158,6 +158,17 @@ body { background:#04040a; color:#fff; font-family:-apple-system,sans-serif; hei
         <input type="password" id="f-gk" class="field-input"
             placeholder="AIzaSy..."
             autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore>
+        <div style="display:flex;gap:8px;margin-top:-10px;margin-bottom:14px;">
+            <button onclick="hideKeys()" style="flex:1;padding:10px;background:rgba(212,175,55,0.1);border:1px solid rgba(212,175,55,0.25);border-radius:10px;color:#D4AF37;font-size:12px;font-weight:700;cursor:pointer;min-height:40px;-webkit-appearance:none;">
+                🔒 ASCUNDE CHEILE
+            </button>
+            <button onclick="revealKeys()" style="flex:1;padding:10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:rgba(255,255,255,0.4);font-size:12px;font-weight:700;cursor:pointer;min-height:40px;-webkit-appearance:none;">
+                👁 ARATĂ
+            </button>
+        </div>
+        <div id="aegis-status" style="display:none;padding:10px 12px;background:rgba(52,199,89,0.06);border:1px solid rgba(52,199,89,0.15);border-radius:10px;font-size:11px;color:rgba(52,199,89,0.7);margin-bottom:14px;">
+            🛡 Aegis activ — cheile sunt mascate. Nimeni nu le poate citi.
+        </div>
         <div class="field-hint">
             Obții cheia GRATUIT de la aistudio.google.com → Get API Key → Create API Key
         </div>
@@ -425,36 +436,68 @@ Răspunde MEREU în română. Cod funcțional din prima.`;
     });
 })();
 
-// ── Storage helpers — localStorage + cookie fallback ────────────
-// Safari iOS șterge localStorage pe GitHub Pages — folosim și cookies
-function lsS(k, v) {
-    try { localStorage.setItem(k, v); } catch(e) {}
-    // Cookie cu expirare 1 an ca fallback
+
+// ── VV AEGIS CRYPTO — criptare locală chei ───────────────────
+// Cheia reală nu se salvează niciodată — doar forma criptată
+var _SALT = 'VVNexusArhitect' + navigator.userAgent.substring(10, 20);
+
+function aegisEncrypt(text) {
     try {
-        var d = new Date();
-        d.setFullYear(d.getFullYear() + 1);
-        document.cookie = encodeURIComponent(k) + '=' + encodeURIComponent(v) + ';expires=' + d.toUTCString() + ';path=/;SameSite=Strict';
+        var result = '';
+        for (var i = 0; i < text.length; i++) {
+            result += String.fromCharCode(text.charCodeAt(i) ^ _SALT.charCodeAt(i % _SALT.length));
+        }
+        return btoa(unescape(encodeURIComponent(result)));
+    } catch(e) { return text; }
+}
+
+function aegisDecrypt(encoded) {
+    try {
+        var decoded = decodeURIComponent(escape(atob(encoded)));
+        var result = '';
+        for (var i = 0; i < decoded.length; i++) {
+            result += String.fromCharCode(decoded.charCodeAt(i) ^ _SALT.charCodeAt(i % _SALT.length));
+        }
+        return result;
+    } catch(e) { return encoded; }
+}
+
+function isEncrypted(val) {
+    // Cheile reale încep cu AIza sau ghp_ — dacă nu, e criptată
+    if (!val) return false;
+    return !val.startsWith('AIza') && !val.startsWith('ghp_') && val.length > 10;
+}
+
+// ── Storage helpers cu criptare automată ─────────────────────
+var SENSITIVE_KEYS = ['nx_gk', 'nx_gt'];
+
+function lsS(k, v) {
+    var toStore = (SENSITIVE_KEYS.indexOf(k) > -1 && v) ? aegisEncrypt(v) : v;
+    try { localStorage.setItem(k, toStore); } catch(e) {}
+    try {
+        var d = new Date(); d.setFullYear(d.getFullYear() + 1);
+        document.cookie = encodeURIComponent(k) + '=' + encodeURIComponent(toStore) + ';expires=' + d.toUTCString() + ';path=/;SameSite=Strict';
     } catch(e) {}
 }
 
 function lsG(k) {
-    // Încearcă localStorage primul
-    try {
-        var v = localStorage.getItem(k);
-        if (v !== null) return v;
-    } catch(e) {}
-    // Fallback: citește din cookie
-    try {
-        var name = encodeURIComponent(k) + '=';
-        var parts = document.cookie.split(';');
-        for (var i = 0; i < parts.length; i++) {
-            var c = parts[i].trim();
-            if (c.indexOf(name) === 0) {
-                return decodeURIComponent(c.substring(name.length));
+    var raw = null;
+    try { raw = localStorage.getItem(k); } catch(e) {}
+    if (!raw) {
+        try {
+            var name = encodeURIComponent(k) + '=';
+            var parts = document.cookie.split(';');
+            for (var i = 0; i < parts.length; i++) {
+                var c = parts[i].trim();
+                if (c.indexOf(name) === 0) { raw = decodeURIComponent(c.substring(name.length)); break; }
             }
-        }
-    } catch(e) {}
-    return null;
+        } catch(e) {}
+    }
+    // Decriptăm automat cheile sensibile
+    if (raw && SENSITIVE_KEYS.indexOf(k) > -1 && isEncrypted(raw)) {
+        return aegisDecrypt(raw);
+    }
+    return raw;
 }
 
 // ── TAB SWITCHING ─────────────────────────────────────────────
@@ -1069,6 +1112,44 @@ function renderProjects() {
     });
 
     el.innerHTML = html;
+}
+
+
+// ── AEGIS — Ascunde/Arată chei ───────────────────────────────
+function hideKeys() {
+    var gkEl = document.getElementById('f-gk');
+    var gtEl = document.getElementById('f-gt');
+    var gkVal = gkEl ? gkEl.value.trim() : '';
+    var gtVal = gtEl ? gtEl.value.trim() : '';
+
+    if (!gkVal) { toast('Introdu mai întâi cheia înainte să o ascunzi.', 'o'); return; }
+
+    // Salvăm criptat
+    if (gkVal && !isEncrypted(gkVal)) lsS('nx_gk', gkVal);
+    if (gtVal && !isEncrypted(gtVal)) lsS('nx_gt', gtVal);
+
+    // Înlocuim câmpurile cu text mascat
+    if (gkEl) gkEl.value = '••••••••••••••••••••••••••••••••••••';
+    if (gtEl && gtVal) gtEl.value = '••••••••••••••••••••••••••••••••••••';
+
+    var st = document.getElementById('aegis-status');
+    if (st) st.style.display = 'block';
+
+    // G le știe deja din lsG
+    G.gk = lsG('nx_gk') || gkVal;
+    G.gt = lsG('nx_gt') || gtVal;
+
+    toast('🛡 Chei ascunse de Aegis!', 'g');
+}
+
+function revealKeys() {
+    var gkEl = document.getElementById('f-gk');
+    var gtEl = document.getElementById('f-gt');
+    if (gkEl) gkEl.value = G.gk || lsG('nx_gk') || '';
+    if (gtEl) gtEl.value = G.gt || lsG('nx_gt') || '';
+    var st = document.getElementById('aegis-status');
+    if (st) st.style.display = 'none';
+    toast('👁 Chei vizibile temporar.', 'o');
 }
 
 </script>
