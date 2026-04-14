@@ -4,670 +4,561 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="VV NEXUS">
 <title>VV NEXUS</title>
 <style>
-* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:rgba(0,0,0,0); }
-body { background:#04040a; color:#fff; font-family:-apple-system,sans-serif; height:100dvh; display:flex; flex-direction:column; overflow:hidden; }
-
-/* ── HEADER ── */
-.hdr { background:#080810; border-bottom:1px solid rgba(255,255,255,0.08); padding:12px 16px; display:flex; align-items:center; justify-content:space-between; flex-shrink:0; padding-top:calc(12px + env(safe-area-inset-top, 0px)); }
-.hdr-left { display:flex; align-items:center; gap:10px; }
-.logo { width:34px; height:34px; background:rgba(212,175,55,0.15); border:1px solid rgba(212,175,55,0.3); border-radius:9px; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:12px; color:#D4AF37; }
-.title { font-weight:900; font-size:15px; letter-spacing:1px; }
-.subtitle { font-size:10px; color:rgba(255,255,255,0.3); letter-spacing:1px; }
-.dot { width:8px; height:8px; border-radius:50%; background:rgba(255,255,255,0.2); }
-.dot.on  { background:#34c759; box-shadow:0 0 6px #34c759; }
-.dot.bsy { background:#D4AF37; box-shadow:0 0 6px #D4AF37; animation:p 1s infinite; }
-@keyframes p { 0%,100%{opacity:1} 50%{opacity:.3} }
-
-/* ── TABS ── */
-.tabs { display:flex; background:#080810; border-bottom:1px solid rgba(255,255,255,0.08); flex-shrink:0; }
-.tab { flex:1; padding:10px 4px; text-align:center; font-size:11px; font-weight:700; letter-spacing:1px; color:rgba(255,255,255,0.3); border-bottom:2px solid transparent; cursor:pointer; min-height:44px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; -webkit-user-select:none; user-select:none; }
-.tab.on { color:#D4AF37; border-bottom-color:#D4AF37; }
-
-/* ── SCREENS ── */
-.screen { display:none; flex:1; flex-direction:column; overflow:hidden; }
-.screen.on { display:flex; }
-
-/* ── SETUP SCREEN ── */
-.setup { flex:1; overflow-y:auto; padding:20px 16px; padding-bottom:calc(20px + env(safe-area-inset-bottom, 0px)); -webkit-overflow-scrolling:touch; }
-.setup-card { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:18px; padding:20px; margin-bottom:14px; }
-.card-title { font-size:10px; color:rgba(255,255,255,0.25); letter-spacing:2px; font-weight:700; margin-bottom:14px; }
-.field-label { font-size:11px; color:rgba(255,255,255,0.4); letter-spacing:1px; margin-bottom:6px; display:block; }
-.field-input { width:100%; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); border-radius:12px; padding:14px; color:#fff; font-size:14px; outline:none; -webkit-appearance:none; margin-bottom:14px; font-family:-apple-system,sans-serif; }
-.field-input::placeholder { color:rgba(255,255,255,0.2); }
-.field-input:-webkit-autofill,
-.field-input:-webkit-autofill:hover,
-.field-input:-webkit-autofill:focus {
-    -webkit-box-shadow: 0 0 0 100px #0d0d1a inset !important;
-    -webkit-text-fill-color: #ffffff !important;
-    caret-color: #ffffff;
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+    background: #050508;
+    color: #fff;
+    font-family: -apple-system, sans-serif;
+    padding: env(safe-area-inset-top,20px) 0 env(safe-area-inset-bottom,0px);
+    min-height: 100vh;
 }
-.field-input:focus { border-color:rgba(212,175,55,0.4); }
-.field-hint { font-size:11px; color:rgba(255,255,255,0.2); line-height:1.6; margin-top:-10px; margin-bottom:14px; }
-.btn-save { width:100%; padding:16px; background:#fff; color:#000; border:none; border-radius:14px; font-size:15px; font-weight:800; cursor:pointer; letter-spacing:0.5px; min-height:52px; -webkit-appearance:none; }
-.security-note { background:rgba(52,199,89,0.06); border:1px solid rgba(52,199,89,0.15); border-radius:12px; padding:12px 14px; font-size:11px; color:rgba(52,199,89,0.7); line-height:1.7; margin-bottom:14px; }
 
-/* Repo pills */
-.pills { display:flex; flex-wrap:wrap; gap:7px; margin-bottom:6px; }
-.pill { padding:8px 14px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); border-radius:20px; font-size:12px; color:rgba(255,255,255,0.4); cursor:pointer; -webkit-user-select:none; user-select:none; min-height:36px; display:flex; align-items:center; }
-.pill.on { background:rgba(212,175,55,0.12); border-color:rgba(212,175,55,0.3); color:#D4AF37; }
+/* Header */
+.hdr {
+    background: #0a0a12;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.hdr-title { font-size: 18px; font-weight: 900; letter-spacing: 2px; color: #D4AF37; }
+.hdr-dot { width: 10px; height: 10px; border-radius: 50%; background: #333; }
+.hdr-dot.on { background: #34c759; }
 
-/* ── CHAT SCREEN ── */
-.chat-wrap { flex:1; overflow-y:auto; padding:12px; display:flex; flex-direction:column; gap:10px; -webkit-overflow-scrolling:touch; }
-.msg { display:flex; flex-direction:column; gap:3px; }
-.msg.u { align-items:flex-end; }
-.msg.a { align-items:flex-start; }
-.msg.s { align-items:center; }
-.who { font-size:9px; color:rgba(255,255,255,0.25); letter-spacing:2px; padding:0 4px; }
-.msg.u .who { color:rgba(212,175,55,0.4); }
-.msg.a .who { color:rgba(10,132,255,0.4); }
-.bub { max-width:88%; padding:12px 15px; border-radius:16px; font-size:13px; line-height:1.7; white-space:pre-wrap; word-break:break-word; }
-.msg.u .bub { background:rgba(212,175,55,0.1); border:1px solid rgba(212,175,55,0.2); border-bottom-right-radius:4px; }
-.msg.a .bub { background:rgba(10,132,255,0.08); border:1px solid rgba(10,132,255,0.18); border-bottom-left-radius:4px; }
-.msg.s .bub { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:10px; color:rgba(255,255,255,0.3); font-size:11px; text-align:center; max-width:100%; }
-.bub pre { background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.08); border-radius:8px; padding:10px; margin-top:8px; overflow-x:auto; font-size:11px; font-family:monospace; white-space:pre; color:rgba(255,255,255,0.7); }
-.bub code { font-family:monospace; font-size:11px; background:rgba(0,0,0,0.3); padding:2px 5px; border-radius:4px; color:#D4AF37; }
-.bub strong { color:rgba(255,255,255,0.9); font-weight:600; }
+/* Pagini */
+.page { display: none; padding: 16px; }
+.page.active { display: block; }
 
-/* Deploy card */
-.dcard { background:rgba(52,199,89,0.07); border:1px solid rgba(52,199,89,0.2); border-radius:12px; padding:12px 14px; margin-top:8px; max-width:88%; }
-.dcard-title { font-size:9px; color:rgba(52,199,89,0.6); letter-spacing:2px; font-weight:700; margin-bottom:8px; }
-.dcard-path { font-family:monospace; font-size:11px; color:rgba(255,255,255,0.5); background:rgba(0,0,0,0.2); padding:5px 8px; border-radius:6px; margin-bottom:9px; word-break:break-all; }
-.btn-push { width:100%; padding:11px; background:rgba(52,199,89,0.15); border:1px solid rgba(52,199,89,0.3); border-radius:9px; color:#34c759; font-weight:700; font-size:12px; cursor:pointer; letter-spacing:0.5px; min-height:42px; -webkit-appearance:none; }
+/* Card */
+.card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px;
+    padding: 18px;
+    margin-bottom: 14px;
+}
+.card-title {
+    font-size: 11px;
+    color: rgba(255,255,255,0.3);
+    letter-spacing: 2px;
+    font-weight: 700;
+    margin-bottom: 14px;
+}
 
-/* Typing */
-.typing { display:none; padding:10px 14px; }
-.typing-inner { display:inline-flex; align-items:center; gap:4px; padding:10px 14px; background:rgba(10,132,255,0.07); border:1px solid rgba(10,132,255,0.15); border-radius:14px; }
-.typing-inner span { width:5px; height:5px; border-radius:50%; background:rgba(10,132,255,0.5); animation:td 1.2s infinite; }
-.typing-inner span:nth-child(2) { animation-delay:.2s; }
-.typing-inner span:nth-child(3) { animation-delay:.4s; }
+/* Inputs */
+input[type=text], input[type=password], textarea {
+    display: block;
+    width: 100%;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 12px;
+    padding: 14px;
+    color: #fff;
+    font-size: 15px;
+    font-family: -apple-system, sans-serif;
+    outline: none;
+    -webkit-appearance: none;
+    margin-bottom: 10px;
+}
+input:focus, textarea:focus {
+    border-color: #D4AF37;
+}
+textarea {
+    resize: none;
+    min-height: 80px;
+    line-height: 1.5;
+}
+label {
+    display: block;
+    font-size: 11px;
+    color: rgba(255,255,255,0.35);
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+}
+.hint {
+    font-size: 11px;
+    color: rgba(255,255,255,0.2);
+    line-height: 1.6;
+    margin-bottom: 14px;
+}
+
+/* Butoane */
+.btn {
+    display: block;
+    width: 100%;
+    padding: 16px;
+    border: none;
+    border-radius: 14px;
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    margin-bottom: 10px;
+    -webkit-appearance: none;
+    text-align: center;
+    min-height: 52px;
+    touch-action: manipulation;
+}
+.btn-white { background: #fff; color: #000; }
+.btn-gold  { background: rgba(212,175,55,0.15); border: 1px solid rgba(212,175,55,0.3); color: #D4AF37; }
+.btn-green { background: rgba(52,199,89,0.15); border: 1px solid rgba(52,199,89,0.3); color: #34c759; }
+.btn-red   { background: rgba(255,59,48,0.12); border: 1px solid rgba(255,59,48,0.25); color: #ff3b30; }
+.btn-gray  { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.4); }
+
+/* Nav tabs */
+.nav {
+    position: fixed;
+    bottom: 0;
+    left: 0; right: 0;
+    background: #0a0a12;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    display: flex;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+.nav-btn {
+    flex: 1;
+    padding: 12px 4px;
+    text-align: center;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: rgba(255,255,255,0.3);
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    -webkit-appearance: none;
+    touch-action: manipulation;
+    min-height: 56px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+}
+.nav-btn.active { color: #D4AF37; }
+.nav-icon { font-size: 18px; }
+
+/* Chat messages */
+.chat-box {
+    padding-bottom: 120px;
+}
+.msg-wrap { margin-bottom: 12px; }
+.msg-wrap.user { text-align: right; }
+.msg-wrap.ai   { text-align: left; }
+.msg-wrap.sys  { text-align: center; }
+.msg-who { font-size: 9px; color: rgba(255,255,255,0.25); letter-spacing: 2px; margin-bottom: 4px; }
+.msg-wrap.user .msg-who { color: rgba(212,175,55,0.4); }
+.msg-wrap.ai   .msg-who { color: rgba(10,132,255,0.4); }
+.msg-bub {
+    display: inline-block;
+    max-width: 88%;
+    padding: 12px 15px;
+    border-radius: 16px;
+    font-size: 14px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    text-align: left;
+}
+.msg-wrap.user .msg-bub { background: rgba(212,175,55,0.1); border: 1px solid rgba(212,175,55,0.2); border-bottom-right-radius: 4px; }
+.msg-wrap.ai   .msg-bub { background: rgba(10,132,255,0.08); border: 1px solid rgba(10,132,255,0.18); border-bottom-left-radius: 4px; }
+.msg-wrap.sys  .msg-bub { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; color: rgba(255,255,255,0.35); font-size: 12px; }
+.msg-bub pre { background: rgba(0,0,0,0.35); border-radius: 8px; padding: 10px; margin-top: 8px; overflow-x: auto; font-size: 12px; font-family: monospace; }
+.msg-bub code { font-family: monospace; background: rgba(0,0,0,0.3); padding: 2px 5px; border-radius: 4px; color: #D4AF37; font-size: 12px; }
+.msg-bub strong { color: rgba(255,255,255,0.9); }
+
+/* Input chat fix */
+.chat-input-area {
+    position: fixed;
+    bottom: env(safe-area-inset-bottom, 0px);
+    left: 0; right: 0;
+    background: #0a0a12;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    padding: 10px 14px;
+    display: flex;
+    gap: 8px;
+    align-items: flex-end;
+    padding-bottom: calc(66px + env(safe-area-inset-bottom, 0px));
+}
+.chat-input-area textarea {
+    flex: 1;
+    margin-bottom: 0;
+    min-height: 44px;
+    max-height: 100px;
+    font-size: 14px;
+    border-radius: 12px;
+    padding: 12px;
+}
+.btn-send {
+    width: 44px;
+    height: 44px;
+    min-height: 44px;
+    background: rgba(212,175,55,0.15);
+    border: 1px solid rgba(212,175,55,0.3);
+    border-radius: 12px;
+    color: #D4AF37;
+    font-size: 20px;
+    font-weight: 900;
+    cursor: pointer;
+    -webkit-appearance: none;
+    touch-action: manipulation;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+/* Typing dots */
+.typing { display: none; margin: 8px 0 8px 16px; }
+.typing-inner { display: inline-flex; gap: 4px; align-items: center; padding: 10px 14px; background: rgba(10,132,255,0.08); border: 1px solid rgba(10,132,255,0.15); border-radius: 14px; }
+.typing-inner span { width: 6px; height: 6px; border-radius: 50%; background: rgba(10,132,255,0.5); animation: td 1.2s infinite; }
+.typing-inner span:nth-child(2) { animation-delay: .2s; }
+.typing-inner span:nth-child(3) { animation-delay: .4s; }
 @keyframes td { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-4px)} }
 
-/* Input bar */
-.inp { background:#080810; border-top:1px solid rgba(255,255,255,0.08); padding:10px 14px; padding-bottom:calc(10px + env(safe-area-inset-bottom, 0px)); flex-shrink:0; }
-.inp-row { display:flex; gap:8px; align-items:flex-end; }
-.inp-ta { flex:1; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); border-radius:14px; padding:12px 14px; color:#fff; font-size:14px; font-family:-apple-system,sans-serif; outline:none; resize:none; min-height:46px; max-height:120px; line-height:1.5; -webkit-appearance:none; }
-.inp-ta:focus { border-color:rgba(212,175,55,0.35); }
-.btn-go { width:46px; height:46px; background:rgba(212,175,55,0.15); border:1px solid rgba(212,175,55,0.3); border-radius:13px; color:#D4AF37; font-size:20px; font-weight:900; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; -webkit-appearance:none; }
-.btn-go:disabled { opacity:0.3; }
+/* Toast */
+#toast {
+    display: none;
+    position: fixed;
+    top: calc(20px + env(safe-area-inset-top, 0px));
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9999;
+    padding: 12px 20px;
+    border-radius: 14px;
+    font-size: 13px;
+    font-weight: 700;
+    white-space: nowrap;
+    max-width: 90vw;
+    text-align: center;
+    pointer-events: none;
+}
+#toast.g { background: rgba(52,199,89,0.2); border: 1px solid rgba(52,199,89,0.4); color: #34c759; }
+#toast.r { background: rgba(255,59,48,0.2); border: 1px solid rgba(255,59,48,0.4); color: #ff3b30; }
+#toast.o { background: rgba(212,175,55,0.2); border: 1px solid rgba(212,175,55,0.4); color: #D4AF37; }
+#toast.b { background: rgba(10,132,255,0.2); border: 1px solid rgba(10,132,255,0.4); color: #0A84FF; }
 
-/* ── SANDBOX ── */
-.sandbox { flex:1; overflow-y:auto; padding:14px; display:flex; flex-direction:column; gap:10px; -webkit-overflow-scrolling:touch; }
-.sb-file-row { display:flex; align-items:center; justify-content:space-between; }
-.sb-file { font-family:monospace; font-size:11px; color:rgba(212,175,55,0.6); background:rgba(212,175,55,0.08); padding:4px 10px; border-radius:6px; border:1px solid rgba(212,175,55,0.2); }
-.sb-editor { flex:1; background:rgba(0,0,0,0.4); border:1px solid rgba(255,255,255,0.08); border-radius:14px; padding:14px; font-family:monospace; font-size:12px; color:rgba(255,255,255,0.8); outline:none; resize:none; min-height:260px; line-height:1.6; -webkit-appearance:none; }
-.sb-btns { display:flex; gap:8px; flex-wrap:wrap; }
-.sb-btn { flex:1; padding:12px; border-radius:11px; font-size:12px; font-weight:700; cursor:pointer; min-height:44px; -webkit-appearance:none; font-family:-apple-system,sans-serif; }
-.sb-btn.g { background:rgba(52,199,89,0.1); border:1px solid rgba(52,199,89,0.25); color:#34c759; }
-.sb-btn.b { background:rgba(10,132,255,0.1); border:1px solid rgba(10,132,255,0.25); color:#0A84FF; }
-.sb-btn.r { background:rgba(255,59,48,0.1); border:1px solid rgba(255,59,48,0.2); color:#ff3b30; }
+/* Status */
+#status-msg { font-size: 12px; text-align: center; padding: 10px; }
 
-/* ── TOAST ── */
-.toast { position:fixed; bottom:calc(80px + env(safe-area-inset-bottom,0px)); left:50%; transform:translateX(-50%); z-index:9999; padding:11px 20px; border-radius:14px; font-size:12px; font-weight:600; white-space:nowrap; max-width:90vw; pointer-events:none; }
-.toast.g { background:rgba(52,199,89,0.2); border:1px solid rgba(52,199,89,0.35); color:#34c759; }
-.toast.r { background:rgba(255,59,48,0.2); border:1px solid rgba(255,59,48,0.35); color:#ff3b30; }
-.toast.b { background:rgba(10,132,255,0.2); border:1px solid rgba(10,132,255,0.3); color:#0A84FF; }
-.toast.o { background:rgba(212,175,55,0.2); border:1px solid rgba(212,175,55,0.3); color:#D4AF37; }
+/* Sandbox */
+.sandbox-page { padding: 16px; padding-bottom: 80px; }
+.sb-editor { min-height: 300px; font-family: monospace; font-size: 12px; }
 
-/* Quick actions */
-.qa { display:flex; gap:6px; padding:6px 14px 2px; overflow-x:auto; flex-shrink:0; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
-.qa::-webkit-scrollbar { display:none; }
-.qa-btn { padding:7px 13px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:8px; font-size:11px; color:rgba(255,255,255,0.35); cursor:pointer; white-space:nowrap; min-height:34px; flex-shrink:0; -webkit-user-select:none; user-select:none; }
+/* Mascare chei */
+.masked { letter-spacing: 3px; color: rgba(255,255,255,0.3); }
 </style>
 </head>
 <body>
 
+<!-- TOAST -->
+<div id="toast"></div>
+
 <!-- HEADER -->
 <div class="hdr">
-    <div class="hdr-left">
-        <div class="logo">VV</div>
-        <div>
-            <div class="title">NEXUS</div>
-            <div class="subtitle">AI ASSISTANT</div>
-        </div>
-    </div>
-    <div style="display:flex;align-items:center;gap:10px;">
-        <div class="dot" id="dot"></div>
-        <div id="hdr-status" style="font-size:11px;color:rgba(255,255,255,0.3);">neconectat</div>
+    <div class="hdr-title">VV NEXUS</div>
+    <div style="display:flex;align-items:center;gap:8px;">
+        <div class="hdr-dot" id="dot"></div>
+        <div id="hdr-txt" style="font-size:11px;color:rgba(255,255,255,0.3);">offline</div>
     </div>
 </div>
 
-<!-- TABS -->
-<div class="tabs">
-    <div class="tab on"  id="t-setup"   onclick="sw('setup')">⚙️<br>SETUP</div>
-    <div class="tab"     id="t-chat"    onclick="sw('chat')">💬<br>CHAT</div>
-    <div class="tab"     id="t-sandbox" onclick="sw('sandbox')">🛠<br>SANDBOX</div>
-    <div class="tab"     id="t-deploy"  onclick="sw('deploy')">🚀<br>DEPLOY</div>
+<!-- PAGE: SETUP -->
+<div class="page active" id="page-setup">
+
+    <div style="height:16px;"></div>
+
+    <div class="card">
+        <div class="card-title">🔑 CHEI API</div>
+
+        <label>GEMINI API KEY *</label>
+        <input type="password" id="inp-gk" placeholder="AIzaSy..."
+            autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false">
+        <div class="hint">aistudio.google.com → Get API Key → Create (gratuit)</div>
+
+        <label>GITHUB USERNAME</label>
+        <input type="text" id="inp-gu" placeholder="vv-technologies" autocomplete="off">
+
+        <label>GITHUB TOKEN (opțional — pentru deploy)</label>
+        <input type="password" id="inp-gt" placeholder="ghp_..."
+            autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false">
+    </div>
+
+    <div class="card">
+        <div class="card-title">📁 REPO ACTIV</div>
+        <div id="repo-list" style="display:flex;flex-wrap:wrap;gap:8px;">
+            <div class="rpill active" onclick="setRepo('ceo.html',this)">ceo.html</div>
+            <div class="rpill" onclick="setRepo('vv-team',this)">vv-team</div>
+            <div class="rpill" onclick="setRepo('vv-technologies',this)">vv-technologies</div>
+            <div class="rpill" onclick="setRepo('vvhi',this)">vvhi</div>
+        </div>
+    </div>
+
+    <button class="btn btn-white" onclick="doActivate()">ACTIVEAZĂ NEXUS</button>
+    <div id="status-msg"></div>
+
 </div>
 
-<!-- ══ SCREEN: SETUP ══ -->
-<div class="screen on" id="s-setup">
-<div class="setup">
-
-    <div class="security-note">
-        🔒 Cheile tale sunt salvate DOAR în browserul acestui telefon (localStorage). Nu sunt trimise nicăieri altundeva.
+<!-- PAGE: CHAT -->
+<div class="page" id="page-chat" style="padding-bottom:0;">
+    <div style="padding:8px 14px 0;display:flex;gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch;">
+        <button class="nav-btn" style="flex-shrink:0;min-height:32px;font-size:11px;padding:6px 12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:rgba(255,255,255,0.35);"
+            onclick="quickSend('Ce bug-uri poate avea VV Beta?')">🔍 Bugs</button>
+        <button class="nav-btn" style="flex-shrink:0;min-height:32px;font-size:11px;padding:6px 12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:rgba(255,255,255,0.35);"
+            onclick="quickSend('Ce feature nou ar crește retenția în VV Beta?')">💡 Idee</button>
+        <button class="nav-btn" style="flex-shrink:0;min-height:32px;font-size:11px;padding:6px 12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:rgba(255,255,255,0.35);"
+            onclick="quickSend('Care sunt pașii pentru lansarea VV Beta?')">🚀 Plan</button>
     </div>
 
-    <div class="setup-card">
-        <div class="card-title">MOTOR AI — GOOGLE GEMINI</div>
+    <div class="chat-box" id="chat" style="padding:12px 16px 0;overflow-y:auto;height:calc(100vh - 200px);-webkit-overflow-scrolling:touch;"></div>
 
-        <label class="field-label" for="f-gk">GEMINI API KEY *</label>
-        <input type="password" id="f-gk" class="field-input"
-            placeholder="AIzaSy..."
-            autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore>
-        <div style="display:flex;gap:8px;margin-top:-10px;margin-bottom:14px;">
-            <button onclick="hideKeys()" style="flex:1;padding:10px;background:rgba(212,175,55,0.1);border:1px solid rgba(212,175,55,0.25);border-radius:10px;color:#D4AF37;font-size:12px;font-weight:700;cursor:pointer;min-height:40px;-webkit-appearance:none;">
-                🔒 ASCUNDE CHEILE
-            </button>
-            <button onclick="revealKeys()" style="flex:1;padding:10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:rgba(255,255,255,0.4);font-size:12px;font-weight:700;cursor:pointer;min-height:40px;-webkit-appearance:none;">
-                👁 ARATĂ
-            </button>
-        </div>
-        <div id="aegis-status" style="display:none;padding:10px 12px;background:rgba(52,199,89,0.06);border:1px solid rgba(52,199,89,0.15);border-radius:10px;font-size:11px;color:rgba(52,199,89,0.7);margin-bottom:14px;">
-            🛡 Aegis activ — cheile sunt mascate. Nimeni nu le poate citi.
-        </div>
-        <div class="field-hint">
-            Obții cheia GRATUIT de la aistudio.google.com → Get API Key → Create API Key
-        </div>
-
-        <label class="field-label" for="f-gu">GITHUB USERNAME</label>
-        <input type="text" id="f-gu" class="field-input"
-            placeholder="vv-technologies"
-            autocomplete="off">
-
-        <label class="field-label" for="f-gt">GITHUB TOKEN (pentru deploy)</label>
-        <input type="password" id="f-gt" class="field-input"
-            placeholder="ghp_..."
-            autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore>
-        <div class="field-hint">
-            GitHub → Settings → Developer settings → Fine-grained tokens → Contents: Read &amp; Write
-        </div>
-    </div>
-
-    <div class="setup-card">
-        <div class="card-title">REPO ACTIV (target principal)</div>
-        <div class="pills" id="repo-pills">
-            <div class="pill on"  onclick="selRepo('ceo.html',this)">ceo.html</div>
-            <div class="pill"     onclick="selRepo('vv-team',this)">vv-team</div>
-            <div class="pill"     onclick="selRepo('vv-technologies',this)">vv-technologies</div>
-            <div class="pill"     onclick="selRepo('vvhi',this)">vvhi</div>
-            <div class="pill"     onclick="selRepo('vv-hybrid-univers',this)">vv-hybrid-univers</div>
-        </div>
-    </div>
-
-    <div class="setup-card">
-        <div class="card-title">🔄 MIRROR REPOS (push simultan)</div>
-        <div style="font-size:11px;color:rgba(255,255,255,0.25);margin-bottom:10px;">Selectează repo-urile care primesc Mirror Push simultan cu cel principal.</div>
-        <div class="pills" id="mirror-pills">
-            <div class="pill" onclick="toggleMirror('ceo.html',this)">ceo.html</div>
-            <div class="pill" onclick="toggleMirror('vv-team',this)">vv-team</div>
-            <div class="pill" onclick="toggleMirror('vv-technologies',this)">vv-technologies</div>
-            <div class="pill" onclick="toggleMirror('vvhi',this)">vvhi</div>
-            <div class="pill" onclick="toggleMirror('vv-hybrid-univers',this)">vv-hybrid-univers</div>
-        </div>
-    </div>
-
-    <div class="setup-card">
-        <div class="card-title">🔍 VV SCOT — GOOGLE SEARCH</div>
-        <label style="display:flex;align-items:center;gap:12px;cursor:pointer;padding:4px 0;">
-            <input type="checkbox" id="scot-cb" style="width:20px;height:20px;accent-color:#D4AF37;flex-shrink:0;cursor:pointer;">
-            <span style="font-size:12px;color:rgba(255,255,255,0.4);line-height:1.6;">Activează VV Scot — Gemini caută pe Google înainte să răspundă. Date reale, nu halucinații.</span>
-        </label>
-    </div>
-
-    <div class="setup-card">
-        <div class="card-title">✂️ PATCH MODE — CHIRURGIE PRECISĂ</div>
-        <label style="display:flex;align-items:center;gap:12px;cursor:pointer;padding:4px 0;">
-            <input type="checkbox" id="patch-cb" checked style="width:20px;height:20px;accent-color:#34c759;flex-shrink:0;cursor:pointer;">
-            <span style="font-size:12px;color:rgba(255,255,255,0.4);line-height:1.6;">
-                <strong style="color:rgba(255,255,255,0.7);">Recomandat ON.</strong> NEXUS modifică doar porțiunea de cod necesară, nu rescrie tot fișierul. Economisește tokeni și reduce erorile.<br>
-                <span style="color:rgba(255,255,255,0.2);font-size:11px;">OFF = generează fișierul complet (mai lent, mai mulți tokeni)</span>
-            </span>
-        </label>
-    </div>
-
-    <div class="setup-card">
-        <div class="card-title">🌍 MULTI-SITE MODE</div>
-        <div style="font-size:12px;color:rgba(255,255,255,0.3);margin-bottom:12px;line-height:1.6;">
-            NEXUS poate lucra pe orice site sau aplicație, nu doar VV. Adaugă un proiect nou și schimbă contextul instant.
-        </div>
-        <div id="projects-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px;">
-            <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:rgba(212,175,55,0.06);border:1px solid rgba(212,175,55,0.15);border-radius:10px;">
-                <div>
-                    <div style="font-size:12px;font-weight:700;color:#fff;">VV Beta + TEAM</div>
-                    <div style="font-size:10px;color:rgba(255,255,255,0.3);">vv-technologies.github.io</div>
-                </div>
-                <div style="font-size:10px;color:#D4AF37;font-weight:700;letter-spacing:1px;">ACTIV</div>
-            </div>
-        </div>
-        <button onclick="addProject()" style="width:100%;padding:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:12px;color:rgba(255,255,255,0.4);font-size:12px;cursor:pointer;min-height:44px;-webkit-appearance:none;">
-            + ADAUGĂ PROIECT NOU
-        </button>
-    </div>
-
-    <button class="btn-save" onclick="doSave()">
-        ACTIVEAZĂ NEXUS
-    </button>
-
-    <div id="save-status" style="text-align:center;padding:12px;font-size:12px;color:rgba(255,255,255,0.3);display:none;"></div>
-
-</div>
-</div>
-
-<!-- ══ SCREEN: CHAT ══ -->
-<div class="screen" id="s-chat">
-
-    <!-- Quick actions -->
-    <div class="qa" id="qa">
-        <div class="qa-btn" onclick="qc('Ce bug-uri poate avea VV Beta pe iPhone X?')">🔍 Bug scan</div>
-        <div class="qa-btn" onclick="qc('Ce feature ar crește retenția utilizatorilor VV Beta?')">💡 Feature idea</div>
-        <div class="qa-btn" onclick="qc('Explică arhitectura VV în 5 puncte.')">📋 Arhitectură</div>
-        <div class="qa-btn" onclick="qc('Ce pași concreți să fac săptămâna asta pentru lansarea VV Beta?')">🚀 Launch plan</div>
-    </div>
-
-    <!-- Chat messages -->
-    <div class="chat-wrap" id="chat"></div>
-
-    <!-- Typing -->
     <div class="typing" id="typing">
         <div class="typing-inner"><span></span><span></span><span></span></div>
     </div>
 
-    <!-- Input -->
-    <div class="inp">
-        <div class="inp-row">
-            <textarea class="inp-ta" id="inp" placeholder="Scrie comanda ta..." rows="1"
-                autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
-            <button class="btn-go" id="btn-go" onclick="send()">↑</button>
-        </div>
+    <div class="chat-input-area">
+        <textarea id="inp-msg" placeholder="Scrie comanda ta..." rows="1"
+            autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
+        <button class="btn-send" id="btn-send" onclick="doSend()">↑</button>
     </div>
 </div>
 
-<!-- ══ SCREEN: SANDBOX ══ -->
-<div class="screen" id="s-sandbox">
-<div class="sandbox">
-    <div class="sb-file-row">
-        <div style="font-size:11px;color:rgba(255,255,255,0.3);letter-spacing:1px;">ATELIERUL DE COD</div>
-        <div class="sb-file" id="sb-file">—</div>
+<!-- PAGE: SANDBOX -->
+<div class="page" id="page-sandbox">
+<div class="sandbox-page">
+    <div class="card">
+        <div class="card-title">🛠 SANDBOX — COD GENERAT</div>
+        <div id="sb-filename" style="font-size:11px;color:rgba(212,175,55,0.5);margin-bottom:10px;font-family:monospace;">—</div>
+        <textarea class="sb-editor" id="sb-code" placeholder="Codul generat de NEXUS apare aici automat."
+            autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
     </div>
-    <textarea class="sb-editor" id="sb-editor"
-        placeholder="Codul generat apare aici automat. Îl poți edita manual."
-        spellcheck="false" autocorrect="off" autocapitalize="off"></textarea>
-    <div class="sb-btns">
-        <button class="sb-btn g" onclick="sbPush()">🚀 PUSH GITHUB</button>
-        <button class="sb-btn b" onclick="sbCopy()">📋 COPIAZĂ</button>
-        <button class="sb-btn r" onclick="sbClear()">✕ CURĂȚĂ</button>
-    </div>
+    <button class="btn btn-green" onclick="sbPush()">🚀 PUSH PE GITHUB</button>
+    <button class="btn btn-gray"  onclick="sbCopy()">📋 COPIAZĂ CODUL</button>
+    <button class="btn btn-red"   onclick="sbClear()">✕ CURĂȚĂ</button>
 </div>
 </div>
 
-<!-- ══ SCREEN: DEPLOY ══ -->
-<div class="screen" id="s-deploy">
-<div class="setup">
-
-    <div class="setup-card">
-        <div class="card-title">🚀 DEPLOY RAPID</div>
-        <div id="deploy-repos-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px;">
-            <div style="color:rgba(255,255,255,0.25);font-size:12px;text-align:center;padding:10px;">Configurează GitHub în SETUP.</div>
-        </div>
-        <button onclick="doBigPush()" style="width:100%;padding:16px;background:rgba(52,199,89,0.12);border:1px solid rgba(52,199,89,0.25);border-radius:14px;color:#34c759;font-size:14px;font-weight:800;cursor:pointer;min-height:52px;letter-spacing:0.5px;-webkit-appearance:none;">
-            ⬆ PUSH PE REPO PRIMAR
-        </button>
-        <button id="btn-mirror-all" onclick="doMirrorAll()" style="display:none;width:100%;margin-top:10px;padding:16px;background:rgba(10,132,255,0.1);border:1px solid rgba(10,132,255,0.22);border-radius:14px;color:#0A84FF;font-size:14px;font-weight:800;cursor:pointer;min-height:52px;letter-spacing:0.5px;-webkit-appearance:none;">
-            🔄 MIRROR PUSH — TOATE REPO-URILE
-        </button>
-    </div>
-
-    <div class="setup-card">
-        <div class="card-title">👻 VV GHOST — ROLLBACK</div>
-        <div id="ghost-info" style="font-size:12px;color:rgba(255,255,255,0.25);margin-bottom:12px;">Niciun backup creat încă. Fă un push pentru a crea primul Ghost.</div>
-        <button onclick="doRollback()" style="width:100%;padding:13px;background:rgba(255,149,0,0.08);border:1px solid rgba(255,149,0,0.2);border-radius:12px;color:#ff9500;font-size:12px;font-weight:700;cursor:pointer;min-height:44px;-webkit-appearance:none;">
-            ↩ RESTAUREAZĂ VERSIUNEA ANTERIOARĂ
-        </button>
-    </div>
-
-    <div class="setup-card">
-        <div class="card-title">🧬 VV LOGIC DNA — MEMORIA SISTEMULUI</div>
-        <div id="dna-list" style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px;">
-            <div style="color:rgba(255,255,255,0.2);font-size:12px;text-align:center;padding:8px;">Nicio decizie înregistrată.</div>
-        </div>
-        <button onclick="exportDNA()" style="width:100%;padding:12px;background:rgba(212,175,55,0.07);border:1px solid rgba(212,175,55,0.18);border-radius:12px;color:#D4AF37;font-size:12px;font-weight:700;cursor:pointer;min-height:44px;-webkit-appearance:none;">
-            📥 EXPORTĂ VV_Logic_DNA.json
-        </button>
-    </div>
-
+<!-- NAV -->
+<div class="nav">
+    <button class="nav-btn active" id="nav-setup" onclick="goPage('setup')">
+        <span class="nav-icon">⚙️</span>SETUP
+    </button>
+    <button class="nav-btn" id="nav-chat" onclick="goPage('chat')">
+        <span class="nav-icon">💬</span>CHAT
+    </button>
+    <button class="nav-btn" id="nav-sandbox" onclick="goPage('sandbox')">
+        <span class="nav-icon">🛠</span>SANDBOX
+    </button>
 </div>
-</div>
+
+<style>
+.rpill {
+    padding: 8px 16px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px;
+    font-size: 12px;
+    color: rgba(255,255,255,0.4);
+    cursor: pointer;
+    touch-action: manipulation;
+}
+.rpill.active {
+    background: rgba(212,175,55,0.12);
+    border-color: rgba(212,175,55,0.3);
+    color: #D4AF37;
+}
+</style>
 
 <script>
 // ================================================================
-// VV NEXUS — versiune simplă, robustă pe Safari iOS
+// VV NEXUS — Ultra Simple · iPhone X Guaranteed
 // ================================================================
 
 var G = {
     gk: '', gt: '', gu: '',
     repo: 'ceo.html',
-    mirrors: [],
-    scotOn: false,
     msgs: [],
     busy: false,
     lastCode: null,
-    lastFile: null,
-    dna: [],
-    ghost: null,
-    patchMode: true,
-    projects: []
+    lastFile: null
 };
 
-var VV_CTX = `Ești VV NEXUS — asistentul AI personal al Arhitectului (fondatorul VV Technologies).
+var CTX = 'Ești VV NEXUS — asistentul AI personal al fondatorului VV Technologies.\n\nProiect VV: aplicație P2P urban intelligence pe GitHub Pages (vv-technologies.github.io).\nStack: HTML + CSS + Vanilla JS + Firebase (project: vv-ep-beta).\nDesign: BG #050507, Gold #D4AF37, Green #34c759, Blue #0A84FF. Glassmorphism dark.\nReguli: nu alert(), folosește showToast(). Firebase: .set merge:true. min-height:44px butoane.\nMarchează [DEPLOY:filename] la final când codul e gata.\nRăspunde MEREU în română. Cod funcțional din prima.';
 
-PROIECT VV:
-- VV Beta: aplicație web P2P urban intelligence, GitHub Pages (vv-technologies.github.io/ceo.html)
-- VV TEAM: panou CEO (vv-technologies.github.io/vv-team)
-- Stack: HTML + CSS + Vanilla JS + Firebase Firestore/Auth (project: vv-ep-beta)
-- Total: ~9.700 linii în 13 fișiere
-
-FIȘIERE PRINCIPALE:
-index.html, vv-beta-app.js, vv-beta-style.css (VV Beta)
-vv-team.html, vv-team-logic.js, vv-team-style.css (VV TEAM)
-vvhi-shadow.js (VVhi AI module), firestore.rules
-
-DESIGN: BG #050507, Gold #D4AF37, Green #34c759, Blue #0A84FF, Red #ff3b30
-Glassmorphism dark, -apple-system font, iPhone X safe areas
-
-REGULI COD:
-- NU alert() — folosește showCEOToast() sau showToast()
-- Firebase: .set({},{merge:true}) nu .update()
-- Inbox: nu where()+orderBy() fără index
-- min-height:44px pe toate butoanele
-- VVhi.logApproval() și VVhi.logRejection() după decizii CEO
-
-Marchează [DEPLOY:filename.js] la final când codul e gata de push.
-Răspunde MEREU în română. Cod funcțional din prima.`;
-
-// ── INIT ──────────────────────────────────────────────────────
-(function init() {
-    G.gk   = lsG('nx_gk')   || '';
-    G.gt   = lsG('nx_gt')   || '';
-    G.gu   = lsG('nx_gu')   || '';
-    G.repo = lsG('nx_repo') || 'ceo.html';
-    G.scotOn = lsG('nx_scot') === '1';
-    try { G.mirrors = JSON.parse(lsG('nx_mirrors') || '[]'); } catch(_) { G.mirrors = []; }
-    try { G.dna = JSON.parse(lsG('nx_dna') || '[]'); } catch(_) { G.dna = []; }
-    try { G.ghost = JSON.parse(lsG('nx_ghost') || 'null'); } catch(_) { G.ghost = null; }
-    G.patchMode = lsG('nx_patch') !== '0'; // default ON
-    try { G.projects = JSON.parse(lsG('nx_projects') || '[]'); } catch(_) { G.projects = []; }
-
-    // Populăm câmpurile Settings
-    if (G.gk) document.getElementById('f-gk').value = G.gk;
-    if (G.gt) document.getElementById('f-gt').value = G.gt;
-    if (G.gu) document.getElementById('f-gu').value = G.gu;
-    syncRepoPills();
-    syncMirrorPills();
-    if (G.scotOn) { var scb = document.getElementById('scot-cb'); if(scb) scb.checked = true; }
-    var pcb = document.getElementById('patch-cb'); if(pcb) pcb.checked = G.patchMode;
-    renderProjects();
-    renderDNA();
-    renderDeployScreen();
-    updateGhostInfo();
+// ── INIT ─────────────────────────────────────────────────────
+(function() {
+    G.gk   = store('get', 'nx_gk')   || '';
+    G.gt   = store('get', 'nx_gt')   || '';
+    G.gu   = store('get', 'nx_gu')   || '';
+    G.repo = store('get', 'nx_repo') || 'ceo.html';
 
     if (G.gk) {
-        dotOn(true);
-        hdrStatus('online');
-        // Dacă e deja configurat, mergem direct la chat
-        sw('chat');
-        addSys('NEXUS online · Repo: ' + G.repo + ' · Scrie comanda ta.');
+        document.getElementById('inp-gk').value = G.gk;
+        document.getElementById('inp-gt').value = G.gt || '';
+        document.getElementById('inp-gu').value = G.gu || '';
+        syncRepo();
+        setOnline(true);
+        goPage('chat');
+        addSys('NEXUS online · ' + G.repo + ' · Scrie comanda ta.');
     }
 
-    // Auto-resize textarea
-    var ta = document.getElementById('inp');
+    syncRepo();
+
+    var ta = document.getElementById('inp-msg');
     ta.addEventListener('input', function() {
         this.style.height = 'auto';
-        this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+        this.style.height = Math.min(this.scrollHeight, 100) + 'px';
     });
     ta.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            send();
-        }
+        if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); doSend(); }
     });
 })();
 
-
-// ── VV AEGIS CRYPTO — criptare locală chei ───────────────────
-// Cheia reală nu se salvează niciodată — doar forma criptată
-var _SALT = 'VVNexusArhitect' + navigator.userAgent.substring(10, 20);
-
-function aegisEncrypt(text) {
-    try {
-        var result = '';
-        for (var i = 0; i < text.length; i++) {
-            result += String.fromCharCode(text.charCodeAt(i) ^ _SALT.charCodeAt(i % _SALT.length));
-        }
-        return btoa(unescape(encodeURIComponent(result)));
-    } catch(e) { return text; }
-}
-
-function aegisDecrypt(encoded) {
-    try {
-        var decoded = decodeURIComponent(escape(atob(encoded)));
-        var result = '';
-        for (var i = 0; i < decoded.length; i++) {
-            result += String.fromCharCode(decoded.charCodeAt(i) ^ _SALT.charCodeAt(i % _SALT.length));
-        }
-        return result;
-    } catch(e) { return encoded; }
-}
-
-function isEncrypted(val) {
-    // Cheile reale încep cu AIza sau ghp_ — dacă nu, e criptată
-    if (!val) return false;
-    return !val.startsWith('AIza') && !val.startsWith('ghp_') && val.length > 10;
-}
-
-// ── Storage helpers cu criptare automată ─────────────────────
-var SENSITIVE_KEYS = ['nx_gk', 'nx_gt'];
-
-function lsS(k, v) {
-    var toStore = (SENSITIVE_KEYS.indexOf(k) > -1 && v) ? aegisEncrypt(v) : v;
-    try { localStorage.setItem(k, toStore); } catch(e) {}
-    try {
-        var d = new Date(); d.setFullYear(d.getFullYear() + 1);
-        document.cookie = encodeURIComponent(k) + '=' + encodeURIComponent(toStore) + ';expires=' + d.toUTCString() + ';path=/;SameSite=Strict';
-    } catch(e) {}
-}
-
-function lsG(k) {
-    var raw = null;
-    try { raw = localStorage.getItem(k); } catch(e) {}
-    if (!raw) {
+// ── STORAGE cu cookie fallback ────────────────────────────────
+function store(action, key, val) {
+    if (action === 'set') {
+        try { localStorage.setItem(key, val); } catch(e) {}
         try {
-            var name = encodeURIComponent(k) + '=';
-            var parts = document.cookie.split(';');
-            for (var i = 0; i < parts.length; i++) {
-                var c = parts[i].trim();
-                if (c.indexOf(name) === 0) { raw = decodeURIComponent(c.substring(name.length)); break; }
+            var d = new Date(); d.setFullYear(d.getFullYear() + 1);
+            document.cookie = key + '=' + encodeURIComponent(val) + ';expires=' + d.toUTCString() + ';path=/';
+        } catch(e) {}
+    } else {
+        var v = null;
+        try { v = localStorage.getItem(key); } catch(e) {}
+        if (v) return v;
+        try {
+            var ca = document.cookie.split(';');
+            for (var i = 0; i < ca.length; i++) {
+                var c = ca[i].trim();
+                if (c.indexOf(key + '=') === 0) return decodeURIComponent(c.substring(key.length + 1));
             }
         } catch(e) {}
+        return null;
     }
-    // Decriptăm automat cheile sensibile
-    if (raw && SENSITIVE_KEYS.indexOf(k) > -1 && isEncrypted(raw)) {
-        return aegisDecrypt(raw);
-    }
-    return raw;
 }
 
-// ── TAB SWITCHING ─────────────────────────────────────────────
-function sw(id) {
-    ['setup','chat','sandbox','deploy'].forEach(function(t) {
-        document.getElementById('s-'+t).classList.toggle('on', t===id);
-        document.getElementById('t-'+t).classList.toggle('on', t===id);
-    });
-    var inp = document.querySelector('.inp');
-    if (inp) inp.style.display = (id==='chat') ? 'block' : 'none';
-    if (id === 'deploy') { renderDeployScreen(); renderDNA(); updateGhostInfo(); }
+// ── NAVIGARE ─────────────────────────────────────────────────
+function goPage(id) {
+    document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
+    document.querySelectorAll('.nav-btn').forEach(function(b) { b.classList.remove('active'); });
+    document.getElementById('page-' + id).classList.add('active');
+    document.getElementById('nav-' + id).classList.add('active');
 }
 
-// ── REPO SELECTION ────────────────────────────────────────────
-function selRepo(name, el) {
-    document.querySelectorAll('#repo-pills .pill').forEach(function(p) { p.classList.remove('on'); });
-    el.classList.add('on');
+// ── REPO ─────────────────────────────────────────────────────
+function setRepo(name, el) {
     G.repo = name;
+    store('set', 'nx_repo', name);
+    document.querySelectorAll('.rpill').forEach(function(p) { p.classList.remove('active'); });
+    el.classList.add('active');
 }
 
-function syncRepoPills() {
-    document.querySelectorAll('#repo-pills .pill').forEach(function(p) {
-        p.classList.toggle('on', p.textContent.trim() === G.repo);
+function syncRepo() {
+    document.querySelectorAll('.rpill').forEach(function(p) {
+        p.classList.toggle('active', p.textContent.trim() === G.repo);
     });
 }
 
-function syncMirrorPills() {
-    document.querySelectorAll('#mirror-pills .pill').forEach(function(p) {
-        p.classList.toggle('on', G.mirrors.indexOf(p.textContent.trim()) > -1);
-    });
-}
-
-function toggleMirror(name, el) {
-    var idx = G.mirrors.indexOf(name);
-    if (idx > -1) G.mirrors.splice(idx, 1);
-    else G.mirrors.push(name);
-    el.classList.toggle('on', G.mirrors.indexOf(name) > -1);
-    lsS('nx_mirrors', JSON.stringify(G.mirrors));
-}
-
-// ── SAVE SETTINGS ─────────────────────────────────────────────
-function doSave() {
-    var gk = document.getElementById('f-gk').value.trim();
-    var gt = document.getElementById('f-gt').value.trim();
-    var gu = document.getElementById('f-gu').value.trim();
+// ── ACTIVEAZĂ ─────────────────────────────────────────────────
+function doActivate() {
+    var gk = document.getElementById('inp-gk').value.trim();
+    var gu = document.getElementById('inp-gu').value.trim();
+    var gt = document.getElementById('inp-gt').value.trim();
 
     if (!gk) {
-        showStatus('⚠️ Cheia Gemini API e obligatorie.', true);
-        document.getElementById('f-gk').focus();
+        showStatus('⚠️ Cheia Gemini e obligatorie.', 'red');
         return;
     }
 
-    G.gk = gk; G.gt = gt; G.gu = gu;
-    G.scotOn = document.getElementById('scot-cb') ? document.getElementById('scot-cb').checked : false;
-    G.patchMode = document.getElementById('patch-cb') ? document.getElementById('patch-cb').checked : true;
-    lsS('nx_patch', G.patchMode ? '1' : '0');
-    lsS('nx_gk', gk);
-    lsS('nx_gt', gt);
-    lsS('nx_gu', gu);
-    lsS('nx_repo', G.repo);
-    lsS('nx_scot', G.scotOn ? '1' : '0');
-    lsS('nx_mirrors', JSON.stringify(G.mirrors));
-    renderDeployScreen();
+    G.gk = gk; G.gu = gu; G.gt = gt;
+    store('set', 'nx_gk', gk);
+    store('set', 'nx_gu', gu);
+    store('set', 'nx_gt', gt);
+    store('set', 'nx_repo', G.repo);
 
-    dotOn(true);
-    hdrStatus('online');
-    showStatus('✅ NEXUS activat! Mergi la tab-ul CHAT.', false);
+    setOnline(true);
     toast('✅ NEXUS activat!', 'g');
 
-    // Switch automat la chat după 1s
     setTimeout(function() {
-        sw('chat');
-        if (document.getElementById('chat').children.length === 0) {
-            addSys('NEXUS online · Repo: ' + G.repo + ' · Scrie comanda ta.');
-        }
-    }, 800);
+        goPage('chat');
+        addSys('NEXUS online · Repo: ' + G.repo + ' · Scrie comanda ta.');
+    }, 600);
 }
 
-function showStatus(msg, isErr) {
-    var el = document.getElementById('save-status');
+function showStatus(msg, color) {
+    var el = document.getElementById('status-msg');
     el.textContent = msg;
-    el.style.color = isErr ? '#ff3b30' : '#34c759';
-    el.style.display = 'block';
-    if (!isErr) setTimeout(function() { el.style.display = 'none'; }, 3000);
+    el.style.color = color === 'red' ? '#ff3b30' : '#34c759';
 }
 
-// ── HEADER STATUS ─────────────────────────────────────────────
-function dotOn(on) {
-    document.getElementById('dot').className = 'dot' + (on ? ' on' : '');
+function setOnline(on) {
+    document.getElementById('dot').className = 'hdr-dot' + (on ? ' on' : '');
+    document.getElementById('hdr-txt').textContent = on ? 'online' : 'offline';
 }
 
-function dotBusy(b) {
-    document.getElementById('dot').className = 'dot' + (b ? ' bsy' : ' on');
-}
-
-function hdrStatus(txt) {
-    document.getElementById('hdr-status').textContent = txt;
-}
-
-// ── SEND MESSAGE ──────────────────────────────────────────────
-async function send() {
+// ── SEND ─────────────────────────────────────────────────────
+function doSend() {
     if (G.busy) return;
-    var ta = document.getElementById('inp');
+    var ta = document.getElementById('inp-msg');
     var txt = ta.value.trim();
     if (!txt) return;
+    if (!G.gk) { toast('Configurează cheia în SETUP.', 'o'); goPage('setup'); return; }
 
-    if (!G.gk) {
-        toast('Configurează cheia Gemini în tab-ul SETUP.', 'o');
-        sw('setup');
-        return;
-    }
-
-    addMsg('u', txt);
+    addMsg('user', txt);
     ta.value = ''; ta.style.height = 'auto';
     G.msgs.push({ role: 'user', parts: [{ text: txt }] });
-    await callAI();
+    callAI();
 }
 
-function qc(text) {
-    if (!G.gk) { toast('Configurează cheia în SETUP.', 'o'); sw('setup'); return; }
-    document.getElementById('inp').value = text;
-    send();
+function quickSend(txt) {
+    if (!G.gk) { toast('Configurează cheia în SETUP.', 'o'); goPage('setup'); return; }
+    document.getElementById('inp-msg').value = txt;
+    doSend();
 }
 
-// ── GEMINI API ────────────────────────────────────────────────
+// ── GEMINI ───────────────────────────────────────────────────
 async function callAI() {
     G.busy = true;
-    dotBusy(true);
-    hdrStatus('procesează...');
-    showTyping(true);
-    document.getElementById('btn-go').disabled = true;
-
-    // Patch Mode — trimitem context redus pentru economie tokeni
-    var ctxToSend = G.patchMode
-        ? 'Ești VV NEXUS. Patch Mode activ — modifică DOAR porțiunea cerută, nu rescrie tot.\n' + VV_CTX
-        : VV_CTX;
+    setOnline(false);
+    document.getElementById('hdr-txt').textContent = 'procesează...';
+    document.getElementById('typing').style.display = 'block';
+    document.getElementById('btn-send').disabled = true;
 
     var contents = [
-        { role: 'user',  parts: [{ text: ctxToSend + '\n\n--- SESIUNE:' }] },
-        { role: 'model', parts: [{ text: 'NEXUS gata. ' + (G.patchMode ? 'Patch Mode ON — modific doar ce e necesar.' : 'Full mode activ.') }] }
+        { role: 'user',  parts: [{ text: CTX + '\n\n---' }] },
+        { role: 'model', parts: [{ text: 'NEXUS gata.' }] }
     ];
-    // Limităm istoricul la ultimele 6 mesaje pentru economie tokeni
-    var recentMsgs = G.msgs.slice(-6);
-    recentMsgs.forEach(function(m) { contents.push(m); });
+    G.msgs.slice(-6).forEach(function(m) { contents.push(m); });
 
     try {
-        var reqBody = {
-            contents: contents,
-            generationConfig: { temperature: 0.7, maxOutputTokens: 8192 },
-            safetySettings: [
-                { category: 'HARM_CATEGORY_HARASSMENT',        threshold: 'BLOCK_NONE' },
-                { category: 'HARM_CATEGORY_HATE_SPEECH',       threshold: 'BLOCK_NONE' },
-                { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_NONE' },
-                { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_NONE' }
-            ]
-        };
-        // VV Scot — Google Search Grounding
-        if (G.scotOn) { reqBody.tools = [{ googleSearch: {} }]; }
-
         var r = await fetch(
             'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' + G.gk,
-            { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(reqBody) }
+            {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: contents,
+                    generationConfig: { temperature: 0.7, maxOutputTokens: 4096 },
+                    safetySettings: [
+                        { category: 'HARM_CATEGORY_HARASSMENT',        threshold: 'BLOCK_NONE' },
+                        { category: 'HARM_CATEGORY_HATE_SPEECH',       threshold: 'BLOCK_NONE' },
+                        { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_NONE' },
+                        { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_NONE' }
+                    ]
+                })
+            }
         );
 
         if (!r.ok) {
             var e = await r.json().catch(function() { return {}; });
-            var m = (e.error && e.error.message) || ('HTTP ' + r.status);
-            if (r.status === 400) m = 'Cheie Gemini invalidă — verifică în SETUP';
-            if (r.status === 429) m = '⏳ Limită API (429) — așteaptă 1 minut și retrimite. Sau verifică cheia în SETUP.';
-            if (r.status === 403) m = 'Cheie fără acces — generează una nouă din AI Studio';
+            var m = (e.error && e.error.message) || ('Eroare HTTP ' + r.status);
+            if (r.status === 400) m = 'Cheie invalidă. Verifică în SETUP.';
+            if (r.status === 429) m = 'Limită depășită. Așteaptă 1 minut.';
+            if (r.status === 403) m = 'Cheie fără acces. Regenerează din AI Studio.';
             throw new Error(m);
         }
 
@@ -679,115 +570,70 @@ async function callAI() {
                    data.candidates[0].content.parts[0] &&
                    data.candidates[0].content.parts[0].text;
 
-        if (!txt) throw new Error('Răspuns gol de la Gemini.');
+        if (!txt) throw new Error('Răspuns gol.');
 
         G.msgs.push({ role: 'model', parts: [{ text: txt }] });
-        showTyping(false);
         processReply(txt);
-        hdrStatus('online');
 
     } catch(err) {
-        showTyping(false);
-        addMsg('a', '⚠️ ' + err.message);
-        dotOn(true);
-        hdrStatus('eroare');
-        setTimeout(function() { hdrStatus('online'); }, 3000);
+        addMsg('ai', '⚠️ ' + err.message);
     } finally {
         G.busy = false;
-        dotBusy(false);
-        document.getElementById('btn-go').disabled = false;
+        document.getElementById('typing').style.display = 'none';
+        document.getElementById('btn-send').disabled = false;
+        setOnline(true);
     }
 }
 
-// ── PROCESS REPLY ─────────────────────────────────────────────
+// ── PROCESS ──────────────────────────────────────────────────
 function processReply(text) {
-    // Detectăm [DEPLOY:filename]
     var dm = text.match(/\[DEPLOY:\s*([^\]]+)\]/);
     var fn = dm ? dm[1].trim() : null;
 
-    // Extragem blocuri cod
     var codeRx = /```(?:\w+)?\n([\s\S]*?)```/g;
     var codes = [], m;
     while ((m = codeRx.exec(text)) !== null) codes.push(m[1]);
 
     if (codes.length) {
         G.lastCode = codes[codes.length - 1];
-        G.lastFile = fn || guessFile(text);
-        // Trimitem în Sandbox automat
-        document.getElementById('sb-editor').value = G.lastCode;
-        document.getElementById('sb-file').textContent = G.lastFile || 'cod.js';
+        G.lastFile = fn;
+        document.getElementById('sb-code').value = G.lastCode;
+        document.getElementById('sb-filename').textContent = fn || 'cod generat';
     }
 
-    addMsg('a', text, fn, codes.length > 0);
-
-    // DNA — logăm decizia
-    var lastCmd = G.msgs.length >= 2 ? G.msgs[G.msgs.length - 2].parts[0].text : '';
-    addDNA(lastCmd.substring(0, 80), fn || '—', codes.length > 0);
+    addMsg('ai', text, codes.length > 0, fn);
 }
 
-function guessFile(text) {
-    var m = text.match(/(?:în|adaugă în|modifică)\s+([a-z][a-z\-]*\.(?:js|html|css))/i);
-    return m ? m[1] : null;
-}
-
-// ── ADD MESSAGE ───────────────────────────────────────────────
-function addMsg(role, text, deployFn, hasCode) {
+// ── MESSAGES ─────────────────────────────────────────────────
+function addMsg(role, text, hasCode, deployFile) {
     var chat = document.getElementById('chat');
-
-    if (role === 's') {
-        var d = document.createElement('div');
-        d.className = 'msg s';
-        d.innerHTML = '<div class="bub">' + esc(text) + '</div>';
-        chat.appendChild(d);
-        scrollBot();
-        return;
-    }
-
     var wrap = document.createElement('div');
-    wrap.className = 'msg ' + role;
 
-    var who = document.createElement('div');
-    who.className = 'who';
-    who.textContent = role === 'u' ? 'TU' : 'NEXUS';
-    wrap.appendChild(who);
-
-    var bub = document.createElement('div');
-    bub.className = 'bub';
-    bub.innerHTML = fmt(text);
-    wrap.appendChild(bub);
-
-    // Deploy card dacă are cod și GitHub configurat
-    if (hasCode && G.gt && G.gu) {
-        var fn = deployFn || G.lastFile || 'fișier.js';
-        var dc = document.createElement('div');
-        dc.className = 'dcard';
-        dc.innerHTML =
-            '<div class="dcard-title">🚀 GATA DE PUSH</div>' +
-            '<div class="dcard-path">→ ' + G.gu + '/' + G.repo + '/' + fn + '</div>';
-        var pb = document.createElement('button');
-        pb.className = 'btn-push';
-        pb.textContent = '⬆ PUSH PE GITHUB';
-        (function(fileName) {
-            pb.onclick = function() { pushFile(fileName, pb); };
-        })(fn);
-        dc.appendChild(pb);
-        wrap.appendChild(dc);
+    if (role === 'sys') {
+        wrap.className = 'msg-wrap sys';
+        wrap.innerHTML = '<div class="msg-bub">' + esc(text) + '</div>';
+        chat.appendChild(wrap); scrBot(); return;
     }
 
-    // Buton "Vezi în Sandbox" dacă are cod
+    wrap.className = 'msg-wrap ' + (role === 'user' ? 'user' : 'ai');
+    var who = role === 'user' ? 'TU' : 'NEXUS';
+    var bubHtml = fmt(text);
+
+    wrap.innerHTML = '<div class="msg-who">' + who + '</div><div class="msg-bub">' + bubHtml + '</div>';
+
     if (hasCode) {
-        var sb = document.createElement('button');
-        sb.style.cssText = 'margin-top:6px;padding:8px 14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:9px;color:rgba(255,255,255,0.5);font-size:11px;cursor:pointer;min-height:36px;';
-        sb.textContent = '🛠 DESCHIDE ÎN SANDBOX';
-        sb.onclick = function() { sw('sandbox'); };
-        wrap.appendChild(sb);
+        var sbBtn = document.createElement('button');
+        sbBtn.style.cssText = 'margin-top:6px;padding:8px 14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:9px;color:rgba(255,255,255,0.5);font-size:12px;cursor:pointer;display:block;touch-action:manipulation;';
+        sbBtn.textContent = '🛠 DESCHIDE ÎN SANDBOX';
+        sbBtn.onclick = function() { goPage('sandbox'); };
+        wrap.appendChild(sbBtn);
     }
 
     chat.appendChild(wrap);
-    scrollBot();
+    scrBot();
 }
 
-function addSys(text) { addMsg('s', text); }
+function addSys(text) { addMsg('sys', text); }
 
 function fmt(t) {
     var h = esc(t);
@@ -799,359 +645,65 @@ function fmt(t) {
 }
 
 function esc(t) {
-    return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    return (t || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-// ── GITHUB PUSH ───────────────────────────────────────────────
-async function pushFile(fileName, btn) {
-    if (!G.lastCode) { toast('Niciun cod disponibil.', 'r'); return; }
-    if (!G.gt || !G.gu) { toast('Configurează GitHub Token în SETUP.', 'o'); sw('setup'); return; }
-
-    btn.disabled = true;
-    btn.textContent = 'SE TRIMITE...';
-
-    // Ghost backup înainte de orice push
-    saveGhost(fileName, G.lastCode);
-
-    var url = 'https://api.github.com/repos/' + G.gu + '/' + G.repo + '/contents/' + fileName;
-
-    try {
-        var sha = null;
-        try {
-            var gr = await fetch(url, { headers: { 'Authorization': 'Bearer ' + G.gt, 'Accept': 'application/vnd.github+json' } });
-            if (gr.ok) { var fd = await gr.json(); sha = fd.sha; }
-        } catch(_) {}
-
-        var body = {
-            message: 'VV NEXUS · ' + fileName + ' · ' + new Date().toLocaleString('ro-RO'),
-            content: btoa(unescape(encodeURIComponent(G.lastCode)))
-        };
-        if (sha) body.sha = sha;
-
-        var pr = await fetch(url, {
-            method: 'PUT',
-            headers: { 'Authorization': 'Bearer ' + G.gt, 'Accept': 'application/vnd.github+json', 'Content-Type': 'application/json' },
-            body: JSON.stringify(body)
-        });
-
-        if (!pr.ok) {
-            var ej = await pr.json().catch(function() { return {}; });
-            var em = ej.message || 'HTTP ' + pr.status;
-            if (em.includes('Bad credentials')) em = 'Token GitHub invalid — verifică în SETUP';
-            if (em.includes('Not Found'))       em = 'Repo "' + G.repo + '" negăsit';
-            throw new Error(em);
-        }
-
-        btn.textContent = '✓ DEPLOIAT!';
-        btn.style.background = 'rgba(52,199,89,0.2)';
-        toast('🚀 ' + fileName + ' → ' + G.repo, 'g');
-        addDNA('DEPLOY ' + fileName, G.repo, true);
-        renderDeployScreen();
-
-    } catch(err) {
-        btn.disabled = false;
-        btn.textContent = '⬆ PUSH PE GITHUB';
-        toast('Eroare: ' + err.message, 'r');
-    }
+function scrBot() {
+    var c = document.getElementById('chat');
+    setTimeout(function() { c.scrollTop = c.scrollHeight; }, 50);
 }
 
-// ── SANDBOX ───────────────────────────────────────────────────
+// ── SANDBOX ──────────────────────────────────────────────────
 function sbPush() {
-    var code = document.getElementById('sb-editor').value.trim();
+    var code = document.getElementById('sb-code').value.trim();
     if (!code) { toast('Sandbox gol.', 'r'); return; }
-    G.lastCode = code;
-    var fn = document.getElementById('sb-file').textContent;
-    if (!fn || fn === '—') { fn = prompt('Numele fișierului (ex: vv-beta-app.js):'); }
+    if (!G.gt || !G.gu) { toast('Configurează GitHub Token în SETUP.', 'o'); goPage('setup'); return; }
+    var fn = document.getElementById('sb-filename').textContent;
+    if (!fn || fn === '—' || fn === 'cod generat') {
+        fn = prompt('Numele fișierului (ex: vv-beta-app.js):');
+    }
     if (!fn) return;
-    G.lastFile = fn;
-    var btn = document.createElement('button');
-    btn.textContent = '⬆ PUSH';
-    pushFile(fn, btn);
-    toast('Trimite...', 'b');
-    // Facem push direct
-    if (!G.gt || !G.gu) { toast('Configurează GitHub în SETUP.', 'o'); sw('setup'); return; }
+    G.lastCode = code; G.lastFile = fn;
+
     var url = 'https://api.github.com/repos/' + G.gu + '/' + G.repo + '/contents/' + fn;
     fetch(url, { headers: { 'Authorization': 'Bearer ' + G.gt, 'Accept': 'application/vnd.github+json' } })
         .then(function(r) { return r.ok ? r.json() : null; })
         .then(function(fd) {
-            var body = { message: 'VV NEXUS Sandbox · ' + fn, content: btoa(unescape(encodeURIComponent(code))) };
+            var body = { message: 'VV NEXUS · ' + fn, content: btoa(unescape(encodeURIComponent(code))) };
             if (fd && fd.sha) body.sha = fd.sha;
             return fetch(url, { method: 'PUT', headers: { 'Authorization': 'Bearer ' + G.gt, 'Accept': 'application/vnd.github+json', 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
         })
-        .then(function(r) {
-            if (r && r.ok) toast('🚀 ' + fn + ' deploiat!', 'g');
-            else toast('Eroare la push.', 'r');
-        })
+        .then(function(r) { if (r && r.ok) toast('🚀 ' + fn + ' deploiat!', 'g'); else toast('Eroare la push.', 'r'); })
         .catch(function(e) { toast('Eroare: ' + e.message, 'r'); });
 }
 
 function sbCopy() {
-    var code = document.getElementById('sb-editor').value;
+    var code = document.getElementById('sb-code').value;
     if (!code) { toast('Sandbox gol.', 'r'); return; }
     if (navigator.clipboard) {
         navigator.clipboard.writeText(code).then(function() { toast('Copiat!', 'g'); });
     } else {
-        document.getElementById('sb-editor').select();
+        document.getElementById('sb-code').select();
         document.execCommand('copy');
         toast('Copiat!', 'g');
     }
 }
 
 function sbClear() {
-    document.getElementById('sb-editor').value = '';
-    document.getElementById('sb-file').textContent = '—';
+    document.getElementById('sb-code').value = '';
+    document.getElementById('sb-filename').textContent = '—';
     G.lastCode = null; G.lastFile = null;
     toast('Sandbox curățat.', 'b');
 }
 
-// ── UTILS ─────────────────────────────────────────────────────
-function showTyping(s) {
-    document.getElementById('typing').style.display = s ? 'block' : 'none';
-    if (s) scrollBot();
-}
-
-function scrollBot() {
-    var c = document.getElementById('chat');
-    setTimeout(function() { c.scrollTop = c.scrollHeight; }, 60);
-}
-
+// ── TOAST ────────────────────────────────────────────────────
 function toast(msg, type) {
-    var old = document.getElementById('nx-toast');
-    if (old) old.remove();
-    var t = document.createElement('div');
-    t.id = 'nx-toast';
-    t.className = 'toast ' + (type || 'g');
+    var t = document.getElementById('toast');
     t.textContent = msg;
-    document.body.appendChild(t);
-    setTimeout(function() {
-        t.style.opacity = '0';
-        t.style.transition = 'opacity 0.3s';
-        setTimeout(function() { t.remove(); }, 300);
-    }, 3000);
+    t.className = type || 'g';
+    t.style.display = 'block';
+    setTimeout(function() { t.style.display = 'none'; }, 3000);
 }
-
-// ── MIRROR PUSH ────────────────────────────────────────────────
-async function ghPush(repoName, fileName, code) {
-    var url = 'https://api.github.com/repos/' + G.gu + '/' + repoName + '/contents/' + fileName;
-    var sha = null;
-    try {
-        var gr = await fetch(url, { headers: { 'Authorization': 'Bearer ' + G.gt, 'Accept': 'application/vnd.github+json' } });
-        if (gr.ok) { var fd = await gr.json(); sha = fd.sha; }
-    } catch(_) {}
-    var body = { message: 'VV NEXUS · ' + fileName + ' · ' + new Date().toLocaleString('ro-RO'), content: btoa(unescape(encodeURIComponent(code))) };
-    if (sha) body.sha = sha;
-    var pr = await fetch(url, { method: 'PUT', headers: { 'Authorization': 'Bearer ' + G.gt, 'Accept': 'application/vnd.github+json', 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
-    if (!pr.ok) { var e = await pr.json().catch(function(){return{}}); throw new Error(e.message || 'HTTP ' + pr.status); }
-    return true;
-}
-
-async function doBigPush() {
-    if (!G.lastCode) { toast('Niciun cod. Du-te la CHAT și generează ceva.', 'r'); return; }
-    var fn = G.lastFile || prompt('Numele fișierului (ex: vv-beta-app.js):');
-    if (!fn) return;
-    saveGhost(fn, G.lastCode);
-    try {
-        await ghPush(G.repo, fn, G.lastCode);
-        toast('🚀 ' + fn + ' → ' + G.repo, 'g');
-        addDNA('BIG PUSH ' + fn, G.repo, true);
-        renderDeployScreen();
-    } catch(e) { toast('Eroare: ' + e.message, 'r'); }
-}
-
-async function doMirrorAll() {
-    if (!G.lastCode || !G.mirrors.length) { toast('Niciun cod sau mirror nesetat.', 'r'); return; }
-    var fn = G.lastFile || prompt('Fișierul target:');
-    if (!fn) return;
-    var ok = 0;
-    var allRepos = [G.repo].concat(G.mirrors.filter(function(r) { return r !== G.repo; }));
-    for (var i = 0; i < allRepos.length; i++) {
-        try { await ghPush(allRepos[i], fn, G.lastCode); ok++; } catch(_) {}
-    }
-    toast('🔄 Mirror: ' + ok + '/' + allRepos.length + ' repo-uri', ok === allRepos.length ? 'g' : 'o');
-    addDNA('MIRROR ALL ' + fn, allRepos.join(', '), true);
-    renderDeployScreen();
-}
-
-// ── VV GHOST ───────────────────────────────────────────────────
-function saveGhost(fileName, code) {
-    G.ghost = { fileName: fileName, code: code, ts: Date.now() };
-    lsS('nx_ghost', JSON.stringify(G.ghost));
-    updateGhostInfo();
-}
-
-function updateGhostInfo() {
-    var el = document.getElementById('ghost-info');
-    if (!el) return;
-    if (G.ghost) {
-        el.textContent = 'Backup: ' + G.ghost.fileName + ' · ' + new Date(G.ghost.ts).toLocaleString('ro-RO', {hour:'2-digit',minute:'2-digit',second:'2-digit'});
-        el.style.color = 'rgba(255,149,0,0.6)';
-    } else {
-        el.textContent = 'Niciun backup. Fă primul push pentru a crea Ghost.';
-        el.style.color = 'rgba(255,255,255,0.2)';
-    }
-}
-
-async function doRollback() {
-    if (!G.ghost) { toast('Niciun backup disponibil.', 'r'); return; }
-    if (!confirm('Restaurezi ' + G.ghost.fileName + ' la versiunea din ' + new Date(G.ghost.ts).toLocaleString('ro-RO') + '?')) return;
-    try {
-        await ghPush(G.repo, G.ghost.fileName, G.ghost.code);
-        toast('↩ Rollback complet: ' + G.ghost.fileName, 'o');
-        addDNA('ROLLBACK ' + G.ghost.fileName, G.repo, true);
-    } catch(e) { toast('Eroare rollback: ' + e.message, 'r'); }
-}
-
-// ── VV LOGIC DNA ───────────────────────────────────────────────
-function addDNA(cmd, target, ok) {
-    G.dna.unshift({ ts: Date.now(), cmd: cmd, target: target, ok: ok });
-    if (G.dna.length > 50) G.dna = G.dna.slice(0, 50);
-    lsS('nx_dna', JSON.stringify(G.dna));
-    renderDNA();
-}
-
-function renderDNA() {
-    var el = document.getElementById('dna-list');
-    if (!el) return;
-    if (!G.dna.length) {
-        el.innerHTML = '<div style="color:rgba(255,255,255,0.2);font-size:12px;text-align:center;padding:8px;">Nicio decizie înregistrată.</div>';
-        return;
-    }
-    el.innerHTML = G.dna.slice(0, 8).map(function(e) {
-        return '<div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:12px;">'
-            + '<span style="color:rgba(255,255,255,0.2);font-family:monospace;font-size:10px;flex-shrink:0;">' + new Date(e.ts).toLocaleString('ro-RO',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}) + '</span>'
-            + '<span style="color:rgba(255,255,255,0.5);">' + (e.ok ? '✓' : '✗') + ' ' + esc(e.cmd) + '</span>'
-            + '</div>';
-    }).join('');
-}
-
-function exportDNA() {
-    var data = JSON.stringify({ version: '1.0', exported: new Date().toISOString(), entries: G.dna }, null, 2);
-    var blob = new Blob([data], { type: 'application/json' });
-    var url = URL.createObjectURL(blob);
-    var a = document.createElement('a');
-    a.href = url; a.download = 'VV_Logic_DNA.json'; a.click();
-    URL.revokeObjectURL(url);
-    toast('DNA exportat ✅', 'g');
-}
-
-// ── DEPLOY SCREEN ──────────────────────────────────────────────
-function renderDeployScreen() {
-    var el = document.getElementById('deploy-repos-list');
-    if (!el || !G.gu) return;
-    var allRepos = [G.repo].concat(G.mirrors.filter(function(r) { return r !== G.repo; }));
-    el.innerHTML = allRepos.map(function(r) {
-        var isPrimary = r === G.repo;
-        return '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.05);">'
-            + '<div><span style="font-family:monospace;font-size:12px;color:rgba(255,255,255,0.6);">' + G.gu + '/' + r + '</span>'
-            + (isPrimary ? '<span style="margin-left:8px;font-size:9px;color:rgba(212,175,55,0.5);letter-spacing:1px;font-weight:700;">PRIMAR</span>' : '<span style="margin-left:8px;font-size:9px;color:rgba(10,132,255,0.5);letter-spacing:1px;font-weight:700;">MIRROR</span>')
-            + '</div>'
-            + '<span style="font-size:11px;color:rgba(52,199,89,0.5);font-weight:700;">GATA</span>'
-            + '</div>';
-    }).join('');
-    var mirrorBtn = document.getElementById('btn-mirror-all');
-    if (mirrorBtn) mirrorBtn.style.display = G.mirrors.length > 0 ? 'block' : 'none';
-}
-
-
-// ── MULTI-SITE / PROIECTE ─────────────────────────────────────
-function addProject() {
-    var name = prompt('Numele proiectului (ex: Blog Personal, Shop XYZ):');
-    if (!name) return;
-    var repo = prompt('Repo GitHub (ex: my-blog):');
-    if (!repo) return;
-    var url  = prompt('URL site (ex: mysite.github.io) — opțional:') || '';
-    var desc = prompt('Scurtă descriere (ex: Site prezentare firma):') || '';
-
-    G.projects.push({ name: name, repo: repo, url: url, desc: desc, ts: Date.now() });
-    lsS('nx_projects', JSON.stringify(G.projects));
-    renderProjects();
-    // Adăugăm repo-ul în lista de repo pills
-    toast(name + ' adăugat ✅', 'g');
-}
-
-function switchProject(idx) {
-    var p = G.projects[idx];
-    if (!p) return;
-    G.repo = p.repo;
-    lsS('nx_repo', p.repo);
-    syncRepoPills();
-    renderProjects();
-    toast('Proiect activ: ' + p.name, 'b');
-    // Informăm AI-ul despre schimbarea de proiect
-    if (G.msgs.length > 0) G.msgs = []; // reset context la schimbare proiect
-    sw('chat');
-    addSys('Proiect schimbat: ' + p.name + ' (' + p.repo + '). Context resetat.');
-}
-
-function removeProject(idx) {
-    if (!confirm('Ștergi proiectul ' + G.projects[idx].name + '?')) return;
-    G.projects.splice(idx, 1);
-    lsS('nx_projects', JSON.stringify(G.projects));
-    renderProjects();
-}
-
-function renderProjects() {
-    var el = document.getElementById('projects-list');
-    if (!el) return;
-    var html = '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:rgba(212,175,55,0.06);border:1px solid rgba(212,175,55,0.15);border-radius:10px;margin-bottom:6px;">'
-        + '<div><div style="font-size:12px;font-weight:700;color:#fff;">VV Beta + TEAM</div>'
-        + '<div style="font-size:10px;color:rgba(255,255,255,0.3);">vv-technologies.github.io</div></div>'
-        + '<div style="font-size:10px;color:#D4AF37;font-weight:700;letter-spacing:1px;">' + (G.repo === 'ceo.html' || G.repo === 'vv-team' ? 'ACTIV' : '') + '</div>'
-        + '</div>';
-
-    G.projects.forEach(function(p, i) {
-        var isActive = G.repo === p.repo;
-        html += '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:' + (isActive ? 'rgba(10,132,255,0.08)' : 'rgba(255,255,255,0.03)') + ';border:1px solid ' + (isActive ? 'rgba(10,132,255,0.2)' : 'rgba(255,255,255,0.08)') + ';border-radius:10px;margin-bottom:6px;cursor:pointer;" onclick="switchProject(' + i + ')">'
-            + '<div><div style="font-size:12px;font-weight:700;color:#fff;">' + esc(p.name) + '</div>'
-            + '<div style="font-size:10px;color:rgba(255,255,255,0.3);">' + esc(p.repo) + (p.url ? ' · ' + esc(p.url) : '') + '</div></div>'
-            + '<div style="display:flex;gap:8px;align-items:center;">'
-            + (isActive ? '<span style="font-size:10px;color:#0A84FF;font-weight:700;">ACTIV</span>' : '')
-            + '<span onclick="event.stopPropagation();removeProject(' + i + ')" style="font-size:16px;color:rgba(255,59,48,0.4);cursor:pointer;padding:4px;">✕</span>'
-            + '</div>'
-            + '</div>';
-    });
-
-    el.innerHTML = html;
-}
-
-
-// ── AEGIS — Ascunde/Arată chei ───────────────────────────────
-function hideKeys() {
-    var gkEl = document.getElementById('f-gk');
-    var gtEl = document.getElementById('f-gt');
-    var gkVal = gkEl ? gkEl.value.trim() : '';
-    var gtVal = gtEl ? gtEl.value.trim() : '';
-
-    if (!gkVal) { toast('Introdu mai întâi cheia înainte să o ascunzi.', 'o'); return; }
-
-    // Salvăm criptat
-    if (gkVal && !isEncrypted(gkVal)) lsS('nx_gk', gkVal);
-    if (gtVal && !isEncrypted(gtVal)) lsS('nx_gt', gtVal);
-
-    // Înlocuim câmpurile cu text mascat
-    if (gkEl) gkEl.value = '••••••••••••••••••••••••••••••••••••';
-    if (gtEl && gtVal) gtEl.value = '••••••••••••••••••••••••••••••••••••';
-
-    var st = document.getElementById('aegis-status');
-    if (st) st.style.display = 'block';
-
-    // G le știe deja din lsG
-    G.gk = lsG('nx_gk') || gkVal;
-    G.gt = lsG('nx_gt') || gtVal;
-
-    toast('🛡 Chei ascunse de Aegis!', 'g');
-}
-
-function revealKeys() {
-    var gkEl = document.getElementById('f-gk');
-    var gtEl = document.getElementById('f-gt');
-    if (gkEl) gkEl.value = G.gk || lsG('nx_gk') || '';
-    if (gtEl) gtEl.value = G.gt || lsG('nx_gt') || '';
-    var st = document.getElementById('aegis-status');
-    if (st) st.style.display = 'none';
-    toast('👁 Chei vizibile temporar.', 'o');
-}
-
 </script>
 </body>
 </html>
