@@ -173,6 +173,7 @@ body { background:#04040a; color:#fff; font-family:-apple-system,sans-serif; hei
             <div class="pill"     onclick="selRepo('vv-team',this)">vv-team</div>
             <div class="pill"     onclick="selRepo('vv-technologies',this)">vv-technologies</div>
             <div class="pill"     onclick="selRepo('vvhi',this)">vvhi</div>
+            <div class="pill"     onclick="selRepo('vv-hybrid-univers',this)">vv-hybrid-univers</div>
         </div>
     </div>
 
@@ -184,6 +185,7 @@ body { background:#04040a; color:#fff; font-family:-apple-system,sans-serif; hei
             <div class="pill" onclick="toggleMirror('vv-team',this)">vv-team</div>
             <div class="pill" onclick="toggleMirror('vv-technologies',this)">vv-technologies</div>
             <div class="pill" onclick="toggleMirror('vvhi',this)">vvhi</div>
+            <div class="pill" onclick="toggleMirror('vv-hybrid-univers',this)">vv-hybrid-univers</div>
         </div>
     </div>
 
@@ -530,7 +532,7 @@ async function callAI() {
         if (G.scotOn) { reqBody.tools = [{ googleSearch: {} }]; }
 
         var r = await fetch(
-            'https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash-latest:generateContent?key=' + G.gk,
+            'https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=' + G.gk,
             { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(reqBody) }
         );
 
