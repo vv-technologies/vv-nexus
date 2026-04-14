@@ -530,7 +530,7 @@ async function callAI() {
         if (G.scotOn) { reqBody.tools = [{ googleSearch: {} }]; }
 
         var r = await fetch(
-            'https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=' + G.gk,
+            'https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash-latest:generateContent?key=' + G.gk,
             { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(reqBody) }
         );
 
@@ -538,7 +538,7 @@ async function callAI() {
             var e = await r.json().catch(function() { return {}; });
             var m = (e.error && e.error.message) || ('HTTP ' + r.status);
             if (r.status === 400) m = 'Cheie Gemini invalidă — verifică în SETUP';
-            if (r.status === 429) m = 'Limită depășită — încearcă în câteva minute';
+            if (r.status === 429) m = '⏳ Limită API (429) — așteaptă 1 minut și retrimite. Sau verifică cheia în SETUP.';
             if (r.status === 403) m = 'Cheie fără acces — generează una nouă din AI Studio';
             throw new Error(m);
         }
