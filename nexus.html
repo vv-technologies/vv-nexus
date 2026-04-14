@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="VV NEXUS">
 <title>VV NEXUS</title>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:rgba(0,0,0,0); }
@@ -422,9 +425,37 @@ Răspunde MEREU în română. Cod funcțional din prima.`;
     });
 })();
 
-// ── LocalStorage helpers ──────────────────────────────────────
-function lsG(k) { try { return localStorage.getItem(k); } catch(e) { return null; } }
-function lsS(k,v) { try { localStorage.setItem(k,v); } catch(e) {} }
+// ── Storage helpers — localStorage + cookie fallback ────────────
+// Safari iOS șterge localStorage pe GitHub Pages — folosim și cookies
+function lsS(k, v) {
+    try { localStorage.setItem(k, v); } catch(e) {}
+    // Cookie cu expirare 1 an ca fallback
+    try {
+        var d = new Date();
+        d.setFullYear(d.getFullYear() + 1);
+        document.cookie = encodeURIComponent(k) + '=' + encodeURIComponent(v) + ';expires=' + d.toUTCString() + ';path=/;SameSite=Strict';
+    } catch(e) {}
+}
+
+function lsG(k) {
+    // Încearcă localStorage primul
+    try {
+        var v = localStorage.getItem(k);
+        if (v !== null) return v;
+    } catch(e) {}
+    // Fallback: citește din cookie
+    try {
+        var name = encodeURIComponent(k) + '=';
+        var parts = document.cookie.split(';');
+        for (var i = 0; i < parts.length; i++) {
+            var c = parts[i].trim();
+            if (c.indexOf(name) === 0) {
+                return decodeURIComponent(c.substring(name.length));
+            }
+        }
+    } catch(e) {}
+    return null;
+}
 
 // ── TAB SWITCHING ─────────────────────────────────────────────
 function sw(id) {
