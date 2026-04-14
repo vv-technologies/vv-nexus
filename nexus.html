@@ -301,6 +301,16 @@ label {
     <button class="btn btn-white" onclick="doActivate()">ACTIVEAZĂ NEXUS</button>
     <div id="status-msg"></div>
 
+    <div class="card" style="margin-top:4px;">
+        <div class="card-title">💾 SĂMÂNȚA VV — BACKUP CHEI</div>
+        <div class="hint">Exporti o dată → salvezi în Files → oricând Safari uită, importi în 2 secunde.</div>
+        <button class="btn btn-gold" onclick="exportSeed()">📥 EXPORTĂ CONFIGURAȚIA</button>
+        <label class="btn btn-gray" style="text-align:center;cursor:pointer;display:block;padding:16px;border-radius:14px;font-size:15px;font-weight:800;margin-bottom:10px;">
+            📤 IMPORTĂ SĂMÂNȚA
+            <input type="file" id="seed-file" accept=".vvseed,.txt" style="display:none;" onchange="importSeed(this)">
+        </label>
+    </div>
+
 </div>
 
 <!-- PAGE: CHAT -->
@@ -704,6 +714,94 @@ function toast(msg, type) {
     t.style.display = 'block';
     setTimeout(function() { t.style.display = 'none'; }, 3000);
 }
+
+// ── SĂMÂNȚA VV — Export/Import configurație ──────────────────
+function exportSeed() {
+    if (!G.gk) { toast('Activează NEXUS mai întâi.', 'o'); return; }
+
+    // Criptăm simplu cu XOR
+    var salt = 'VVSeed2025';
+    function xorStr(s) {
+        var r = '';
+        for (var i = 0; i < s.length; i++) {
+            r += String.fromCharCode(s.charCodeAt(i) ^ salt.charCodeAt(i % salt.length));
+        }
+        return btoa(unescape(encodeURIComponent(r)));
+    }
+
+    var seed = {
+        v: '1',
+        k: xorStr(G.gk),
+        t: xorStr(G.gt || ''),
+        u: G.gu || '',
+        r: G.repo || 'ceo.html'
+    };
+
+    var content = JSON.stringify(seed);
+    var blob = new Blob([content], { type: 'text/plain' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'nexus.vvseed';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast('✅ Sămânța salvată! Pune-o în Files.', 'g');
+}
+
+function importSeed(input) {
+    var file = input.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            var salt = 'VVSeed2025';
+            function xorDec(enc) {
+                var decoded = decodeURIComponent(escape(atob(enc)));
+                var r = '';
+                for (var i = 0; i < decoded.length; i++) {
+                    r += String.fromCharCode(decoded.charCodeAt(i) ^ salt.charCodeAt(i % salt.length));
+                }
+                return r;
+            }
+
+            var seed = JSON.parse(e.target.result);
+            var gk = xorDec(seed.k);
+            var gt = xorDec(seed.t || '');
+            var gu = seed.u || '';
+            var repo = seed.r || 'ceo.html';
+
+            if (!gk) { toast('Sămânță invalidă.', 'r'); return; }
+
+            // Salvăm
+            G.gk = gk; G.gt = gt; G.gu = gu; G.repo = repo;
+            store('set', 'nx_gk', gk);
+            store('set', 'nx_gt', gt);
+            store('set', 'nx_gu', gu);
+            store('set', 'nx_repo', repo);
+
+            // Update UI
+            document.getElementById('inp-gk').value = gk;
+            document.getElementById('inp-gt').value = gt;
+            document.getElementById('inp-gu').value = gu;
+            syncRepo();
+            setOnline(true);
+
+            toast('✅ Sămânța importată! NEXUS activ.', 'g');
+            setTimeout(function() {
+                goPage('chat');
+                addSys('NEXUS restaurat din Sămânță · Repo: ' + repo);
+            }, 800);
+
+        } catch(err) {
+            toast('Eroare la import: ' + err.message, 'r');
+        }
+    };
+    reader.readAsText(file);
+    input.value = '';
+}
+
 </script>
 </body>
 </html>
