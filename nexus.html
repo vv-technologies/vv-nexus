@@ -321,13 +321,19 @@ label {
 
 <!-- PAGE: CHAT -->
 <div class="page" id="page-chat" style="padding-bottom:0;">
-    <div style="padding:8px 14px 0;display:flex;gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch;">
-        <button class="nav-btn" style="flex-shrink:0;min-height:32px;font-size:11px;padding:6px 12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:rgba(255,255,255,0.35);"
-            onclick="quickSend('Ce bug-uri poate avea VV Beta?')">🔍 Bugs</button>
-        <button class="nav-btn" style="flex-shrink:0;min-height:32px;font-size:11px;padding:6px 12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:rgba(255,255,255,0.35);"
-            onclick="quickSend('Ce feature nou ar crește retenția în VV Beta?')">💡 Idee</button>
-        <button class="nav-btn" style="flex-shrink:0;min-height:32px;font-size:11px;padding:6px 12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:rgba(255,255,255,0.35);"
-            onclick="quickSend('Care sunt pașii pentru lansarea VV Beta?')">🚀 Plan</button>
+    <div style="padding:8px 14px 0;display:flex;gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;">
+        <button style="flex-shrink:0;min-height:36px;font-size:11px;padding:6px 13px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:rgba(255,255,255,0.4);cursor:pointer;touch-action:manipulation;white-space:nowrap;"
+            onclick="quickSend('Analizează codul VV Beta și găsește toate bug-urile posibile, în special pe iPhone X.')">🔍 Analiză Cod</button>
+        <button style="flex-shrink:0;min-height:36px;font-size:11px;padding:6px 13px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:rgba(255,255,255,0.4);cursor:pointer;touch-action:manipulation;white-space:nowrap;"
+            onclick="quickSend('Rezumă pe scurt ultimele decizii din VV Logic DNA și ce am construit.')">📋 Rezumat DNA</button>
+        <button style="flex-shrink:0;min-height:36px;font-size:11px;padding:6px 13px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:rgba(255,255,255,0.4);cursor:pointer;touch-action:manipulation;white-space:nowrap;"
+            onclick="quickSend('Debug VVhi: verifică logica de antrenament și spune-mi dacă există probleme în vvhi-shadow.js')">🐛 Debug VVhi</button>
+        <button style="flex-shrink:0;min-height:36px;font-size:11px;padding:6px 13px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:rgba(255,255,255,0.4);cursor:pointer;touch-action:manipulation;white-space:nowrap;"
+            onclick="quickSend('Care sunt pașii concreți pentru lansarea VV Beta la primii 20 utilizatori din București?')">🚀 Launch Plan</button>
+        <button style="flex-shrink:0;min-height:36px;font-size:11px;padding:6px 13px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:rgba(255,255,255,0.4);cursor:pointer;touch-action:manipulation;white-space:nowrap;"
+            onclick="quickSend('Generează un anunț pentru site-ul VV Hybrid Univers despre cel mai recent update din VV Beta.')">📢 Anunț Site</button>
+        <button style="flex-shrink:0;min-height:36px;font-size:11px;padding:6px 13px;background:rgba(212,175,55,0.08);border:1px solid rgba(212,175,55,0.2);border-radius:8px;color:rgba(212,175,55,0.6);cursor:pointer;touch-action:manipulation;white-space:nowrap;"
+            onclick="clearChat()">🗑 Reset</button>
     </div>
 
     <div class="chat-box" id="chat" style="padding:12px 16px 0;overflow-y:auto;height:calc(100vh - 200px);-webkit-overflow-scrolling:touch;"></div>
@@ -544,19 +550,10 @@ function quickSend(txt) {
 async function callAI() {
     G.busy = true;
     setOnline(false);
-    // Safety timeout — deblochează după 30s dacă ceva pică
-    var _safetyTimer = setTimeout(function() {
-        if (G.busy) {
-            G.busy = false;
-            document.getElementById('typing').style.display = 'none';
-            document.getElementById('btn-send').disabled = false;
-            setOnline(true);
-            addMsg('ai', '⚠️ Timeout — încearcă din nou.');
-        }
-    }, 30000);
     document.getElementById('hdr-txt').textContent = 'procesează...';
     document.getElementById('typing').style.display = 'block';
     document.getElementById('btn-send').disabled = true;
+    hideFailoverBar();
 
     var contents = [
         { role: 'user',  parts: [{ text: CTX + '\n\n---' }] },
@@ -564,56 +561,96 @@ async function callAI() {
     ];
     G.msgs.slice(-6).forEach(function(m) { contents.push(m); });
 
-    try {
-        var r = await fetch(
-            'https://generativelanguage.googleapis.com/v1beta/models/' + G.model + ':generateContent?key=' + G.gk,
-            {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    contents: contents,
-                    generationConfig: { temperature: 0.7, maxOutputTokens: 4096 },
-                    safetySettings: [
-                        { category: 'HARM_CATEGORY_HARASSMENT',        threshold: 'BLOCK_NONE' },
-                        { category: 'HARM_CATEGORY_HATE_SPEECH',       threshold: 'BLOCK_NONE' },
-                        { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_NONE' },
-                        { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_NONE' }
-                    ]
-                })
-            }
-        );
+    var FALLBACK_MODELS = [G.model, 'gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-pro'].filter(
+        function(m, i, a) { return a.indexOf(m) === i; }
+    );
 
-        if (!r.ok) {
-            var e = await r.json().catch(function() { return {}; });
-            var m = (e.error && e.error.message) || ('Eroare HTTP ' + r.status);
-            if (r.status === 400) m = 'Cheie invalidă. Verifică în SETUP.';
-            if (r.status === 429) m = 'Limită depășită. Așteaptă 1 minut.';
-            if (r.status === 403) m = 'Cheie fără acces. Regenerează din AI Studio.';
-            throw new Error(m);
-        }
-
-        var data = await r.json();
-        var txt  = data.candidates &&
-                   data.candidates[0] &&
-                   data.candidates[0].content &&
-                   data.candidates[0].content.parts &&
-                   data.candidates[0].content.parts[0] &&
-                   data.candidates[0].content.parts[0].text;
-
-        if (!txt) throw new Error('Răspuns gol.');
-
-        G.msgs.push({ role: 'model', parts: [{ text: txt }] });
-        processReply(txt);
-
-    } catch(err) {
-        addMsg('ai', '⚠️ ' + err.message);
-    } finally {
-        clearTimeout(_safetyTimer);
+    var _safetyTimer = setTimeout(function() {
+        if (!G.busy) return;
         G.busy = false;
         document.getElementById('typing').style.display = 'none';
         document.getElementById('btn-send').disabled = false;
-        setOnline(true);
+        hideFailoverBar(); setOnline(true);
+        addMsg('ai', '⚠️ Timeout 45s — încearcă din nou.');
+    }, 45000);
+
+    var success = false;
+
+    for (var mi = 0; mi < FALLBACK_MODELS.length && !success; mi++) {
+        var tryModel = FALLBACK_MODELS[mi];
+        if (mi > 0) showFailoverBar('🔄 Schimb frecvența → ' + tryModel + '...');
+
+        for (var retry = 0; retry < 2 && !success; retry++) {
+            try {
+                var r = await fetch(
+                    'https://generativelanguage.googleapis.com/v1beta/models/' + tryModel + ':generateContent?key=' + G.gk,
+                    {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            contents: contents,
+                            generationConfig: { temperature: 0.7, maxOutputTokens: 4096 },
+                            safetySettings: [
+                                { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_NONE' },
+                                { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_NONE' },
+                                { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_NONE' },
+                                { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_NONE' }
+                            ]
+                        })
+                    }
+                );
+
+                if (r.status === 503 || r.status === 429) {
+                    var waitSec = (retry + 1) * 3;
+                    var lbl = r.status === 503 ? '⏳ Gemini aglomerat. Reîncerc în ' : '⏳ Limită API. Reîncerc în ';
+                    await doCountdown(waitSec, lbl);
+                    continue;
+                }
+
+                if (r.status === 404) break; // model inexistent, sari la următorul
+
+                if (!r.ok) {
+                    var e = await r.json().catch(function() { return {}; });
+                    var em = (e.error && e.error.message) || ('HTTP ' + r.status);
+                    if (r.status === 400) em = 'Cheie invalidă — verifică în SETUP';
+                    if (r.status === 403) em = 'Cheie fără acces — regenerează din AI Studio';
+                    throw new Error(em);
+                }
+
+                var data = await r.json();
+                var txt = data.candidates && data.candidates[0] &&
+                          data.candidates[0].content && data.candidates[0].content.parts &&
+                          data.candidates[0].content.parts[0] && data.candidates[0].content.parts[0].text;
+
+                if (!txt) throw new Error('Răspuns gol.');
+
+                if (tryModel !== G.model) {
+                    G.model = tryModel;
+                    store('set', 'nx_model', tryModel);
+                    updateModelBadge();
+                    toast('🔄 Frecvență: ' + tryModel, 'o');
+                }
+
+                G.msgs.push({ role: 'model', parts: [{ text: txt }] });
+                processReply(txt);
+                success = true;
+
+            } catch(err) {
+                if (mi === FALLBACK_MODELS.length - 1 && retry === 1) {
+                    addMsg('ai', '⚠️ ' + err.message);
+                }
+            }
+        }
     }
+
+    if (!success) addMsg('ai', '⚠️ Toate modelele sunt ocupate momentan. Încearcă în 1 minut.');
+
+    clearTimeout(_safetyTimer);
+    G.busy = false;
+    document.getElementById('typing').style.display = 'none';
+    document.getElementById('btn-send').disabled = false;
+    setOnline(true);
+    hideFailoverBar();
 }
 
 // ── PROCESS ──────────────────────────────────────────────────
@@ -913,6 +950,39 @@ function updateModelBadge() {
         badge.textContent = G.model.replace('gemini-', '').replace('-latest', '');
         badge.style.display = 'inline-block';
     }
+}
+
+
+// ── FAILOVER HELPERS ─────────────────────────────────────────
+function showFailoverBar(msg) {
+    var bar = document.getElementById('failover-bar');
+    if (bar) { bar.textContent = msg; bar.style.display = 'block'; }
+}
+function hideFailoverBar() {
+    var bar = document.getElementById('failover-bar');
+    if (bar) bar.style.display = 'none';
+}
+function doCountdown(sec, prefix) {
+    return new Promise(function(resolve) {
+        var i = sec;
+        showFailoverBar(prefix + i + 's...');
+        var iv = setInterval(function() {
+            i--;
+            if (i <= 0) { clearInterval(iv); resolve(); }
+            else showFailoverBar(prefix + i + 's...');
+        }, 1000);
+    });
+}
+
+
+// ── CLEAR CHAT ────────────────────────────────────────────────
+function clearChat() {
+    if (!confirm('Ștergi istoricul chat?')) return;
+    G.msgs = []; G.lastCode = null; G.lastFile = null;
+    document.getElementById('chat').innerHTML = '';
+    store('set', 'nx_chat', '[]');
+    addSys('Chat curățat · NEXUS gata de comenzi.');
+    toast('Chat resetat.', 'b');
 }
 
 </script>
