@@ -264,8 +264,10 @@ label {
     <div style="display:flex;align-items:center;gap:8px;">
         <div class="hdr-dot" id="dot"></div>
         <div id="hdr-txt" style="font-size:11px;color:rgba(255,255,255,0.3);">offline</div>
+        <div id="model-badge" style="display:none;font-size:9px;color:rgba(212,175,55,0.5);background:rgba(212,175,55,0.08);border:1px solid rgba(212,175,55,0.15);border-radius:6px;padding:3px 7px;letter-spacing:0.5px;"></div>
     </div>
 </div>
+<div id="failover-bar" style="display:none;background:rgba(212,175,55,0.08);border-bottom:1px solid rgba(212,175,55,0.2);padding:6px 16px;font-size:11px;color:rgba(212,175,55,0.7);text-align:center;"></div>
 
 <!-- PAGE: SETUP -->
 <div class="page active" id="page-setup">
@@ -419,7 +421,9 @@ var CTX = 'Ești VV NEXUS — asistentul AI personal al fondatorului VV Technolo
         syncRepo();
         setOnline(true);
         goPage('chat');
-        addSys('NEXUS online · ' + G.repo + ' · Scrie comanda ta.');
+        updateModelBadge();
+        loadChatHistory();
+        if (!G.msgs.length) addSys('NEXUS online · ' + G.repo + ' · Scrie comanda ta.');
     }
 
     syncRepo();
@@ -658,6 +662,7 @@ function addMsg(role, text, hasCode, deployFile) {
 
     chat.appendChild(wrap);
     scrBot();
+    saveChatHistory();
 }
 
 function addSys(text) { addMsg('sys', text); }
@@ -873,6 +878,40 @@ async function autoDiscoverModel() {
     } finally {
         btn.textContent = '🔍 AUTO-DETECTEAZĂ MODELUL OPTIM';
         btn.disabled = false;
+    }
+}
+
+
+// ── CHAT HISTORY PERSISTENCE ─────────────────────────────────
+function saveChatHistory() {
+    try {
+        var msgs = G.msgs.slice(-20); // păstrăm ultimele 20
+        store('set', 'nx_chat', JSON.stringify(msgs));
+    } catch(e) {}
+}
+
+function loadChatHistory() {
+    try {
+        var saved = store('get', 'nx_chat');
+        if (!saved) return;
+        var msgs = JSON.parse(saved);
+        if (!msgs || !msgs.length) return;
+        G.msgs = msgs;
+        // Redăm vizual ultimele 5 mesaje
+        msgs.slice(-5).forEach(function(m) {
+            if (m.role === 'user') addMsg('user', m.parts[0].text);
+            else if (m.role === 'model') addMsg('ai', m.parts[0].text);
+        });
+        addSys('💾 ' + msgs.length + ' mesaje restaurate din sesiunea anterioară.');
+    } catch(e) {}
+}
+
+// ── MODEL BADGE ───────────────────────────────────────────────
+function updateModelBadge() {
+    var badge = document.getElementById('model-badge');
+    if (badge && G.model) {
+        badge.textContent = G.model.replace('gemini-', '').replace('-latest', '');
+        badge.style.display = 'inline-block';
     }
 }
 
