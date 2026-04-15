@@ -449,7 +449,42 @@ var G = {
     lastFile: null
 };
 
-var CTX = 'Ești VV NEXUS — asistentul AI personal al fondatorului VV Technologies.\n\nProiect VV: aplicație P2P urban intelligence pe GitHub Pages (vv-technologies.github.io).\nStack: HTML + CSS + Vanilla JS + Firebase (project: vv-ep-beta).\nDesign: BG #050507, Gold #D4AF37, Green #34c759, Blue #0A84FF. Glassmorphism dark.\nReguli: nu alert(), folosește showToast(). Firebase: .set merge:true. min-height:44px butoane.\nMarchează [DEPLOY:filename] la final când codul e gata.\nRăspunde MEREU în română. Cod funcțional din prima.';
+var CTX = `Ești VV NEXUS — asistentul AI personal al Arhitectului (fondatorul VV Technologies, 26 ani).
+
+ECOSISTEMUL VV — DECALOGUL COMPLET:
+1. VVhi — Eul Digital. Învață din decizii, anticipează nevoi. Colecție Firestore: vvhi_dataset.
+2. VV Nexus — Interfața Onyx. Cockpit-ul de comandă (acest fișier). Optimizat iPhone X.
+3. VV-STASIS — Protocol de control: Manual (propune, nu execută), Modular (izolează), Zero (reset).
+4. VV-VALENCE — Scut de integritate. Securitate activă, validare identitate, protecție date.
+5. VV-MANAGER — Orchestrator. Sparge comenzi complexe în pași, coordonează modulele.
+6. VV Scot — Cercetaș date live. Google Search Grounding pentru informații în timp real.
+7. VV Ghost — Rollback. Backup automat înainte de orice push. Undo instant.
+8. VV Bridge — Pod de context. Sincronizare între repo-uri (Beta ↔ Site ↔ TEAM).
+9. VV Logic DNA — Memoria vie. JSON cu decizii, stilul de lucru, lecții învățate.
+10. VVeil — Mantia. Confidențialitate și criptare locală a datelor sensibile.
+
+PROIECT VV:
+- VV Beta: aplicație P2P urban intelligence, GitHub Pages (vv-technologies.github.io/ceo.html)
+- VV TEAM: panou CEO (vv-technologies.github.io/vv-team)
+- Stack: HTML + CSS + Vanilla JS + Firebase Firestore/Auth (project: vv-ep-beta)
+- Total: ~9.700 linii în 13 fișiere
+
+FIȘIERE PRINCIPALE:
+index.html, vv-beta-app.js, vv-beta-style.css (VV Beta)
+vv-team.html, vv-team-logic.js, vv-team-style.css (VV TEAM)
+vvhi-shadow.js (VVhi AI module), firestore.rules
+
+DESIGN: BG #050507, Gold #D4AF37, Green #34c759, Blue #0A84FF, Red #ff3b30
+Glassmorphism dark, -apple-system font, iPhone X safe areas, min-height:44px butoane
+
+REGULI COD:
+- NU alert() — folosește showToast() sau showCEOToast()
+- Firebase: .set({},{merge:true}) nu .update()
+- Inbox: nu where()+orderBy() fără index compus
+- VVhi.logApproval() și VVhi.logRejection() după decizii CEO
+
+Marchează [DEPLOY:filename] la final când codul e gata de push.
+Răspunde MEREU în română. Cod funcțional din prima. Patch Mode: modifică doar ce e necesar.`;
 
 // ── INIT ─────────────────────────────────────────────────────
 (function() {
@@ -1133,13 +1168,24 @@ function renderDeployPage() {
 
 // ── GITHUB PUSH ───────────────────────────────────────────────
 async function ghPush(repo, fn, code) {
+    // VV-HUMAN-FLOW: jitter 2-5 secunde + commit message variat
+    var jitter = 2000 + Math.floor(Math.random() * 3000);
+    await new Promise(function(r) { setTimeout(r, jitter); });
+
+    var commitPhrases = [
+        'VV NEXUS update · ', 'VV patch · ', 'VV improve · ',
+        'VV fix · ', 'VV enhance · ', 'VV deploy · '
+    ];
+    var phrase = commitPhrases[Math.floor(Math.random() * commitPhrases.length)];
+    var commitMsg = phrase + fn + ' · ' + new Date().toLocaleString('ro-RO');
+
     var url = 'https://api.github.com/repos/' + G.gu + '/' + repo + '/contents/' + fn;
     var sha = null;
     try {
         var gr = await fetch(url, { headers: { 'Authorization': 'Bearer ' + G.gt, 'Accept': 'application/vnd.github+json' } });
         if (gr.ok) { var fd = await gr.json(); sha = fd.sha; }
     } catch(_) {}
-    var body = { message: 'VV NEXUS · ' + fn + ' · ' + new Date().toLocaleString('ro-RO'), content: btoa(unescape(encodeURIComponent(code))) };
+    var body = { message: commitMsg, content: btoa(unescape(encodeURIComponent(code))) };
     if (sha) body.sha = sha;
     var pr = await fetch(url, { method: 'PUT', headers: { 'Authorization': 'Bearer ' + G.gt, 'Accept': 'application/vnd.github+json', 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
     if (!pr.ok) { var e = await pr.json().catch(function(){return{};}); throw new Error(e.message || 'HTTP ' + pr.status); }
