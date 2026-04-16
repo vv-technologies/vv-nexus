@@ -185,7 +185,7 @@ label {
     display: flex;
     gap: 8px;
     align-items: flex-end;
-    padding-bottom: calc(60px + env(safe-area-inset-bottom, 10px));
+    padding-bottom: calc(65px + env(safe-area-inset-bottom, 10px));
     z-index: 100;
 }
 .chat-input-area textarea {
@@ -309,6 +309,18 @@ label {
         </div>
     </div>
 
+    <div class="card">
+        <div class="card-title">🔄 MIRROR REPOS (push simultan)</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.25);margin-bottom:10px;">Selectează repo-urile care primesc Mirror Push simultan.</div>
+        <div id="mirror-list" style="display:flex;flex-wrap:wrap;gap:8px;">
+            <div class="rpill" onclick="toggleMirrorPill('ceo.html',this)">ceo.html</div>
+            <div class="rpill" onclick="toggleMirrorPill('vv-team',this)">vv-team</div>
+            <div class="rpill" onclick="toggleMirrorPill('vv-technologies',this)">vv-technologies</div>
+            <div class="rpill" onclick="toggleMirrorPill('vvhi',this)">vvhi</div>
+            <div class="rpill" onclick="toggleMirrorPill('vv-hybrid-univers',this)">vv-hybrid-univers</div>
+        </div>
+    </div>
+
     <button class="btn btn-white" onclick="doActivate()">ACTIVEAZĂ NEXUS</button>
     <div id="status-msg"></div>
 
@@ -341,7 +353,7 @@ label {
             onclick="clearChat()">🗑 Reset</button>
     </div>
 
-    <div class="chat-box" id="chat" style="padding:12px 16px 0;overflow-y:auto;height:calc(100vh - 200px);-webkit-overflow-scrolling:touch;"></div>
+    <div class="chat-box" id="chat" style="padding:12px 16px 120px;overflow-y:auto;height:calc(100dvh - 180px);-webkit-overflow-scrolling:touch;scroll-padding-bottom:120px;"></div>
 
     <div class="typing" id="typing">
         <div class="typing-inner"><span></span><span></span><span></span></div>
@@ -363,6 +375,10 @@ label {
         <textarea class="sb-editor" id="sb-code" placeholder="Codul generat de NEXUS apare aici automat."
             autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
     </div>
+    <label class="btn btn-gray" style="text-align:center;cursor:pointer;">
+        📂 ANALIZEAZĂ FIȘIER (.txt)
+        <input type="file" id="file-upload" accept=".txt,.js,.html,.css,.json" style="display:none;" onchange="analyzeFile(this)">
+    </label>
     <button class="btn btn-green" onclick="sbPush()">🚀 PUSH PE GITHUB</button>
     <button class="btn btn-gray"  onclick="sbCopy()">📋 COPIAZĂ CODUL</button>
     <button class="btn btn-red"   onclick="sbClear()">✕ CURĂȚĂ</button>
@@ -499,6 +515,7 @@ Răspunde MEREU în română. Cod funcțional din prima. Patch Mode: modifică d
         document.getElementById('inp-gt').value = G.gt || '';
         document.getElementById('inp-gu').value = G.gu || '';
         syncRepo();
+    syncMirrorPills();
         setOnline(true);
         goPage('chat');
         updateModelBadge();
@@ -1219,6 +1236,48 @@ async function deployMirror() {
     }
     toast('🔄 Mirror: ' + ok + '/' + all.length, ok === all.length ? 'g' : 'o');
     addDNA('MIRROR ' + fn, all.join(', '), true);
+}
+
+
+// ── MIRROR PILLS ──────────────────────────────────────────────
+function toggleMirrorPill(name, el) {
+    var mirrors = [];
+    try { mirrors = JSON.parse(store('get', 'nx_mirrors') || '[]'); } catch(e) {}
+    var idx = mirrors.indexOf(name);
+    if (idx > -1) mirrors.splice(idx, 1);
+    else mirrors.push(name);
+    store('set', 'nx_mirrors', JSON.stringify(mirrors));
+    el.classList.toggle('active', mirrors.indexOf(name) > -1);
+}
+
+function syncMirrorPills() {
+    var mirrors = [];
+    try { mirrors = JSON.parse(store('get', 'nx_mirrors') || '[]'); } catch(e) {}
+    document.querySelectorAll('#mirror-list .rpill').forEach(function(p) {
+        p.classList.toggle('active', mirrors.indexOf(p.textContent.trim()) > -1);
+    });
+}
+
+
+// ── FILE ANALYZER ─────────────────────────────────────────────
+function analyzeFile(input) {
+    var file = input.files[0];
+    if (!file) return;
+    if (file.size > 50000) { toast('Fișier prea mare. Max 50KB.', 'r'); return; }
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        var content = e.target.result;
+        document.getElementById('sb-code').value = content;
+        document.getElementById('sb-filename').textContent = file.name;
+        G.lastFile = file.name;
+        // Trimitem automat în chat pentru analiză
+        goPage('chat');
+        var prompt = 'Analizează acest fișier (' + file.name + ') și spune-mi:\n1. Ce face\n2. Ce probleme are\n3. Ce îmbunătățiri recomand\n\nCONȚINUT:\n' + content.substring(0, 3000);
+        document.getElementById('inp-msg').value = prompt;
+        toast('Fișier încărcat. Trimite mesajul pentru analiză.', 'g');
+    };
+    reader.readAsText(file);
+    input.value = '';
 }
 
 </script>
