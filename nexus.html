@@ -265,11 +265,12 @@ label {
 <!-- HEADER -->
 <div class="hdr">
     <div class="hdr-title">VV NEXUS</div>
-    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
-        <div id="valence-badge" style="font-size:9px;color:rgba(52,199,89,0.6);letter-spacing:1px;font-weight:700;">VALENCE: ON</div>
+    <div style="display:flex;align-items:center;gap:6px;">
+        <button onclick="emergencyGhost()" style="padding:6px 10px;background:rgba(255,149,0,0.12);border:1px solid rgba(255,149,0,0.25);border-radius:8px;color:#ff9500;font-size:10px;font-weight:700;cursor:pointer;min-height:32px;touch-action:manipulation;">👻 GHOST</button>
+        <button onclick="emergencyStasis()" style="padding:6px 10px;background:rgba(255,59,48,0.12);border:1px solid rgba(255,59,48,0.25);border-radius:8px;color:#ff3b30;font-size:10px;font-weight:700;cursor:pointer;min-height:32px;touch-action:manipulation;">⏹ STASIS</button>
         <div class="hdr-dot" id="dot"></div>
         <div id="hdr-txt" style="font-size:11px;color:rgba(255,255,255,0.3);">offline</div>
-        <div id="model-badge" style="display:none;font-size:9px;color:rgba(212,175,55,0.5);background:rgba(212,175,55,0.08);border:1px solid rgba(212,175,55,0.15);border-radius:6px;padding:3px 7px;letter-spacing:0.5px;"></div>
+        <div id="model-badge" style="display:none;font-size:9px;color:rgba(212,175,55,0.5);background:rgba(212,175,55,0.08);border:1px solid rgba(212,175,55,0.15);border-radius:6px;padding:3px 7px;">flash</div>
     </div>
 </div>
 <div id="failover-bar" style="display:none;background:rgba(212,175,55,0.08);border-bottom:1px solid rgba(212,175,55,0.2);padding:6px 16px;font-size:11px;color:rgba(212,175,55,0.7);text-align:center;"></div>
@@ -826,7 +827,7 @@ function sbPush() {
         fn = prompt('Numele fișierului (ex: vv-beta-app.js):');
     }
     if (!fn) return;
-    G.lastCode = code; G.lastFile = fn;
+    G.lastCode = shadowClean(code); G.lastFile = fn;
 
     var url = 'https://api.github.com/repos/' + G.gu + '/' + G.repo + '/contents/' + fn;
     fetch(url, { headers: { 'Authorization': 'Bearer ' + G.gt, 'Accept': 'application/vnd.github+json' } })
@@ -1279,6 +1280,68 @@ function analyzeFile(input) {
     reader.readAsText(file);
     input.value = '';
 }
+
+
+// ── BUTOANE DE URGENȚĂ ────────────────────────────────────────
+
+function emergencyStasis() {
+    if (!confirm('STASIS — oprești orice execuție AI în curs?')) return;
+    G.busy = false;
+    document.getElementById('typing').style.display = 'none';
+    document.getElementById('btn-send').disabled = false;
+    document.getElementById('hdr-txt').textContent = 'STASIS';
+    document.getElementById('dot').className = 'hdr-dot';
+    hideFailoverBar();
+    addSys('⏹ VV-STASIS activat — toate execuțiile oprite.');
+    toast('STASIS activ. Nicio comandă nu va rula.', 'r');
+    // Dezactivăm butonul de send temporar
+    document.getElementById('btn-send').disabled = true;
+    setTimeout(function() {
+        document.getElementById('btn-send').disabled = false;
+        document.getElementById('hdr-txt').textContent = G.gk ? 'online' : 'offline';
+        addSys('✅ STASIS dezactivat — sistem repornit.');
+    }, 30000); // 30 secunde stasis
+}
+
+async function emergencyGhost() {
+    if (!G_ghost) {
+        try { G_ghost = JSON.parse(store('get', 'nx_ghost') || 'null'); } catch(e) {}
+    }
+    if (!G_ghost) {
+        toast('Niciun backup Ghost disponibil.', 'r');
+        addSys('👻 Ghost: niciun backup găsit. Fă un push mai întâi.');
+        return;
+    }
+    if (!confirm('GHOST ROLLBACK — restaurezi ' + G_ghost.fn + ' din ' + new Date(G_ghost.ts).toLocaleString('ro-RO') + '?')) return;
+    if (!G.gt || !G.gu) { toast('Configurează GitHub în SETUP.', 'o'); return; }
+    try {
+        await ghPush(G.repo, G_ghost.fn, G_ghost.code);
+        toast('↩ Rollback complet: ' + G_ghost.fn, 'o');
+        addSys('👻 Ghost Rollback reușit: ' + G_ghost.fn + ' restaurat pe ' + G.repo);
+    } catch(e) {
+        toast('Eroare rollback: ' + e.message, 'r');
+    }
+}
+
+// ── VV-SHADOW: Curăță codul înainte de push ───────────────────
+function shadowClean(code) {
+    if (!code) return code;
+    // Elimină comentarii single-line inutile (// TODO, // FIXME, // test, // debug)
+    code = code.replace(/\/\/\s*(TODO|FIXME|HACK|XXX|test|debug|console\.log)[^
+]*/gi, '');
+    // Elimină console.log-uri
+    code = code.replace(/console\.(log|warn|error|debug)\([^)]*\);?
+?/g, '');
+    // Elimină linii goale multiple (mai mult de 2 consecutive)
+    code = code.replace(/
+{3,}/g, '
+
+');
+    return code.trim();
+}
+
+// Aplicăm VV-Shadow la push
+var _origGhPush = ghPush;
 
 </script>
 </body>
