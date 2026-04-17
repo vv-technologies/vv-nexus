@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="VV Repos">
+<title>VV REPOS</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+body {
+    background: #04040a;
+    color: #fff;
+    font-family: -apple-system, sans-serif;
+    min-height: 100dvh;
+    padding: env(safe-area-inset-top,20px) 0 env(safe-area-inset-bottom,20px);
+}
+
+.hdr {
+    background: #080810;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.hdr-title { font-size:17px; font-weight:900; letter-spacing:2px; color:#D4AF37; }
+.hdr-sub { font-size:10px; color:rgba(255,255,255,0.3); letter-spacing:1px; margin-top:2px; }
+
+.content { padding: 16px; }
+
+.section-title {
+    font-size: 10px;
+    color: rgba(255,255,255,0.25);
+    letter-spacing: 3px;
+    font-weight: 700;
+    margin: 20px 0 10px;
+}
+.section-title:first-child { margin-top: 4px; }
+
+.repo-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px;
+    padding: 16px 18px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    touch-action: manipulation;
+    transition: all 0.15s;
+    text-decoration: none;
+    color: inherit;
+}
+.repo-card:active { background: rgba(255,255,255,0.07); transform: scale(0.98); }
+.repo-card.gold { border-color: rgba(212,175,55,0.2); background: rgba(212,175,55,0.05); }
+.repo-card.blue { border-color: rgba(10,132,255,0.2); background: rgba(10,132,255,0.04); }
+.repo-card.green { border-color: rgba(52,199,89,0.2); background: rgba(52,199,89,0.04); }
+
+.repo-icon { font-size: 24px; margin-right: 14px; flex-shrink:0; }
+.repo-info { flex: 1; }
+.repo-name { font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 3px; }
+.repo-desc { font-size: 11px; color: rgba(255,255,255,0.3); line-height: 1.5; }
+.repo-url { font-size: 10px; color: rgba(255,255,255,0.2); font-family: monospace; margin-top: 4px; }
+.repo-arrow { font-size: 16px; color: rgba(255,255,255,0.2); flex-shrink:0; margin-left:10px; }
+
+.btn-nexus {
+    display: block;
+    width: 100%;
+    padding: 16px;
+    background: rgba(212,175,55,0.12);
+    border: 1px solid rgba(212,175,55,0.25);
+    border-radius: 14px;
+    color: #D4AF37;
+    font-size: 14px;
+    font-weight: 800;
+    text-align: center;
+    cursor: pointer;
+    touch-action: manipulation;
+    letter-spacing: 0.5px;
+    text-decoration: none;
+    margin-top: 20px;
+}
+
+.live-badge {
+    display: inline-block;
+    padding: 2px 7px;
+    background: rgba(52,199,89,0.12);
+    border: 1px solid rgba(52,199,89,0.25);
+    border-radius: 6px;
+    font-size: 9px;
+    color: #34c759;
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin-left: 8px;
+    vertical-align: middle;
+}
+
+.status-bar {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 12px;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    font-size: 11px;
+    color: rgba(255,255,255,0.3);
+    line-height: 1.6;
+    text-align: center;
+}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+    <div>
+        <div class="hdr-title">VV REPOS</div>
+        <div class="hdr-sub">HUB DE CONTROL · vv-technologies</div>
+    </div>
+    <div style="font-size:11px;color:rgba(255,255,255,0.25);" id="repo-count">— repo-uri</div>
+</div>
+
+<div class="content">
+
+    <div class="status-bar" id="sync-status">
+        Apasă pe orice repo pentru a-l deschide în NEXUS și a lucra la el instant.
+    </div>
+
+    <div style="display:flex;gap:8px;margin-bottom:4px;">
+        <button onclick="syncGitHub()" style="flex:1;padding:12px;background:rgba(10,132,255,0.1);border:1px solid rgba(10,132,255,0.22);border-radius:12px;color:#0A84FF;font-size:12px;font-weight:700;cursor:pointer;touch-action:manipulation;min-height:44px;">
+            🔄 SINCRONIZEAZĂ GITHUB
+        </button>
+        <button onclick="toggleSettings()" style="padding:12px 16px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;color:rgba(255,255,255,0.4);font-size:12px;cursor:pointer;touch-action:manipulation;min-height:44px;">
+            ⚙️
+        </button>
+    </div>
+
+    <!-- Settings panel — ascuns implicit -->
+    <div id="settings-panel" style="display:none;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:16px;margin-bottom:12px;">
+        <div style="font-size:10px;color:rgba(255,255,255,0.25);letter-spacing:2px;margin-bottom:10px;font-weight:700;">CONFIGURARE AUTO-FETCH</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.2);margin-bottom:10px;line-height:1.6;">
+            Token-ul tău GitHub — salvat DOAR în browserul acestui telefon. Nu apare în cod.
+        </div>
+        <input type="password" id="gh-token-input" placeholder="ghp_..."
+            style="width:100%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:12px;color:#fff;font-size:14px;outline:none;-webkit-appearance:none;margin-bottom:8px;font-family:-apple-system,sans-serif;"
+            autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false">
+        <input type="text" id="gh-user-input" placeholder="GitHub username (ex: vv-technologies)"
+            style="width:100%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:12px;color:#fff;font-size:14px;outline:none;-webkit-appearance:none;margin-bottom:10px;font-family:-apple-system,sans-serif;"
+            autocomplete="off">
+        <button onclick="saveGhSettings()" style="width:100%;padding:13px;background:#fff;color:#000;border:none;border-radius:10px;font-size:14px;font-weight:800;cursor:pointer;touch-action:manipulation;min-height:44px;">
+            SALVEAZĂ
+        </button>
+    </div>
+
+    <!-- Repo-uri live de pe GitHub -->
+    <div id="live-repos-section" style="display:none;">
+        <div class="section-title">📡 TOATE REPO-URILE TALE (live)</div>
+        <div id="live-repos-list"></div>
+    </div>
+
+    <!-- VV CORE -->
+    <div class="section-title">VV CORE — PRODUSE PRINCIPALE</div>
+
+    <div class="repo-card gold" onclick="openInNexus('ceo.html', 'VV Beta')">
+        <div class="repo-icon">🏙</div>
+        <div class="repo-info">
+            <div class="repo-name">ceo.html <span class="live-badge">LIVE</span></div>
+            <div class="repo-desc">VV Beta — aplicația principală P2P urban intelligence</div>
+            <div class="repo-url">vv-technologies.github.io/ceo.html</div>
+        </div>
+        <div class="repo-arrow">→</div>
+    </div>
+
+    <div class="repo-card gold" onclick="openInNexus('vv-team', 'VV TEAM')">
+        <div class="repo-icon">👑</div>
+        <div class="repo-info">
+            <div class="repo-name">vv-team <span class="live-badge">LIVE</span></div>
+            <div class="repo-desc">Panoul tău de control CEO — moderare, misiuni, statistici</div>
+            <div class="repo-url">vv-technologies.github.io/vv-team</div>
+        </div>
+        <div class="repo-arrow">→</div>
+    </div>
+
+    <div class="repo-card" onclick="openInNexus('vv-technologies', 'Site Principal')">
+        <div class="repo-icon">🌍</div>
+        <div class="repo-info">
+            <div class="repo-name">vv-technologies</div>
+            <div class="repo-desc">Site principal VV Technologies — landing page public</div>
+            <div class="repo-url">vv-technologies.github.io</div>
+        </div>
+        <div class="repo-arrow">→</div>
+    </div>
+
+    <!-- VV AI -->
+    <div class="section-title">VV INTELLIGENCE</div>
+
+    <div class="repo-card blue" onclick="openInNexus('vvhi', 'VVhi')">
+        <div class="repo-icon">🧠</div>
+        <div class="repo-info">
+            <div class="repo-name">vvhi</div>
+            <div class="repo-desc">VV Hybrid Intelligence — modulul AI care învață</div>
+            <div class="repo-url">vv-technologies.github.io/vvhi</div>
+        </div>
+        <div class="repo-arrow">→</div>
+    </div>
+
+    <div class="repo-card blue" onclick="openInNexus('vv-nexus', 'VV NEXUS')">
+        <div class="repo-icon">⚡</div>
+        <div class="repo-info">
+            <div class="repo-name">vv-nexus</div>
+            <div class="repo-desc">VV NEXUS — interfața de comandă AI (acest sistem)</div>
+            <div class="repo-url">vv-technologies.github.io/vv-nexus</div>
+        </div>
+        <div class="repo-arrow">→</div>
+    </div>
+
+    <!-- VV SITE -->
+    <div class="section-title">VV UNIVERSE</div>
+
+    <div class="repo-card green" onclick="openInNexus('vv-hybrid-univers', 'VV Hybrid Univers')">
+        <div class="repo-icon">🌐</div>
+        <div class="repo-info">
+            <div class="repo-name">vv-hybrid-univers <span class="live-badge">LIVE</span></div>
+            <div class="repo-desc">Site marketing VV — prezentare ecosistem, careers, features</div>
+            <div class="repo-url">vv-technologies.github.io/vv-hybrid-univers</div>
+        </div>
+        <div class="repo-arrow">→</div>
+    </div>
+
+    <!-- PROIECTE EXTERNE -->
+    <div class="section-title">PROIECTE EXTERNE (clienți)</div>
+
+    <div class="repo-card" id="add-project-card" onclick="addExternalProject()" style="border-style:dashed;justify-content:center;gap:10px;">
+        <div style="font-size:20px;">+</div>
+        <div style="font-size:13px;color:rgba(255,255,255,0.3);">Adaugă proiect extern</div>
+    </div>
+
+    <div id="external-projects"></div>
+
+    <!-- BUTON NEXUS -->
+    <a class="btn-nexus" href="nexus.html">
+        ⚡ DESCHIDE VV NEXUS
+    </a>
+
+    <div style="height:20px;"></div>
+
+</div>
+
+<script>
+// ── CONFIG ────────────────────────────────────────────────────
+var NEXUS_URL = 'nexus.html'; // același folder
+var externalProjects = [];
+
+// ── INIT ──────────────────────────────────────────────────────
+(function() {
+    try { externalProjects = JSON.parse(localStorage.getItem('vv_ext_projects') || '[]'); } catch(e) {}
+    renderExternalProjects();
+
+    // Populăm settings dacă există token salvat
+    var savedToken = lsGet('vv_gh_token');
+    var savedUser  = lsGet('vv_gh_user');
+    if (savedToken) document.getElementById('gh-token-input').value = savedToken;
+    if (savedUser)  document.getElementById('gh-user-input').value  = savedUser;
+
+    // Auto-sincronizăm dacă avem token
+    if (savedToken && savedUser) {
+        syncGitHub();
+    }
+
+    updateCount();
+})();
+
+function lsGet(k) {
+    try { return localStorage.getItem(k); } catch(e) { return null; }
+}
+function lsSet(k, v) {
+    try { localStorage.setItem(k, v); } catch(e) {}
+    // Cookie fallback
+    try {
+        var d = new Date(); d.setFullYear(d.getFullYear() + 1);
+        document.cookie = k + '=' + encodeURIComponent(v) + ';expires=' + d.toUTCString() + ';path=/';
+    } catch(e) {}
+}
+
+function updateCount() {
+    var fixed = document.querySelectorAll('.repo-card:not(#add-project-card):not(.live-repo-card)').length;
+    var live  = document.querySelectorAll('.live-repo-card').length;
+    var total = fixed + live + externalProjects.length;
+    document.getElementById('repo-count').textContent = total + ' repo-uri';
+}
+
+function toggleSettings() {
+    var p = document.getElementById('settings-panel');
+    p.style.display = p.style.display === 'none' ? 'block' : 'none';
+}
+
+function saveGhSettings() {
+    var token = document.getElementById('gh-token-input').value.trim();
+    var user  = document.getElementById('gh-user-input').value.trim();
+    if (!token || !user) { alert('Completează tokenul și username-ul.'); return; }
+    lsSet('vv_gh_token', token);
+    lsSet('vv_gh_user',  user);
+    // Salvăm și în NEXUS
+    lsSet('nx_gt', token);
+    lsSet('nx_gu', user);
+    document.getElementById('settings-panel').style.display = 'none';
+    syncGitHub();
+}
+
+async function syncGitHub() {
+    var token = lsGet('vv_gh_token');
+    var user  = lsGet('vv_gh_user');
+    if (!token || !user) {
+        document.getElementById('settings-panel').style.display = 'block';
+        setSyncStatus('⚙️ Introdu tokenul GitHub pentru sincronizare automată.');
+        return;
+    }
+
+    setSyncStatus('🔄 Se sincronizează cu GitHub...');
+
+    try {
+        // Fetch toate repo-urile utilizatorului
+        var r = await fetch('https://api.github.com/user/repos?per_page=100&sort=updated', {
+            headers: {
+                'Authorization': 'Bearer ' + token,
+                'Accept': 'application/vnd.github+json'
+            }
+        });
+
+        if (!r.ok) {
+            if (r.status === 401) setSyncStatus('⚠️ Token invalid. Regenerează din GitHub Settings.');
+            else setSyncStatus('⚠️ Eroare GitHub: HTTP ' + r.status);
+            return;
+        }
+
+        var repos = await r.json();
+
+        // Filtrăm repo-urile VV cunoscute (să nu le dublăm)
+        var knownRepos = ['ceo.html','vv-team','vv-technologies','vvhi','vv-nexus','vv-hybrid-univers'];
+        var newRepos = repos.filter(function(r) {
+            return knownRepos.indexOf(r.name) === -1;
+        });
+
+        renderLiveRepos(newRepos, user);
+        setSyncStatus('✅ ' + repos.length + ' repo-uri găsite · Ultimul update: ' + new Date().toLocaleTimeString('ro-RO'));
+        updateCount();
+
+    } catch(err) {
+        setSyncStatus('⚠️ Eroare conexiune: ' + err.message);
+    }
+}
+
+function renderLiveRepos(repos, user) {
+    var section = document.getElementById('live-repos-section');
+    var list    = document.getElementById('live-repos-list');
+
+    if (!repos.length) {
+        section.style.display = 'none';
+        return;
+    }
+
+    section.style.display = 'block';
+    list.innerHTML = repos.map(function(r) {
+        var isPrivate = r.private;
+        var desc = r.description || 'Fără descriere';
+        var url  = r.homepage || (user + '.github.io/' + r.name);
+        return '<div class="repo-card live-repo-card" onclick="openInNexus('' + esc(r.name) + '','' + esc(r.name) + '')">'
+            + '<div class="repo-icon">' + (isPrivate ? '🔒' : '📁') + '</div>'
+            + '<div class="repo-info">'
+            + '<div class="repo-name">' + esc(r.name) + (isPrivate ? ' <span style="font-size:9px;color:rgba(255,149,0,0.6);background:rgba(255,149,0,0.08);border:1px solid rgba(255,149,0,0.15);border-radius:5px;padding:2px 6px;letter-spacing:1px;">PRIVAT</span>' : '') + '</div>'
+            + '<div class="repo-desc">' + esc(desc) + '</div>'
+            + '<div class="repo-url">' + esc(url) + '</div>'
+            + '</div>'
+            + '<div class="repo-arrow">→</div>'
+            + '</div>';
+    }).join('');
+}
+
+function setSyncStatus(msg) {
+    var el = document.getElementById('sync-status');
+    if (el) el.textContent = msg;
+}
+
+// ── DESCHIDE ÎN NEXUS ─────────────────────────────────────────
+function openInNexus(repo, name) {
+    // Salvăm repo-ul selectat în localStorage
+    // NEXUS îl va prelua la deschidere
+    try {
+        localStorage.setItem('nx_repo', repo);
+        localStorage.setItem('nx_last_repo_name', name);
+    } catch(e) {}
+
+    // Setăm cookie ca fallback
+    try {
+        var d = new Date(); d.setFullYear(d.getFullYear() + 1);
+        document.cookie = 'nx_repo=' + encodeURIComponent(repo) + ';expires=' + d.toUTCString() + ';path=/';
+    } catch(e) {}
+
+    // Navigăm la NEXUS
+    window.location.href = NEXUS_URL + '?repo=' + encodeURIComponent(repo) + '&name=' + encodeURIComponent(name);
+}
+
+// ── PROIECTE EXTERNE ─────────────────────────────────────────
+function addExternalProject() {
+    var name = prompt('Numele proiectului (ex: Site Firma XYZ):');
+    if (!name) return;
+    var repo = prompt('Repo GitHub (ex: my-client-site):');
+    if (!repo) return;
+    var desc = prompt('Descriere scurtă (opțional):') || 'Proiect extern';
+    var url = prompt('URL live (opțional):') || '';
+
+    externalProjects.push({ name:name, repo:repo, desc:desc, url:url, ts:Date.now() });
+    try { localStorage.setItem('vv_ext_projects', JSON.stringify(externalProjects)); } catch(e) {}
+    renderExternalProjects();
+
+    // Update contor
+    var count = document.querySelectorAll('.repo-card:not(#add-project-card)').length;
+    document.getElementById('repo-count').textContent = count + ' repo-uri';
+}
+
+function renderExternalProjects() {
+    var el = document.getElementById('external-projects');
+    if (!externalProjects.length) { el.innerHTML = ''; return; }
+    el.innerHTML = externalProjects.map(function(p, i) {
+        return '<div class="repo-card" onclick="openInNexus(\'' + esc(p.repo) + '\',\'' + esc(p.name) + '\')">'
+            + '<div class="repo-icon">🔧</div>'
+            + '<div class="repo-info">'
+            + '<div class="repo-name">' + esc(p.name) + '</div>'
+            + '<div class="repo-desc">' + esc(p.desc) + '</div>'
+            + (p.url ? '<div class="repo-url">' + esc(p.url) + '</div>' : '')
+            + '</div>'
+            + '<div style="display:flex;gap:8px;align-items:center;">'
+            + '<div class="repo-arrow">→</div>'
+            + '<span onclick="event.stopPropagation();removeProject(' + i + ')" style="color:rgba(255,59,48,0.4);font-size:18px;padding:4px;cursor:pointer;">✕</span>'
+            + '</div>'
+            + '</div>';
+    }).join('');
+}
+
+function removeProject(i) {
+    if (!confirm('Ștergi ' + externalProjects[i].name + '?')) return;
+    externalProjects.splice(i, 1);
+    try { localStorage.setItem('vv_ext_projects', JSON.stringify(externalProjects)); } catch(e) {}
+    renderExternalProjects();
+}
+
+function esc(t) {
+    return (t||'').replace(/'/g,"\\'").replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+</script>
+</body>
+</html>
