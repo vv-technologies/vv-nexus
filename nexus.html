@@ -7,58 +7,115 @@
 <meta name="apple-mobile-web-app-title" content="VV NEXUS">
 <title>VV NEXUS</title>
 <style>
-* { margin:0; padding:0; box-sizing:border-box; }
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
 body {
     background: #050508;
     color: #fff;
     font-family: -apple-system, sans-serif;
-    padding: env(safe-area-inset-top,20px) 0 0;
     height: 100dvh;
+    display: flex;
+    flex-direction: column;
     overflow: hidden;
     -webkit-text-size-adjust: 100%;
 }
 
-/* Header */
+/* HEADER */
 .hdr {
-    background: #0a0a12;
+    background: #080810;
     border-bottom: 1px solid rgba(255,255,255,0.08);
-    padding: 14px 18px;
+    padding: 12px 16px;
+    padding-top: calc(12px + env(safe-area-inset-top, 0px));
     display: flex;
     align-items: center;
     justify-content: space-between;
+    flex-shrink: 0;
+    z-index: 10;
 }
-.hdr-title { font-size: 18px; font-weight: 900; letter-spacing: 2px; color: #D4AF37; }
-.hdr-dot { width: 10px; height: 10px; border-radius: 50%; background: #333; }
-.hdr-dot.on { background: #34c759; }
+.hdr-title { font-size:16px; font-weight:900; letter-spacing:1px; color:#D4AF37; }
+.hdr-sub { font-size:10px; color:rgba(255,255,255,0.3); letter-spacing:1px; margin-top:1px; }
 
-/* Pagini */
-.page { display: none; padding: 16px; }
-.page.active { display: block; }
+/* TABS NAV */
+.nav {
+    display: flex;
+    background: #080810;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    flex-shrink: 0;
+    z-index: 10;
+}
+.nav-btn {
+    flex: 1;
+    padding: 10px 4px;
+    text-align: center;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: rgba(255,255,255,0.3);
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    touch-action: manipulation;
+    background: transparent;
+    border-left: none;
+    border-right: none;
+    border-top: none;
+    -webkit-appearance: none;
+    min-height: 48px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+}
+.nav-btn.active { color: #D4AF37; border-bottom-color: #D4AF37; }
+.nav-icon { font-size: 16px; }
 
-/* Card */
+/* PAGES */
+.page {
+    display: none;
+    flex: 1;
+    flex-direction: column;
+    overflow: hidden;
+    min-height: 0;
+}
+.page.active { display: flex; }
+
+/* SETUP PAGE */
+.setup-scroll {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 14px 16px;
+    padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+/* CARDS */
 .card {
     background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.08);
     border-radius: 16px;
-    padding: 18px;
-    margin-bottom: 14px;
+    padding: 16px;
+    margin-bottom: 12px;
 }
 .card-title {
-    font-size: 11px;
-    color: rgba(255,255,255,0.3);
+    font-size: 10px;
+    color: rgba(255,255,255,0.25);
     letter-spacing: 2px;
     font-weight: 700;
-    margin-bottom: 14px;
+    margin-bottom: 12px;
 }
 
-/* Inputs */
-input[type=text], input[type=password], textarea {
+/* INPUTS */
+input[type=text], input[type=password], input[type=email],
+input[type=tel], input[type=number], input[type=url], textarea, select {
     display: block;
     width: 100%;
     background: rgba(255,255,255,0.07);
-    border: 1px solid rgba(255,255,255,0.15);
-    border-radius: 12px;
-    padding: 14px;
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 11px;
+    padding: 13px 14px;
     color: #fff;
     font-size: 16px;
     font-family: -apple-system, sans-serif;
@@ -67,230 +124,293 @@ input[type=text], input[type=password], textarea {
     margin-bottom: 10px;
     -webkit-text-size-adjust: 100%;
 }
-input:focus, textarea:focus {
-    border-color: #D4AF37;
+input:focus, textarea:focus, select:focus { border-color: rgba(212,175,55,0.4); }
+input::placeholder, textarea::placeholder { color: rgba(255,255,255,0.2); }
+
+label { display: block; font-size: 11px; color: rgba(255,255,255,0.35); letter-spacing: 1px; margin-bottom: 5px; }
+
+/* PILLS */
+.pills { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 10px; }
+.rpill {
+    padding: 8px 14px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px;
+    font-size: 12px;
+    color: rgba(255,255,255,0.4);
+    cursor: pointer;
+    touch-action: manipulation;
+    -webkit-user-select: none;
 }
-textarea {
-    resize: none;
-    min-height: 80px;
-    line-height: 1.5;
+.rpill.active { background: rgba(212,175,55,0.12); border-color: rgba(212,175,55,0.3); color: #D4AF37; }
+
+.project-card {
+    padding: 11px 13px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 11px;
+    cursor: pointer;
+    touch-action: manipulation;
+    color: rgba(255,255,255,0.6);
+    margin-bottom: 7px;
 }
-label {
-    display: block;
-    font-size: 11px;
-    color: rgba(255,255,255,0.35);
-    letter-spacing: 1px;
-    margin-bottom: 6px;
-}
-.hint {
-    font-size: 11px;
-    color: rgba(255,255,255,0.2);
-    line-height: 1.6;
-    margin-bottom: 14px;
+.project-card.active-proj {
+    background: rgba(212,175,55,0.07);
+    border-color: rgba(212,175,55,0.22);
+    color: #fff;
 }
 
-/* Butoane */
+/* BUTTONS */
 .btn {
     display: block;
     width: 100%;
-    padding: 16px;
-    border: none;
-    border-radius: 14px;
-    font-size: 15px;
+    padding: 15px;
+    border-radius: 13px;
+    font-size: 14px;
     font-weight: 800;
-    letter-spacing: 0.5px;
     cursor: pointer;
-    margin-bottom: 10px;
-    -webkit-appearance: none;
-    text-align: center;
-    min-height: 52px;
     touch-action: manipulation;
+    text-align: center;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+    min-height: 50px;
+    border: none;
+    font-family: -apple-system, sans-serif;
+    -webkit-appearance: none;
 }
 .btn-white { background: #fff; color: #000; }
-.btn-gold  { background: rgba(212,175,55,0.15); border: 1px solid rgba(212,175,55,0.3); color: #D4AF37; }
-.btn-green { background: rgba(52,199,89,0.15); border: 1px solid rgba(52,199,89,0.3); color: #34c759; }
-.btn-red   { background: rgba(255,59,48,0.12); border: 1px solid rgba(255,59,48,0.25); color: #ff3b30; }
-.btn-gray  { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.4); }
+.btn-gold  { background: rgba(212,175,55,0.12); border: 1px solid rgba(212,175,55,0.25) !important; color: #D4AF37; }
+.btn-green { background: rgba(52,199,89,0.12); border: 1px solid rgba(52,199,89,0.25) !important; color: #34c759; }
+.btn-red   { background: rgba(255,59,48,0.1); border: 1px solid rgba(255,59,48,0.2) !important; color: #ff3b30; }
+.btn-gray  { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1) !important; color: rgba(255,255,255,0.4); }
 
-/* Nav tabs */
-.nav {
-    position: fixed;
-    bottom: 0;
-    left: 0; right: 0;
-    background: #0a0a12;
-    border-top: 1px solid rgba(255,255,255,0.08);
+/* CHAT PAGE */
+.chat-quick-bar {
+    background: #080810;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+    padding: 7px 12px;
     display: flex;
-    padding-bottom: env(safe-area-inset-bottom, 0px);
+    gap: 6px;
+    overflow-x: auto;
+    flex-shrink: 0;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    z-index: 5;
 }
-.nav-btn {
-    flex: 1;
-    padding: 12px 4px;
-    text-align: center;
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 1px;
-    color: rgba(255,255,255,0.3);
+.chat-quick-bar::-webkit-scrollbar { display: none; }
+.qbtn {
+    flex-shrink: 0;
+    padding: 7px 12px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px;
+    font-size: 11px;
+    color: rgba(255,255,255,0.4);
     cursor: pointer;
-    border: none;
-    background: transparent;
-    -webkit-appearance: none;
     touch-action: manipulation;
-    min-height: 56px;
+    white-space: nowrap;
+    min-height: 34px;
+    font-family: -apple-system, sans-serif;
+    -webkit-appearance: none;
+}
+
+/* CHAT MESSAGES */
+#chat {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 12px 14px;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 3px;
+    gap: 10px;
+    min-height: 0;
 }
-.nav-btn.active { color: #D4AF37; }
-.nav-icon { font-size: 18px; }
 
-/* Chat messages */
-.chat-box {
-    padding-bottom: 120px;
-}
-.msg-wrap { margin-bottom: 12px; }
+.msg-wrap { margin-bottom: 2px; }
 .msg-wrap.user { text-align: right; }
 .msg-wrap.ai   { text-align: left; }
 .msg-wrap.sys  { text-align: center; }
-.msg-who { font-size: 9px; color: rgba(255,255,255,0.25); letter-spacing: 2px; margin-bottom: 4px; }
+.msg-who { font-size: 9px; color: rgba(255,255,255,0.2); letter-spacing: 2px; margin-bottom: 3px; padding: 0 2px; }
 .msg-wrap.user .msg-who { color: rgba(212,175,55,0.4); }
 .msg-wrap.ai   .msg-who { color: rgba(10,132,255,0.4); }
 .msg-bub {
     display: inline-block;
     max-width: 88%;
-    padding: 12px 15px;
+    padding: 11px 14px;
     border-radius: 16px;
     font-size: 14px;
-    line-height: 1.6;
+    line-height: 1.65;
     white-space: pre-wrap;
     word-break: break-word;
     text-align: left;
 }
 .msg-wrap.user .msg-bub { background: rgba(212,175,55,0.1); border: 1px solid rgba(212,175,55,0.2); border-bottom-right-radius: 4px; }
-.msg-wrap.ai   .msg-bub { background: rgba(10,132,255,0.08); border: 1px solid rgba(10,132,255,0.18); border-bottom-left-radius: 4px; }
-.msg-wrap.sys  .msg-bub { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; color: rgba(255,255,255,0.35); font-size: 12px; }
-.msg-bub pre { background: rgba(0,0,0,0.35); border-radius: 8px; padding: 10px; margin-top: 8px; overflow-x: auto; font-size: 12px; font-family: monospace; }
-.msg-bub code { font-family: monospace; background: rgba(0,0,0,0.3); padding: 2px 5px; border-radius: 4px; color: #D4AF37; font-size: 12px; }
+.msg-wrap.ai   .msg-bub { background: rgba(10,132,255,0.07); border: 1px solid rgba(10,132,255,0.17); border-bottom-left-radius: 4px; }
+.msg-wrap.sys  .msg-bub { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 9px; color: rgba(255,255,255,0.3); font-size: 11px; max-width: 100%; }
+.msg-bub pre { background: rgba(0,0,0,0.3); border-radius: 8px; padding: 10px; margin-top: 8px; overflow-x: auto; font-size: 11px; font-family: monospace; white-space: pre; }
+.msg-bub code { font-family: monospace; background: rgba(0,0,0,0.3); padding: 2px 5px; border-radius: 4px; color: #D4AF37; font-size: 11px; }
 .msg-bub strong { color: rgba(255,255,255,0.9); }
 
-/* Input chat fix */
+/* TYPING */
+.typing-wrap { padding: 6px 14px; flex-shrink: 0; display: none; }
+.typing-dots { display: inline-flex; align-items: center; gap: 4px; padding: 10px 14px; background: rgba(10,132,255,0.07); border: 1px solid rgba(10,132,255,0.15); border-radius: 14px; }
+.typing-dots span { width: 5px; height: 5px; border-radius: 50%; background: rgba(10,132,255,0.5); animation: td 1.2s infinite; display: inline-block; }
+.typing-dots span:nth-child(2) { animation-delay: .2s; }
+.typing-dots span:nth-child(3) { animation-delay: .4s; }
+@keyframes td { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-5px)} }
 
-.chat-input-area textarea {
-    flex: 1;
-    margin-bottom: 0;
-    min-height: 44px;
-    max-height: 100px;
-    font-size: 14px;
-    border-radius: 12px;
-    padding: 12px;
+/* IMAGE PREVIEW */
+.img-preview-bar {
+    display: none;
+    padding: 6px 12px;
+    background: rgba(10,132,255,0.06);
+    border-top: 1px solid rgba(10,132,255,0.15);
+    flex-shrink: 0;
+    align-items: center;
+    gap: 10px;
 }
+.img-thumb {
+    width: 56px; height: 56px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid rgba(10,132,255,0.3);
+    flex-shrink: 0;
+}
+
+/* CHAT INPUT */
+.chat-input-bar {
+    background: #080810;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    padding: 8px 12px;
+    padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+    flex-shrink: 0;
+    display: flex;
+    gap: 8px;
+    align-items: flex-end;
+}
+#inp-msg {
+    flex: 1;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 14px;
+    padding: 12px 14px;
+    color: #fff;
+    font-size: 16px;
+    font-family: -apple-system, sans-serif;
+    outline: none;
+    resize: none;
+    min-height: 46px;
+    max-height: 100px;
+    line-height: 1.5;
+    -webkit-appearance: none;
+}
+#inp-msg:focus { border-color: rgba(212,175,55,0.35); }
+#inp-msg::placeholder { color: rgba(255,255,255,0.2); }
 .btn-send {
-    width: 44px;
-    height: 44px;
-    min-height: 44px;
+    width: 46px; height: 46px;
     background: rgba(212,175,55,0.15);
     border: 1px solid rgba(212,175,55,0.3);
-    border-radius: 12px;
+    border-radius: 13px;
     color: #D4AF37;
     font-size: 20px;
     font-weight: 900;
     cursor: pointer;
-    -webkit-appearance: none;
     touch-action: manipulation;
+    flex-shrink: 0;
+    -webkit-appearance: none;
     display: flex;
     align-items: center;
     justify-content: center;
+}
+.btn-attach {
+    width: 46px; height: 46px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    touch-action: manipulation;
     flex-shrink: 0;
+    font-size: 20px;
 }
 
-/* Typing dots */
-.typing { display: none; margin: 8px 0 8px 16px; }
-.typing-inner { display: inline-flex; gap: 4px; align-items: center; padding: 10px 14px; background: rgba(10,132,255,0.08); border: 1px solid rgba(10,132,255,0.15); border-radius: 14px; }
-.typing-inner span { width: 6px; height: 6px; border-radius: 50%; background: rgba(10,132,255,0.5); animation: td 1.2s infinite; }
-.typing-inner span:nth-child(2) { animation-delay: .2s; }
-.typing-inner span:nth-child(3) { animation-delay: .4s; }
-@keyframes td { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-4px)} }
+/* SANDBOX */
+.sandbox-scroll { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 14px; display: flex; flex-direction: column; gap: 10px; min-height: 0; }
+.sb-editor { min-height: 250px; font-family: monospace; font-size: 12px; }
 
-/* Toast */
-#toast {
-    display: none;
-    position: fixed;
-    top: calc(20px + env(safe-area-inset-top, 0px));
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 9999;
-    padding: 12px 20px;
-    border-radius: 14px;
-    font-size: 13px;
-    font-weight: 700;
-    white-space: nowrap;
-    max-width: 90vw;
-    text-align: center;
-    pointer-events: none;
-}
+/* DEPLOY */
+.deploy-scroll { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 14px; padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px)); min-height: 0; }
+
+/* TOAST */
+#toast { display: none; position: fixed; top: calc(20px + env(safe-area-inset-top, 0px)); left: 50%; transform: translateX(-50%); z-index: 9999; padding: 11px 20px; border-radius: 14px; font-size: 12px; font-weight: 700; white-space: nowrap; max-width: 90vw; text-align: center; pointer-events: none; }
 #toast.g { background: rgba(52,199,89,0.2); border: 1px solid rgba(52,199,89,0.4); color: #34c759; }
 #toast.r { background: rgba(255,59,48,0.2); border: 1px solid rgba(255,59,48,0.4); color: #ff3b30; }
 #toast.o { background: rgba(212,175,55,0.2); border: 1px solid rgba(212,175,55,0.4); color: #D4AF37; }
 #toast.b { background: rgba(10,132,255,0.2); border: 1px solid rgba(10,132,255,0.4); color: #0A84FF; }
 
-/* Status */
-#status-msg { font-size: 12px; text-align: center; padding: 10px; }
-
-/* Sandbox */
-.sandbox-page { padding: 16px; padding-bottom: 80px; }
-.sb-editor { min-height: 300px; font-family: monospace; font-size: 12px; }
-
-/* Mascare chei */
-.masked { letter-spacing: 3px; color: rgba(255,255,255,0.3); }
+/* FAILOVER BAR */
+#failover-bar { display: none; background: rgba(212,175,55,0.08); border-bottom: 1px solid rgba(212,175,55,0.2); padding: 6px 16px; font-size: 11px; color: rgba(212,175,55,0.7); text-align: center; flex-shrink: 0; }
 </style>
+
 </head>
 <body>
 
-<!-- TOAST -->
 <div id="toast"></div>
 
 <!-- HEADER -->
 <div class="hdr">
-    <div class="hdr-title">VV NEXUS</div>
-    <div style="display:flex;align-items:center;gap:6px;">
-        <button onclick="emergencyGhost()" style="padding:6px 10px;background:rgba(255,149,0,0.12);border:1px solid rgba(255,149,0,0.25);border-radius:8px;color:#ff9500;font-size:10px;font-weight:700;cursor:pointer;min-height:32px;touch-action:manipulation;">👻 GHOST</button>
-        <button onclick="emergencyStasis()" style="padding:6px 10px;background:rgba(255,59,48,0.12);border:1px solid rgba(255,59,48,0.25);border-radius:8px;color:#ff3b30;font-size:10px;font-weight:700;cursor:pointer;min-height:32px;touch-action:manipulation;">⏹ STASIS</button>
-        <div class="hdr-dot" id="dot"></div>
+    <div class="logo" style="display:flex;align-items:center;gap:10px;">
+        <div style="width:32px;height:32px;background:rgba(212,175,55,0.15);border:1px solid rgba(212,175,55,0.3);border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:12px;color:#D4AF37;">VV</div>
+        <div>
+            <div class="hdr-title">NEXUS</div>
+            <div class="hdr-sub">AI ASSISTANT</div>
+        </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;">
+        <div id="model-badge" style="display:none;font-size:9px;color:rgba(212,175,55,0.5);background:rgba(212,175,55,0.08);border:1px solid rgba(212,175,55,0.15);border-radius:6px;padding:3px 7px;"></div>
+        <button onclick="emergencyGhost()" style="padding:5px 10px;background:rgba(255,149,0,0.1);border:1px solid rgba(255,149,0,0.22);border-radius:8px;color:#ff9500;font-size:10px;font-weight:700;cursor:pointer;touch-action:manipulation;min-height:30px;">👻</button>
+        <button onclick="emergencyStasis()" style="padding:5px 10px;background:rgba(255,59,48,0.1);border:1px solid rgba(255,59,48,0.22);border-radius:8px;color:#ff3b30;font-size:10px;font-weight:700;cursor:pointer;touch-action:manipulation;min-height:30px;">⏹</button>
+        <div id="dot" style="width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.2);"></div>
         <div id="hdr-txt" style="font-size:11px;color:rgba(255,255,255,0.3);">offline</div>
-        <div id="model-badge" style="display:none;font-size:9px;color:rgba(212,175,55,0.5);background:rgba(212,175,55,0.08);border:1px solid rgba(212,175,55,0.15);border-radius:6px;padding:3px 7px;">flash</div>
     </div>
 </div>
-<div id="failover-bar" style="display:none;background:rgba(212,175,55,0.08);border-bottom:1px solid rgba(212,175,55,0.2);padding:6px 16px;font-size:11px;color:rgba(212,175,55,0.7);text-align:center;"></div>
 
-<!-- PAGE: SETUP -->
+<!-- FAILOVER BAR -->
+<div id="failover-bar"></div>
+
+<!-- NAV TABS -->
+<div class="nav">
+    <button class="nav-btn active" id="nav-setup" onclick="goPage('setup')"><span class="nav-icon">⚙️</span>SETUP</button>
+    <button class="nav-btn" id="nav-chat" onclick="goPage('chat')"><span class="nav-icon">💬</span>CHAT</button>
+    <button class="nav-btn" id="nav-sandbox" onclick="goPage('sandbox')"><span class="nav-icon">🛠</span>SANDBOX</button>
+    <button class="nav-btn" id="nav-deploy" onclick="goPage('deploy')"><span class="nav-icon">🚀</span>DEPLOY</button>
+</div>
+
+<!-- ══ SETUP ══ -->
 <div class="page active" id="page-setup">
+<div class="setup-scroll">
 
-    <div style="height:16px;"></div>
+    <div style="background:rgba(52,199,89,0.05);border:1px solid rgba(52,199,89,0.12);border-radius:12px;padding:11px 14px;margin-bottom:12px;font-size:11px;color:rgba(52,199,89,0.65);line-height:1.6;">
+        🔒 Cheile tale sunt salvate DOAR în browserul acestui telefon.
+    </div>
 
     <div class="card">
-        <div class="card-title">🔑 CHEI API</div>
-
-        <label>GEMINI API KEY *</label>
-        <input type="password" id="inp-gk" placeholder="AIzaSy..."
-            autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false">
-        <div class="hint">aistudio.google.com → Get API Key → Create (gratuit)</div>
-        <button class="btn btn-gold" onclick="autoDiscoverModel()" id="btn-discover">
-            🔍 AUTO-DETECTEAZĂ MODELUL OPTIM
-        </button>
-        <div id="model-status" class="hint" style="text-align:center;"></div>
-
-        <label>GITHUB USERNAME</label>
-        <input type="text" id="inp-gu" placeholder="vv-technologies" autocomplete="off">
-
-        <label>GITHUB TOKEN (opțional — pentru deploy)</label>
-        <input type="password" id="inp-gt" placeholder="ghp_..."
-            autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false">
+        <div class="card-title">MOTOR AI — GEMINI</div>
+        <label for="f-gk">GEMINI API KEY *</label>
+        <input type="password" id="f-gk" placeholder="AIzaSy..." autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false">
+        <button class="btn btn-gold" onclick="autoDiscoverModel()" id="btn-discover">🔍 AUTO-DETECTEAZĂ MODELUL</button>
+        <div id="model-status" style="font-size:11px;color:rgba(255,255,255,0.25);text-align:center;min-height:16px;margin-bottom:6px;"></div>
+        <label for="f-gu">GITHUB USERNAME</label>
+        <input type="text" id="f-gu" placeholder="vv-technologies" autocomplete="off">
+        <label for="f-gt">GITHUB TOKEN (pentru deploy)</label>
+        <input type="password" id="f-gt" placeholder="ghp_..." autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false">
     </div>
 
     <div class="card">
         <div class="card-title">📁 REPO ACTIV</div>
-        <div id="repo-list" style="display:flex;flex-wrap:wrap;gap:8px;">
+        <div class="pills" id="repo-pills">
             <div class="rpill active" onclick="setRepo('ceo.html',this)">ceo.html</div>
             <div class="rpill" onclick="setRepo('vv-team',this)">vv-team</div>
             <div class="rpill" onclick="setRepo('vv-technologies',this)">vv-technologies</div>
@@ -301,9 +421,9 @@ label {
     </div>
 
     <div class="card">
-        <div class="card-title">🔄 MIRROR REPOS (push simultan)</div>
-        <div style="font-size:11px;color:rgba(255,255,255,0.25);margin-bottom:10px;">Selectează repo-urile care primesc Mirror Push simultan.</div>
-        <div id="mirror-list" style="display:flex;flex-wrap:wrap;gap:8px;">
+        <div class="card-title">🔄 MIRROR REPOS</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.2);margin-bottom:10px;">Push simultan pe mai multe repo-uri.</div>
+        <div class="pills" id="mirror-pills">
             <div class="rpill" onclick="toggleMirrorPill('ceo.html',this)">ceo.html</div>
             <div class="rpill" onclick="toggleMirrorPill('vv-team',this)">vv-team</div>
             <div class="rpill" onclick="toggleMirrorPill('vv-technologies',this)">vv-technologies</div>
@@ -312,106 +432,102 @@ label {
         </div>
     </div>
 
-    <button class="btn btn-white" onclick="doActivate()">ACTIVEAZĂ NEXUS</button>
-    <div id="status-msg"></div>
+    <div class="card">
+        <div class="card-title">🌍 TIP PROIECT</div>
+        <div id="project-types">
+            <div class="project-card active-proj" id="proj-vv" onclick="selectProject('vv')"><strong>🏙 VV Beta + TEAM</strong><div style="font-size:11px;color:rgba(255,255,255,0.3);margin-top:3px;">Urban intelligence P2P</div></div>
+            <div class="project-card" id="proj-site" onclick="selectProject('site')"><strong>🌐 Site de Prezentare</strong><div style="font-size:11px;color:rgba(255,255,255,0.3);margin-top:3px;">Landing page · Portfolio</div></div>
+            <div class="project-card" id="proj-shop" onclick="selectProject('shop')"><strong>🛒 Magazin Online</strong><div style="font-size:11px;color:rgba(255,255,255,0.3);margin-top:3px;">Produse · Plăți · Comenzi</div></div>
+            <div class="project-card" id="proj-app" onclick="selectProject('app')"><strong>📱 Aplicație Web</strong><div style="font-size:11px;color:rgba(255,255,255,0.3);margin-top:3px;">Dashboard · Auth · DB</div></div>
+            <div class="project-card" id="proj-custom" onclick="selectProject('custom')"><strong>⚡ Custom</strong><div style="font-size:11px;color:rgba(255,255,255,0.3);margin-top:3px;">NEXUS te întreabă ce construiești</div></div>
+        </div>
+    </div>
 
-    <div class="card" style="margin-top:4px;">
-        <div class="card-title">💾 SĂMÂNȚA VV — BACKUP CHEI</div>
-        <div class="hint">Exporti o dată → salvezi în Files → oricând Safari uită, importi în 2 secunde.</div>
+    <div class="card">
+        <div class="card-title">💾 SĂMÂNȚA VV</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.2);margin-bottom:10px;line-height:1.6;">Exporti cheile o dată → le ai mereu în Files.</div>
         <button class="btn btn-gold" onclick="exportSeed()">📥 EXPORTĂ CONFIGURAȚIA</button>
-        <label class="btn btn-gray" style="text-align:center;cursor:pointer;display:block;padding:16px;border-radius:14px;font-size:15px;font-weight:800;margin-bottom:10px;">
+        <label class="btn btn-gray" style="cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">
             📤 IMPORTĂ SĂMÂNȚA
             <input type="file" id="seed-file" accept=".vvseed,.txt" style="display:none;" onchange="importSeed(this)">
         </label>
     </div>
 
+    <button class="btn btn-white" onclick="doActivate()">ACTIVEAZĂ NEXUS</button>
+    <div id="save-status" style="text-align:center;padding:10px;font-size:12px;display:none;"></div>
+
+</div>
 </div>
 
-<!-- PAGE: CHAT -->
-<div class="page" id="page-chat" style="display:none;flex-direction:column;overflow:hidden;flex:1;">
+<!-- ══ CHAT ══ -->
+<div class="page" id="page-chat">
 
-    <!-- QUICK ACTIONS — FIXATE SUS, MEREU VIZIBILE -->
-    <div style="background:#080810;border-bottom:1px solid rgba(255,255,255,0.07);padding:8px 12px;display:flex;gap:6px;overflow-x:auto;flex-shrink:0;-webkit-overflow-scrolling:touch;scrollbar-width:none;">
-        <button onclick="quickSend('Ce bug-uri poate avea VV Beta pe iPhone X?')" style="flex-shrink:0;padding:7px 12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;font-size:11px;color:rgba(255,255,255,0.4);cursor:pointer;touch-action:manipulation;white-space:nowrap;min-height:36px;">🔍 Bug scan</button>
-        <button onclick="quickSend('Ce feature nou ar crește retenția utilizatorilor VV Beta?')" style="flex-shrink:0;padding:7px 12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;font-size:11px;color:rgba(255,255,255,0.4);cursor:pointer;touch-action:manipulation;white-space:nowrap;min-height:36px;">💡 Feature</button>
-        <button onclick="quickSend('Care sunt pașii concreți pentru lansarea VV Beta la primii 20 utilizatori din București?')" style="flex-shrink:0;padding:7px 12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;font-size:11px;color:rgba(255,255,255,0.4);cursor:pointer;touch-action:manipulation;white-space:nowrap;min-height:36px;">🚀 Launch</button>
-        <button onclick="quickSend('Analizează codul VV Beta și spune-mi ce optimizări pot face.')" style="flex-shrink:0;padding:7px 12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;font-size:11px;color:rgba(255,255,255,0.4);cursor:pointer;touch-action:manipulation;white-space:nowrap;min-height:36px;">⚡ Optimizare</button>
-        <button onclick="quickSend('Generează un anunț pentru site-ul VV Hybrid Univers despre cel mai recent update.')" style="flex-shrink:0;padding:7px 12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;font-size:11px;color:rgba(255,255,255,0.4);cursor:pointer;touch-action:manipulation;white-space:nowrap;min-height:36px;">📢 Anunț</button>
-        <button onclick="clearChat()" style="flex-shrink:0;padding:7px 12px;background:rgba(255,59,48,0.08);border:1px solid rgba(255,59,48,0.15);border-radius:8px;font-size:11px;color:rgba(255,59,48,0.5);cursor:pointer;touch-action:manipulation;white-space:nowrap;min-height:36px;">🗑 Reset</button>
+    <!-- Quick actions — FIXATE SUS -->
+    <div class="chat-quick-bar">
+        <button class="qbtn" onclick="quickSend('Ce bug-uri poate avea VV Beta pe iPhone X?')">🔍 Bugs</button>
+        <button class="qbtn" onclick="quickSend('Ce feature nou ar crește retenția în VV Beta?')">💡 Feature</button>
+        <button class="qbtn" onclick="quickSend('Pași concreți pentru lansarea VV Beta la 20 utilizatori din București.')">🚀 Launch</button>
+        <button class="qbtn" onclick="quickSend('Optimizează codul VV Beta pentru performanță pe iPhone X.')">⚡ Optimizare</button>
+        <button class="qbtn" onclick="quickSend('Generează un anunț pentru site-ul VV despre ultimul update.')">📢 Anunț</button>
+        <button class="qbtn" style="color:rgba(255,59,48,0.5);border-color:rgba(255,59,48,0.15);" onclick="clearChat()">🗑</button>
     </div>
 
-    <!-- CHAT MESSAGES -->
-    <div id="chat" style="flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:10px;-webkit-overflow-scrolling:touch;padding-bottom:16px;"></div>
+    <!-- Messages -->
+    <div id="chat"></div>
 
-    <!-- TYPING -->
-    <div id="typing" style="display:none;padding:6px 14px;flex-shrink:0;">
-        <div style="display:inline-flex;align-items:center;gap:4px;padding:10px 14px;background:rgba(10,132,255,0.07);border:1px solid rgba(10,132,255,0.15);border-radius:14px;">
-            <span style="width:5px;height:5px;border-radius:50%;background:rgba(10,132,255,0.5);animation:td 1.2s infinite;display:inline-block;"></span>
-            <span style="width:5px;height:5px;border-radius:50%;background:rgba(10,132,255,0.5);animation:td 1.2s .2s infinite;display:inline-block;"></span>
-            <span style="width:5px;height:5px;border-radius:50%;background:rgba(10,132,255,0.5);animation:td 1.2s .4s infinite;display:inline-block;"></span>
-        </div>
+    <!-- Typing -->
+    <div class="typing-wrap" id="typing">
+        <div class="typing-dots"><span></span><span></span><span></span></div>
     </div>
 
-    <!-- INPUT AREA — FIXAT JOS -->
-    <div style="background:#080810;border-top:1px solid rgba(255,255,255,0.08);flex-shrink:0;padding-bottom:env(safe-area-inset-bottom,0px);">
-
-        <!-- PREVIEW IMAGINE — apare deasupra input când e selectată -->
-        <div id="img-preview-container" style="display:none;padding:8px 12px 0;">
-            <div style="background:rgba(10,132,255,0.07);border:1px solid rgba(10,132,255,0.18);border-radius:12px;padding:8px 12px;display:flex;align-items:center;gap:10px;">
-                <img id="img-thumb" src="" alt="" style="width:48px;height:48px;object-fit:cover;border-radius:8px;flex-shrink:0;border:1px solid rgba(255,255,255,0.1);">
-                <div style="flex:1;min-width:0;">
-                    <div id="img-preview-name" style="font-size:12px;color:rgba(10,132,255,0.8);font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">📷 Imagine</div>
-                    <div style="font-size:10px;color:rgba(255,255,255,0.3);margin-top:2px;">Gata de trimis cu mesajul</div>
-                </div>
-                <button onclick="removeImage()" style="background:rgba(255,59,48,0.1);border:1px solid rgba(255,59,48,0.2);border-radius:8px;color:#ff3b30;font-size:12px;padding:6px 10px;cursor:pointer;touch-action:manipulation;flex-shrink:0;">✕</button>
-            </div>
+    <!-- Image preview -->
+    <div class="img-preview-bar" id="img-preview-container">
+        <img class="img-thumb" id="img-thumb" src="" alt="">
+        <div style="flex:1;min-width:0;">
+            <div id="img-preview-name" style="font-size:12px;color:rgba(10,132,255,0.8);font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">📷 Imagine</div>
+            <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:2px;">Gata de trimis</div>
         </div>
-
-        <!-- ROW: buton imagine + textarea + send -->
-        <div style="display:flex;gap:8px;align-items:flex-end;padding:10px 12px;">
-            <label style="width:46px;height:46px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:12px;display:flex;align-items:center;justify-content:center;cursor:pointer;touch-action:manipulation;flex-shrink:0;font-size:20px;">
-                📷
-                <input type="file" id="img-input" accept="image/*" capture="environment" style="display:none;" onchange="attachImage(this)">
-            </label>
-            <textarea id="inp-msg"
-                style="flex:1;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:12px 14px;color:#fff;font-size:16px;font-family:-apple-system,sans-serif;outline:none;resize:none;min-height:46px;max-height:100px;line-height:1.5;-webkit-appearance:none;"
-                placeholder="Scrie comanda ta..." rows="1"
-                autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
-            <button id="btn-send" onclick="doSend()"
-                style="width:46px;height:46px;background:rgba(212,175,55,0.15);border:1px solid rgba(212,175,55,0.3);border-radius:13px;color:#D4AF37;font-size:20px;font-weight:900;cursor:pointer;touch-action:manipulation;flex-shrink:0;-webkit-appearance:none;display:flex;align-items:center;justify-content:center;">↑</button>
-        </div>
+        <button onclick="removeImage()" style="background:rgba(255,59,48,0.1);border:1px solid rgba(255,59,48,0.2);border-radius:8px;color:#ff3b30;font-size:12px;padding:7px 12px;cursor:pointer;touch-action:manipulation;flex-shrink:0;">✕</button>
     </div>
-</div>
 
-<!-- PAGE: SANDBOX -->
-<div class="page" id="page-sandbox">
-<div class="sandbox-page">
-    <div class="card">
-        <div class="card-title">🛠 SANDBOX — COD GENERAT</div>
-        <div id="sb-filename" style="font-size:11px;color:rgba(212,175,55,0.5);margin-bottom:10px;font-family:monospace;">—</div>
-        <textarea class="sb-editor" id="sb-code" placeholder="Codul generat de NEXUS apare aici automat."
+    <!-- Input -->
+    <div class="chat-input-bar">
+        <label class="btn-attach">
+            📷<input type="file" id="img-input" accept="image/*" style="display:none;" onchange="attachImage(this)">
+        </label>
+        <textarea id="inp-msg" placeholder="Scrie comanda ta..." rows="1"
             autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
+        <button class="btn-send" id="btn-send" onclick="doSend()">↑</button>
     </div>
-    <label class="btn btn-gray" style="text-align:center;cursor:pointer;">
-        📂 ANALIZEAZĂ FIȘIER (.txt)
+</div>
+
+<!-- ══ SANDBOX ══ -->
+<div class="page" id="page-sandbox">
+<div class="sandbox-scroll">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+        <div style="font-size:10px;color:rgba(255,255,255,0.25);letter-spacing:2px;font-weight:700;">ATELIERUL DE COD</div>
+        <div id="sb-filename" style="font-size:10px;color:rgba(212,175,55,0.5);background:rgba(212,175,55,0.08);padding:3px 9px;border-radius:6px;border:1px solid rgba(212,175,55,0.18);">—</div>
+    </div>
+    <textarea class="sb-editor" id="sb-editor" placeholder="Codul generat apare aici automat. Poți edita manual." spellcheck="false" autocorrect="off" autocapitalize="off"></textarea>
+    <label class="btn btn-gray" style="cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">
+        📂 ANALIZEAZĂ FIȘIER
         <input type="file" id="file-upload" accept=".txt,.js,.html,.css,.json" style="display:none;" onchange="analyzeFile(this)">
     </label>
-    <button class="btn btn-green" onclick="sbPush()">🚀 PUSH PE GITHUB</button>
-    <button class="btn btn-gray"  onclick="sbCopy()">📋 COPIAZĂ CODUL</button>
+    <button class="btn btn-green" onclick="sbPush()">🚀 PUSH GITHUB</button>
+    <button class="btn btn-gray"  onclick="sbCopy()">📋 COPIAZĂ</button>
     <button class="btn btn-red"   onclick="sbClear()">✕ CURĂȚĂ</button>
 </div>
 </div>
 
-<!-- NAV -->
-<!-- PAGE: DEPLOY -->
+<!-- ══ DEPLOY ══ -->
 <div class="page" id="page-deploy">
-<div style="padding:16px;padding-bottom:80px;overflow-y:auto;max-height:calc(100dvh - 120px);">
+<div class="deploy-scroll">
 
     <div class="card">
         <div class="card-title">🚀 DEPLOY RAPID</div>
         <div id="deploy-status" style="font-size:12px;color:rgba(255,255,255,0.3);margin-bottom:12px;">Generează cod în CHAT apoi vino aici.</div>
         <button class="btn btn-green" onclick="deployPrimary()">⬆ PUSH REPO PRIMAR</button>
-        <button class="btn btn-gray"  id="btn-mirror" onclick="deployMirror()" style="display:none;">🔄 MIRROR PUSH — TOATE</button>
+        <button class="btn btn-gray" id="btn-mirror" onclick="deployMirror()" style="display:none;">🔄 MIRROR PUSH</button>
     </div>
 
     <div class="card">
@@ -427,60 +543,13 @@ label {
     </div>
 
     <div class="card">
-        <div class="card-title">📁 REPO-URI ACTIVE</div>
+        <div class="card-title">📁 REPO-URI</div>
         <div id="repos-display" style="font-size:12px;color:rgba(255,255,255,0.3);">Configurează în SETUP.</div>
     </div>
 
 </div>
 </div>
 
-<div class="nav">
-    <button class="nav-btn active" id="nav-setup" onclick="goPage('setup')">
-        <span class="nav-icon">⚙️</span>SETUP
-    </button>
-    <button class="nav-btn" id="nav-chat" onclick="goPage('chat')">
-        <span class="nav-icon">💬</span>CHAT
-    </button>
-    <button class="nav-btn" id="nav-sandbox" onclick="goPage('sandbox')">
-        <span class="nav-icon">🛠</span>SANDBOX
-    </button>
-    <button class="nav-btn" id="nav-deploy" onclick="goPage('deploy')">
-        <span class="nav-icon">🚀</span>DEPLOY
-    </button>
-</div>
-
-<style>
-.rpill {
-    padding: 8px 16px;
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 20px;
-    font-size: 12px;
-    color: rgba(255,255,255,0.4);
-    cursor: pointer;
-    touch-action: manipulation;
-}
-.rpill.active {
-    background: rgba(212,175,55,0.12);
-    border-color: rgba(212,175,55,0.3);
-    color: #D4AF37;
-}
-.project-card {
-    padding: 12px 14px;
-    background: rgba(255,255,255,0.03);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 12px;
-    cursor: pointer;
-    touch-action: manipulation;
-    transition: all 0.2s;
-    color: rgba(255,255,255,0.7);
-}
-.project-card.active-proj {
-    background: rgba(212,175,55,0.08);
-    border-color: rgba(212,175,55,0.25);
-    color: #fff;
-}
-</style>
 
 <script>
 // ================================================================
@@ -617,8 +686,12 @@ function goPage(id) {
     ['setup','chat','sandbox','deploy'].forEach(function(t) {
         var page = document.getElementById('page-' + t);
         var nav  = document.getElementById('nav-' + t);
-        if (page) page.style.display = t === id ? 'flex' : 'none';
-        if (nav)  nav.classList.toggle('active', t === id);
+        if (page) {
+            page.style.display = t === id ? 'flex' : 'none';
+            if (t === id) page.classList.add('active');
+            else page.classList.remove('active');
+        }
+        if (nav) nav.classList.toggle('active', t === id);
     });
     if (id === 'deploy') { renderDeployPage(); renderDNA(); updateGhostStatus(); }
 }
