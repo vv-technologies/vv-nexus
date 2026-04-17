@@ -399,13 +399,25 @@ label { display: block; font-size: 11px; color: rgba(255,255,255,0.35); letter-s
     <div class="card">
         <div class="card-title">MOTOR AI — GEMINI</div>
         <label for="f-gk">GEMINI API KEY *</label>
-        <input type="password" id="f-gk" placeholder="AIzaSy..." autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false">
+        <div style="position:relative;margin-bottom:10px;">
+            <input type="text" id="f-gk" placeholder="AIzaSy..."
+                autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+                style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:11px;padding:13px 50px 13px 14px;color:#fff;font-size:16px;font-family:-apple-system,sans-serif;outline:none;-webkit-appearance:none;display:block;-webkit-text-security:disc;">
+            <button onclick="toggleKeyVis('f-gk',this)"
+                style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:rgba(255,255,255,0.3);font-size:16px;cursor:pointer;touch-action:manipulation;padding:6px;">👁</button>
+        </div>
         <button class="btn btn-gold" onclick="autoDiscoverModel()" id="btn-discover">🔍 AUTO-DETECTEAZĂ MODELUL</button>
         <div id="model-status" style="font-size:11px;color:rgba(255,255,255,0.25);text-align:center;min-height:16px;margin-bottom:6px;"></div>
         <label for="f-gu">GITHUB USERNAME</label>
         <input type="text" id="f-gu" placeholder="vv-technologies" autocomplete="off">
         <label for="f-gt">GITHUB TOKEN (pentru deploy)</label>
-        <input type="password" id="f-gt" placeholder="ghp_..." autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false">
+        <div style="position:relative;margin-bottom:10px;">
+            <input type="text" id="f-gt" placeholder="ghp_..."
+                autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+                style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:11px;padding:13px 50px 13px 14px;color:#fff;font-size:16px;font-family:-apple-system,sans-serif;outline:none;-webkit-appearance:none;display:block;-webkit-text-security:disc;">
+            <button onclick="toggleKeyVis('f-gt',this)"
+                style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:rgba(255,255,255,0.3);font-size:16px;cursor:pointer;touch-action:manipulation;padding:6px;">👁</button>
+        </div>
     </div>
 
     <div class="card">
@@ -453,7 +465,7 @@ label { display: block; font-size: 11px; color: rgba(255,255,255,0.35); letter-s
         </label>
     </div>
 
-    <button class="btn btn-white" onclick="doActivate()">ACTIVEAZĂ NEXUS</button>
+    <button class="btn btn-white" onclick="doActivate()" style="touch-action:manipulation;position:relative;z-index:5;-webkit-appearance:none;cursor:pointer;">ACTIVEAZĂ NEXUS</button>
     <div id="save-status" style="text-align:center;padding:10px;font-size:12px;display:none;"></div>
 
 </div>
@@ -1600,6 +1612,21 @@ callGeminiOnce = async function(model, contents) {
     }
     return _origCallGeminiOnce(model, contents);
 };
+
+
+// ── TOGGLE VIZIBILITATE CHEI ──────────────────────────────────
+function toggleKeyVis(inputId, btn) {
+    var inp = document.getElementById(inputId);
+    if (!inp) return;
+    var isHidden = inp.style.webkitTextSecurity === 'disc' || inp.style.webkitTextSecurity === '';
+    if (isHidden) {
+        inp.style.webkitTextSecurity = 'none';
+        btn.textContent = '🙈';
+    } else {
+        inp.style.webkitTextSecurity = 'disc';
+        btn.textContent = '👁';
+    }
+}
 
 </script>
 </body>
