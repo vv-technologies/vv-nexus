@@ -307,6 +307,8 @@ label {
             <div class="rpill" onclick="setRepo('vv-team',this)">vv-team</div>
             <div class="rpill" onclick="setRepo('vv-technologies',this)">vv-technologies</div>
             <div class="rpill" onclick="setRepo('vvhi',this)">vvhi</div>
+            <div class="rpill" onclick="setRepo('vv-hybrid-univers',this)">vv-hybrid-univers</div>
+            <div class="rpill" onclick="setRepo('vv-nexus',this)">vv-nexus</div>
         </div>
     </div>
 
@@ -449,6 +451,21 @@ label {
     border-color: rgba(212,175,55,0.3);
     color: #D4AF37;
 }
+.project-card {
+    padding: 12px 14px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    cursor: pointer;
+    touch-action: manipulation;
+    transition: all 0.2s;
+    color: rgba(255,255,255,0.7);
+}
+.project-card.active-proj {
+    background: rgba(212,175,55,0.08);
+    border-color: rgba(212,175,55,0.25);
+    color: #fff;
+}
 </style>
 
 <script>
@@ -517,11 +534,17 @@ var CTX = 'Ești VV NEXUS — asistentul AI personal al Arhitectului (fondatorul
         document.getElementById('inp-gu').value = G.gu || '';
         syncRepo();
     syncMirrorPills();
+    G_project = store('get', 'nx_project') || 'vv';
+    var projEl = document.getElementById('proj-' + G_project);
+    if (projEl) {
+        document.querySelectorAll('.project-card').forEach(function(c) { c.classList.remove('active-proj'); });
+        projEl.classList.add('active-proj');
+    }
         setOnline(true);
         goPage('chat');
         updateModelBadge();
         loadChatHistory();
-        if (!G.msgs.length) addSys('NEXUS online · ' + G.repo + ' · Scrie comanda ta.');
+        if (!G.msgs.length) addSys(projectWelcome());
     }
 
     syncRepo();
@@ -650,9 +673,13 @@ async function callAI() {
     document.getElementById('btn-send').disabled = true;
     hideFailoverBar();
 
+    // Context dinamic per proiect
+    var projectCtx = getProjectContext();
+    var fullCtx = CTX + '\n\nPROIECT ACTIV: ' + getProjectName(G_project) + '\n' + projectCtx;
+
     var contents = [
-        { role: 'user',  parts: [{ text: CTX + '\n\n---' }] },
-        { role: 'model', parts: [{ text: 'NEXUS gata.' }] }
+        { role: 'user',  parts: [{ text: fullCtx + '\n\n---' }] },
+        { role: 'model', parts: [{ text: 'NEXUS gata · ' + getProjectName(G_project) + ' activ.' }] }
     ];
     G.msgs.slice(-6).forEach(function(m) { contents.push(m); });
 
@@ -728,6 +755,7 @@ async function callAI() {
 
                 G.msgs.push({ role: 'model', parts: [{ text: txt }] });
                 processReply(txt);
+                vvhiLog(G.msgs[G.msgs.length-2].parts[0].text, txt, true);
                 success = true;
 
             } catch(err) {
@@ -1341,6 +1369,71 @@ function shadowClean(code) {
 
 // Aplicăm VV-Shadow la push
 var _origGhPush = ghPush;
+
+
+// ── MULTI-PROJECT MODE ────────────────────────────────────────
+var PROJECT_CONTEXTS = {
+    vv: 'Lucrăm pe VV Beta — aplicație P2P urban intelligence, Firebase, iPhone X. Cunoști toată arhitectura VV.',
+    site: 'Construim un site de prezentare. Întreabă: numele firmei/persoanei, domeniul de activitate, culori preferate, câte pagini, dacă are logo. Apoi generează structura HTML/CSS completă.',
+    shop: 'Construim un magazin online. Întreabă: ce produse vinde, câte categorii, sistemul de plată dorit (Stripe/PayPal/ramburs), dacă are cont de hosting. Apoi generează structura.',
+    app: 'Construim o aplicație web. Întreabă: ce problemă rezolvă, cine sunt utilizatorii, dacă are nevoie de autentificare, ce date stochează. Apoi propune arhitectura.',
+    blog: 'Construim un blog/site de conținut. Întreabă: subiectul principal, publicul țintă, frecvența postărilor, dacă vrea newsletter. Apoi generează structura SEO-optimizată.',
+    custom: 'Proiect custom. Întreabă Arhitectul: ce vrea să construiască, pentru cine, care e scopul principal, ce tehnologii preferă. Ascultă și propune cea mai bună abordare.'
+};
+
+var G_project = 'vv'; // proiectul activ
+
+function selectProject(type) {
+    G_project = type;
+    store('set', 'nx_project', type);
+
+    // Update UI
+    document.querySelectorAll('.project-card').forEach(function(c) {
+        c.classList.remove('active-proj');
+    });
+    var el = document.getElementById('proj-' + type);
+    if (el) el.classList.add('active-proj');
+
+    toast('Proiect: ' + getProjectName(type), 'b');
+}
+
+function getProjectName(type) {
+    var names = { vv:'VV Beta', site:'Site Prezentare', shop:'Magazin Online', app:'Aplicație Web', blog:'Blog', custom:'Custom' };
+    return names[type] || type;
+}
+
+function getProjectContext() {
+    return PROJECT_CONTEXTS[G_project] || PROJECT_CONTEXTS.vv;
+}
+
+// ── VVhi LOGIC ÎN NEXUS ───────────────────────────────────────
+// VVhi observă comenzile și le stochează pentru antrenament
+function vvhiLog(cmd, response, success) {
+    try {
+        var entry = {
+            ts: Date.now(),
+            project: G_project,
+            cmd: cmd.substring(0, 100),
+            ok: success,
+            model: G.model
+        };
+        var log = [];
+        try { log = JSON.parse(store('get', 'nx_vvhi') || '[]'); } catch(e) {}
+        log.unshift(entry);
+        if (log.length > 100) log = log.slice(0, 100);
+        store('set', 'nx_vvhi', JSON.stringify(log));
+    } catch(e) {}
+}
+
+// Funcție care construiește mesajul de bun venit per proiect
+function projectWelcome() {
+    var names = { vv:'VV Beta', site:'Site nou', shop:'Magazin', app:'Aplicație', blog:'Blog', custom:'Proiect' };
+    var name = names[G_project] || 'proiect';
+    if (G_project === 'vv') {
+        return 'NEXUS online · VV Beta activ · Scrie comanda ta.';
+    }
+    return 'NEXUS gata · ' + name + ' selectat · Spune-mi ce construim.';
+}
 
 </script>
 </body>
