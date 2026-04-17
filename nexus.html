@@ -179,6 +179,14 @@ label { display: block; font-size: 11px; color: rgba(255,255,255,0.35); letter-s
     -webkit-appearance: none;
 }
 .btn-white { background: #fff; color: #000; }
+#btn-activate {
+    touch-action: manipulation;
+    -webkit-appearance: none;
+    cursor: pointer;
+    position: relative;
+    z-index: 10;
+    margin-top: 4px;
+}
 .btn-gold  { background: rgba(212,175,55,0.12); border: 1px solid rgba(212,175,55,0.25) !important; color: #D4AF37; }
 .btn-green { background: rgba(52,199,89,0.12); border: 1px solid rgba(52,199,89,0.25) !important; color: #34c759; }
 .btn-red   { background: rgba(255,59,48,0.1); border: 1px solid rgba(255,59,48,0.2) !important; color: #ff3b30; }
@@ -399,25 +407,17 @@ label { display: block; font-size: 11px; color: rgba(255,255,255,0.35); letter-s
     <div class="card">
         <div class="card-title">MOTOR AI — GEMINI</div>
         <label for="f-gk">GEMINI API KEY *</label>
-        <div style="position:relative;margin-bottom:10px;">
-            <input type="text" id="f-gk" placeholder="AIzaSy..."
-                autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
-                style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:11px;padding:13px 50px 13px 14px;color:#fff;font-size:16px;font-family:-apple-system,sans-serif;outline:none;-webkit-appearance:none;display:block;-webkit-text-security:disc;">
-            <button onclick="toggleKeyVis('f-gk',this)"
-                style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:rgba(255,255,255,0.3);font-size:16px;cursor:pointer;touch-action:manipulation;padding:6px;">👁</button>
-        </div>
+        <input type="password" id="f-gk" placeholder="AIzaSy..."
+            autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+            style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:11px;padding:13px 14px;color:#fff;font-size:16px;font-family:-apple-system,sans-serif;outline:none;-webkit-appearance:none;display:block;margin-bottom:10px;">
         <button class="btn btn-gold" onclick="autoDiscoverModel()" id="btn-discover">🔍 AUTO-DETECTEAZĂ MODELUL</button>
         <div id="model-status" style="font-size:11px;color:rgba(255,255,255,0.25);text-align:center;min-height:16px;margin-bottom:6px;"></div>
         <label for="f-gu">GITHUB USERNAME</label>
         <input type="text" id="f-gu" placeholder="vv-technologies" autocomplete="off">
         <label for="f-gt">GITHUB TOKEN (pentru deploy)</label>
-        <div style="position:relative;margin-bottom:10px;">
-            <input type="text" id="f-gt" placeholder="ghp_..."
-                autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
-                style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:11px;padding:13px 50px 13px 14px;color:#fff;font-size:16px;font-family:-apple-system,sans-serif;outline:none;-webkit-appearance:none;display:block;-webkit-text-security:disc;">
-            <button onclick="toggleKeyVis('f-gt',this)"
-                style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:rgba(255,255,255,0.3);font-size:16px;cursor:pointer;touch-action:manipulation;padding:6px;">👁</button>
-        </div>
+        <input type="password" id="f-gt" placeholder="ghp_..."
+            autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+            style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:11px;padding:13px 14px;color:#fff;font-size:16px;font-family:-apple-system,sans-serif;outline:none;-webkit-appearance:none;display:block;margin-bottom:10px;">
     </div>
 
     <div class="card">
@@ -465,7 +465,7 @@ label { display: block; font-size: 11px; color: rgba(255,255,255,0.35); letter-s
         </label>
     </div>
 
-    <button class="btn btn-white" onclick="doActivate()" style="touch-action:manipulation;position:relative;z-index:5;-webkit-appearance:none;cursor:pointer;">ACTIVEAZĂ NEXUS</button>
+    <button class="btn btn-white" id="btn-activate" onclick="doActivate()">ACTIVEAZĂ NEXUS</button>
     <div id="save-status" style="text-align:center;padding:10px;font-size:12px;display:none;"></div>
 
 </div>
