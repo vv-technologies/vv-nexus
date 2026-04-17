@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>VV PORTFOLIO</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+body {
+    background: #03030a;
+    color: #fff;
+    font-family: -apple-system, sans-serif;
+    min-height: 100dvh;
+    padding: env(safe-area-inset-top,20px) 0 env(safe-area-inset-bottom,20px);
+}
+
+.hdr {
+    background: rgba(8,8,16,0.95);
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+    padding: 16px 20px;
+    text-align: center;
+}
+.hdr-logo { font-size:11px; color:rgba(212,175,55,0.5); letter-spacing:4px; font-weight:700; margin-bottom:6px; }
+.hdr-title { font-size:26px; font-weight:900; letter-spacing:2px; color:#fff; margin-bottom:4px; }
+.hdr-sub { font-size:12px; color:rgba(255,255,255,0.3); }
+
+.content { padding:20px 16px; max-width:600px; margin:0 auto; }
+
+/* Hero */
+.hero {
+    text-align: center;
+    padding: 32px 20px;
+    background: rgba(212,175,55,0.04);
+    border: 1px solid rgba(212,175,55,0.12);
+    border-radius: 20px;
+    margin-bottom: 28px;
+}
+.hero-title { font-size:20px; font-weight:900; margin-bottom:10px; line-height:1.3; }
+.hero-text { font-size:13px; color:rgba(255,255,255,0.45); line-height:1.8; margin-bottom:18px; }
+.hero-btn {
+    display: inline-block;
+    padding: 13px 28px;
+    background: rgba(212,175,55,0.12);
+    border: 1px solid rgba(212,175,55,0.3);
+    border-radius: 14px;
+    color: #D4AF37;
+    font-size:13px;
+    font-weight:700;
+    cursor:pointer;
+    touch-action:manipulation;
+    text-decoration:none;
+}
+
+.section-title {
+    font-size:10px;
+    color:rgba(255,255,255,0.25);
+    letter-spacing:3px;
+    font-weight:700;
+    margin: 24px 0 12px;
+}
+
+/* Project cards */
+.proj-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 18px;
+    overflow: hidden;
+    margin-bottom: 14px;
+}
+.proj-preview {
+    height: 140px;
+    background: linear-gradient(135deg, #0a0a18 0%, #12121f 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    position: relative;
+    overflow: hidden;
+}
+.proj-preview::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 30% 50%, rgba(212,175,55,0.08), transparent 60%);
+}
+.proj-body { padding: 16px; }
+.proj-name { font-size:15px; font-weight:800; margin-bottom:4px; }
+.proj-desc { font-size:12px; color:rgba(255,255,255,0.4); line-height:1.6; margin-bottom:12px; }
+.proj-tags { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:12px; }
+.tag {
+    padding:4px 10px;
+    background:rgba(255,255,255,0.05);
+    border:1px solid rgba(255,255,255,0.1);
+    border-radius:20px;
+    font-size:10px;
+    color:rgba(255,255,255,0.4);
+}
+.tag.gold { background:rgba(212,175,55,0.08); border-color:rgba(212,175,55,0.2); color:rgba(212,175,55,0.7); }
+.proj-link {
+    display:block;
+    width:100%;
+    padding:11px;
+    background:rgba(255,255,255,0.06);
+    border:1px solid rgba(255,255,255,0.1);
+    border-radius:10px;
+    color:rgba(255,255,255,0.6);
+    font-size:12px;
+    font-weight:700;
+    text-align:center;
+    text-decoration:none;
+    cursor:pointer;
+    touch-action:manipulation;
+}
+
+/* Testimonial */
+.testimonial {
+    background: rgba(52,199,89,0.04);
+    border: 1px solid rgba(52,199,89,0.12);
+    border-radius: 16px;
+    padding: 18px;
+    margin-bottom: 14px;
+}
+.test-text { font-size:13px; color:rgba(255,255,255,0.55); line-height:1.7; margin-bottom:10px; font-style:italic; }
+.test-name { font-size:11px; color:rgba(52,199,89,0.6); font-weight:700; }
+
+/* CTA */
+.cta-card {
+    background: rgba(212,175,55,0.06);
+    border: 1px solid rgba(212,175,55,0.18);
+    border-radius: 20px;
+    padding: 28px 20px;
+    text-align: center;
+    margin: 24px 0;
+}
+.cta-title { font-size:18px; font-weight:900; margin-bottom:8px; }
+.cta-text { font-size:12px; color:rgba(255,255,255,0.4); line-height:1.7; margin-bottom:18px; }
+.btn-cta {
+    display:block;
+    padding:16px;
+    background:#fff;
+    color:#000;
+    border:none;
+    border-radius:14px;
+    font-size:14px;
+    font-weight:800;
+    cursor:pointer;
+    touch-action:manipulation;
+    text-decoration:none;
+    letter-spacing:0.5px;
+    margin-bottom:10px;
+}
+.btn-wa {
+    display:block;
+    padding:14px;
+    background:rgba(37,211,102,0.12);
+    border:1px solid rgba(37,211,102,0.25);
+    border-radius:14px;
+    color:#25d366;
+    font-size:14px;
+    font-weight:700;
+    cursor:pointer;
+    touch-action:manipulation;
+    text-decoration:none;
+    text-align:center;
+}
+
+/* Admin panel */
+.admin-toggle {
+    text-align:center;
+    padding:12px;
+    font-size:11px;
+    color:rgba(255,255,255,0.15);
+    cursor:pointer;
+    touch-action:manipulation;
+}
+.admin-panel {
+    display:none;
+    background:rgba(255,255,255,0.02);
+    border:1px solid rgba(255,255,255,0.06);
+    border-radius:14px;
+    padding:16px;
+    margin-bottom:16px;
+}
+.admin-input {
+    width:100%;
+    background:rgba(255,255,255,0.06);
+    border:1px solid rgba(255,255,255,0.1);
+    border-radius:10px;
+    padding:12px;
+    color:#fff;
+    font-size:14px;
+    font-family:-apple-system,sans-serif;
+    outline:none;
+    -webkit-appearance:none;
+    margin-bottom:8px;
+    display:block;
+}
+.admin-btn {
+    width:100%;
+    padding:13px;
+    background:rgba(212,175,55,0.12);
+    border:1px solid rgba(212,175,55,0.25);
+    border-radius:10px;
+    color:#D4AF37;
+    font-size:13px;
+    font-weight:700;
+    cursor:pointer;
+    touch-action:manipulation;
+    min-height:44px;
+}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+    <div class="hdr-logo">VV TECHNOLOGIES</div>
+    <div class="hdr-title">PORTFOLIO</div>
+    <div class="hdr-sub">Site-uri & Aplicații Web · Livrare în 24h</div>
+</div>
+
+<div class="content">
+
+    <!-- HERO -->
+    <div class="hero">
+        <div class="hero-title">Transformăm ideile tale<br>în produse digitale reale.</div>
+        <div class="hero-text">
+            Construim site-uri, aplicații și platforme web care funcționează perfect pe orice dispozitiv.
+            Design premium, cod curat, livrare rapidă.
+        </div>
+        <a class="hero-btn" href="#contact">CERE O OFERTĂ GRATUITĂ</a>
+    </div>
+
+    <!-- PROIECTE -->
+    <div class="section-title">PROIECTE REALIZATE</div>
+
+    <div id="projects-container">
+        <!-- Proiect 1 — VV Beta -->
+        <div class="proj-card">
+            <div class="proj-preview">🏙</div>
+            <div class="proj-body">
+                <div class="proj-name">VV Beta — Urban Intelligence</div>
+                <div class="proj-desc">Aplicație P2P pentru validarea locațiilor urbane. Misiuni live, sistem de recompense, moderare AI.</div>
+                <div class="proj-tags">
+                    <span class="tag gold">Web App</span>
+                    <span class="tag">Firebase</span>
+                    <span class="tag">AI Integration</span>
+                    <span class="tag">Mobile-first</span>
+                </div>
+                <a class="proj-link" href="https://vv-technologies.github.io/ceo.html" target="_blank">🔗 Vezi live</a>
+            </div>
+        </div>
+
+        <!-- Proiect 2 — VV TEAM -->
+        <div class="proj-card">
+            <div class="proj-preview" style="background:linear-gradient(135deg,#0a1020,#0d1830);">👑</div>
+            <div class="proj-body">
+                <div class="proj-name">VV TEAM — Panou CEO</div>
+                <div class="proj-desc">Dashboard complet pentru managementul echipei, misiunilor și statisticilor în timp real.</div>
+                <div class="proj-tags">
+                    <span class="tag gold">Dashboard</span>
+                    <span class="tag">Real-time</span>
+                    <span class="tag">Firestore</span>
+                </div>
+                <a class="proj-link" href="https://vv-technologies.github.io/vv-team" target="_blank">🔗 Vezi live</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- TESTIMONIALE -->
+    <div class="section-title">CE SPUN CLIENȚII</div>
+
+    <div id="testimonials-container">
+        <div class="testimonial">
+            <div class="test-text">"Am primit site-ul în aceeași zi. Arată mai bine decât mă așteptam și funcționează perfect pe telefon."</div>
+            <div class="test-name">— Client VV Technologies</div>
+        </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="cta-card" id="contact">
+        <div class="cta-title">Îți construim site-ul în 24h</div>
+        <div class="cta-text">
+            Preț fix, fără surprize. Dai o descriere, primești un site gata de lansat.
+            Site prezentare de la 300€ · Aplicație web de la 800€.
+        </div>
+        <a class="btn-wa" id="wa-btn" href="https://wa.me/40700000000?text=Buna%20ziua%2C%20vreau%20un%20site%20de%20la%20VV%20Technologies" target="_blank">
+            💬 SCRIE PE WHATSAPP
+        </a>
+    </div>
+
+    <!-- ADMIN PANEL (ascuns) -->
+    <div class="admin-toggle" onclick="toggleAdmin()">⚙ admin</div>
+    <div class="admin-panel" id="admin-panel">
+        <div style="font-size:10px;color:rgba(255,255,255,0.25);letter-spacing:2px;margin-bottom:12px;font-weight:700;">PERSONALIZARE PORTFOLIO</div>
+
+        <input class="admin-input" id="admin-phone" type="tel" placeholder="Numărul tău WhatsApp (ex: 40712345678)">
+        <input class="admin-input" id="admin-name" type="text" placeholder="Numele tău / firma">
+        <input class="admin-input" id="admin-tagline" type="text" placeholder="Tagline (ex: Site-uri premium în 24h)">
+
+        <div style="font-size:10px;color:rgba(255,255,255,0.2);margin:8px 0 10px;line-height:1.6;">
+            Adaugă proiect nou:
+        </div>
+        <input class="admin-input" id="new-proj-name" type="text" placeholder="Numele proiectului">
+        <input class="admin-input" id="new-proj-desc" type="text" placeholder="Descriere scurtă">
+        <input class="admin-input" id="new-proj-url" type="url" placeholder="URL live (opțional)">
+        <input class="admin-input" id="new-proj-emoji" type="text" placeholder="Emoji preview (ex: 🚗)">
+
+        <button class="admin-btn" onclick="addProject()" style="margin-bottom:8px;">+ ADAUGĂ PROIECT</button>
+        <button class="admin-btn" onclick="saveAdminSettings()" style="background:rgba(52,199,89,0.12);border-color:rgba(52,199,89,0.25);color:#34c759;">✅ SALVEAZĂ SETĂRILE</button>
+    </div>
+
+</div>
+
+<script>
+var projects = [];
+var testimonials = [];
+
+(function init() {
+    try { projects = JSON.parse(localStorage.getItem('vv_portfolio_projects') || '[]'); } catch(e) { projects = []; }
+    try { testimonials = JSON.parse(localStorage.getItem('vv_portfolio_testimonials') || '[]'); } catch(e) { testimonials = []; }
+
+    // Setări salvate
+    var phone = localStorage.getItem('vv_portfolio_phone');
+    var name  = localStorage.getItem('vv_portfolio_name');
+    var tag   = localStorage.getItem('vv_portfolio_tagline');
+
+    if (phone) {
+        var waBtn = document.getElementById('wa-btn');
+        if (waBtn) waBtn.href = 'https://wa.me/' + phone + '?text=Buna%20ziua%2C%20vreau%20un%20site%20de%20la%20VV%20Technologies';
+    }
+    if (tag) {
+        document.querySelector('.hdr-sub').textContent = tag;
+    }
+
+    renderProjects();
+    renderTestimonials();
+})();
+
+function toggleAdmin() {
+    var p = document.getElementById('admin-panel');
+    p.style.display = p.style.display === 'none' ? 'block' : 'none';
+    if (p.style.display === 'block') {
+        document.getElementById('admin-phone').value = localStorage.getItem('vv_portfolio_phone') || '';
+        document.getElementById('admin-name').value  = localStorage.getItem('vv_portfolio_name')  || '';
+        document.getElementById('admin-tagline').value = localStorage.getItem('vv_portfolio_tagline') || '';
+    }
+}
+
+function saveAdminSettings() {
+    var phone = document.getElementById('admin-phone').value.trim();
+    var name  = document.getElementById('admin-name').value.trim();
+    var tag   = document.getElementById('admin-tagline').value.trim();
+
+    if (phone) {
+        localStorage.setItem('vv_portfolio_phone', phone);
+        var waBtn = document.getElementById('wa-btn');
+        if (waBtn) waBtn.href = 'https://wa.me/' + phone + '?text=Buna%20ziua%2C%20vreau%20un%20site';
+    }
+    if (name) localStorage.setItem('vv_portfolio_name', name);
+    if (tag)  {
+        localStorage.setItem('vv_portfolio_tagline', tag);
+        document.querySelector('.hdr-sub').textContent = tag;
+    }
+
+    document.getElementById('admin-panel').style.display = 'none';
+    showToast('Setări salvate ✅');
+}
+
+function addProject() {
+    var name  = document.getElementById('new-proj-name').value.trim();
+    var desc  = document.getElementById('new-proj-desc').value.trim();
+    var url   = document.getElementById('new-proj-url').value.trim();
+    var emoji = document.getElementById('new-proj-emoji').value.trim() || '🌐';
+
+    if (!name) { showToast('Introdu numele proiectului.'); return; }
+
+    projects.push({ name:name, desc:desc, url:url, emoji:emoji, ts:Date.now() });
+    localStorage.setItem('vv_portfolio_projects', JSON.stringify(projects));
+    renderProjects();
+
+    document.getElementById('new-proj-name').value = '';
+    document.getElementById('new-proj-desc').value = '';
+    document.getElementById('new-proj-url').value = '';
+    document.getElementById('new-proj-emoji').value = '';
+    showToast('Proiect adăugat ✅');
+}
+
+function renderProjects() {
+    if (!projects.length) return;
+    var container = document.getElementById('projects-container');
+    var extra = projects.map(function(p) {
+        var linkHtml = p.url
+            ? '<a class="proj-link" href="' + p.url + '" target="_blank">🔗 Vezi live</a>'
+            : '<div class="proj-link" style="opacity:0.4;">În curând</div>';
+        return '<div class="proj-card">'
+            + '<div class="proj-preview">' + p.emoji + '</div>'
+            + '<div class="proj-body">'
+            + '<div class="proj-name">' + esc(p.name) + '</div>'
+            + '<div class="proj-desc">' + esc(p.desc) + '</div>'
+            + linkHtml
+            + '</div></div>';
+    }).join('');
+    container.innerHTML += extra;
+}
+
+function renderTestimonials() {
+    if (!testimonials.length) return;
+    var container = document.getElementById('testimonials-container');
+    container.innerHTML += testimonials.map(function(t) {
+        return '<div class="testimonial">'
+            + '<div class="test-text">"' + esc(t.text) + '"</div>'
+            + '<div class="test-name">— ' + esc(t.name) + '</div>'
+            + '</div>';
+    }).join('');
+}
+
+function showToast(msg) {
+    var t = document.createElement('div');
+    t.style.cssText = 'position:fixed;top:calc(20px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);background:rgba(52,199,89,0.2);border:1px solid rgba(52,199,89,0.35);color:#34c759;padding:10px 20px;border-radius:12px;font-size:12px;font-weight:700;z-index:9999;pointer-events:none;';
+    t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(function() { t.remove(); }, 2500);
+}
+
+function esc(t) {
+    return (t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+</script>
+</body>
+</html>
