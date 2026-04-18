@@ -227,6 +227,7 @@ body {
     <button class="tab"    id="tab-chat"    onclick="sw('chat')"><span class="tab-icon">💬</span>CHAT</button>
     <button class="tab"    id="tab-sandbox" onclick="sw('sandbox')"><span class="tab-icon">🛠</span>SANDBOX</button>
     <button class="tab"    id="tab-deploy"  onclick="sw('deploy')"><span class="tab-icon">🚀</span>DEPLOY</button>
+    <button class="tab"    id="tab-hub"     onclick="sw('hub')"><span class="tab-icon">🌐</span>HUB</button>
 </div>
 
 <!-- ══ SETUP ══ -->
@@ -351,6 +352,70 @@ body {
 </div>
 </div>
 
+<!-- ══ HUB ══ -->
+<div class="screen" id="sc-hub">
+<div class="scroll">
+
+    <div class="card">
+        <div class="card-title">🚀 ACCES RAPID</div>
+        <a href="vv-repos.html" style="display:block;padding:14px;background:rgba(212,175,55,0.08);border:1px solid rgba(212,175,55,0.2);border-radius:12px;color:#D4AF37;text-decoration:none;font-weight:700;font-size:13px;margin-bottom:8px;touch-action:manipulation;">
+            📁 VV REPOS — toate repo-urile →
+        </a>
+        <a href="vv-portfolio.html" style="display:block;padding:14px;background:rgba(52,199,89,0.07);border:1px solid rgba(52,199,89,0.18);border-radius:12px;color:#34c759;text-decoration:none;font-weight:700;font-size:13px;margin-bottom:8px;touch-action:manipulation;">
+            🌟 VV PORTFOLIO — vitrina clienți →
+        </a>
+        <a href="vv-billing.html" style="display:block;padding:14px;background:rgba(10,132,255,0.07);border:1px solid rgba(10,132,255,0.18);border-radius:12px;color:#0A84FF;text-decoration:none;font-weight:700;font-size:13px;margin-bottom:8px;touch-action:manipulation;">
+            💰 VV BILLING — oferte și facturi →
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-title">🏙 VV BETA — LINKS RAPIDE</div>
+        <a href="https://vv-technologies.github.io/ceo.html" target="_blank" style="display:block;padding:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;color:rgba(255,255,255,0.6);text-decoration:none;font-size:12px;margin-bottom:7px;touch-action:manipulation;">
+            📱 VV Beta — aplicația live →
+        </a>
+        <a href="https://vv-technologies.github.io/vv-team" target="_blank" style="display:block;padding:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;color:rgba(255,255,255,0.6);text-decoration:none;font-size:12px;margin-bottom:7px;touch-action:manipulation;">
+            👑 VV TEAM — panou CEO →
+        </a>
+        <a href="https://vv-technologies.github.io/vv-hybrid-univers" target="_blank" style="display:block;padding:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;color:rgba(255,255,255,0.6);text-decoration:none;font-size:12px;margin-bottom:7px;touch-action:manipulation;">
+            🌍 VV Hybrid Univers — site →
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-title">🧬 VV MEMORY — STATUSUL SISTEMULUI</div>
+        <div id="memory-status" style="font-size:12px;line-height:1.8;color:rgba(255,255,255,0.4);">
+            <div>🔵 VVhi: <span style="color:#34c759;">Activ</span></div>
+            <div>🔵 VV-STASIS: <span style="color:#34c759;">GREEN</span></div>
+            <div>🔵 VV-VALENCE: <span style="color:#34c759;">Scut activ</span></div>
+            <div>🔵 VV Ghost: <span id="hub-ghost-status">—</span></div>
+            <div>🔵 Firebase: <span style="color:#34c759;">vv-ep-beta</span></div>
+            <div>🔵 Model AI: <span id="hub-model" style="color:#D4AF37;">—</span></div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-title">📋 NOTE RAPIDE (VV Memory)</div>
+        <textarea id="vv-notes" class="sb-editor" style="min-height:100px;font-family:-apple-system,sans-serif;font-size:13px;" placeholder="Notițele tale... idei, taskuri, decizii..."></textarea>
+        <button class="btn btn-gold" onclick="saveNotes()">💾 SALVEAZĂ NOTIȚELE</button>
+    </div>
+
+    <div class="card" style="background:rgba(255,255,255,0.02);border-color:rgba(255,255,255,0.05);">
+        <div class="card-title">⚖️ LEGAL VV</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.25);line-height:1.8;">
+            <div>✅ GDPR Art.17 — ștergere date la cerere</div>
+            <div>✅ DSA — moderare conținut documentată</div>
+            <div>✅ Cookie consent — implementat</div>
+            <div>✅ Date anonimizate — vvhi_dataset</div>
+            <div>✅ GDPR expiry — 6 luni talent pool</div>
+            <div style="margin-top:8px;color:rgba(255,255,255,0.15);">VV Technologies · vv.ep.team@gmail.com</div>
+        </div>
+    </div>
+
+</div>
+</div>
+
+
 <script>
 // ================================================================
 // VV NEXUS — simplu, robust, Safari iOS
@@ -364,24 +429,39 @@ var G = {
 };
 
 // Context VV complet
-var CTX = 'Ești VV NEXUS — asistentul AI personal al Arhitectului VV Technologies.\n\n'
-    + 'ECOSISTEM VV:\n'
-    + '1. VVhi — AI care învață din decizii\n'
-    + '2. VV Nexus — interfața de comandă (ești tu)\n'
-    + '3. VV-STASIS — protocol oprire urgență\n'
-    + '4. VV-VALENCE — scut securitate\n'
-    + '5. VV-MANAGER — orchestrator taskuri\n'
-    + '6. VV Scot — cercetaș date live\n'
-    + '7. VV Ghost — rollback automat\n'
-    + '8. VV Bridge — sincronizare repo-uri\n'
-    + '9. VV Logic DNA — memoria deciziilor\n'
-    + '10. VVeil — confidențialitate\n\n'
-    + 'VV Beta: aplicație P2P urban intelligence, GitHub Pages (vv-technologies.github.io/ceo.html)\n'
-    + 'VV TEAM: panou CEO (vv-technologies.github.io/vv-team)\n'
-    + 'Stack: HTML + CSS + Vanilla JS + Firebase (vv-ep-beta)\n'
-    + 'Design: BG #050507, Gold #D4AF37, Green #34c759, Blue #0A84FF\n'
-    + 'Reguli: nu alert(), .set merge:true, min-height:44px butoane\n'
-    + 'Marchează [DEPLOY:filename] la final. Răspunde în română.';
+var CTX = 'Ești VV NEXUS — asistentul AI personal al Arhitectului (fondatorul VV Technologies, 26 ani, lucrează pe iPhone X).\n\n'
+    + '=== VV MEMORY — CONTEXT COMPLET ===\n\n'
+    + 'VV BETA (vv-technologies.github.io/ceo.html):\n'
+    + 'Aplicație P2P urban intelligence pentru București. Insiderii primesc misiuni pe hartă, fotografiază locații, validează informații urbane, primesc VV Coins. Stack: HTML+CSS+Vanilla JS+Firebase Firestore/Auth (project: vv-ep-beta). ~9700 linii în 13 fișiere.\n\n'
+    + 'FIȘIERE VV BETA:\n'
+    + 'index.html — structura HTML principală\n'
+    + 'vv-beta-app.js — logica JS (2500+ linii)\n'
+    + 'vv-beta-style.css — stiluri\n\n'
+    + 'VV TEAM (vv-technologies.github.io/vv-team) — PANOUL CEO:\n'
+    + 'vv-team.html + vv-team-logic.js (946 linii) + vv-team-style.css\n'
+    + 'Funcții VV TEAM: moderare foto (aprobare/respingere DSA), Intelligence Inbox, misiuni cu hartă Leaflet, Talent Pool CRM (new→contacted→hired/rejected), Remote Config live (versioning, maintenance, push updates), VVhi Shadow Mode, Audit Log, Garbage Collector GDPR (șterge poze >5 zile), statistici live.\n\n'
+    + 'VV HYBRID UNIVERS (site marketing):\n'
+    + 'vv-hybrid-univers-final.html — site public cu secțiune Careers (manifest filtrul de adevăr al lumii), formular GDPR, Firebase lazy init.\n\n'
+    + 'DESIGN SYSTEM VV:\n'
+    + 'BG: #050507 | Gold: #D4AF37 | Green: #34c759 | Blue: #0A84FF | Red: #ff3b30\n'
+    + 'Glassmorphism dark, backdrop-filter:blur, border: rgba(255,255,255,0.08)\n'
+    + 'Font: -apple-system | iPhone X: env(safe-area-inset-*) | min-height:44px butoane\n\n'
+    + 'REGULI CRITICE COD:\n'
+    + 'NU alert() → showToast() sau showCEOToast()\n'
+    + 'Firebase: .set({},{merge:true}) NU .update()\n'
+    + 'Inbox: NU where()+orderBy() fără index compus — sortează client-side\n'
+    + 'VVhi.logApproval() și VVhi.logRejection() după decizii CEO\n'
+    + 'switchSection() — O SINGURĂ definiție (evită recursie)\n\n'
+    + 'SISTEME IMPLEMENTATE:\n'
+    + 'Remote Config live | GC GDPR | Intelligence Inbox | Talent Pool CRM | Hartă misiuni | VVhi Shadow Mode | DSA Reject 6 motive | Careers manifest | Chei de acces Insider\n\n'
+    + 'ECOSISTEM VV (10 ramuri):\n'
+    + '1.VVhi-Eul Digital 2.VV Nexus-Interfața 3.VV-STASIS-Urgență 4.VV-VALENCE-Scut\n'
+    + '5.VV-MANAGER-Orchestrator 6.VV Scot-Date live 7.VV Ghost-Rollback\n'
+    + '8.VV Bridge-Sincronizare repo-uri 9.VV Logic DNA-Memorie 10.VVeil-Confidențialitate\n\n'
+    + 'PLAN VV 1.0: lansare utilizatori reali București, stabilizare misiuni, monetizare VV Coins, extindere națională.\n\n'
+    + 'LEGAL: GDPR Art.17 pentru ștergere date, DSA pentru moderare conținut, cookie consent, date anonimizate în vvhi_dataset.\n\n'
+    + 'Când generezi cod: specifică fișierul exact, marchează [DEPLOY:filename] la final.\n'
+    + 'Răspunde în română, scurt și direct. Cod funcțional din prima.'
 
 var PROJ_CTX = {
     vv:'Lucrăm pe VV Beta — cunoști toată arhitectura.',
@@ -465,13 +545,14 @@ function setVal(id, val) {
 
 // ── NAVIGARE ─────────────────────────────────────────────────
 function sw(id) {
-    ['setup','chat','sandbox','deploy'].forEach(function(t){
+    ['setup','chat','sandbox','deploy','hub'].forEach(function(t){
         var sc  = document.getElementById('sc-'+t);
         var tab = document.getElementById('tab-'+t);
         if (sc)  { sc.style.display  = t===id ? 'flex' : 'none'; sc.classList.toggle('on', t===id); }
         if (tab) tab.classList.toggle('on', t===id);
     });
     if (id==='deploy') { renderDeployInfo(); renderDNA(); updateGhostInfo(); }
+    if (id==='hub') { updateHubStatus(); }
 }
 
 // ── REPO & PROJ ───────────────────────────────────────────────
@@ -933,6 +1014,26 @@ function toast(msg,type){
     document.body.appendChild(t);
     setTimeout(function(){ t.style.opacity='0'; t.style.transition='opacity .3s'; setTimeout(function(){t.remove();},300); },3000);
 }
+
+// ── HUB ───────────────────────────────────────────────────────
+function updateHubStatus() {
+    var ghostEl = document.getElementById('hub-ghost-status');
+    var modelEl = document.getElementById('hub-model');
+    if (ghostEl) ghostEl.textContent = G.ghost ? '✅ Backup: '+G.ghost.fn : '—';
+    if (ghostEl) ghostEl.style.color = G.ghost ? '#34c759' : 'rgba(255,255,255,0.3)';
+    if (modelEl) modelEl.textContent = G.model || 'gemini-1.5-flash';
+
+    // Note
+    var notesEl = document.getElementById('vv-notes');
+    if (notesEl) notesEl.value = lsGet('nx_notes') || '';
+}
+
+function saveNotes() {
+    var notes = (document.getElementById('vv-notes')||{value:''}).value;
+    lsSet('nx_notes', notes);
+    toast('Notițe salvate ✅','g');
+}
+
 </script>
 </body>
 </html>
