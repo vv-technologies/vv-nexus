@@ -228,6 +228,7 @@ body {
     <button class="tab"    id="tab-sandbox" onclick="sw('sandbox')"><span class="tab-icon">🛠</span>SANDBOX</button>
     <button class="tab"    id="tab-deploy"  onclick="sw('deploy')"><span class="tab-icon">🚀</span>DEPLOY</button>
     <button class="tab"    id="tab-hub"     onclick="sw('hub')"><span class="tab-icon">🌐</span>HUB</button>
+    <button class="tab"    id="tab-brief"   onclick="sw('brief')" style="position:relative;"><span class="tab-icon">📋</span>BRIEF<span id="brief-badge" style="display:none;position:absolute;top:6px;right:8px;width:8px;height:8px;background:#ff3b30;border-radius:50%;"></span></button>
 </div>
 
 <!-- ══ SETUP ══ -->
@@ -257,6 +258,27 @@ body {
         <input class="inp-field" type="password" id="f-gt"
             placeholder="ghp_..."
             autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+
+        <label class="lbl" style="margin-top:4px;">GROQ API KEY (motor rapid, gratuit)</label>
+        <input class="inp-field" type="password" id="f-groq"
+            placeholder="gsk_..."
+            autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+        <div style="font-size:11px;color:rgba(255,255,255,0.2);margin-top:-8px;margin-bottom:12px;line-height:1.6;">
+            console.groq.com → API Keys → Create. Gratuit. Motor rapid pentru cod punctual.
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-title">⚡ MOTOR AI ACTIV</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.2);margin-bottom:10px;line-height:1.6;">
+            Dual-Core: Gemini citește context mare, Groq scrie cod rapid. Auto = NEXUS alege singur.
+        </div>
+        <div class="pills" id="motor-pills">
+            <div class="pill on" onclick="setMotor('auto',this)">🤖 AUTO</div>
+            <div class="pill" onclick="setMotor('gemini',this)">🔵 Gemini</div>
+            <div class="pill" onclick="setMotor('groq',this)">⚡ Groq</div>
+        </div>
+        <div id="motor-status" style="font-size:11px;color:rgba(255,255,255,0.2);margin-top:6px;min-height:14px;"></div>
     </div>
 
     <div class="card">
@@ -336,6 +358,7 @@ body {
         <div id="sb-file" style="font-size:10px;color:rgba(212,175,55,0.5);background:rgba(212,175,55,0.08);padding:3px 9px;border-radius:6px;">—</div>
     </div>
     <textarea class="sb-editor" id="sb-code" placeholder="Codul generat apare automat. Poți edita." spellcheck="false" autocorrect="off" autocapitalize="off"></textarea>
+    <button class="btn btn-gold"  onclick="loadFileForEdit()">📂 CITEȘTE FIȘIER DIN GITHUB</button>
     <button class="btn btn-green" onclick="sbPush()">🚀 PUSH GITHUB</button>
     <button class="btn btn-gray"  onclick="sbCopy()">📋 COPIAZĂ</button>
     <button class="btn btn-red"   onclick="sbClear()">✕ CURĂȚĂ</button>
@@ -433,59 +456,116 @@ body {
 </div>
 
 
+<!-- ══ BRIEFING ══ -->
+<div class="screen" id="sc-brief">
+<div class="scroll">
+
+    <!-- NOTIFICARE CEO -->
+    <div id="ceo-alert-box" style="display:none;background:rgba(255,59,48,0.08);border:1px solid rgba(255,59,48,0.25);border-radius:16px;padding:16px;margin-bottom:12px;">
+        <div style="font-size:10px;color:rgba(255,59,48,0.6);letter-spacing:2px;font-weight:700;margin-bottom:8px;">🚨 ALERTĂ CEO</div>
+        <div id="ceo-alert-text" style="font-size:13px;color:rgba(255,255,255,0.7);line-height:1.7;"></div>
+    </div>
+
+    <!-- SCAN VV BETA -->
+    <div class="card">
+        <div class="card-title">🔍 SCAN VV BETA — CITEȘTE FIȘIERELE</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.25);margin-bottom:12px;line-height:1.6;">
+            NEXUS citește fișierele VV Beta de pe GitHub și le trimite la AI pentru analiză. Găsește buguri, sugerează fix-uri.
+        </div>
+        <select id="scan-file" style="display:block;width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:11px;padding:13px 14px;color:#fff;font-size:16px;font-family:-apple-system,sans-serif;outline:none;-webkit-appearance:none;margin-bottom:10px;cursor:pointer;">
+            <option value="index.html">index.html — structura VV Beta</option>
+            <option value="vv-beta-app.js">vv-beta-app.js — logica principală</option>
+            <option value="vv-beta-style.css">vv-beta-style.css — stiluri</option>
+            <option value="vv-team.html">vv-team.html — panoul CEO</option>
+            <option value="vv-team-logic.js">vv-team-logic.js — logica CEO</option>
+            <option value="firestore.rules">firestore.rules — securitate</option>
+        </select>
+        <button class="btn btn-gold" onclick="scanFile()">🔍 CITEȘTE ȘI ANALIZEAZĂ</button>
+        <div id="scan-status" style="font-size:11px;color:rgba(255,255,255,0.25);text-align:center;min-height:16px;margin-top:4px;"></div>
+    </div>
+
+    <!-- READ BEFORE WRITE -->
+    <div class="card">
+        <div class="card-title">✂️ READ BEFORE WRITE — MODIFICARE CHIRURGICALĂ</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.25);margin-bottom:12px;line-height:1.6;">
+            Înainte să scrie cod nou, NEXUS citește fișierul existent. Modifică DOAR ce trebuie, nu creează fișiere noi lângă.
+        </div>
+        <select id="rbw-file" style="display:block;width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:11px;padding:13px 14px;color:#fff;font-size:16px;font-family:-apple-system,sans-serif;outline:none;-webkit-appearance:none;margin-bottom:10px;cursor:pointer;">
+            <option value="index.html">index.html</option>
+            <option value="vv-beta-app.js">vv-beta-app.js</option>
+            <option value="vv-team-logic.js">vv-team-logic.js</option>
+            <option value="vv-beta-style.css">vv-beta-style.css</option>
+        </select>
+        <textarea id="rbw-task" style="display:block;width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:11px;padding:13px 14px;color:#fff;font-size:16px;font-family:-apple-system,sans-serif;outline:none;resize:none;min-height:80px;margin-bottom:10px;line-height:1.5;-webkit-appearance:none;" placeholder="Ce vrei să modifici? Ex: Rezolvă eroarea la anularea misiunilor"></textarea>
+        <button class="btn btn-green" onclick="readBeforeWrite()">🔬 CITEȘTE + MODIFICĂ CHIRURGICAL</button>
+        <div id="rbw-status" style="font-size:11px;color:rgba(255,255,255,0.25);text-align:center;min-height:16px;margin-top:4px;"></div>
+    </div>
+
+    <!-- RAPORT ZILNIC -->
+    <div class="card">
+        <div class="card-title">📊 RAPORT ZILNIC AUTO</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.25);margin-bottom:10px;line-height:1.6;">
+            La 23:59 se generează automat. Mâine dimineață îl găsești aici și în Notițe.
+        </div>
+        <button class="btn btn-gold" onclick="genReport()">📋 GENEREAZĂ RAPORT ACUM</button>
+        <div id="report-preview" style="display:none;background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:14px;margin-top:10px;font-size:12px;color:rgba(255,255,255,0.6);line-height:1.8;white-space:pre-wrap;"></div>
+        <button id="btn-save-report" class="btn btn-gray" onclick="saveReportToNotes()" style="display:none;margin-top:8px;">💾 SALVEAZĂ ÎN NOTIȚE</button>
+        <button id="btn-delete-report" class="btn btn-red" onclick="deleteReport()" style="display:none;margin-top:4px;">🗑 ȘTERGE RAPORTUL</button>
+    </div>
+
+    <!-- NOTIȚE CEO -->
+    <div class="card">
+        <div class="card-title">📝 NOTIȚE CEO</div>
+        <textarea id="ceo-notes" style="display:block;width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:11px;padding:13px 14px;color:#fff;font-size:15px;font-family:-apple-system,sans-serif;outline:none;resize:none;min-height:120px;margin-bottom:10px;line-height:1.6;-webkit-appearance:none;" placeholder="Idei, taskuri, decizii importante..."></textarea>
+        <div style="display:flex;gap:8px;">
+            <button class="btn btn-gold" onclick="saveNotesCEO()" style="flex:2;margin-bottom:0;">💾 SALVEAZĂ</button>
+            <button class="btn btn-red" onclick="clearNotesCEO()" style="flex:1;margin-bottom:0;">🗑</button>
+        </div>
+    </div>
+
+</div>
+</div>
+
+
 <script>
 // ================================================================
 // VV NEXUS — simplu, robust, Safari iOS
 // ================================================================
 
 var G = {
-    gk:'', gt:'', gu:'',
+    gk:'', gt:'', gu:'', groq:'',
     repo:'ceo.html', proj:'vv', model:'gemini-1.5-flash',
+    motor:'auto',
     msgs:[], busy:false, lastCode:null, lastFile:null,
     ghost:null, dna:[]
 };
 
 // Context VV complet
-var CTX = 'Ești VV NEXUS — asistentul AI personal al Arhitectului (fondatorul VV Technologies, 26 ani, lucrează pe iPhone X).\n\n'
-    + '=== VV MEMORY — CONTEXT COMPLET ===\n\n'
+var CTX = 'Esti VV NEXUS - asistentul AI personal al Arhitectului VV Technologies.\n\n'
+    + '=== VV MEMORY ===\n\n'
     + 'VV BETA (vv-technologies.github.io/ceo.html):\n'
-    + 'Aplicație P2P urban intelligence pentru București. Insiderii primesc misiuni pe hartă, fotografiază locații, validează informații urbane, primesc VV Coins. Stack: HTML+CSS+Vanilla JS+Firebase Firestore/Auth (project: vv-ep-beta). ~9700 linii în 13 fișiere.\n\n'
-    + 'FIȘIERE VV BETA:\n'
-    + 'index.html — structura HTML principală\n'
-    + 'vv-beta-app.js — logica JS (2500+ linii)\n'
-    + 'vv-beta-style.css — stiluri\n\n'
-    + 'VV TEAM (vv-technologies.github.io/vv-team) — PANOUL CEO:\n'
+    + 'Aplicatie P2P urban intelligence pentru Bucuresti. Insiderii primesc misiuni pe harta, fotografiaza locatii, valideaza informatii urbane, primesc VV Coins.\n'
+    + 'Stack: HTML+CSS+Vanilla JS+Firebase Firestore/Auth (project: vv-ep-beta). ~9700 linii in 13 fisiere.\n\n'
+    + 'FISIERE VV BETA: index.html, vv-beta-app.js (2500+ linii), vv-beta-style.css\n\n'
+    + 'VV TEAM (vv-technologies.github.io/vv-team) - PANOUL CEO:\n'
     + 'vv-team.html + vv-team-logic.js (946 linii) + vv-team-style.css\n'
-    + 'Funcții VV TEAM: moderare foto (aprobare/respingere DSA), Intelligence Inbox, misiuni cu hartă Leaflet, Talent Pool CRM (new→contacted→hired/rejected), Remote Config live (versioning, maintenance, push updates), VVhi Shadow Mode, Audit Log, Garbage Collector GDPR (șterge poze >5 zile), statistici live.\n\n'
-    + 'VV HYBRID UNIVERS (site marketing):\n'
-    + 'vv-hybrid-univers-final.html — site public cu secțiune Careers (manifest filtrul de adevăr al lumii), formular GDPR, Firebase lazy init.\n\n'
-    + 'DESIGN SYSTEM VV:\n'
-    + 'BG: #050507 | Gold: #D4AF37 | Green: #34c759 | Blue: #0A84FF | Red: #ff3b30\n'
-    + 'Glassmorphism dark, backdrop-filter:blur, border: rgba(255,255,255,0.08)\n'
-    + 'Font: -apple-system | iPhone X: env(safe-area-inset-*) | min-height:44px butoane\n\n'
-    + 'REGULI CRITICE COD:\n'
-    + 'NU alert() → showToast() sau showCEOToast()\n'
-    + 'Firebase: .set({},{merge:true}) NU .update()\n'
-    + 'Inbox: NU where()+orderBy() fără index compus — sortează client-side\n'
-    + 'VVhi.logApproval() și VVhi.logRejection() după decizii CEO\n'
-    + 'switchSection() — O SINGURĂ definiție (evită recursie)\n\n'
-    + 'SISTEME IMPLEMENTATE:\n'
-    + 'Remote Config live | GC GDPR | Intelligence Inbox | Talent Pool CRM | Hartă misiuni | VVhi Shadow Mode | DSA Reject 6 motive | Careers manifest | Chei de acces Insider\n\n'
-    + 'ECOSISTEM VV (10 ramuri):\n'
-    + '1.VVhi-Eul Digital 2.VV Nexus-Interfața 3.VV-STASIS-Urgență 4.VV-VALENCE-Scut\n'
-    + '5.VV-MANAGER-Orchestrator 6.VV Scot-Date live 7.VV Ghost-Rollback\n'
-    + '8.VV Bridge-Sincronizare repo-uri 9.VV Logic DNA-Memorie 10.VVeil-Confidențialitate\n\n'
-    + 'PLAN VV 1.0: lansare utilizatori reali București, stabilizare misiuni, monetizare VV Coins, extindere națională.\n\n'
-    + 'LEGAL: GDPR Art.17 pentru ștergere date, DSA pentru moderare conținut, cookie consent, date anonimizate în vvhi_dataset.\n\n'
-    + 'Când generezi cod: specifică fișierul exact, marchează [DEPLOY:filename] la final.\n'
-    + 'Răspunde în română, scurt și direct. Cod funcțional din prima.'
+    + 'Functii: moderare foto DSA, Intelligence Inbox, misiuni harta Leaflet, Talent Pool CRM, Remote Config live, VVhi Shadow Mode, Audit Log, GC GDPR.\n\n'
+    + 'DESIGN SYSTEM: BG #050507 | Gold #D4AF37 | Green #34c759 | Blue #0A84FF | Red #ff3b30\n'
+    + 'Glassmorphism dark | -apple-system font | iPhone X safe areas | min-height:44px butoane\n\n'
+    + 'REGULI COD: NU alert() | Firebase .set merge:true | NU where()+orderBy() fara index\n'
+    + 'VVhi.logApproval() si VVhi.logRejection() dupa decizii CEO\n\n'
+    + 'ECOSISTEM (10 ramuri): VVhi, VV Nexus, VV-STASIS, VV-VALENCE, VV-MANAGER, VV Scot, VV Ghost, VV Bridge, VV Logic DNA, VVeil\n\n'
+    + 'PLAN VV 1.0: lansare utilizatori reali Bucuresti, stabilizare misiuni, monetizare VV Coins.\n\n'
+    + 'LEGAL: GDPR Art.17 stergere date | DSA moderare continut | cookie consent | date anonimizate vvhi_dataset\n\n'
+    + 'Cand generezi cod: specifica fisierul exact, marcheaza [DEPLOY:filename] la final.\n'
+    + 'Raspunde in romana, scurt si direct. Cod functional din prima.'
 
 var PROJ_CTX = {
-    vv:'Lucrăm pe VV Beta — cunoști toată arhitectura.',
-    site:'Site de prezentare. Întreabă: nume firmă, culori, câte pagini, dacă are logo.',
-    shop:'Magazin online. Întreabă: ce vinde, sistem plată, hosting.',
-    app:'Aplicație web. Întreabă: ce problemă rezolvă, utilizatori, autentificare.',
-    custom:'Proiect custom. Întreabă ce vrea să construiască.'
+    vv:'Lucram pe VV Beta - cunosti toata arhitectura.',
+    site:'Site de prezentare. Intreaba: nume firma, culori, cate pagini, daca are logo.',
+    shop:'Magazin online. Intreaba: ce vinde, sistem plata, hosting.',
+    app:'Aplicatie web. Intreaba: ce problema rezolva, utilizatori, autentificare.',
+    custom:'Proiect custom. Intreaba ce vrea sa construiasca.'
 };
 
 var FALLBACK = ['gemini-1.5-flash','gemini-1.5-pro','gemini-pro'];
@@ -517,12 +597,14 @@ function lsSet(k,v) {
     G.gu    = lsGet('nx_gu')    || '';
     G.repo  = lsGet('nx_repo')  || 'ceo.html';
     G.model = lsGet('nx_model') || 'gemini-1.5-flash';
+    G.groq  = lsGet('nx_groq')  || '';
+    G.motor = lsGet('nx_motor') || 'auto';
     G.proj  = lsGet('nx_proj')  || 'vv';
 
     try { G.dna   = JSON.parse(lsGet('nx_dna')   || '[]'); } catch(e){ G.dna=[]; }
     try { G.ghost = JSON.parse(lsGet('nx_ghost') || 'null'); } catch(e){ G.ghost=null; }
 
-    // Populăm câmpurile
+    // Populam campurile
     if (G.gk) setVal('f-gk', G.gk);
     if (G.gt) setVal('f-gt', G.gt);
     if (G.gu) setVal('f-gu', G.gu);
@@ -531,7 +613,7 @@ function lsSet(k,v) {
     updateGhostInfo();
     renderDNA();
 
-    // Dacă e configurat, mergem direct la chat
+    // Daca e configurat, mergem la chat
     if (G.gk) {
         setDot('on'); setStatus('online');
         sw('chat');
@@ -562,14 +644,19 @@ function setVal(id, val) {
 
 // ── NAVIGARE ─────────────────────────────────────────────────
 function sw(id) {
-    ['setup','chat','sandbox','deploy','hub'].forEach(function(t){
+    ['setup','chat','sandbox','deploy','hub','brief'].forEach(function(t){
         var sc  = document.getElementById('sc-'+t);
         var tab = document.getElementById('tab-'+t);
         if (sc)  { sc.style.display  = t===id ? 'flex' : 'none'; sc.classList.toggle('on', t===id); }
         if (tab) tab.classList.toggle('on', t===id);
     });
     if (id==='deploy') { renderDeployInfo(); renderDNA(); updateGhostInfo(); }
-    if (id==='hub') { updateHubStatus(); }
+    if (id==='hub')    { updateHubStatus(); }
+    if (id==='brief')  {
+        initBriefing();
+        var badge = document.getElementById('brief-badge');
+        if (badge) badge.style.display = 'none';
+    }
 }
 
 // ── REPO & PROJ ───────────────────────────────────────────────
@@ -602,7 +689,10 @@ function doActivate() {
 
     if (!gk) { showStatus('⚠️ Cheia Gemini e obligatorie.', true); return; }
 
-    G.gk=gk; G.gt=gt; G.gu=gu;
+    var groqKey = (document.getElementById('f-groq')||{value:''}).value.trim();
+    G.gk=gk; G.gt=gt; G.gu=gu; G.groq=groqKey;
+    if (groqKey) lsSet('nx_groq', groqKey);
+    lsSet('nx_motor', G.motor);
     lsSet('nx_gk',gk); lsSet('nx_gt',gt); lsSet('nx_gu',gu);
     lsSet('nx_repo',G.repo); lsSet('nx_proj',G.proj);
 
@@ -641,7 +731,7 @@ function doSend() {
     var ta = document.getElementById('inp-msg');
     var txt = ta ? ta.value.trim() : '';
     if (!txt) return;
-    if (!G.gk) { toast('Configurează cheia în SETUP.','o'); sw('setup'); return; }
+    if (!G.gk) { toast('Configureaza cheia in SETUP.','o'); sw('setup'); return; }
     addMsg('u', txt);
     ta.value=''; ta.style.height='auto';
     G.msgs.push({role:'user', parts:[{text:txt}]});
@@ -649,7 +739,7 @@ function doSend() {
 }
 
 function qsend(txt) {
-    if (!G.gk) { toast('Configurează cheia în SETUP.','o'); sw('setup'); return; }
+    if (!G.gk) { toast('Configureaza cheia in SETUP.','o'); sw('setup'); return; }
     var ta = document.getElementById('inp-msg');
     if (ta) ta.value = txt;
     doSend();
@@ -657,7 +747,13 @@ function qsend(txt) {
 
 // ── GEMINI + FAILOVER ─────────────────────────────────────────
 async function callAI() {
-    G.busy=true; setDot('bsy'); setStatus('procesează...');
+    G.busy=true; setDot('bsy');
+
+    // Alegem motorul
+    var lastMsg = G.msgs.length > 0 ? G.msgs[G.msgs.length-1].parts[0].text : '';
+    var selectedMotor = chooseMotor(lastMsg);
+    setStatus(selectedMotor === 'groq' ? 'Groq ⚡' : 'Gemini 🔵');
+
     var typEl = document.getElementById('typing');
     if (typEl) typEl.style.display='block';
     var sendBtn = document.getElementById('btn-send');
@@ -665,7 +761,7 @@ async function callAI() {
     setFailover('');
 
     var projCtx = PROJ_CTX[G.proj] || PROJ_CTX.vv;
-    // Dacă avem imagine, o adăugăm la ultimul mesaj
+    // Daca avem imagine
     var lastMsgs = G.msgs.slice(-6);
     if (G_img && lastMsgs.length > 0) {
         var lastMsg = lastMsgs[lastMsgs.length - 1];
@@ -681,7 +777,7 @@ async function callAI() {
             };
             lastMsgs[lastMsgs.length - 1] = lastMsg;
         }
-        // Curățăm după trimitere
+        // Curatam dupa trimitere
         G_img = null;
         var bar = document.getElementById('img-bar');
         if (bar) bar.style.display = 'none';
@@ -693,8 +789,28 @@ async function callAI() {
     ];
     lastMsgs.forEach(function(m){ contents.push(m); });
 
+    if (ok) { clearTimeout(timer); G.busy=false; if(typEl) typEl.style.display='none'; if(sendBtn) sendBtn.disabled=false; setDot('on'); setStatus('online'); setFailover(''); return; }
+
     var models = [G.model].concat(FALLBACK.filter(function(m){ return m!==G.model; }));
     var ok = false;
+
+    // Încercăm Groq dacă e selectat și cheia există
+    if (selectedMotor === 'groq' && G.groq) {
+        try {
+            setFailover('⚡ Groq - motor rapid...');
+            var groqTxt = await callGroqAPI(contents);
+            if (groqTxt) {
+                G.msgs.push({role:'model', parts:[{text:groqTxt}]});
+                processReply(groqTxt);
+                addDNA(lastMsg.substring(0,60), 'groq', true);
+                ok = true;
+                setFailover('');
+            }
+        } catch(groqErr) {
+            setFailover('Groq eroare, comut pe Gemini...');
+            // Fallback automat pe Gemini
+        }
+    }
 
     var timer = setTimeout(function(){
         if (!G.busy) return;
@@ -702,7 +818,7 @@ async function callAI() {
         if (typEl) typEl.style.display='none';
         if (sendBtn) sendBtn.disabled=false;
         setDot('on'); setStatus('online'); setFailover('');
-        addMsg('a','⚠️ Timeout — încearcă din nou.');
+        addMsg('a','Timeout - incearca din nou.');
     }, 45000);
 
     for (var mi=0; mi<models.length && !ok; mi++) {
@@ -734,14 +850,14 @@ async function callAI() {
                 if (!r.ok) {
                     var e=await r.json().catch(function(){return{};});
                     var em=(e.error&&e.error.message)||'HTTP '+r.status;
-                    if (r.status===400) em='Cheie invalidă — verifică în SETUP';
-                    if (r.status===403) em='Cheie fără acces — regenerează din AI Studio';
+                    if (r.status===400) em='Cheie invalida - verifica in SETUP';
+                    if (r.status===403) em='Cheie fara acces - regenereaza din AI Studio';
                     throw new Error(em);
                 }
 
                 var data=await r.json();
                 var txt=data.candidates&&data.candidates[0]&&data.candidates[0].content&&data.candidates[0].content.parts&&data.candidates[0].content.parts[0]&&data.candidates[0].content.parts[0].text;
-                if (!txt) throw new Error('Răspuns gol.');
+                if (!txt) throw new Error('Raspuns gol.');
 
                 if (mod!==G.model) {
                     G.model=mod; lsSet('nx_model',mod);
@@ -846,9 +962,9 @@ function saveChatHistory() {
 async function sbPush() {
     var code=(document.getElementById('sb-code')||{value:''}).value.trim();
     if (!code) { toast('Sandbox gol.','r'); return; }
-    if (!G.gt||!G.gu) { toast('Configurează GitHub în SETUP.','o'); sw('setup'); return; }
+    if (!G.gt||!G.gu) { toast('Configureaza GitHub in SETUP.','o'); sw('setup'); return; }
     var fn=document.getElementById('sb-file').textContent;
-    if (!fn||fn==='—') fn=prompt('Numele fișierului:');
+    if (!fn||fn==='—') fn=prompt('Numele fisierului:');
     if (!fn) return;
     G.lastCode=code; G.lastFile=fn;
     saveGhost(fn,code);
@@ -862,13 +978,13 @@ function sbCopy(){
     var code=(document.getElementById('sb-code')||{value:''}).value;
     if (!code){ toast('Sandbox gol.','r'); return; }
     if (navigator.clipboard) navigator.clipboard.writeText(code).then(function(){toast('Copiat!','g');});
-    else { toast('Selectează manual și copiază.','o'); }
+    else { toast('Selecteaza manual si copiaza.','o'); }
 }
 function sbClear(){
     document.getElementById('sb-code').value='';
     document.getElementById('sb-file').textContent='—';
     G.lastCode=null; G.lastFile=null;
-    toast('Sandbox curățat.','b');
+    toast('Sandbox curatat.','b');
 }
 
 // ── GITHUB ────────────────────────────────────────────────────
@@ -894,8 +1010,8 @@ async function ghPush(repo,fn,code) {
 
 // ── DEPLOY ────────────────────────────────────────────────────
 async function doDeploy() {
-    if (!G.lastCode){ toast('Niciun cod. Du-te în CHAT.','r'); return; }
-    if (!G.gt||!G.gu){ toast('Configurează GitHub în SETUP.','o'); sw('setup'); return; }
+    if (!G.lastCode){ toast('Niciun cod. Du-te in CHAT.','r'); return; }
+    if (!G.gt||!G.gu){ toast('Configureaza GitHub in SETUP.','o'); sw('setup'); return; }
     var fn=G.lastFile||prompt('Fișierul target:');
     if (!fn) return;
     saveGhost(fn,G.lastCode);
@@ -933,7 +1049,7 @@ async function doRollback(){
 
 // ── URGENȚĂ ───────────────────────────────────────────────────
 function doStasis(){
-    if (!confirm('STASIS — oprești execuția AI?')) return;
+    if (!confirm('STASIS - opresti executia AI?')) return;
     G.busy=false;
     var typEl=document.getElementById('typing'); if(typEl) typEl.style.display='none';
     var sendBtn=document.getElementById('btn-send'); if(sendBtn) sendBtn.disabled=false;
@@ -999,7 +1115,7 @@ function importSeed(input){
             setVal('f-gk',G.gk); setVal('f-gt',G.gt); setVal('f-gu',G.gu); syncRepoPills();
             setDot('on'); setStatus('online');
             toast('✅ Sămânța importată!','g');
-            setTimeout(function(){ sw('chat'); addSys('NEXUS restaurat din Sămânță · Repo: '+G.repo); },600);
+            setTimeout(function(){ sw('chat'); addSys('NEXUS restaurat. Repo: '+G.repo); },600);
         }catch(err){ toast('Eroare import: '+err.message,'r'); }
     };
     reader.readAsText(file);
@@ -1022,7 +1138,7 @@ async function autoDiscover(){
             return m.name&&m.name.toLowerCase().indexOf('flash')>-1&&
                    m.supportedGenerationMethods&&m.supportedGenerationMethods.indexOf('generateContent')>-1;
         });
-        if(!models.length) throw new Error('Niciun model Flash găsit.');
+        if(!models.length) throw new Error('Niciun model Flash gasit.');
         models.sort(function(a,b){return b.name.localeCompare(a.name);});
         var best=models[0].name.replace('models/','');
         G.model=best; lsSet('nx_model',best);
@@ -1037,11 +1153,11 @@ async function autoDiscover(){
 
 // ── CLEAR CHAT ────────────────────────────────────────────────
 function clearChat(){
-    if(!confirm('Ștergi istoricul?')) return;
+    if(!confirm('Stergi istoricul?')) return;
     G.msgs=[]; G.lastCode=null; G.lastFile=null;
     var c=document.getElementById('chat-msgs'); if(c) c.innerHTML='';
     lsSet('nx_chat','[]');
-    addSys('Chat curățat · NEXUS gata.');
+    addSys('Chat curatat. NEXUS gata.');
     toast('Chat resetat.','b');
 }
 
@@ -1070,7 +1186,7 @@ function updateHubStatus() {
 function saveNotes() {
     var notes = (document.getElementById('vv-notes')||{value:''}).value;
     lsSet('nx_notes', notes);
-    toast('Notițe salvate ✅','g');
+    toast('Note salvate!','g');
 }
 
 
@@ -1101,7 +1217,430 @@ function removeImg() {
     G_img = null;
     var bar = document.getElementById('img-bar');
     if (bar) bar.style.display = 'none';
-    toast('Imagine eliminată.', 'b');
+    toast('Imagine eliminata.', 'b');
+}
+
+
+// ── CITEȘTE FIȘIER DIN GITHUB (chirurgical) ───────────────────
+async function readFileFromGitHub(repo, filename) {
+    if (!G.gt || !G.gu) { toast('Configureaza GitHub in SETUP.','o'); return null; }
+    var url = 'https://api.github.com/repos/' + G.gu + '/' + repo + '/contents/' + filename;
+    try {
+        var r = await fetch(url, { headers: { 'Authorization': 'Bearer ' + G.gt, 'Accept': 'application/vnd.github+json' } });
+        if (!r.ok) { toast('Fisier negasit: ' + filename, 'r'); return null; }
+        var data = await r.json();
+        // Decodam base64
+        var content = decodeURIComponent(escape(atob(data.content.replace(/\n/g, ''))));
+        return { content: content, sha: data.sha, name: filename };
+    } catch(e) { toast('Eroare citire: ' + e.message, 'r'); return null; }
+}
+
+async function loadFileForEdit() {
+    if (!G.gu || !G.gt) { toast('Configureaza GitHub in SETUP.','o'); sw('setup'); return; }
+    var filename = prompt('Numele fisierului de citit (ex: vv-beta-app.js):');
+    if (!filename) return;
+    toast('⏳ Citesc ' + filename + '...', 'b');
+    var file = await readFileFromGitHub(G.repo, filename);
+    if (!file) return;
+    document.getElementById('sb-code').value = file.content;
+    document.getElementById('sb-file').textContent = filename;
+    G.lastCode = file.content;
+    G.lastFile = filename;
+    // Trimitem în chat pentru analiză
+    sw('chat');
+    var msg = ['Analizeaza fisierul ', filename, ' si spune-mi ce probleme gasesti si ce imbunatatiri recomanzi.'].join('');
+    addSys('📂 Fișier încărcat: ' + filename + ' (' + file.content.split('\n').length + ' linii)');
+    document.getElementById('inp-msg').value = msg;
+    toast(filename + ' incarcat!', 'g');
+}
+
+
+// ── READ GITHUB FILE ──────────────────────────────────────────
+async function readGitHubFile(repo, filename) {
+    if (!G.gt || !G.gu) throw new Error('GitHub neconfigurat în SETUP');
+    var url = 'https://api.github.com/repos/' + G.gu + '/' + repo + '/contents/' + filename;
+    var r = await fetch(url, {
+        headers: { 'Authorization': 'Bearer ' + G.gt, 'Accept': 'application/vnd.github+json' }
+    });
+    if (!r.ok) throw new Error('Nu gasesc ' + filename + ' in ' + repo);
+    var data = await r.json();
+    return decodeURIComponent(escape(atob(data.content.replace(/\n/g,''))));
+}
+
+// ── SCAN FILE ─────────────────────────────────────────────────
+async function scanFile() {
+    if (!G.gk) { toast('Configurează cheia Gemini în SETUP.','o'); return; }
+    var file = document.getElementById('scan-file').value;
+    var repo = 'ceo.html'; // repo VV Beta
+    var status = document.getElementById('scan-status');
+    if (status) { status.textContent = '⏳ Citesc ' + file + ' de pe GitHub...'; status.style.color = 'rgba(212,175,55,0.6)'; }
+
+    try {
+        var content = '';
+        if (G.gt && G.gu) {
+            content = await readGitHubFile(repo, file);
+        } else {
+            // Fără GitHub token, cerem la AI cu ce știe
+            content = '[Fișierul nu a putut fi citit — configurează GitHub Token în SETUP pentru analiză completă]';
+        }
+
+        // Trimitem la AI pentru analiză
+        var prompt = ['Analizeaza fisierul VV ', file, ' din VV Beta si gaseste:', '\n1. Buguri si erori de logica', '\n2. Probleme pe iPhone X / Safari iOS', '\n3. Ce trebuie imbunatatit', '\n\nFii specific - spune exact functia/linia cu problema.', '\n\nCONTINUT FISIER:\n', content.substring(0, 8000)].join('');
+
+        if (status) status.textContent = 'AI analizeaza...';
+
+        G.msgs.push({ role: 'user', parts: [{ text: prompt }] });
+        sw('chat');
+        callAI();
+        if (status) status.textContent = 'Analiza trimisa in CHAT';
+
+    } catch(err) {
+        if (status) { status.textContent = '⚠️ ' + err.message; status.style.color = '#ff3b30'; }
+    }
+}
+
+// ── READ BEFORE WRITE ─────────────────────────────────────────
+async function readBeforeWrite() {
+    if (!G.gk) { toast('Configurează cheia Gemini în SETUP.','o'); return; }
+    var file = document.getElementById('rbw-file').value;
+    var task = (document.getElementById('rbw-task')||{value:''}).value.trim();
+    var status = document.getElementById('rbw-status');
+
+    if (!task) { toast('Spune ce vrei sa modifici.','o'); return; }
+    if (!G.gt || !G.gu) { toast('Ai nevoie de GitHub Token pentru Read Before Write.','o'); sw('setup'); return; }
+
+    if (status) { status.textContent = '⏳ Citesc ' + file + '...'; status.style.color = 'rgba(212,175,55,0.6)'; }
+
+    try {
+        var content = await readGitHubFile('ceo.html', file);
+        if (status) status.textContent = '⏳ Trimite la AI cu contextul complet...';
+
+        var prompt = ['TASK: ', task, '\n\nFISIER: ', file, '\n\nModifica DOAR ce e cerut. NU rescrie tot. NU crea fisiere noi. Returneaza doar portiunea modificata cu // INLOCUIESTE FUNCTIA: [nume]\n\nFISIER ACTUAL:\n', content.substring(0, 6000)].join('');
+
+        G.msgs.push({ role: 'user', parts: [{ text: prompt }] });
+        sw('chat');
+        callAI();
+        if (status) status.textContent = 'Analiza chirurgicala trimisa in CHAT';
+
+    } catch(err) {
+        if (status) { status.textContent = '⚠️ ' + err.message; status.style.color = '#ff3b30'; }
+    }
+}
+
+// ── RAPORT ZILNIC ─────────────────────────────────────────────
+async function genReport() {
+    if (!G.gk) { toast('Configureaza cheia Gemini.','o'); return; }
+    var dna = [];
+    try { dna = JSON.parse(lsGet('nx_dna') || '[]'); } catch(e) {}
+    var notes = lsGet('nx_notes') || '';
+    var today = new Date().toLocaleDateString('ro-RO', {weekday:'long', day:'numeric', month:'long'});
+    var dnaText = dna.slice(0,10).map(function(e){ return '- ' + e.cmd + ' -> ' + e.target; }).join('\n') || 'Nicio actiune.';
+    var prompt = 'Genereaza un raport de sfarsit de zi pentru Arhitectul VV Technologies.\n\n'
+        + 'DATA: ' + today + '\n\n'
+        + 'ACTIUNI AZI (DNA):\n' + dnaText
+        + '\n\nNOTITE CEO:\n' + (notes || 'Fara notite.')
+        + '\n\nRaportul contine:\n1. Ce s-a realizat azi\n2. Ce a mers bine\n3. Top 3 prioritati maine\n4. Status ecosistem VV\n5. Mesaj motivational scurt\n\nRaspunde in romana. Max 15 randuri.';
+    var btn = document.querySelector('[onclick="genReport()"]');
+    if (btn) { btn.disabled = true; btn.textContent = 'Se genereaza...'; }
+    try {
+        var r = await fetch(
+            'https://generativelanguage.googleapis.com/v1beta/models/' + G.model + ':generateContent?key=' + G.gk,
+            { method:'POST', headers:{'Content-Type':'application/json'},
+              body: JSON.stringify({ contents:[{role:'user',parts:[{text:prompt}]}], generationConfig:{temperature:0.7,maxOutputTokens:1024} }) }
+        );
+        var data = await r.json();
+        var txt = data.candidates&&data.candidates[0]&&data.candidates[0].content&&data.candidates[0].content.parts&&data.candidates[0].content.parts[0]&&data.candidates[0].content.parts[0].text;
+        if (!txt) throw new Error('Raspuns gol');
+        var preview = document.getElementById('report-preview');
+        var saveBtn = document.getElementById('btn-save-report');
+        var delBtn  = document.getElementById('btn-delete-report');
+        if (preview) { preview.textContent = txt; preview.style.display = 'block'; }
+        if (saveBtn) saveBtn.style.display = 'block';
+        if (delBtn)  delBtn.style.display  = 'block';
+        lsSet('nx_last_report', JSON.stringify({ date: today, text: txt, ts: Date.now() }));
+        toast('Raport generat!','g');
+    } catch(err) {
+        toast('Eroare: ' + err.message, 'r');
+    } finally {
+        if (btn) { btn.disabled = false; btn.textContent = 'GENEREAZA RAPORT ACUM'; }
+    }
+}
+
+function saveReportToNotes() {
+    var preview = document.getElementById('report-preview');
+    if (!preview || !preview.textContent) return;
+    var existing = lsGet('nx_notes') || '';
+    var date = new Date().toLocaleDateString('ro-RO');
+    var sep = '\n\n--- RAPORT ' + date + ' ---\n';
+    var newNote = existing + sep + preview.textContent;
+    lsSet('nx_notes', newNote);
+    var notesEl = document.getElementById('ceo-notes');
+    if (notesEl) notesEl.value = newNote;
+    toast('Raport salvat!','g');
+}
+
+function deleteReport() {
+    var preview = document.getElementById('report-preview');
+    var saveBtn = document.getElementById('btn-save-report');
+    var delBtn  = document.getElementById('btn-delete-report');
+    if (preview) { preview.textContent = ''; preview.style.display = 'none'; }
+    if (saveBtn) saveBtn.style.display = 'none';
+    if (delBtn)  delBtn.style.display  = 'none';
+    lsGet('nx_last_report') && lsSet('nx_last_report', '');
+    toast('Raport sters.','b');
+}
+
+// ── NOTIȚE CEO ────────────────────────────────────────────────
+function saveNotesCEO() {
+    var notes = (document.getElementById('ceo-notes')||{value:''}).value;
+    lsSet('nx_notes', notes);
+    toast('Note salvate!','g');
+}
+function clearNotesCEO() {
+    if (!confirm('Stergi toate notitele?')) return;
+    document.getElementById('ceo-notes').value = '';
+    lsSet('nx_notes','');
+    toast('Note sterse.','b');
+}
+
+// ── RAPORT AUTO LA 23:59 ──────────────────────────────────────
+(function scheduleReport() {
+    function checkTime() {
+        var now = new Date();
+        var h = now.getHours();
+        var m = now.getMinutes();
+        if (h === 23 && m === 59) {
+            // Verificam sa nu generam de doua ori
+            var lastReport = null;
+            try { lastReport = JSON.parse(lsGet('nx_last_report') || 'null'); } catch(e) {}
+            var today = new Date().toLocaleDateString('ro-RO');
+            if (!lastReport || !lastReport.date || lastReport.date !== today) {
+                genReport();
+                // Notificam
+                var badge = document.getElementById('brief-badge');
+                if (badge) badge.style.display = 'block';
+            }
+        }
+    }
+    setInterval(checkTime, 60000);
+})();
+
+// ── INIT BRIEFING ─────────────────────────────────────────────
+function initBriefing() {
+    // Afisam briefingul zilnic daca exista
+    try {
+        var db = JSON.parse(lsGet('nx_daily_brief') || 'null');
+        var today = new Date().toDateString();
+        if (db && db.date === today && db.text) {
+            var alertBox  = document.getElementById('ceo-alert-box');
+            var alertText = document.getElementById('ceo-alert-text');
+            if (alertBox)  { alertBox.style.display='block'; alertBox.style.background='rgba(10,132,255,0.08)'; alertBox.style.borderColor='rgba(10,132,255,0.25)'; }
+            if (alertText) { alertText.textContent = db.text; alertText.style.color='rgba(255,255,255,0.7)'; }
+            var alertTitle = alertBox ? alertBox.querySelector('div') : null;
+            if (alertTitle) { alertTitle.textContent = 'BRIEFING CEO - ' + new Date().toLocaleDateString('ro-RO'); alertTitle.style.color='rgba(10,132,255,0.6)'; }
+        }
+    } catch(e) {}
+
+    // Restauram notitele
+    var notes = lsGet('nx_notes') || '';
+    var notesEl = document.getElementById('ceo-notes');
+    if (notesEl && notes) notesEl.value = notes;
+
+    // Verificam daca exista raport din azi
+    try {
+        var lr = JSON.parse(lsGet('nx_last_report') || 'null');
+        var today = new Date().toLocaleDateString('ro-RO');
+        if (lr && lr.date === today && lr.text) {
+            var preview = document.getElementById('report-preview');
+            var saveBtn = document.getElementById('btn-save-report');
+            var delBtn  = document.getElementById('btn-delete-report');
+            if (preview) { preview.textContent = lr.text; preview.style.display = 'block'; }
+            if (saveBtn) saveBtn.style.display = 'block';
+            if (delBtn)  delBtn.style.display  = 'block';
+        }
+    } catch(e) {}
+
+    // Verificam alerta CEO
+    var dna = [];
+    try { dna = JSON.parse(lsGet('nx_dna') || '[]'); } catch(e) {}
+    var failed = dna.filter(function(e){ return !e.ok; });
+    if (failed.length > 0) {
+        var alertBox = document.getElementById('ceo-alert-box');
+        var alertText = document.getElementById('ceo-alert-text');
+        if (alertBox) alertBox.style.display = 'block';
+        if (alertText) alertText.textContent = failed.length + ' operatii esuate in DNA. Ultima: ' + (failed[0] ? failed[0].cmd : '-');
+        var badge = document.getElementById('brief-badge');
+        if (badge) badge.style.display = 'block';
+    }
+}
+
+
+// ── AUTO-BRIEFING LA PORNIRE ─────────────────────────────────
+async function autoBriefing() {
+    if (!G.gk) return; // nu face nimic fara cheie
+    if (!G.gt || !G.gu) return; // nu fara github
+
+    // Verificam daca am facut briefing azi
+    var today = new Date().toDateString();
+    var lastBrief = lsGet('nx_last_brief_date');
+    if (lastBrief === today) return; // am facut deja azi
+
+    // Marcam ca am inceput briefingul azi
+    lsSet('nx_last_brief_date', today);
+
+    // Citim fara sa deranjam userul - in fundal
+    try {
+        var content = await readGitHubFile('ceo.html', 'vv-beta-app.js');
+        if (!content) return;
+
+        var prompt = 'Analizeaza rapid codul VV Beta (vv-beta-app.js) si fa un briefing scurt pentru CEO.\n\n'
+            + 'FORMAT EXACT (max 10 randuri):\n'
+            + 'CEO BRIEFING - [data]\n'
+            + 'BUGURI DETECTATE: [lista scurta sau "Niciunul detectat"]\n'
+            + 'PRIORITATE #1: [ce trebuie rezolvat urgent]\n'
+            + 'PRIORITATE #2: [al doilea lucru important]\n'
+            + 'STATUS VV BETA: [Stabil/Atentie/Critic]\n'
+            + 'RECOMANDARE ZI: [un singur lucru de facut azi]\n\n'
+            + 'COD (primele 5000 caractere):\n' + content.substring(0, 5000);
+
+        var r = await fetch(
+            'https://generativelanguage.googleapis.com/v1beta/models/' + G.model + ':generateContent?key=' + G.gk,
+            { method:'POST', headers:{'Content-Type':'application/json'},
+              body: JSON.stringify({ contents:[{role:'user',parts:[{text:prompt}]}],
+                generationConfig:{temperature:0.3, maxOutputTokens:512} }) }
+        );
+        if (!r.ok) return;
+        var data = await r.json();
+        var txt = data.candidates&&data.candidates[0]&&data.candidates[0].content&&
+                  data.candidates[0].content.parts&&data.candidates[0].content.parts[0]&&
+                  data.candidates[0].content.parts[0].text;
+        if (!txt) return;
+
+        // Salvam briefingul
+        lsSet('nx_daily_brief', JSON.stringify({date: today, text: txt, ts: Date.now()}));
+
+        // Afisam badge pe tab BRIEF
+        var badge = document.getElementById('brief-badge');
+        if (badge) badge.style.display = 'block';
+
+        // Afisam alerta CEO
+        var alertBox = document.getElementById('ceo-alert-box');
+        var alertText = document.getElementById('ceo-alert-text');
+        if (alertBox) alertBox.style.display = 'block';
+        if (alertText) {
+            alertText.textContent = txt;
+            alertText.style.color = 'rgba(255,255,255,0.7)';
+        }
+        if (alertBox) alertBox.style.background = 'rgba(10,132,255,0.08)';
+        if (alertBox) alertBox.style.borderColor = 'rgba(10,132,255,0.25)';
+        var alertTitle = alertBox ? alertBox.querySelector('div') : null;
+        if (alertTitle) { alertTitle.textContent = 'BRIEFING CEO - ' + new Date().toLocaleDateString('ro-RO'); alertTitle.style.color = 'rgba(10,132,255,0.6)'; }
+
+    } catch(e) {
+        // Fail silentios - nu deranjeaza userul
+    }
+}
+
+// ── AUTO-DELETE RAPOARTE VECHI (5 zile) ──────────────────────
+function cleanOldReports() {
+    try {
+        var lr = JSON.parse(lsGet('nx_last_report') || 'null');
+        if (lr && lr.ts && (Date.now() - lr.ts) > 5 * 24 * 60 * 60 * 1000) {
+            lsSet('nx_last_report', '');
+        }
+    } catch(e) {}
+}
+
+
+// ── DUAL-CORE MOTOR SYSTEM ────────────────────────────────────
+// Gemini = Bibliotecar (context mare, citit fisiere, briefing)
+// Groq   = Muncitor rapid (cod punctual, modificari mici)
+
+function setMotor(name, el) {
+    G.motor = name;
+    lsSet('nx_motor', name);
+    document.querySelectorAll('#motor-pills .pill').forEach(function(p){ p.classList.remove('on'); });
+    el.classList.add('on');
+    var status = document.getElementById('motor-status');
+    var msgs = {
+        auto: 'Auto: Gemini pentru context mare, Groq pentru cod rapid.',
+        gemini: 'Gemini activ - context 1M tokeni, bun pentru citit fisiere mari.',
+        groq: 'Groq activ - viteza maxima pentru cod punctual.'
+    };
+    if (status) status.textContent = msgs[name] || '';
+    toast('Motor: ' + name.toUpperCase(), 'b');
+}
+
+function syncMotorPills() {
+    document.querySelectorAll('#motor-pills .pill').forEach(function(p){
+        var txt = p.textContent.trim().toLowerCase();
+        p.classList.toggle('on',
+            (txt.indexOf('auto') > -1 && G.motor === 'auto') ||
+            (txt.indexOf('gemini') > -1 && G.motor === 'gemini') ||
+            (txt.indexOf('groq') > -1 && G.motor === 'groq')
+        );
+    });
+}
+
+// Decide ce motor folosim pentru un mesaj
+function chooseMotor(text) {
+    if (G.motor === 'gemini') return 'gemini';
+    if (G.motor === 'groq') return 'groq';
+
+    // AUTO: logica inteligenta
+    var textLower = text.toLowerCase();
+
+    // Groq e mai bun pentru: cod scurt, functii punctuale, fix rapid
+    var groqKeywords = ['adauga', 'modifica', 'schimba', 'fix', 'repara', 'buton',
+                        'culoare', 'text', 'functie', 'rapid', 'quick', 'scurt'];
+    var isShort = text.length < 200;
+    var isCodeTask = groqKeywords.some(function(k){ return textLower.indexOf(k) > -1; });
+
+    // Gemini e mai bun pentru: analize, citit fisiere, context mare, briefing
+    var geminiKeywords = ['analizeaza', 'citeste', 'explica', 'arhitectura',
+                         'toate', 'intreg', 'fisierul', 'context', 'vv beta'];
+    var isAnalysis = geminiKeywords.some(function(k){ return textLower.indexOf(k) > -1; });
+
+    if (G.groq && isShort && isCodeTask && !isAnalysis) return 'groq';
+    return 'gemini';
+}
+
+// Apel Groq API
+async function callGroqAPI(contents) {
+    if (!G.groq) throw new Error('Cheia Groq lipseste - adauga in SETUP');
+
+    // Convertim contents din format Gemini in format OpenAI (Groq foloseste OpenAI API)
+    var messages = contents.map(function(c) {
+        return {
+            role: c.role === 'model' ? 'assistant' : c.role,
+            content: c.parts.map(function(p){ return p.text || ''; }).join('')
+        };
+    });
+
+    var r = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + G.groq
+        },
+        body: JSON.stringify({
+            model: 'llama3-70b-8192',
+            messages: messages,
+            max_tokens: 4096,
+            temperature: 0.7
+        })
+    });
+
+    if (!r.ok) {
+        var e = await r.json().catch(function(){ return {}; });
+        var msg = (e.error && e.error.message) || ('HTTP ' + r.status);
+        if (r.status === 401) msg = 'Cheie Groq invalida - verifica in SETUP';
+        if (r.status === 429) msg = 'Limita Groq depasita - incearca in 1 minut';
+        throw new Error('Groq: ' + msg);
+    }
+
+    var data = await r.json();
+    return data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
 }
 
 </script>
