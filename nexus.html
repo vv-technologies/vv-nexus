@@ -569,6 +569,7 @@ var PROJ_CTX = {
 };
 
 var FALLBACK = ['gemini-1.5-flash','gemini-1.5-pro','gemini-pro'];
+var GEMINI_PRO = 'gemini-1.5-pro';
 
 // ── STORAGE ───────────────────────────────────────────────────
 function lsGet(k) {
@@ -791,7 +792,10 @@ async function callAI() {
 
     if (ok) { clearTimeout(timer); G.busy=false; if(typEl) typEl.style.display='none'; if(sendBtn) sendBtn.disabled=false; setDot('on'); setStatus('online'); setFailover(''); return; }
 
-    var models = [G.model].concat(FALLBACK.filter(function(m){ return m!==G.model; }));
+    // Gemini Pro pentru analize complexe, Flash pentru restul
+    var primaryModel = (selectedMotor === 'gemini-pro') ? GEMINI_PRO : G.model;
+    if (selectedMotor === 'gemini-pro') setFailover('Gemini Pro - analiza complexa...');
+    var models = [primaryModel].concat(FALLBACK.filter(function(m){ return m!==primaryModel; }));
     var ok = false;
 
     // Încercăm Groq dacă e selectat și cheia există
@@ -803,6 +807,7 @@ async function callAI() {
                 G.msgs.push({role:'model', parts:[{text:groqTxt}]});
                 processReply(groqTxt);
                 addDNA(lastMsg.substring(0,60), 'groq', true);
+                extractMemoryFromReply(groqTxt);
                 ok = true;
                 setFailover('');
             }
@@ -1602,6 +1607,8 @@ function chooseMotor(text) {
     var isAnalysis = geminiKeywords.some(function(k){ return textLower.indexOf(k) > -1; });
 
     if (G.groq && isShort && isCodeTask && !isAnalysis) return 'groq';
+    // Folosim Pro pentru analize complexe daca nu e task scurt de cod
+    if (isAnalysis || text.length > 300) return 'gemini-pro';
     return 'gemini';
 }
 
@@ -1641,6 +1648,48 @@ async function callGroqAPI(contents) {
 
     var data = await r.json();
     return data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
+}
+
+
+// ── VV MEMORY — MEMORIE REALĂ ────────────────────────────────
+// Salvăm buguri, decizii, lecții învățate pentru context persistent
+
+function addToMemory(type, content) {
+    var memory = [];
+    try { memory = JSON.parse(lsGet('nx_memory') || '[]'); } catch(e) {}
+    memory.unshift({
+        type: type, // 'bug', 'decizie', 'lectie', 'fix'
+        content: content.substring(0, 200),
+        ts: Date.now(),
+        date: new Date().toLocaleDateString('ro-RO')
+    });
+    if (memory.length > 100) memory = memory.slice(0, 100);
+    lsSet('nx_memory', JSON.stringify(memory));
+}
+
+function getMemoryContext() {
+    var memory = [];
+    try { memory = JSON.parse(lsGet('nx_memory') || '[]'); } catch(e) {}
+    if (!memory.length) return '';
+    var recent = memory.slice(0, 15);
+    return '\nMEMORIE VV (lecții și decizii anterioare):\n'
+        + recent.map(function(m){
+            return '[' + m.type.toUpperCase() + ' ' + m.date + '] ' + m.content;
+          }).join('\n') + '\n';
+}
+
+// Extragem automat buguri și decizii din răspunsurile AI
+function extractMemoryFromReply(text) {
+    var lower = text.toLowerCase();
+    if (lower.indexOf('bug') > -1 || lower.indexOf('eroare') > -1 || lower.indexOf('problema') > -1) {
+        addToMemory('bug', text.substring(0, 150));
+    }
+    if (lower.indexOf('am rezolvat') > -1 || lower.indexOf('fix') > -1 || lower.indexOf('reparat') > -1) {
+        addToMemory('fix', text.substring(0, 150));
+    }
+    if (lower.indexOf('recomanд') > -1 || lower.indexOf('propun') > -1) {
+        addToMemory('decizie', text.substring(0, 150));
+    }
 }
 
 </script>
