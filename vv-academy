@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>VV ACADEMY</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;900&family=DM+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#020208;--gold:#D4AF37;--green:#34c759;--red:#ff3b30;--blue:#0A84FF;--purple:#bf5af2;--orange:#ff9500;}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+body{background:var(--bg);color:#fff;font-family:'DM Mono',monospace;min-height:100vh;
+padding-top:env(safe-area-inset-top,0px);padding-bottom:calc(20px + env(safe-area-inset-bottom,0px));}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;
+background-image:linear-gradient(rgba(191,90,242,0.02) 1px,transparent 1px),linear-gradient(90deg,rgba(191,90,242,0.02) 1px,transparent 1px);
+background-size:50px 50px;}
+.hdr{position:sticky;top:0;z-index:100;background:rgba(2,2,8,0.92);backdrop-filter:blur(20px);
+-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,0.07);
+padding:13px 16px;display:flex;align-items:center;justify-content:space-between;}
+.hdr-logo{font-family:'Syne',sans-serif;font-weight:900;font-size:16px;letter-spacing:2px;color:var(--purple);}
+.hdr-sub{font-size:9px;color:rgba(255,255,255,0.25);letter-spacing:2px;margin-top:1px;}
+.hdr-badge{font-size:10px;padding:4px 10px;background:rgba(191,90,242,0.1);border:1px solid rgba(191,90,242,0.25);border-radius:20px;color:var(--purple);font-weight:700;}
+.c{padding:14px;max-width:680px;margin:0 auto;}
+.cap-card{background:linear-gradient(135deg,rgba(191,90,242,0.07),rgba(10,132,255,0.04));border:1px solid rgba(191,90,242,0.18);border-radius:18px;padding:20px;margin-bottom:12px;}
+.cap-title{font-family:'Syne',sans-serif;font-weight:900;font-size:15px;color:var(--purple);margin-bottom:14px;}
+.cap-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;}
+.cap-item{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:11px;padding:12px;}
+.cap-val{font-family:'Syne',sans-serif;font-size:22px;font-weight:900;margin-bottom:2px;}
+.cap-lbl{font-size:9px;color:rgba(255,255,255,0.3);letter-spacing:2px;}
+.prog-row{margin-bottom:9px;}
+.prog-label{display:flex;justify-content:space-between;font-size:10px;color:rgba(255,255,255,0.3);margin-bottom:4px;}
+.prog-bar{height:5px;background:rgba(255,255,255,0.07);border-radius:3px;overflow:hidden;}
+.prog-fill{height:100%;border-radius:3px;transition:width .8s cubic-bezier(.16,1,.3,1);}
+.card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:16px;margin-bottom:12px;}
+.card-title{font-size:10px;color:rgba(255,255,255,0.25);letter-spacing:2.5px;font-weight:700;margin-bottom:12px;}
+.test-card{background:rgba(191,90,242,0.04);border:1px solid rgba(191,90,242,0.14);border-radius:16px;padding:16px;margin-bottom:12px;}
+.mpill{padding:7px 13px;border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;touch-action:manipulation;border:1px solid;-webkit-appearance:none;background:transparent;margin:3px;}
+.qbtn{padding:6px 11px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;font-size:11px;color:rgba(255,255,255,0.4);cursor:pointer;touch-action:manipulation;margin:3px;-webkit-appearance:none;}
+.finput{display:block;width:100%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:13px 14px;color:#fff;font-size:15px;font-family:'DM Mono',monospace;outline:none;-webkit-appearance:none;margin-bottom:10px;}
+.finput:focus{border-color:rgba(191,90,242,0.4);}
+.finput::placeholder{color:rgba(255,255,255,0.15);}
+textarea.finput{resize:none;line-height:1.6;}
+.btn{display:block;width:100%;padding:15px;border-radius:13px;font-size:14px;font-weight:700;cursor:pointer;touch-action:manipulation;text-align:center;margin-bottom:8px;min-height:50px;font-family:'DM Mono',monospace;-webkit-appearance:none;border:none;}
+.btn-p{background:rgba(191,90,242,0.12);border:1px solid rgba(191,90,242,0.28)!important;color:var(--purple);}
+.btn-g{background:rgba(212,175,55,0.12);border:1px solid rgba(212,175,55,0.28)!important;color:var(--gold);}
+.btn-r{background:rgba(255,59,48,0.1);border:1px solid rgba(255,59,48,0.2)!important;color:var(--red);}
+.resp-box{display:none;background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:14px;margin-top:10px;font-size:12px;color:rgba(255,255,255,0.7);line-height:1.8;white-space:pre-wrap;word-break:break-word;max-height:280px;overflow-y:auto;}
+.mem-item{padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.04);display:flex;gap:10px;align-items:flex-start;}
+.mem-item:last-child{border-bottom:none;}
+.mem-type{flex-shrink:0;padding:3px 8px;border-radius:6px;font-size:9px;font-weight:700;letter-spacing:1px;min-width:52px;text-align:center;}
+.mem-type.bug{background:rgba(255,59,48,0.12);border:1px solid rgba(255,59,48,0.2);color:var(--red);}
+.mem-type.fix{background:rgba(52,199,89,0.12);border:1px solid rgba(52,199,89,0.2);color:var(--green);}
+.mem-type.decizie{background:rgba(212,175,55,0.12);border:1px solid rgba(212,175,55,0.2);color:var(--gold);}
+.mem-type.lectie{background:rgba(10,132,255,0.12);border:1px solid rgba(10,132,255,0.2);color:var(--blue);}
+.mem-content{font-size:11px;color:rgba(255,255,255,0.5);line-height:1.6;flex:1;}
+.mem-date{font-size:9px;color:rgba(255,255,255,0.18);flex-shrink:0;}
+#toast{position:fixed;bottom:calc(16px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);z-index:9999;padding:11px 20px;border-radius:13px;font-size:12px;font-weight:700;white-space:nowrap;max-width:90vw;pointer-events:none;display:none;}
+#toast.g{background:rgba(52,199,89,0.2);border:1px solid rgba(52,199,89,0.4);color:var(--green);}
+#toast.r{background:rgba(255,59,48,0.2);border:1px solid rgba(255,59,48,0.4);color:var(--red);}
+#toast.p{background:rgba(191,90,242,0.2);border:1px solid rgba(191,90,242,0.4);color:var(--purple);}
+</style>
+</head>
+<body>
+<div id="toast"></div>
+<div class="hdr">
+    <div><div class="hdr-logo">VV ACADEMY</div><div class="hdr-sub">VVHI LEARNING CENTER</div></div>
+    <div class="hdr-badge">🧠 LIVE</div>
+</div>
+<div class="c">
+
+<!-- CAPACITATE -->
+<div class="cap-card">
+    <div class="cap-title">🧠 CAPACITATE VVhi AZI</div>
+    <div class="cap-grid">
+        <div class="cap-item"><div class="cap-val" id="cap-total" style="color:var(--purple);">0</div><div class="cap-lbl">MEMORII TOTALE</div></div>
+        <div class="cap-item"><div class="cap-val" id="cap-azi" style="color:var(--gold);">0</div><div class="cap-lbl">INVATATE AZI</div></div>
+        <div class="cap-item"><div class="cap-val" id="cap-bugs" style="color:var(--red);">0</div><div class="cap-lbl">BUGURI STIUTE</div></div>
+        <div class="cap-item"><div class="cap-val" id="cap-fixes" style="color:var(--green);">0</div><div class="cap-lbl">FIX-URI</div></div>
+    </div>
+    <div class="prog-row"><div class="prog-label"><span>Capacitate memorie</span><span id="pct-mem">0%</span></div><div class="prog-bar"><div class="prog-fill" id="fill-mem" style="width:0%;background:var(--purple);"></div></div></div>
+    <div class="prog-row"><div class="prog-label"><span>Cunostinte VV Beta</span><span id="pct-vv">0%</span></div><div class="prog-bar"><div class="prog-fill" id="fill-vv" style="width:0%;background:var(--blue);"></div></div></div>
+    <div class="prog-row"><div class="prog-label"><span>Precizie cod</span><span id="pct-cod">0%</span></div><div class="prog-bar"><div class="prog-fill" id="fill-cod" style="width:0%;background:var(--green);"></div></div></div>
+    <div class="prog-row"><div class="prog-label"><span>Invatare din erori</span><span id="pct-err">0%</span></div><div class="prog-bar"><div class="prog-fill" id="fill-err" style="width:0%;background:var(--orange);"></div></div></div>
+</div>
+
+<!-- TEST -->
+<div class="test-card">
+    <div class="card-title">TESTEAZA VVhi — PUNE-L LA TREABA</div>
+    <div style="display:flex;flex-wrap:wrap;margin-bottom:10px;">
+        <div class="mpill on" id="m-gemini" onclick="selMotor('gemini',this)" style="border-color:rgba(10,132,255,0.3);color:rgba(10,132,255,0.7);">🔵 Flash</div>
+        <div class="mpill" id="m-pro" onclick="selMotor('pro',this)" style="border-color:rgba(212,175,55,0.3);color:rgba(212,175,55,0.7);">🔵 Pro</div>
+        <div class="mpill" id="m-groq" onclick="selMotor('groq',this)" style="border-color:rgba(52,199,89,0.3);color:rgba(52,199,89,0.7);">⚡ Groq</div>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;margin-bottom:10px;">
+        <button class="qbtn" onclick="setQ('Ce buguri stii despre VV Beta?')">🐛 Buguri</button>
+        <button class="qbtn" onclick="setQ('Care sunt regulile de cod VV?')">📋 Reguli</button>
+        <button class="qbtn" onclick="setQ('Ce ai invatat azi?')">📚 Invatat</button>
+        <button class="qbtn" onclick="setQ('Care e prioritatea #1 pentru VV Beta acum?')">🎯 Prioritate</button>
+    </div>
+    <textarea class="finput" id="test-q" rows="3" placeholder="Pune orice intrebare lui VVhi..."></textarea>
+    <button class="btn btn-p" id="btn-test" onclick="runTest()">🧠 TESTEAZA VVhi</button>
+    <div class="resp-box" id="resp-box"></div>
+    <div id="eval-sec" style="display:none;margin-top:12px;">
+        <div style="font-size:10px;color:rgba(255,255,255,0.25);letter-spacing:2px;font-weight:700;margin-bottom:8px;">EVALUEAZA RASPUNSUL (1-5 stele)</div>
+        <div style="display:flex;gap:12px;justify-content:center;">
+            <button onclick="score(1)" style="font-size:28px;background:none;border:none;cursor:pointer;touch-action:manipulation;">⭐</button>
+            <button onclick="score(2)" style="font-size:28px;background:none;border:none;cursor:pointer;touch-action:manipulation;">⭐</button>
+            <button onclick="score(3)" style="font-size:28px;background:none;border:none;cursor:pointer;touch-action:manipulation;">⭐</button>
+            <button onclick="score(4)" style="font-size:28px;background:none;border:none;cursor:pointer;touch-action:manipulation;">⭐</button>
+            <button onclick="score(5)" style="font-size:28px;background:none;border:none;cursor:pointer;touch-action:manipulation;">⭐</button>
+        </div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.2);text-align:center;margin-top:6px;">1 stea = Prost · 5 stele = Excelent</div>
+    </div>
+</div>
+
+<!-- CE A INVATAT AZI -->
+<div class="card">
+    <div class="card-title">📚 CE A INVATAT VVhi AZI</div>
+    <div id="today-mem"><div style="font-size:12px;color:rgba(255,255,255,0.2);text-align:center;padding:14px;">Nicio lectie azi. Foloseste NEXUS si VVhi invata automat.</div></div>
+</div>
+
+<!-- TOATE MEMORIILE -->
+<div class="card">
+    <div class="card-title">🗄 TOATE MEMORIILE</div>
+    <div style="display:flex;flex-wrap:wrap;margin-bottom:12px;">
+        <button class="mpill on" id="f-all" onclick="filter('all',this)" style="border-color:rgba(255,255,255,0.2);color:rgba(255,255,255,0.5);">TOATE</button>
+        <button class="mpill" id="f-bug" onclick="filter('bug',this)" style="border-color:rgba(255,59,48,0.25);color:rgba(255,59,48,0.6);">BUGURI</button>
+        <button class="mpill" id="f-fix" onclick="filter('fix',this)" style="border-color:rgba(52,199,89,0.25);color:rgba(52,199,89,0.6);">FIX-URI</button>
+        <button class="mpill" id="f-decizie" onclick="filter('decizie',this)" style="border-color:rgba(212,175,55,0.25);color:rgba(212,175,55,0.6);">DECIZII</button>
+        <button class="mpill" id="f-lectie" onclick="filter('lectie',this)" style="border-color:rgba(10,132,255,0.25);color:rgba(10,132,255,0.6);">LECTII</button>
+    </div>
+    <div id="all-mem" style="max-height:280px;overflow-y:auto;"></div>
+    <button class="btn btn-r" onclick="clearMem()" style="margin-top:10px;">🗑 RESETEAZA MEMORIA</button>
+</div>
+
+<!-- ADAUGA MANUAL -->
+<div class="card">
+    <div class="card-title">✍️ ADAUGA MANUAL LA MEMORIE</div>
+    <select class="finput" id="man-type" style="cursor:pointer;">
+        <option value="lectie">📚 Lectie</option>
+        <option value="decizie">🎯 Decizie</option>
+        <option value="bug">🐛 Bug</option>
+        <option value="fix">✅ Fix</option>
+    </select>
+    <textarea class="finput" id="man-content" rows="3" placeholder="Ex: Anularea misiunilor da eroare cand userul nu e autentificat..."></textarea>
+    <button class="btn btn-g" onclick="addManual()">💾 ADAUGA LA MEMORIE</button>
+</div>
+
+<!-- SCOR -->
+<div class="card">
+    <div class="card-title">🏆 SCORUL VVhi PE MOTOARE</div>
+    <div id="score-display"><div style="font-size:12px;color:rgba(255,255,255,0.2);text-align:center;padding:14px;">Testeaza si evalueaza pentru a construi scorul.</div></div>
+</div>
+
+</div>
+<script>
+function lsGet(k){try{return localStorage.getItem(k);}catch(e){return null;}}
+function lsSet(k,v){try{localStorage.setItem(k,v);}catch(e){}try{var d=new Date();d.setFullYear(d.getFullYear()+1);document.cookie=k+'='+encodeURIComponent(v)+';expires='+d.toUTCString()+';path=/;SameSite=Lax';}catch(e){}}
+
+var G={motor:'gemini',scores:[]};
+try{G.scores=JSON.parse(lsGet('vv_scores')||'[]');}catch(e){}
+var curFilter='all';
+
+function getMem(){try{return JSON.parse(lsGet('nx_memory')||'[]');}catch(e){return[];}}
+function saveMem(m){lsSet('nx_memory',JSON.stringify(m));}
+
+(function init(){
+    renderCap();renderToday();renderMem('all');renderScore();
+})();
+
+function renderCap(){
+    var mem=getMem();
+    var today=new Date().toLocaleDateString('ro-RO');
+    var dna=[];try{dna=JSON.parse(lsGet('nx_dna')||'[]');}catch(e){}
+    var bugs=mem.filter(function(m){return m.type==='bug';}).length;
+    var fixes=mem.filter(function(m){return m.type==='fix';}).length;
+    var azi=mem.filter(function(m){return m.date===today;}).length;
+    s('cap-total',mem.length);s('cap-azi',azi);s('cap-bugs',bugs);s('cap-fixes',fixes);
+    var mp=Math.min(Math.round(mem.length/100*100),100);
+    var vp=Math.min(60+Math.round(dna.filter(function(e){return e.ok;}).length/20*40),100);
+    var cp=Math.min(50+fixes*5,100);
+    var ep=bugs>0?Math.min(Math.round(fixes/bugs*100),100):0;
+    prog('pct-mem','fill-mem',mp,'var(--purple)');
+    prog('pct-vv','fill-vv',vp,'var(--blue)');
+    prog('pct-cod','fill-cod',cp,'var(--green)');
+    prog('pct-err','fill-err',ep,'var(--orange)');
+}
+
+function prog(lid,fid,pct,col){
+    var l=document.getElementById(lid);var f=document.getElementById(fid);
+    if(l)l.textContent=pct+'%';if(f){f.style.width=pct+'%';f.style.background=col;}
+}
+
+function renderToday(){
+    var mem=getMem();var today=new Date().toLocaleDateString('ro-RO');
+    var t=mem.filter(function(m){return m.date===today;});
+    var el=document.getElementById('today-mem');if(!el)return;
+    if(!t.length){el.innerHTML='<div style="font-size:12px;color:rgba(255,255,255,0.2);text-align:center;padding:14px;">Nicio lectie azi. Foloseste NEXUS si VVhi invata automat.</div>';return;}
+    el.innerHTML=t.map(function(m){return '<div class="mem-item"><span class="mem-type '+m.type+'">'+m.type.toUpperCase()+'</span><span class="mem-content">'+esc(m.content.substring(0,120))+'</span></div>';}).join('');
+}
+
+function filter(type,el){
+    curFilter=type;
+    document.querySelectorAll('.card .mpill').forEach(function(p){p.classList.remove('on');});
+    el.classList.add('on');
+    renderMem(type);
+}
+
+function renderMem(f){
+    var mem=getMem();
+    var fl=f==='all'?mem:mem.filter(function(m){return m.type===f;});
+    var el=document.getElementById('all-mem');if(!el)return;
+    if(!fl.length){el.innerHTML='<div style="font-size:12px;color:rgba(255,255,255,0.2);text-align:center;padding:14px;">Nicio memorie de tipul acesta.</div>';return;}
+    el.innerHTML=fl.map(function(m){return '<div class="mem-item"><div style="flex-shrink:0;"><span class="mem-type '+m.type+'">'+m.type.toUpperCase()+'</span><div class="mem-date" style="margin-top:3px;text-align:center;">'+m.date+'</div></div><span class="mem-content">'+esc(m.content.substring(0,150))+'</span></div>';}).join('');
+}
+
+function selMotor(name,el){
+    G.motor=name;
+    document.querySelectorAll('.test-card .mpill').forEach(function(p){p.classList.remove('on');});
+    el.classList.add('on');
+}
+function setQ(q){var el=document.getElementById('test-q');if(el)el.value=q;}
+
+async function runTest(){
+    var q=(document.getElementById('test-q')||{value:''}).value.trim();
+    if(!q){toast('Scrie o intrebare pentru VVhi.','r');return;}
+    var gk=lsGet('nx_gk')||'';var groq=lsGet('nx_groq')||'';
+    if(!gk&&G.motor!=='groq'){toast('Configureaza cheia Gemini in NEXUS Setup.','r');return;}
+    if(G.motor==='groq'&&!groq){toast('Configureaza cheia Groq in NEXUS Setup.','r');return;}
+    var btn=document.getElementById('btn-test');
+    if(btn){btn.disabled=true;btn.textContent='VVhi gandeste...';}
+    var rb=document.getElementById('resp-box');var es=document.getElementById('eval-sec');
+    if(rb){rb.style.display='none';rb.textContent='';}
+    if(es)es.style.display='none';
+    var mem=getMem();
+    var memCtx=mem.slice(0,15).map(function(m){return '['+m.type.toUpperCase()+'] '+m.content.substring(0,80);}).join('\n')||'Nicio memorie inca.';
+    var sys='Esti VVhi - memoria ecosistemului VV Technologies.\nMEMORIA TA:\n'+memCtx+'\nRaspunde scurt, precis, in romana.';
+    try{
+        var txt='';
+        if(G.motor==='groq'){txt=await callGroq(groq,sys,q);}
+        else{var model=G.motor==='pro'?'gemini-1.5-pro':(lsGet('nx_model')||'gemini-1.5-flash');txt=await callGemini(gk,model,sys,q);}
+        if(rb){rb.textContent=txt;rb.style.display='block';}
+        if(es)es.style.display='block';
+        addMem('lectie','TEST ['+G.motor+']: '+q.substring(0,60));
+    }catch(err){
+        if(rb){rb.textContent='Eroare: '+err.message;rb.style.display='block';}
+        toast('Eroare: '+err.message,'r');
+    }finally{if(btn){btn.disabled=false;btn.textContent='🧠 TESTEAZA VVhi';}}
+}
+
+async function callGemini(gk,model,sys,q){
+    var r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+model+':generateContent?key='+gk,
+        {method:'POST',headers:{'Content-Type':'application/json'},
+         body:JSON.stringify({contents:[{role:'user',parts:[{text:sys+'\n\nINTREBARE: '+q}]}],generationConfig:{temperature:0.5,maxOutputTokens:1024}})});
+    if(!r.ok){var e=await r.json().catch(function(){return{};});throw new Error((e.error&&e.error.message)||'HTTP '+r.status);}
+    var d=await r.json();
+    var t=d.candidates&&d.candidates[0]&&d.candidates[0].content&&d.candidates[0].content.parts&&d.candidates[0].content.parts[0]&&d.candidates[0].content.parts[0].text;
+    if(!t)throw new Error('Raspuns gol');return t;
+}
+
+async function callGroq(groq,sys,q){
+    var r=await fetch('https://api.groq.com/openai/v1/chat/completions',
+        {method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+groq},
+         body:JSON.stringify({model:'llama3-70b-8192',messages:[{role:'system',content:sys},{role:'user',content:q}],max_tokens:1024,temperature:0.5})});
+    if(!r.ok){var e=await r.json().catch(function(){return{};});throw new Error((e.error&&e.error.message)||'HTTP '+r.status);}
+    var d=await r.json();
+    var t=d.choices&&d.choices[0]&&d.choices[0].message&&d.choices[0].message.content;
+    if(!t)throw new Error('Raspuns gol');return t;
+}
+
+function score(stars){
+    var q=(document.getElementById('test-q')||{value:''}).value.trim();
+    G.scores.unshift({ts:Date.now(),date:new Date().toLocaleDateString('ro-RO'),motor:G.motor,q:q.substring(0,50),stars:stars});
+    if(G.scores.length>50)G.scores=G.scores.slice(0,50);
+    lsSet('vv_scores',JSON.stringify(G.scores));
+    var labels={5:'Excelent!',4:'Bun!',3:'Mediu',2:'Slab',1:'Prost'};
+    toast(stars+' stele — '+(labels[stars]||'OK'),stars>=4?'g':'r');
+    document.getElementById('eval-sec').style.display='none';
+    if(stars<=2)addMem('bug','Raspuns slab ['+G.motor+'] la: '+q.substring(0,60));
+    renderScore();
+}
+
+function renderScore(){
+    var el=document.getElementById('score-display');if(!el||!G.scores.length)return;
+    var byM={};
+    G.scores.forEach(function(s){if(!byM[s.motor])byM[s.motor]={sum:0,cnt:0};byM[s.motor].sum+=s.stars;byM[s.motor].cnt++;});
+    var html='';
+    Object.keys(byM).forEach(function(m){
+        var avg=(byM[m].sum/byM[m].cnt).toFixed(1);
+        var stars=Math.round(avg);
+        html+='<div class="mem-item"><span style="font-size:12px;color:rgba(255,255,255,0.5);flex-shrink:0;min-width:70px;">'+m.toUpperCase()+'</span>'
+            +'<span style="color:var(--gold);font-size:15px;">'+('★'.repeat(stars)+'☆'.repeat(5-stars))+'</span>'
+            +'<span style="font-size:12px;color:rgba(255,255,255,0.3);margin-left:auto;">'+avg+'/5 ('+byM[m].cnt+')</span></div>';
+    });
+    var ov=G.scores.reduce(function(s,e){return s+e.stars;},0)/G.scores.length;
+    html+='<div style="padding:10px 0;border-top:1px solid rgba(255,255,255,0.06);margin-top:6px;display:flex;justify-content:space-between;font-size:12px;"><span style="color:rgba(255,255,255,0.4);">SCOR GENERAL</span><span style="color:var(--gold);font-weight:700;">'+ov.toFixed(1)+'/5</span></div>';
+    el.innerHTML=html;
+}
+
+function addMem(type,content){
+    var m=getMem();
+    m.unshift({type:type,content:content.substring(0,200),ts:Date.now(),date:new Date().toLocaleDateString('ro-RO')});
+    if(m.length>100)m=m.slice(0,100);
+    saveMem(m);renderCap();renderToday();renderMem(curFilter);
+}
+
+function addManual(){
+    var type=(document.getElementById('man-type')||{value:'lectie'}).value;
+    var content=(document.getElementById('man-content')||{value:''}).value.trim();
+    if(!content){toast('Scrie continutul.','r');return;}
+    addMem(type,content);
+    document.getElementById('man-content').value='';
+    toast('Adaugat in memoria VVhi!','p');
+}
+
+function clearMem(){
+    if(!confirm('Stergi TOATA memoria VVhi?'))return;
+    lsSet('nx_memory','[]');
+    renderCap();renderToday();renderMem('all');
+    toast('Memoria resetata.','r');
+}
+
+function s(id,val){var el=document.getElementById(id);if(el)el.textContent=val;}
+function esc(t){return(t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function toast(msg,type){var t=document.getElementById('toast');if(!t)return;t.textContent=msg;t.className=type;t.style.display='block';setTimeout(function(){t.style.display='none';},3000);}
+</script>
+</body>
+</html>
