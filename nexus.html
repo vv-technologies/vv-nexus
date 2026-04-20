@@ -395,8 +395,20 @@ body {
         <a href="vv-repos.html" style="display:block;padding:14px;background:rgba(212,175,55,0.08);border:1px solid rgba(212,175,55,0.2);border-radius:12px;color:#D4AF37;text-decoration:none;font-weight:700;font-size:13px;margin-bottom:8px;touch-action:manipulation;">
             📁 VV REPOS — toate repo-urile →
         </a>
+        <a href="vv-command.html" style="display:block;padding:14px;background:rgba(191,90,242,0.08);border:1px solid rgba(191,90,242,0.22);border-radius:12px;color:#bf5af2;text-decoration:none;font-weight:700;font-size:13px;margin-bottom:8px;touch-action:manipulation;">
+            🏛 VV COMMAND — toate departamentele →
+        </a>
         <a href="vv-costs.html" style="display:block;padding:14px;background:rgba(255,59,48,0.07);border:1px solid rgba(255,59,48,0.18);border-radius:12px;color:#ff3b30;text-decoration:none;font-weight:700;font-size:13px;margin-bottom:8px;touch-action:manipulation;">
             💸 VV COSTS — costuri & prețuri →
+        </a>
+        <a href="vv-organigrama.html" style="display:block;padding:14px;background:rgba(191,90,242,0.07);border:1px solid rgba(191,90,242,0.18);border-radius:12px;color:#bf5af2;text-decoration:none;font-weight:700;font-size:13px;margin-bottom:8px;touch-action:manipulation;">
+            🏛 VV UNIVERSE — organigrama echipei →
+        </a>
+        <a href="vv-academy.html" style="display:block;padding:14px;background:rgba(191,90,242,0.07);border:1px solid rgba(191,90,242,0.18);border-radius:12px;color:#bf5af2;text-decoration:none;font-weight:700;font-size:13px;margin-bottom:8px;touch-action:manipulation;">
+            🧠 VV ACADEMY — testare VVhi →
+        </a>
+        <a href="vv-academy.html" style="display:block;padding:14px;background:rgba(191,90,242,0.05);border:1px solid rgba(191,90,242,0.15);border-radius:12px;color:#bf5af2;text-decoration:none;font-weight:700;font-size:13px;margin-bottom:8px;touch-action:manipulation;">
+            🎓 VV ACADEMY — VVhi learning center →
         </a>
         <a href="vv-pricing.html" style="display:block;padding:14px;background:rgba(52,199,89,0.07);border:1px solid rgba(52,199,89,0.18);border-radius:12px;color:#34c759;text-decoration:none;font-weight:700;font-size:13px;margin-bottom:8px;touch-action:manipulation;">
             💰 VV PRICING — costuri și legal →
@@ -733,6 +745,9 @@ function doSend() {
     var txt = ta ? ta.value.trim() : '';
     if (!txt) return;
     if (!G.gk) { toast('Configureaza cheia in SETUP.','o'); sw('setup'); return; }
+    // Rate limiter
+    var rl = rateLimiter.check();
+    if (!rl.ok) { toast('Pauza ' + rl.wait + 's — max 8 req/min.', 'o'); return; }
     addMsg('u', txt);
     ta.value=''; ta.style.height='auto';
     G.msgs.push({role:'user', parts:[{text:txt}]});
@@ -748,6 +763,9 @@ function qsend(txt) {
 
 // ── GEMINI + FAILOVER ─────────────────────────────────────────
 async function callAI() {
+    // Rate limiter - max 14 req/min
+    if (!rlCheck('gemini')) { G.busy=false; return; }
+
     G.busy=true; setDot('bsy');
 
     // Alegem motorul
@@ -994,6 +1012,9 @@ function sbClear(){
 
 // ── GITHUB ────────────────────────────────────────────────────
 async function ghPush(repo,fn,code) {
+    // Rate limiter GitHub - max 5 push-uri/min
+    if (!rlCheck('github')) throw new Error('Limita push-uri atinsa. Asteapta 1 minut.');
+    fqCheck('write');
     var jitter=2000+Math.floor(Math.random()*3000);
     await new Promise(function(r){setTimeout(r,jitter);});
     var url='https://api.github.com/repos/'+G.gu+'/'+repo+'/contents/'+fn;
@@ -1691,6 +1712,115 @@ function extractMemoryFromReply(text) {
         addToMemory('decizie', text.substring(0, 150));
     }
 }
+
+
+// ── RATE LIMITER ──────────────────────────────────────────────
+// Blocheaza abuz API: max 15 req/minut Gemini, max 5 push-uri/minut GitHub
+var RL = {
+    gemini: [], // timestamps requesturi Gemini
+    github: [], // timestamps push-uri GitHub
+    maxGemini: 14,  // sigur sub limita de 15/min
+    maxGithub: 5
+};
+
+function rlCheck(type) {
+    var now = Date.now();
+    var window = 60000; // 1 minut
+    RL[type] = RL[type].filter(function(t){ return now - t < window; });
+    var max = type === 'gemini' ? RL.maxGemini : RL.maxGithub;
+    if (RL[type].length >= max) {
+        var oldest = RL[type][0];
+        var wait = Math.ceil((window - (now - oldest)) / 1000);
+        toast('Limita ' + type + ': asteapta ' + wait + 's', 'o');
+        return false;
+    }
+    RL[type].push(now);
+    // Tracking pentru monitor
+    try {
+        var today = new Date().toDateString();
+        var usage = {};
+        try { usage = JSON.parse(lsGet('nx_gemini_usage') || '{}'); } catch(e){}
+        if (!usage[today]) usage[today] = 0;
+        if (type === 'gemini') usage[today]++;
+        lsSet('nx_gemini_usage', JSON.stringify(usage));
+    } catch(e){}
+    return true;
+}
+
+// ── FIREBASE QUOTA MONITOR ────────────────────────────────────
+var FQ = {
+    reads: 0, writes: 0,
+    maxReads: 45000,   // sigur sub 50k
+    maxWrites: 18000,  // sigur sub 20k
+    date: null
+};
+
+function fqCheck(type) {
+    var today = new Date().toDateString();
+    // Reset zilnic
+    try {
+        var saved = JSON.parse(lsGet('nx_fq') || '{}');
+        if (saved.date !== today) {
+            FQ.reads = 0; FQ.writes = 0; FQ.date = today;
+        } else {
+            FQ.reads = saved.reads || 0;
+            FQ.writes = saved.writes || 0;
+            FQ.date = today;
+        }
+    } catch(e) {}
+
+    if (type === 'read')  FQ.reads++;
+    if (type === 'write') FQ.writes++;
+
+    lsSet('nx_fq', JSON.stringify({date:today, reads:FQ.reads, writes:FQ.writes}));
+
+    // Alerta daca aproape de limita
+    var readPct  = Math.round(FQ.reads  / FQ.maxReads  * 100);
+    var writePct = Math.round(FQ.writes / FQ.maxWrites * 100);
+
+    if (readPct > 80 || writePct > 80) {
+        var badge = document.getElementById('brief-badge');
+        if (badge) badge.style.display = 'block';
+        if (readPct > 80)  addSys('ALERTA: Firestore citiri la ' + readPct + '% din limita zilnica!');
+        if (writePct > 80) addSys('ALERTA: Firestore scrieri la ' + writePct + '% din limita zilnica!');
+    }
+    return true;
+}
+
+function fqStatus() {
+    var today = new Date().toDateString();
+    try {
+        var saved = JSON.parse(lsGet('nx_fq') || '{}');
+        if (saved.date === today) {
+            return {
+                reads:  saved.reads  || 0,
+                writes: saved.writes || 0,
+                readPct:  Math.round((saved.reads  || 0) / 45000 * 100),
+                writePct: Math.round((saved.writes || 0) / 18000 * 100)
+            };
+        }
+    } catch(e){}
+    return { reads:0, writes:0, readPct:0, writePct:0 };
+}
+
+
+// ── RATE LIMITER ──────────────────────────────────────────────
+// Max 5 cereri AI pe minut pentru a nu epuiza quota Gemini
+var rateLimiter = {
+    calls: [],
+    maxPerMin: 8,
+    check: function() {
+        var now = Date.now();
+        // Curatam apelurile mai vechi de 1 minut
+        this.calls = this.calls.filter(function(t){ return now - t < 60000; });
+        if (this.calls.length >= this.maxPerMin) {
+            var waitSec = Math.ceil((60000 - (now - this.calls[0])) / 1000);
+            return { ok: false, wait: waitSec };
+        }
+        this.calls.push(now);
+        return { ok: true };
+    }
+};
 
 </script>
 </body>
