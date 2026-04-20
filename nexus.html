@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="VV NEXUS">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <title>VV NEXUS</title>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
@@ -232,7 +234,7 @@ body {
 </div>
 
 <!-- ══ SETUP ══ -->
-<div class="screen on" id="sc-setup">
+<div class="screen on" id="sc-setup" style="display:flex;">
 <div class="scroll">
 
     <div style="background:rgba(52,199,89,0.05);border:1px solid rgba(52,199,89,0.12);border-radius:12px;padding:11px 14px;margin-bottom:12px;font-size:11px;color:rgba(52,199,89,0.65);line-height:1.6;">
@@ -321,7 +323,7 @@ body {
 </div>
 
 <!-- ══ CHAT ══ -->
-<div class="screen" id="sc-chat">
+<div class="screen" id="sc-chat" style="display:none;">
     <div class="chat-quick">
         <button class="qbtn" onclick="qsend('Ce bug-uri poate avea VV Beta pe iPhone X?')">🔍 Bugs</button>
         <button class="qbtn" onclick="qsend('Ce feature nou ar crește retenția în VV Beta?')">💡 Feature</button>
@@ -351,7 +353,7 @@ body {
 </div>
 
 <!-- ══ SANDBOX ══ -->
-<div class="screen" id="sc-sandbox">
+<div class="screen" id="sc-sandbox" style="display:none;">
 <div class="scroll">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
         <div style="font-size:10px;color:rgba(255,255,255,0.25);letter-spacing:2px;font-weight:700;">COD GENERAT</div>
@@ -366,7 +368,7 @@ body {
 </div>
 
 <!-- ══ DEPLOY ══ -->
-<div class="screen" id="sc-deploy">
+<div class="screen" id="sc-deploy" style="display:none;">
 <div class="scroll">
     <div class="card">
         <div class="card-title">🚀 DEPLOY</div>
@@ -387,7 +389,7 @@ body {
 </div>
 
 <!-- ══ HUB ══ -->
-<div class="screen" id="sc-hub">
+<div class="screen" id="sc-hub" style="display:none;">
 <div class="scroll">
 
     <div class="card">
@@ -395,7 +397,7 @@ body {
         <a href="vv-repos.html" style="display:block;padding:14px;background:rgba(212,175,55,0.08);border:1px solid rgba(212,175,55,0.2);border-radius:12px;color:#D4AF37;text-decoration:none;font-weight:700;font-size:13px;margin-bottom:8px;touch-action:manipulation;">
             📁 VV REPOS — toate repo-urile →
         </a>
-        <a href="vv-command.html" style="display:block;padding:14px;background:rgba(191,90,242,0.08);border:1px solid rgba(191,90,242,0.22);border-radius:12px;color:#bf5af2;text-decoration:none;font-weight:700;font-size:13px;margin-bottom:8px;touch-action:manipulation;">
+        <a href="vv-organigrama.html" style="display:block;padding:14px;background:rgba(191,90,242,0.08);border:1px solid rgba(191,90,242,0.22);border-radius:12px;color:#bf5af2;text-decoration:none;font-weight:700;font-size:13px;margin-bottom:8px;touch-action:manipulation;">
             🏛 VV COMMAND — toate departamentele →
         </a>
         <a href="vv-costs.html" style="display:block;padding:14px;background:rgba(255,59,48,0.07);border:1px solid rgba(255,59,48,0.18);border-radius:12px;color:#ff3b30;text-decoration:none;font-weight:700;font-size:13px;margin-bottom:8px;touch-action:manipulation;">
@@ -410,7 +412,7 @@ body {
         <a href="vv-academy.html" style="display:block;padding:14px;background:rgba(191,90,242,0.05);border:1px solid rgba(191,90,242,0.15);border-radius:12px;color:#bf5af2;text-decoration:none;font-weight:700;font-size:13px;margin-bottom:8px;touch-action:manipulation;">
             🎓 VV ACADEMY — VVhi learning center →
         </a>
-        <a href="vv-pricing.html" style="display:block;padding:14px;background:rgba(52,199,89,0.07);border:1px solid rgba(52,199,89,0.18);border-radius:12px;color:#34c759;text-decoration:none;font-weight:700;font-size:13px;margin-bottom:8px;touch-action:manipulation;">
+        <a href="vv-costs.html" style="display:block;padding:14px;background:rgba(52,199,89,0.07);border:1px solid rgba(52,199,89,0.18);border-radius:12px;color:#34c759;text-decoration:none;font-weight:700;font-size:13px;margin-bottom:8px;touch-action:manipulation;">
             💰 VV PRICING — costuri și legal →
         </a>
         <a href="vv-portfolio.html" style="display:block;padding:14px;background:rgba(52,199,89,0.07);border:1px solid rgba(52,199,89,0.18);border-radius:12px;color:#34c759;text-decoration:none;font-weight:700;font-size:13px;margin-bottom:8px;touch-action:manipulation;">
@@ -469,7 +471,7 @@ body {
 
 
 <!-- ══ BRIEFING ══ -->
-<div class="screen" id="sc-brief">
+<div class="screen" id="sc-brief" style="display:none;">
 <div class="scroll">
 
     <!-- NOTIFICARE CEO -->
@@ -660,12 +662,15 @@ function sw(id) {
     ['setup','chat','sandbox','deploy','hub','brief'].forEach(function(t){
         var sc  = document.getElementById('sc-'+t);
         var tab = document.getElementById('tab-'+t);
-        if (sc)  { sc.style.display  = t===id ? 'flex' : 'none'; sc.classList.toggle('on', t===id); }
-        if (tab) tab.classList.toggle('on', t===id);
+        if (sc) {
+            sc.style.display = (t === id) ? 'flex' : 'none';
+            sc.classList.toggle('on', t === id);
+        }
+        if (tab) tab.classList.toggle('on', t === id);
     });
-    if (id==='deploy') { renderDeployInfo(); renderDNA(); updateGhostInfo(); }
-    if (id==='hub')    { updateHubStatus(); }
-    if (id==='brief')  {
+    if (id === 'deploy') { renderDeployInfo(); renderDNA(); updateGhostInfo(); }
+    if (id === 'hub')    { updateHubStatus(); }
+    if (id === 'brief')  {
         initBriefing();
         var badge = document.getElementById('brief-badge');
         if (badge) badge.style.display = 'none';
