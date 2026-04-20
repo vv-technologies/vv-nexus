@@ -4,803 +4,722 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>VV UNIVERSE · Organigrama</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;900&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<meta name="apple-mobile-web-app-title" content="VV Universe">
+<title>VV UNIVERSE</title>
 <style>
-:root{
-    --bg:#020208; --gold:#D4AF37; --gold2:#f0d060;
-    --green:#34c759; --red:#ff3b30; --blue:#0A84FF;
-    --orange:#ff9500; --purple:#bf5af2;
-    --border:rgba(255,255,255,0.07);
-    --glass:rgba(255,255,255,0.03);
+:root {
+    --bg: #000;
+    --card: #0a0a0a;
+    --border: rgba(255,255,255,0.08);
+    --border-fine: rgba(255,255,255,0.05);
+    --gold: #D4AF37;
+    --green: #34c759;
+    --red: #ff3b30;
+    --blue: #0A84FF;
+    --text: #fff;
+    --muted: rgba(255,255,255,0.35);
+    --dim: rgba(255,255,255,0.15);
 }
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-body{background:var(--bg);color:#fff;font-family:'DM Mono',monospace;
-min-height:100vh;overflow-x:hidden;
-padding-top:env(safe-area-inset-top,0px);
-padding-bottom:env(safe-area-inset-bottom,20px);}
-
-/* GRID */
-body::before{content:'';position:fixed;inset:0;pointer-events:none;
-background-image:linear-gradient(rgba(212,175,55,0.02) 1px,transparent 1px),
-linear-gradient(90deg,rgba(212,175,55,0.02) 1px,transparent 1px);
-background-size:50px 50px;z-index:0;}
-
-/* HEADER */
-.hdr{position:sticky;top:0;z-index:100;
-background:rgba(2,2,8,0.9);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
-border-bottom:1px solid var(--border);
-padding:12px 16px;
-display:flex;align-items:center;justify-content:space-between;}
-.hdr-left{display:flex;align-items:center;gap:10px;}
-.hdr-logo{font-family:'Syne',sans-serif;font-weight:900;font-size:16px;
-letter-spacing:2px;color:var(--gold);}
-.hdr-sub{font-size:9px;color:rgba(255,255,255,0.25);letter-spacing:3px;}
-.hdr-time{font-size:11px;color:rgba(255,255,255,0.3);font-family:'DM Mono',monospace;}
-
-/* CEO BADGE */
-.ceo-strip{
-    background:linear-gradient(90deg,rgba(212,175,55,0.08),rgba(212,175,55,0.04),transparent);
-    border-bottom:1px solid rgba(212,175,55,0.12);
-    padding:10px 16px;
-    display:flex;align-items:center;justify-content:space-between;
-    position:relative;z-index:1;}
-.ceo-title{font-family:'Syne',sans-serif;font-weight:900;font-size:12px;
-letter-spacing:3px;color:rgba(212,175,55,0.7);}
-.ceo-status{font-size:10px;color:rgba(52,199,89,0.6);
-display:flex;align-items:center;gap:6px;}
-.pulse{width:6px;height:6px;border-radius:50%;background:var(--green);
-animation:pulse 2s infinite;}
-@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(52,199,89,.4)}50%{box-shadow:0 0 0 5px rgba(52,199,89,0)}}
-
-/* GRID DEPT */
-.dept-grid{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:10px;
-    padding:14px 14px;
-    position:relative;z-index:1;}
-
-/* DEPT CARD */
-.dept{
-    background:var(--glass);
-    border:1px solid var(--border);
-    border-radius:16px;
-    padding:16px 14px;
-    cursor:pointer;
-    touch-action:manipulation;
-    transition:all .2s cubic-bezier(.16,1,.3,1);
-    position:relative;overflow:hidden;
-    -webkit-user-select:none;
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html, body { height:100%; }
+body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, sans-serif;
+    min-height: 100dvh;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 20px);
+    overflow-x: hidden;
 }
-.dept::before{content:'';position:absolute;inset:0;border-radius:16px;opacity:0;transition:opacity .2s;}
-.dept:active{transform:scale(0.97);}
-.dept.nexus{border-color:rgba(212,175,55,0.2);}
-.dept.nexus::before{background:rgba(212,175,55,0.05);}
-.dept.vvhi{border-color:rgba(191,90,242,0.2);}
-.dept.vvhi::before{background:rgba(191,90,242,0.05);}
-.dept.monitor{border-color:rgba(52,199,89,0.2);}
-.dept.monitor::before{background:rgba(52,199,89,0.05);}
-.dept.manager{border-color:rgba(10,132,255,0.2);}
-.dept.manager::before{background:rgba(10,132,255,0.05);}
-.dept.security{border-color:rgba(255,59,48,0.2);}
-.dept.security::before{background:rgba(255,59,48,0.05);}
-.dept.ghost{border-color:rgba(255,149,0,0.2);}
-.dept.ghost::before{background:rgba(255,149,0,0.05);}
-.dept.bridge{border-color:rgba(100,210,255,0.2);}
-.dept.bridge::before{background:rgba(100,210,255,0.05);}
-.dept:active::before{opacity:1;}
 
-.dept-icon{font-size:26px;margin-bottom:8px;display:block;}
-.dept-name{font-family:'Syne',sans-serif;font-weight:900;font-size:13px;
-margin-bottom:3px;line-height:1.2;}
-.dept-role{font-size:9px;letter-spacing:1.5px;font-weight:700;margin-bottom:8px;opacity:.5;}
-.dept-metric{
-    background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);
-    border-radius:8px;padding:7px 9px;
-    display:flex;align-items:center;justify-content:space-between;}
-.metric-val{font-size:15px;font-weight:700;}
-.metric-lbl{font-size:9px;color:rgba(255,255,255,0.3);letter-spacing:1px;}
-.dept-status{
-    position:absolute;top:12px;right:12px;
-    width:7px;height:7px;border-radius:50%;
-    animation:pulse 2s infinite;}
+/* ── HEADER ── */
+.hdr {
+    padding: 18px 20px 14px;
+    border-bottom: 0.5px solid var(--border-fine);
+}
+.hdr-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+}
+.hdr-logo {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: var(--gold);
+}
+.hdr-time {
+    font-size: 12px;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+}
 
-/* NEXUS spans full width */
-.dept.nexus{grid-column:1/-1;}
+/* STATUS PRINCIPAL */
+.status-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.status-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--green);
+    animation: pulse-green 2.5s infinite;
+    flex-shrink: 0;
+}
+@keyframes pulse-green {
+    0%,100% { box-shadow: 0 0 0 0 rgba(52,199,89,0.4); }
+    50% { box-shadow: 0 0 0 5px rgba(52,199,89,0); }
+}
+.status-text {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+}
+.status-sub {
+    margin-left: auto;
+    font-size: 11px;
+    color: var(--dim);
+}
 
-/* MODAL */
-.overlay{
-    display:none;position:fixed;inset:0;z-index:200;
-    background:rgba(2,2,8,0.85);
-    backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
-    align-items:flex-end;padding-bottom:env(safe-area-inset-bottom,0px);}
-.overlay.open{display:flex;}
+/* ── GRID PRINCIPAL 2x2 ── */
+.main-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--border-fine);
+    border-top: 0.5px solid var(--border-fine);
+    border-bottom: 0.5px solid var(--border-fine);
+    margin: 20px 0;
+}
 
-.modal{
-    width:100%;max-height:88vh;
-    background:#0a0a14;
-    border:1px solid rgba(255,255,255,0.1);
-    border-radius:24px 24px 0 0;
-    overflow:hidden;
-    animation:slideUp .35s cubic-bezier(.16,1,.3,1);}
-@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.main-card {
+    background: var(--bg);
+    padding: 20px 18px;
+    cursor: pointer;
+    touch-action: manipulation;
+    transition: background 0.15s;
+    -webkit-user-select: none;
+    position: relative;
+}
+.main-card:active { background: #111; }
 
-.modal-header{
-    padding:18px 20px 14px;
-    border-bottom:1px solid rgba(255,255,255,0.07);
-    display:flex;align-items:center;justify-content:space-between;
-    position:sticky;top:0;background:#0a0a14;z-index:10;}
-.modal-icon{font-size:28px;margin-right:12px;}
-.modal-title{font-family:'Syne',sans-serif;font-weight:900;font-size:17px;}
-.modal-subtitle{font-size:10px;color:rgba(255,255,255,0.3);letter-spacing:1.5px;margin-top:2px;}
-.modal-close{
-    width:32px;height:32px;border-radius:50%;
-    background:rgba(255,255,255,0.08);border:none;color:#fff;
-    font-size:18px;cursor:pointer;touch-action:manipulation;
-    display:flex;align-items:center;justify-content:center;
-    -webkit-appearance:none;}
+.card-domain {
+    font-size: 9px;
+    letter-spacing: 2.5px;
+    font-weight: 700;
+    color: var(--dim);
+    margin-bottom: 6px;
+}
+.card-name {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 10px;
+    line-height: 1.2;
+}
+.card-metric {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--gold);
+    line-height: 1;
+    margin-bottom: 3px;
+}
+.card-metric-label {
+    font-size: 10px;
+    color: var(--dim);
+    letter-spacing: 1px;
+}
+.card-arrow {
+    position: absolute;
+    top: 18px; right: 16px;
+    font-size: 14px;
+    color: var(--border);
+}
 
-.modal-body{padding:18px 20px;overflow-y:auto;max-height:calc(88vh - 80px);}
+/* ── SECȚIUNI SECUNDARE ── */
+.section {
+    padding: 0 20px;
+    margin-bottom: 1px;
+}
+.section-label {
+    font-size: 9px;
+    letter-spacing: 3px;
+    font-weight: 700;
+    color: var(--dim);
+    padding: 14px 0 10px;
+    border-bottom: 0.5px solid var(--border-fine);
+}
 
-/* MODAL SECTIONS */
-.m-section{margin-bottom:18px;}
-.m-title{font-size:9px;color:rgba(255,255,255,0.25);letter-spacing:3px;
-font-weight:700;margin-bottom:10px;}
-.m-card{
-    background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);
-    border-radius:12px;padding:13px 14px;margin-bottom:8px;}
-.m-card-title{font-size:12px;font-weight:700;color:#fff;margin-bottom:4px;}
-.m-card-text{font-size:11px;color:rgba(255,255,255,0.4);line-height:1.7;}
-.m-stat{display:flex;justify-content:space-between;align-items:center;
-padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.05);}
-.m-stat:last-child{border-bottom:none;}
-.m-stat-label{font-size:12px;color:rgba(255,255,255,0.4);}
-.m-stat-val{font-size:13px;font-weight:700;}
-.m-badge{display:inline-flex;align-items:center;gap:6px;
-padding:4px 10px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:1px;margin:3px;}
-.m-badge.green{background:rgba(52,199,89,0.1);border:1px solid rgba(52,199,89,0.25);color:var(--green);}
-.m-badge.gold{background:rgba(212,175,55,0.1);border:1px solid rgba(212,175,55,0.25);color:var(--gold);}
-.m-badge.blue{background:rgba(10,132,255,0.1);border:1px solid rgba(10,132,255,0.25);color:var(--blue);}
-.m-badge.red{background:rgba(255,59,48,0.1);border:1px solid rgba(255,59,48,0.25);color:var(--red);}
-.m-badge.orange{background:rgba(255,149,0,0.1);border:1px solid rgba(255,149,0,0.25);color:var(--orange);}
+.row-list {
+    border-bottom: 0.5px solid var(--border-fine);
+}
+.row-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 0;
+    border-bottom: 0.5px solid var(--border-fine);
+    cursor: pointer;
+    touch-action: manipulation;
+    -webkit-user-select: none;
+}
+.row-item:last-child { border-bottom: none; }
+.row-item:active { opacity: 0.6; }
 
-/* ACTION BTN */
-.m-btn{
-    display:block;width:100%;padding:14px;
-    border-radius:12px;font-size:13px;font-weight:700;
-    cursor:pointer;touch-action:manipulation;text-align:center;
-    margin-bottom:8px;min-height:48px;
-    font-family:'DM Mono',monospace;-webkit-appearance:none;border:none;}
-.m-btn.gold{background:rgba(212,175,55,0.12);border:1px solid rgba(212,175,55,0.28)!important;color:var(--gold);}
-.m-btn.green{background:rgba(52,199,89,0.12);border:1px solid rgba(52,199,89,0.28)!important;color:var(--green);}
-.m-btn.blue{background:rgba(10,132,255,0.1);border:1px solid rgba(10,132,255,0.22)!important;color:var(--blue);}
-.m-btn.red{background:rgba(255,59,48,0.1);border:1px solid rgba(255,59,48,0.2)!important;color:var(--red);}
+.row-left { display: flex; align-items: center; gap: 12px; }
+.row-icon {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px;
+    flex-shrink: 0;
+}
+.row-name { font-size: 14px; font-weight: 600; }
+.row-sub { font-size: 11px; color: var(--muted); margin-top: 1px; }
+.row-right { display: flex; align-items: center; gap: 8px; }
+.row-val { font-size: 13px; color: var(--muted); }
+.row-chevron { font-size: 12px; color: var(--dim); }
 
-/* PROGRESS BAR */
-.prog-wrap{margin-top:6px;}
-.prog-label{display:flex;justify-content:space-between;
-font-size:10px;color:rgba(255,255,255,0.3);margin-bottom:5px;}
-.prog-bar{height:5px;background:rgba(255,255,255,0.08);border-radius:3px;overflow:hidden;}
-.prog-fill{height:100%;border-radius:3px;transition:width .6s cubic-bezier(.16,1,.3,1);}
+/* STATUS BADGE */
+.badge {
+    font-size: 9px;
+    padding: 3px 7px;
+    border-radius: 4px;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+.badge-green { background: rgba(52,199,89,0.1); color: var(--green); }
+.badge-gold { background: rgba(212,175,55,0.1); color: var(--gold); }
+.badge-dim { background: rgba(255,255,255,0.06); color: var(--dim); }
 
-/* LOG */
-.log-item{padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.04);
-display:flex;gap:10px;align-items:flex-start;font-size:11px;}
-.log-item:last-child{border-bottom:none;}
-.log-time{color:rgba(255,255,255,0.2);flex-shrink:0;font-family:'DM Mono',monospace;}
-.log-text{color:rgba(255,255,255,0.5);line-height:1.5;}
+/* ── MODAL ── */
+.overlay {
+    display: none;
+    position: fixed; inset: 0; z-index: 200;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    align-items: flex-end;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+.overlay.open { display: flex; }
+
+.modal {
+    width: 100%;
+    max-height: 80vh;
+    background: #111;
+    border-radius: 20px 20px 0 0;
+    border-top: 0.5px solid var(--border);
+    overflow: hidden;
+    animation: slideUp .3s cubic-bezier(.16,1,.3,1);
+}
+@keyframes slideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+}
+
+.modal-handle {
+    width: 36px; height: 4px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 2px;
+    margin: 10px auto 0;
+}
+
+.modal-header {
+    padding: 16px 20px 14px;
+    border-bottom: 0.5px solid var(--border-fine);
+    display: flex; align-items: center; justify-content: space-between;
+}
+.modal-title { font-size: 17px; font-weight: 700; }
+.modal-close {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.08);
+    border: none; color: var(--muted);
+    font-size: 14px; cursor: pointer;
+    touch-action: manipulation;
+    display: flex; align-items: center; justify-content: center;
+    -webkit-appearance: none;
+}
+
+.modal-body {
+    overflow-y: auto;
+    max-height: calc(80vh - 80px);
+    padding: 16px 20px 20px;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* MODAL STAT ROW */
+.m-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 11px 0;
+    border-bottom: 0.5px solid var(--border-fine);
+    font-size: 14px;
+}
+.m-row:last-child { border-bottom: none; }
+.m-row-label { color: var(--muted); }
+.m-row-val { font-weight: 600; }
+
+.m-section-title {
+    font-size: 9px; letter-spacing: 3px;
+    font-weight: 700; color: var(--dim);
+    margin: 16px 0 10px;
+}
+
+.m-btn {
+    display: block; width: 100%;
+    padding: 15px; border-radius: 12px;
+    font-size: 14px; font-weight: 700;
+    cursor: pointer; touch-action: manipulation;
+    text-align: center; margin-top: 12px;
+    min-height: 50px; border: none;
+    font-family: -apple-system, sans-serif;
+    -webkit-appearance: none;
+    text-decoration: none;
+}
+.m-btn-white { background: #fff; color: #000; }
+.m-btn-outline { background: transparent; border: 0.5px solid var(--border) !important; color: var(--text); }
 </style>
 </head>
 <body>
 
 <!-- HEADER -->
 <div class="hdr">
-    <div class="hdr-left">
-        <div>
-            <div class="hdr-logo">VV UNIVERSE</div>
-            <div class="hdr-sub">ORGANIGRAMA DIGITALĂ</div>
-        </div>
+    <div class="hdr-top">
+        <div class="hdr-logo">VV UNIVERSE</div>
+        <div class="hdr-time" id="clock">—</div>
     </div>
-    <div class="hdr-time" id="clock">--:--</div>
+    <div class="status-row">
+        <div class="status-dot" id="status-dot"></div>
+        <div class="status-text" id="status-text">Sistemul este Optim.</div>
+        <div class="status-sub" id="status-sub">toate sistemele online</div>
+    </div>
 </div>
 
-<!-- CEO STRIP -->
-<div class="ceo-strip">
-    <div class="ceo-title">CEO · ARHITECT VV</div>
-    <div class="ceo-status"><div class="pulse"></div>TOATE SISTEMELE ONLINE</div>
-</div>
+<!-- GRID 2x2 PRINCIPAL -->
+<div class="main-grid">
 
-<!-- DEPT GRID -->
-<div class="dept-grid">
-
-    <!-- NEXUS -->
-    <div class="dept nexus" onclick="openModal('nexus')">
-        <div class="dept-status" style="background:var(--gold);box-shadow:0 0 6px var(--gold);"></div>
-        <span class="dept-icon">⚡</span>
-        <div class="dept-name">VV NEXUS</div>
-        <div class="dept-role" style="color:rgba(212,175,55,0.6);">DIRECTOR DE OPERATIUNI</div>
-        <div class="dept-metric">
-            <div><div class="metric-val" style="color:var(--gold);" id="nexus-msgs">0</div><div class="metric-lbl">COMENZI AZI</div></div>
-            <div style="text-align:right;"><div class="metric-val" style="color:var(--green);" id="nexus-motor">AUTO</div><div class="metric-lbl">MOTOR ACTIV</div></div>
-        </div>
+    <div class="main-card" onclick="openModal('nexus')">
+        <div class="card-domain">OPERAȚIUNI</div>
+        <div class="card-name">VV NEXUS</div>
+        <div class="card-metric" id="g-nexus-msgs">—</div>
+        <div class="card-metric-label">COMENZI AZI</div>
+        <div class="card-arrow">›</div>
     </div>
 
-    <!-- VVhi -->
-    <div class="dept vvhi" onclick="openModal('vvhi')">
-        <div class="dept-status" style="background:var(--purple);box-shadow:0 0 6px var(--purple);"></div>
-        <span class="dept-icon">🧠</span>
-        <div class="dept-name">VVhi</div>
-        <div class="dept-role" style="color:rgba(191,90,242,0.6);">ARHITECT DE BRAND</div>
-        <div class="dept-metric">
-            <div><div class="metric-val" style="color:var(--purple);" id="vvhi-mem">0</div><div class="metric-lbl">MEMORII</div></div>
-        </div>
+    <div class="main-card" onclick="openModal('vvhi')">
+        <div class="card-domain">INTELIGENȚĂ</div>
+        <div class="card-name">VVhi</div>
+        <div class="card-metric" id="g-vvhi-mem">—</div>
+        <div class="card-metric-label">MEMORII</div>
+        <div class="card-arrow">›</div>
     </div>
 
-    <!-- MONITOR -->
-    <div class="dept monitor" onclick="openModal('monitor')">
-        <div class="dept-status" style="background:var(--green);"></div>
-        <span class="dept-icon">💰</span>
-        <div class="dept-name">VV MONITOR</div>
-        <div class="dept-role" style="color:rgba(52,199,89,0.6);">CONTABIL & CONTROLOR</div>
-        <div class="dept-metric">
-            <div><div class="metric-val" style="color:var(--green);">0€</div><div class="metric-lbl">COSTURI/LUNA</div></div>
-        </div>
+    <div class="main-card" onclick="openModal('monitor')">
+        <div class="card-domain">FINANCIAR</div>
+        <div class="card-name">Monitor</div>
+        <div class="card-metric" style="color:var(--green);">0€</div>
+        <div class="card-metric-label">COSTURI LUNĂ</div>
+        <div class="card-arrow">›</div>
     </div>
 
-    <!-- MANAGER -->
-    <div class="dept manager" onclick="openModal('manager')">
-        <div class="dept-status" style="background:var(--blue);"></div>
-        <span class="dept-icon">🔧</span>
-        <div class="dept-name">VV MANAGER</div>
-        <div class="dept-role" style="color:rgba(10,132,255,0.6);">SEF DE SANTIER</div>
-        <div class="dept-metric">
-            <div><div class="metric-val" style="color:var(--blue);">vv-ep-beta</div><div class="metric-lbl">FIREBASE</div></div>
-        </div>
-    </div>
-
-    <!-- SECURITY -->
-    <div class="dept security" onclick="openModal('security')">
-        <div class="dept-status" style="background:var(--red);"></div>
-        <span class="dept-icon">🛡</span>
-        <div class="dept-name">VALENCE + VVeil</div>
-        <div class="dept-role" style="color:rgba(255,59,48,0.6);">SECURITATE & LEGAL</div>
-        <div class="dept-metric">
-            <div><div class="metric-val" style="color:var(--green);">ACTIV</div><div class="metric-lbl">SCUT</div></div>
-        </div>
-    </div>
-
-    <!-- GHOST -->
-    <div class="dept ghost" onclick="openModal('ghost')">
-        <div class="dept-status" style="background:var(--orange);"></div>
-        <span class="dept-icon">👻</span>
-        <div class="dept-name">VV GHOST</div>
-        <div class="dept-role" style="color:rgba(255,149,0,0.6);">SPECIALIST BACKUP</div>
-        <div class="dept-metric">
-            <div><div class="metric-val" style="color:var(--orange);" id="ghost-file">—</div><div class="metric-lbl">BACKUP</div></div>
-        </div>
-    </div>
-
-    <!-- BRIDGE -->
-    <div class="dept bridge" onclick="openModal('bridge')" style="grid-column:1/-1;">
-        <div class="dept-status" style="background:#64d2ff;box-shadow:0 0 6px #64d2ff;"></div>
-        <span class="dept-icon">🌉</span>
-        <div class="dept-name">VV BRIDGE</div>
-        <div class="dept-role" style="color:rgba(100,210,255,0.6);">LOGISTICA & SINCRONIZARE</div>
-        <div class="dept-metric">
-            <div><div class="metric-val" style="color:#64d2ff;" id="bridge-repos">6</div><div class="metric-lbl">REPO-URI CONECTATE</div></div>
-            <div style="text-align:right;"><div class="metric-val" style="color:var(--green);">LIVE</div><div class="metric-lbl">STATUS</div></div>
-        </div>
+    <div class="main-card" onclick="openModal('manager')">
+        <div class="card-domain">INFRASTRUCTURĂ</div>
+        <div class="card-name">Manager</div>
+        <div class="card-metric" style="font-size:14px;color:var(--blue);padding-top:4px;">ONLINE</div>
+        <div class="card-metric-label">FIREBASE STATUS</div>
+        <div class="card-arrow">›</div>
     </div>
 
 </div>
 
-<!-- ═══════════════════════ MODALS ═══════════════════════ -->
+<!-- NAVIGARE RAPIDĂ -->
+<div class="section">
+    <div class="section-label">NAVIGARE RAPIDĂ</div>
+    <div class="row-list">
+        <div class="row-item" onclick="window.location.href='nexus.html'">
+            <div class="row-left">
+                <div class="row-icon" style="background:rgba(212,175,55,0.1);">⚡</div>
+                <div><div class="row-name">VV NEXUS</div><div class="row-sub">Asistent AI personal</div></div>
+            </div>
+            <div class="row-right">
+                <span class="badge badge-green">ACTIV</span>
+                <span class="row-chevron">›</span>
+            </div>
+        </div>
+        <div class="row-item" onclick="window.location.href='vv-repos.html'">
+            <div class="row-left">
+                <div class="row-icon" style="background:rgba(10,132,255,0.1);">📁</div>
+                <div><div class="row-name">VV Repos</div><div class="row-sub">Toate repo-urile GitHub</div></div>
+            </div>
+            <div class="row-right">
+                <span class="row-val" id="g-repos">6</span>
+                <span class="row-chevron">›</span>
+            </div>
+        </div>
+        <div class="row-item" onclick="window.location.href='vv-academy.html'">
+            <div class="row-left">
+                <div class="row-icon" style="background:rgba(191,90,242,0.1);">🎓</div>
+                <div><div class="row-name">VV Academy</div><div class="row-sub">VVhi learning center</div></div>
+            </div>
+            <div class="row-right">
+                <span class="row-chevron">›</span>
+            </div>
+        </div>
+        <div class="row-item" onclick="window.location.href='vv-billing.html'">
+            <div class="row-left">
+                <div class="row-icon" style="background:rgba(52,199,89,0.1);">💰</div>
+                <div><div class="row-name">VV Billing</div><div class="row-sub">Oferte și facturi</div></div>
+            </div>
+            <div class="row-right">
+                <span class="row-chevron">›</span>
+            </div>
+        </div>
+        <div class="row-item" onclick="window.location.href='vv-portfolio.html'">
+            <div class="row-left">
+                <div class="row-icon" style="background:rgba(255,149,0,0.1);">🌟</div>
+                <div><div class="row-name">VV Portfolio</div><div class="row-sub">Vitrina pentru clienți</div></div>
+            </div>
+            <div class="row-right">
+                <span class="row-chevron">›</span>
+            </div>
+        </div>
+    </div>
+</div>
 
-<!-- NEXUS MODAL -->
-<div class="overlay" id="modal-nexus" onclick="closeOnBg(event,'nexus')">
+<!-- SECURITATE & SISTEM -->
+<div class="section" style="margin-top:20px;">
+    <div class="section-label">SECURITATE & SISTEM</div>
+    <div class="row-list">
+        <div class="row-item" onclick="openModal('security')">
+            <div class="row-left">
+                <div class="row-icon" style="background:rgba(255,59,48,0.08);">🛡</div>
+                <div><div class="row-name">Valence + VVeil</div><div class="row-sub">GDPR · DSA · Protecție</div></div>
+            </div>
+            <div class="row-right">
+                <span class="badge badge-green">ON</span>
+                <span class="row-chevron">›</span>
+            </div>
+        </div>
+        <div class="row-item" onclick="openModal('ghost')">
+            <div class="row-left">
+                <div class="row-icon" style="background:rgba(255,149,0,0.08);">👻</div>
+                <div><div class="row-name">VV Ghost</div><div class="row-sub">Backup & Rollback</div></div>
+            </div>
+            <div class="row-right">
+                <span class="row-val" id="g-ghost">—</span>
+                <span class="row-chevron">›</span>
+            </div>
+        </div>
+        <div class="row-item" onclick="openModal('bridge')">
+            <div class="row-left">
+                <div class="row-icon" style="background:rgba(100,210,255,0.08);">🌉</div>
+                <div><div class="row-name">VV Bridge</div><div class="row-sub">Sincronizare GitHub</div></div>
+            </div>
+            <div class="row-right">
+                <span class="badge badge-green">LIVE</span>
+                <span class="row-chevron">›</span>
+            </div>
+        </div>
+        <div class="row-item" onclick="window.location.href='vv-costs.html'">
+            <div class="row-left">
+                <div class="row-icon" style="background:rgba(255,59,48,0.08);">📊</div>
+                <div><div class="row-name">VV Costs</div><div class="row-sub">Tracker costuri</div></div>
+            </div>
+            <div class="row-right">
+                <span class="row-chevron">›</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- PRODUS PUBLIC -->
+<div class="section" style="margin-top:20px;margin-bottom:32px;">
+    <div class="section-label">PRODUSE PUBLICE</div>
+    <div class="row-list">
+        <div class="row-item" onclick="window.open('https://vv-technologies.github.io/ceo.html','_blank')">
+            <div class="row-left">
+                <div class="row-icon" style="background:rgba(212,175,55,0.1);">🏙</div>
+                <div><div class="row-name">VV Beta</div><div class="row-sub">Urban intelligence · Live</div></div>
+            </div>
+            <div class="row-right">
+                <span class="badge badge-gold">BETA</span>
+                <span class="row-chevron">›</span>
+            </div>
+        </div>
+        <div class="row-item" onclick="window.open('https://vv-technologies.github.io/vv-team','_blank')">
+            <div class="row-left">
+                <div class="row-icon" style="background:rgba(10,132,255,0.08);">👑</div>
+                <div><div class="row-name">VV TEAM</div><div class="row-sub">Panou CEO</div></div>
+            </div>
+            <div class="row-right">
+                <span class="row-chevron">›</span>
+            </div>
+        </div>
+        <div class="row-item" onclick="window.location.href='vv-hub.html'">
+            <div class="row-left">
+                <div class="row-icon" style="background:rgba(52,199,89,0.08);">🔑</div>
+                <div><div class="row-name">VV Hub</div><div class="row-sub">Onboarding Beta</div></div>
+            </div>
+            <div class="row-right">
+                <span class="badge badge-dim">50 locuri</span>
+                <span class="row-chevron">›</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════ MODALS ═══════ -->
+
+<!-- NEXUS -->
+<div class="overlay" id="modal-nexus" onclick="closeBg(event,'nexus')">
 <div class="modal">
+    <div class="modal-handle"></div>
     <div class="modal-header">
-        <div style="display:flex;align-items:center;">
-            <span class="modal-icon">⚡</span>
-            <div><div class="modal-title">VV NEXUS</div><div class="modal-subtitle">DIRECTOR DE OPERATIUNI · MANA DREAPTA</div></div>
-        </div>
+        <div class="modal-title">VV NEXUS</div>
         <button class="modal-close" onclick="closeModal('nexus')">✕</button>
     </div>
     <div class="modal-body">
-        <div class="m-section">
-            <div class="m-title">CE FACE AZI</div>
-            <div class="m-card">
-                <div class="m-card-title">🎯 Rolul principal</div>
-                <div class="m-card-text">Traduce viziunea ta în cod funcțional. Tu dai comanda de CEO, el execută. Fără NEXUS trebuie să scrii cod singur. Cu NEXUS, doar descrii ce vrei.</div>
-            </div>
-            <div class="m-card">
-                <div class="m-card-title">⚡ Motor Tri-Core activ</div>
-                <div class="m-card-text">Groq + LLaMA3 pentru cod rapid · Gemini Flash pentru zi de zi · Gemini Pro pentru analize complexe. Alege automat.</div>
-            </div>
-        </div>
-        <div class="m-section">
-            <div class="m-title">STATISTICI SESIUNE</div>
-            <div class="m-stat"><span class="m-stat-label">Comenzi trimise azi</span><span class="m-stat-val" id="m-nexus-msgs" style="color:var(--gold);">0</span></div>
-            <div class="m-stat"><span class="m-stat-label">Motor curent</span><span class="m-stat-val" id="m-nexus-motor" style="color:var(--green);">AUTO</span></div>
-            <div class="m-stat"><span class="m-stat-label">Model Gemini</span><span class="m-stat-val" style="color:var(--blue);" id="m-nexus-model">—</span></div>
-            <div class="m-stat"><span class="m-stat-label">Repo activ</span><span class="m-stat-val" style="color:var(--gold);" id="m-nexus-repo">—</span></div>
-            <div class="m-stat"><span class="m-stat-label">Status</span><span class="m-stat-val" style="color:var(--green);">ONLINE</span></div>
-        </div>
-        <div class="m-section">
-            <div class="m-title">CAPABILITATI</div>
-            <div style="display:flex;flex-wrap:wrap;">
-                <span class="m-badge green">✓ Citit fișiere GitHub</span>
-                <span class="m-badge green">✓ Deploy direct</span>
-                <span class="m-badge green">✓ Auto-Briefing</span>
-                <span class="m-badge green">✓ Read Before Write</span>
-                <span class="m-badge green">✓ Raport 23:59</span>
-                <span class="m-badge gold">⚡ Groq Dual-Core</span>
-            </div>
-        </div>
-        <div class="m-section">
-            <div class="m-title">⚠️ LIMITE FIREBASE (PLAN GRATUIT)</div>
-            <div class="m-card">
-                <div class="m-card-text">
-                    📖 Citiri: <span id="reads-used">0</span> / 50.000 pe zi<br>
-                    ✍️ Scrieri: <span id="writes-used">0</span> / 20.000 pe zi<br>
-                    👥 Utilizatori simultan siguri: ~500<br>
-                    ⏱ Rate limit recomandat: 5 taskuri/minut/user<br>
-                    <span style="color:rgba(255,149,0,0.7);">Peste limite → Firebase Blaze (pay-as-you-go)</span>
-                </div>
-            </div>
-        </div>
-        <button class="m-btn gold" onclick="window.location.href='vv-nexus.html'">⚡ DESCHIDE NEXUS →</button>
+        <div class="m-section-title">SESIUNEA CURENTĂ</div>
+        <div class="m-row"><span class="m-row-label">Comenzi trimise azi</span><span class="m-row-val" id="m-nexus-msgs" style="color:var(--gold);">—</span></div>
+        <div class="m-row"><span class="m-row-label">Motor activ</span><span class="m-row-val" id="m-nexus-motor">AUTO</span></div>
+        <div class="m-row"><span class="m-row-label">Model Gemini</span><span class="m-row-val" id="m-nexus-model">—</span></div>
+        <div class="m-row"><span class="m-row-label">Repo activ</span><span class="m-row-val" id="m-nexus-repo" style="color:var(--gold);">—</span></div>
+        <div class="m-row"><span class="m-row-label">Status</span><span class="m-row-val" style="color:var(--green);">Online</span></div>
+        <div class="m-section-title">CAPABILITĂȚI</div>
+        <div class="m-row"><span class="m-row-label">Read Before Write</span><span class="m-row-val" style="color:var(--green);">✓</span></div>
+        <div class="m-row"><span class="m-row-label">Auto-Briefing zilnic</span><span class="m-row-val" style="color:var(--green);">✓</span></div>
+        <div class="m-row"><span class="m-row-label">Raport 23:59</span><span class="m-row-val" style="color:var(--green);">✓</span></div>
+        <div class="m-row"><span class="m-row-label">Groq Dual-Core</span><span class="m-row-val" id="m-nexus-groq">—</span></div>
+        <a class="m-btn m-btn-white" href="nexus.html">Deschide NEXUS</a>
     </div>
 </div>
 </div>
 
-<!-- VVhi MODAL -->
-<div class="overlay" id="modal-vvhi" onclick="closeOnBg(event,'vvhi')">
+<!-- VVhi -->
+<div class="overlay" id="modal-vvhi" onclick="closeBg(event,'vvhi')">
 <div class="modal">
+    <div class="modal-handle"></div>
     <div class="modal-header">
-        <div style="display:flex;align-items:center;">
-            <span class="modal-icon">🧠</span>
-            <div><div class="modal-title">VVhi</div><div class="modal-subtitle">ARHITECT DE BRAND & DNA</div></div>
-        </div>
+        <div class="modal-title">VVhi</div>
         <button class="modal-close" onclick="closeModal('vvhi')">✕</button>
     </div>
     <div class="modal-body">
-        <div class="m-section">
-            <div class="m-title">ROLUL SAU</div>
-            <div class="m-card">
-                <div class="m-card-title">🎨 Garda de Corp a Esteticii</div>
-                <div class="m-card-text">Se asigură că tot ce iese din VV este "Onyx & Gold". Deține stilul, fonturile, regulile de design și vibe-ul VV. Nu lasă nimic urât să fie publicat.</div>
-            </div>
-        </div>
-        <div class="m-section">
-            <div class="m-title">DNA VV — REGULILE DE AUR</div>
-            <div class="m-card">
-                <div class="m-card-title">🎨 Design System</div>
-                <div class="m-card-text">
-                    BG: #050507 (Onyx)<br>
-                    Gold: #D4AF37 (Auriu)<br>
-                    Green: #34c759 | Blue: #0A84FF<br>
-                    Font: -apple-system / Syne / DM Mono<br>
-                    Glassmorphism dark · min-height: 44px
-                </div>
-            </div>
-            <div class="m-card">
-                <div class="m-card-title">⚡ Reguli Critice Cod</div>
-                <div class="m-card-text">
-                    NU alert() → showToast()<br>
-                    Firebase: .set merge:true<br>
-                    NU where()+orderBy() fara index<br>
-                    VVhi.logApproval() dupa decizii CEO
-                </div>
-            </div>
-        </div>
-        <div class="m-section">
-            <div class="m-title">MEMORIE ACTIVA</div>
-            <div class="m-stat"><span class="m-stat-label">Decizii salvate</span><span class="m-stat-val" style="color:var(--purple);" id="m-vvhi-mem">0</span></div>
-            <div class="m-stat"><span class="m-stat-label">Buguri cunoscute</span><span class="m-stat-val" style="color:var(--red);" id="m-vvhi-bugs">0</span></div>
-            <div class="m-stat"><span class="m-stat-label">Fix-uri aplicate</span><span class="m-stat-val" style="color:var(--green);" id="m-vvhi-fixes">0</span></div>
-        </div>
-        <div id="vvhi-dna-log"></div>
+        <div class="m-section-title">MEMORIE</div>
+        <div class="m-row"><span class="m-row-label">Total memorii</span><span class="m-row-val" id="m-vvhi-total" style="color:var(--gold);">—</span></div>
+        <div class="m-row"><span class="m-row-label">Buguri cunoscute</span><span class="m-row-val" id="m-vvhi-bugs" style="color:var(--red);">—</span></div>
+        <div class="m-row"><span class="m-row-label">Fix-uri aplicate</span><span class="m-row-val" id="m-vvhi-fixes" style="color:var(--green);">—</span></div>
+        <div class="m-row"><span class="m-row-label">Decizii CEO</span><span class="m-row-val" id="m-vvhi-dec">—</span></div>
+        <div class="m-row"><span class="m-row-label">Capacitate</span><span class="m-row-val" id="m-vvhi-pct" style="color:var(--gold);">—</span></div>
+        <div class="m-section-title">DNA VV — REGULI</div>
+        <div class="m-row"><span class="m-row-label">Design system</span><span class="m-row-val" style="color:var(--green);">Onyx & Gold</span></div>
+        <div class="m-row"><span class="m-row-label">Firebase rule</span><span class="m-row-val">.set merge:true</span></div>
+        <div class="m-row"><span class="m-row-label">UI rule</span><span class="m-row-val">showToast()</span></div>
+        <a class="m-btn m-btn-white" href="vv-academy.html">Deschide VV Academy</a>
     </div>
 </div>
 </div>
 
-<!-- MONITOR MODAL -->
-<div class="overlay" id="modal-monitor" onclick="closeOnBg(event,'monitor')">
+<!-- MONITOR -->
+<div class="overlay" id="modal-monitor" onclick="closeBg(event,'monitor')">
 <div class="modal">
+    <div class="modal-handle"></div>
     <div class="modal-header">
-        <div style="display:flex;align-items:center;">
-            <span class="modal-icon">💰</span>
-            <div><div class="modal-title">VV MONITOR</div><div class="modal-subtitle">CONTABILUL & CONTROLORUL FINANCIAR</div></div>
-        </div>
+        <div class="modal-title">VV Monitor</div>
         <button class="modal-close" onclick="closeModal('monitor')">✕</button>
     </div>
     <div class="modal-body">
-        <div class="m-section">
-            <div class="m-title">RAPORT FINANCIAR — AZI</div>
-            <div class="m-stat"><span class="m-stat-label">Costuri lunare</span><span class="m-stat-val" style="color:var(--green);">0€</span></div>
-            <div class="m-stat"><span class="m-stat-label">GitHub Pages</span><span class="m-stat-val" style="color:var(--green);">GRATUIT</span></div>
-            <div class="m-stat"><span class="m-stat-label">Firebase Spark</span><span class="m-stat-val" style="color:var(--green);">GRATUIT</span></div>
-            <div class="m-stat"><span class="m-stat-label">Gemini API</span><span class="m-stat-val" style="color:var(--green);">GRATUIT</span></div>
-            <div class="m-stat"><span class="m-stat-label">Groq API</span><span class="m-stat-val" style="color:var(--green);">GRATUIT</span></div>
-        </div>
-        <div class="m-section">
-            <div class="m-title">UTILIZARE GEMINI AZI</div>
-            <div class="prog-wrap">
-                <div class="prog-label"><span>Requests folosite</span><span id="gemini-pct">0%</span></div>
-                <div class="prog-bar"><div class="prog-fill" id="gemini-prog" style="width:0%;background:var(--green);"></div></div>
-            </div>
-            <div style="font-size:10px;color:rgba(255,255,255,0.2);margin-top:6px;">Limita gratuita: 1500 req/zi</div>
-        </div>
-        <div class="m-section">
-            <div class="m-title">PROIECTIE VENITURI</div>
-            <div class="m-card">
-                <div class="m-card-title">💸 Ce poți vinde acum</div>
-                <div class="m-card-text">
-                    Landing page: 150-250€ · livrare 2-4h<br>
-                    Site prezentare: 300-500€ · livrare 24h<br>
-                    App web Firebase: 800-1500€ · 3-5 zile<br>
-                    <span style="color:var(--green);">5 clienți/lună = 750-2500€</span>
-                </div>
-            </div>
-        </div>
-        <button class="m-btn green" onclick="window.location.href='vv-costs.html'">💰 DESCHIDE VV COSTS →</button>
+        <div class="m-section-title">COSTURI LUNARE</div>
+        <div class="m-row"><span class="m-row-label">GitHub Pages</span><span class="m-row-val" style="color:var(--green);">0€</span></div>
+        <div class="m-row"><span class="m-row-label">Firebase Spark</span><span class="m-row-val" style="color:var(--green);">0€</span></div>
+        <div class="m-row"><span class="m-row-label">Gemini API</span><span class="m-row-val" style="color:var(--green);">0€</span></div>
+        <div class="m-row"><span class="m-row-label">Groq API</span><span class="m-row-val" style="color:var(--green);">0€</span></div>
+        <div class="m-row"><span class="m-row-label">Total lunar</span><span class="m-row-val" style="color:var(--green);font-size:18px;font-weight:800;">0€</span></div>
+        <div class="m-section-title">PROIECȚIE VENITURI</div>
+        <div class="m-row"><span class="m-row-label">Landing page</span><span class="m-row-val">150–250€</span></div>
+        <div class="m-row"><span class="m-row-label">Site prezentare</span><span class="m-row-val">300–500€</span></div>
+        <div class="m-row"><span class="m-row-label">App web Firebase</span><span class="m-row-val">800–1500€</span></div>
+        <a class="m-btn m-btn-white" href="vv-costs.html">Deschide VV Costs</a>
     </div>
 </div>
 </div>
 
-<!-- MANAGER MODAL -->
-<div class="overlay" id="modal-manager" onclick="closeOnBg(event,'manager')">
+<!-- MANAGER -->
+<div class="overlay" id="modal-manager" onclick="closeBg(event,'manager')">
 <div class="modal">
+    <div class="modal-handle"></div>
     <div class="modal-header">
-        <div style="display:flex;align-items:center;">
-            <span class="modal-icon">🔧</span>
-            <div><div class="modal-title">VV MANAGER</div><div class="modal-subtitle">SEFUL DE SANTIER · INFRASTRUCTURE</div></div>
-        </div>
+        <div class="modal-title">VV Manager</div>
         <button class="modal-close" onclick="closeModal('manager')">✕</button>
     </div>
     <div class="modal-body">
-        <div class="m-section">
-            <div class="m-title">INFRASTRUCTURA ACTIVA</div>
-            <div class="m-stat"><span class="m-stat-label">Firebase Project</span><span class="m-stat-val" style="color:var(--blue);">vv-ep-beta</span></div>
-            <div class="m-stat"><span class="m-stat-label">Firestore</span><span class="m-stat-val" style="color:var(--green);">ONLINE</span></div>
-            <div class="m-stat"><span class="m-stat-label">Auth</span><span class="m-stat-val" style="color:var(--green);">ACTIV</span></div>
-            <div class="m-stat"><span class="m-stat-label">Storage</span><span class="m-stat-val" style="color:var(--green);">ACTIV</span></div>
-            <div class="m-stat"><span class="m-stat-label">Plan</span><span class="m-stat-val" style="color:var(--green);">SPARK (GRATUIT)</span></div>
-            <div class="m-stat"><span class="m-stat-label">GitHub Token</span>
-                <span style="display:flex;align-items:center;gap:8px;">
-                    <span id="gh-token-display" style="font-size:13px;font-weight:700;color:rgba(255,255,255,0.3);">••••••••</span>
-                    <button onclick="toggleToken()" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:rgba(255,255,255,0.4);font-size:10px;padding:3px 8px;cursor:pointer;touch-action:manipulation;">👁</button>
-                </span>
-            </div>
-        </div>
-        <div class="m-section">
-            <div class="m-title">QUOTA ZILNICA FIRESTORE</div>
-            <div class="prog-wrap">
-                <div class="prog-label"><span>Citiri</span><span id="fq-read-pct">0%</span></div>
-                <div class="prog-bar"><div class="prog-fill" id="fq-read-bar" style="width:0%;background:var(--blue);"></div></div>
-                <div style="font-size:10px;color:rgba(255,255,255,0.2);margin-top:4px;" id="fq-read-num">0 / 50.000</div>
-            </div>
-            <div class="prog-wrap" style="margin-top:10px;">
-                <div class="prog-label"><span>Scrieri</span><span id="fq-write-pct">0%</span></div>
-                <div class="prog-bar"><div class="prog-fill" id="fq-write-bar" style="width:0%;background:var(--green);"></div></div>
-                <div style="font-size:10px;color:rgba(255,255,255,0.2);margin-top:4px;" id="fq-write-num">0 / 20.000</div>
-            </div>
-        </div>
-        <div class="m-section">
-            <div class="m-title">COLECTII FIRESTORE</div>
-            <div style="display:flex;flex-wrap:wrap;">
-                <span class="m-badge blue">users</span>
-                <span class="m-badge blue">missions</span>
-                <span class="m-badge blue">photos</span>
-                <span class="m-badge blue">inbox</span>
-                <span class="m-badge blue">talent_pool</span>
-                <span class="m-badge blue">vvhi_dataset</span>
-                <span class="m-badge blue">remote_config</span>
-                <span class="m-badge blue">audit_log</span>
-            </div>
-        </div>
-        <div class="m-section">
-            <div class="m-title">REGULI CRITICE</div>
-            <div class="m-card">
-                <div class="m-card-text">
-                    ✅ .set(data, {merge:true}) — nu .update()<br>
-                    ✅ Sortare client-side (nu index compus)<br>
-                    ✅ GC GDPR activ — poze sterse dupa 5 zile<br>
-                    ✅ Firestore rules securizate
-                </div>
-            </div>
-        </div>
-        <button class="m-btn blue" onclick="window.open('https://console.firebase.google.com/project/vv-ep-beta','_blank')">🔧 FIREBASE CONSOLE →</button>
+        <div class="m-section-title">FIREBASE</div>
+        <div class="m-row"><span class="m-row-label">Project</span><span class="m-row-val" style="color:var(--blue);">vv-ep-beta</span></div>
+        <div class="m-row"><span class="m-row-label">Firestore</span><span class="m-row-val" style="color:var(--green);">Online</span></div>
+        <div class="m-row"><span class="m-row-label">Auth</span><span class="m-row-val" style="color:var(--green);">Activ</span></div>
+        <div class="m-row"><span class="m-row-label">Plan</span><span class="m-row-val" style="color:var(--green);">Spark — Gratuit</span></div>
+        <div class="m-section-title">LIMITE GRATUITE</div>
+        <div class="m-row"><span class="m-row-label">Citiri / zi</span><span class="m-row-val">50.000</span></div>
+        <div class="m-row"><span class="m-row-label">Scrieri / zi</span><span class="m-row-val">20.000</span></div>
+        <div class="m-row"><span class="m-row-label">Users simultan siguri</span><span class="m-row-val">~500</span></div>
+        <a class="m-btn m-btn-outline" onclick="window.open('https://console.firebase.google.com/project/vv-ep-beta','_blank');closeModal('manager');">Firebase Console</a>
     </div>
 </div>
 </div>
 
-<!-- SECURITY MODAL -->
-<div class="overlay" id="modal-security" onclick="closeOnBg(event,'security')">
+<!-- SECURITY -->
+<div class="overlay" id="modal-security" onclick="closeBg(event,'security')">
 <div class="modal">
+    <div class="modal-handle"></div>
     <div class="modal-header">
-        <div style="display:flex;align-items:center;">
-            <span class="modal-icon">🛡</span>
-            <div><div class="modal-title">VALENCE + VVeil</div><div class="modal-subtitle">SECURITATE & LEGAL · BODYGUARZII</div></div>
-        </div>
+        <div class="modal-title">Securitate & Legal</div>
         <button class="modal-close" onclick="closeModal('security')">✕</button>
     </div>
     <div class="modal-body">
-        <div class="m-section">
-            <div class="m-title">STATUS PROTECTIE</div>
-            <div class="m-stat"><span class="m-stat-label">VV-VALENCE (Scut)</span><span class="m-stat-val" style="color:var(--green);">ACTIV</span></div>
-            <div class="m-stat"><span class="m-stat-label">VVeil (Confidentialitate)</span><span class="m-stat-val" style="color:var(--green);">ACTIV</span></div>
-            <div class="m-stat"><span class="m-stat-label">GDPR Art.17</span><span class="m-stat-val" style="color:var(--green);">COMPLIANT</span></div>
-            <div class="m-stat"><span class="m-stat-label">DSA Moderare</span><span class="m-stat-val" style="color:var(--green);">COMPLIANT</span></div>
-            <div class="m-stat"><span class="m-stat-label">Cookie Consent</span><span class="m-stat-val" style="color:var(--green);">IMPLEMENTAT</span></div>
-        </div>
-        <div class="m-section">
-            <div class="m-title">DOCUMENTE LEGALE ACTIVE</div>
-            <div class="m-card">
-                <div class="m-card-text">
-                    ✅ Date sterse automat dupa 6 luni<br>
-                    ✅ Talent Pool: GDPR expiry 6 luni<br>
-                    ✅ DSA: 6 motive respingere documentate<br>
-                    ✅ Chei API: localStorage only, zero server<br>
-                    ✅ VVhi dataset: date anonimizate<br>
-                    📧 Contact: vv.ep.team@gmail.com
-                </div>
-            </div>
-        </div>
-        <div class="m-section">
-            <div class="m-title">FIRESTORE RULES</div>
-            <div class="m-card">
-                <div class="m-card-text">Acces autentificat obligatoriu. Userii citesc/scriu doar propriile date. CEO are acces complet. Photos: owner + CEO only.</div>
-            </div>
-        </div>
+        <div class="m-section-title">STATUS</div>
+        <div class="m-row"><span class="m-row-label">VV-VALENCE</span><span class="m-row-val" style="color:var(--green);">Activ</span></div>
+        <div class="m-row"><span class="m-row-label">VVeil</span><span class="m-row-val" style="color:var(--green);">Activ</span></div>
+        <div class="m-section-title">LEGAL</div>
+        <div class="m-row"><span class="m-row-label">GDPR Art.17</span><span class="m-row-val" style="color:var(--green);">Compliant</span></div>
+        <div class="m-row"><span class="m-row-label">DSA</span><span class="m-row-val" style="color:var(--green);">Compliant</span></div>
+        <div class="m-row"><span class="m-row-label">Chei API</span><span class="m-row-val">localStorage only</span></div>
+        <div class="m-row"><span class="m-row-label">Date vândute</span><span class="m-row-val" style="color:var(--green);">Zero</span></div>
+        <div class="m-row"><span class="m-row-label">Contact legal</span><span class="m-row-val" style="font-size:11px;">vv.ep.team@gmail.com</span></div>
     </div>
 </div>
 </div>
 
-<!-- GHOST MODAL -->
-<div class="overlay" id="modal-ghost" onclick="closeOnBg(event,'ghost')">
+<!-- GHOST -->
+<div class="overlay" id="modal-ghost" onclick="closeBg(event,'ghost')">
 <div class="modal">
+    <div class="modal-handle"></div>
     <div class="modal-header">
-        <div style="display:flex;align-items:center;">
-            <span class="modal-icon">👻</span>
-            <div><div class="modal-title">VV GHOST</div><div class="modal-subtitle">MASINA TIMPULUI · SPECIALIST BACKUP</div></div>
-        </div>
+        <div class="modal-title">VV Ghost</div>
         <button class="modal-close" onclick="closeModal('ghost')">✕</button>
     </div>
     <div class="modal-body">
-        <div class="m-section">
-            <div class="m-title">BACKUP CURENT</div>
-            <div class="m-stat"><span class="m-stat-label">Fisier salvat</span><span class="m-stat-val" style="color:var(--orange);" id="m-ghost-file">—</span></div>
-            <div class="m-stat"><span class="m-stat-label">Salvat la</span><span class="m-stat-val" style="color:rgba(255,255,255,0.5);" id="m-ghost-time">—</span></div>
-            <div class="m-stat"><span class="m-stat-label">Rollback disponibil</span><span class="m-stat-val" id="m-ghost-avail" style="color:var(--red);">NU</span></div>
-        </div>
-        <div class="m-section">
-            <div class="m-title">CUM FUNCTIONEAZA</div>
-            <div class="m-card">
-                <div class="m-card-text">Inainte de orice Push pe GitHub, Ghost salveaza o copie locala a codului. Daca ceva merge gresit dupa deploy, apesi Rollback si codul revine in 1 secunda.</div>
-            </div>
-        </div>
-        <div class="m-section">
-            <div class="m-title">DNA — ISTORICUL ACTIUNILOR</div>
-            <div id="ghost-dna-log" style="max-height:160px;overflow-y:auto;"></div>
-        </div>
-        <button class="m-btn orange" onclick="window.location.href='nexus.html#deploy'">👻 DESCHIDE NEXUS → DEPLOY →</button>
+        <div class="m-section-title">BACKUP CURENT</div>
+        <div class="m-row"><span class="m-row-label">Fișier salvat</span><span class="m-row-val" id="m-ghost-file" style="color:var(--gold);">—</span></div>
+        <div class="m-row"><span class="m-row-label">Salvat la</span><span class="m-row-val" id="m-ghost-time">—</span></div>
+        <div class="m-row"><span class="m-row-label">Rollback</span><span class="m-row-val" id="m-ghost-avail" style="color:var(--red);">Indisponibil</span></div>
+        <a class="m-btn m-btn-outline" href="nexus.html">Mergi la NEXUS → Deploy</a>
     </div>
 </div>
 </div>
 
-<!-- BRIDGE MODAL -->
-<div class="overlay" id="modal-bridge" onclick="closeOnBg(event,'bridge')">
+<!-- BRIDGE -->
+<div class="overlay" id="modal-bridge" onclick="closeBg(event,'bridge')">
 <div class="modal">
+    <div class="modal-handle"></div>
     <div class="modal-header">
-        <div style="display:flex;align-items:center;">
-            <span class="modal-icon">🌉</span>
-            <div><div class="modal-title">VV BRIDGE</div><div class="modal-subtitle">CURIERUL RAPID · LOGISTICA & SINCRONIZARE</div></div>
-        </div>
+        <div class="modal-title">VV Bridge</div>
         <button class="modal-close" onclick="closeModal('bridge')">✕</button>
     </div>
     <div class="modal-body">
-        <div class="m-section">
-            <div class="m-title">REPO-URI CONECTATE</div>
-            <div class="m-stat"><span class="m-stat-label">ceo.html</span><span class="m-badge green" style="font-size:9px;">LIVE</span></div>
-            <div class="m-stat"><span class="m-stat-label">vv-team</span><span class="m-badge green" style="font-size:9px;">LIVE</span></div>
-            <div class="m-stat"><span class="m-stat-label">vv-technologies</span><span class="m-badge green" style="font-size:9px;">LIVE</span></div>
-            <div class="m-stat"><span class="m-stat-label">vv-hi</span><span class="m-badge gold" style="font-size:9px;">ACTIV</span></div>
-            <div class="m-stat"><span class="m-stat-label">vv-hybrid-univers</span><span class="m-badge green" style="font-size:9px;">LIVE</span></div>
-            <div class="m-stat"><span class="m-stat-label">vv-nexus</span><span class="m-badge green" style="font-size:9px;">LIVE</span></div>
-        </div>
-        <div class="m-section">
-            <div class="m-title">CUM FUNCTIONEAZA</div>
-            <div class="m-card">
-                <div class="m-card-text">NEXUS genereaza codul → Bridge face Push via GitHub API → Site-ul e live in ~30 secunde. Suporta Mirror Push simultan pe mai multe repo-uri.</div>
-            </div>
-        </div>
-        <div class="m-section">
-            <div class="m-title">⚠️ SECURITATE BRIDGE</div>
-            <div class="m-card">
-                <div class="m-card-text">GitHub Token stocat criptat local. Nu e transmis pe niciun server. Jitter Engine activ — push-urile arata ca activitate umana.</div>
-            </div>
-        </div>
-        <button class="m-btn blue" onclick="window.location.href='vv-repos.html'">🌉 DESCHIDE VV REPOS →</button>
+        <div class="m-section-title">REPO-URI CONECTATE</div>
+        <div class="m-row"><span class="m-row-label">ceo.html</span><span class="m-row-val" style="color:var(--green);">Live</span></div>
+        <div class="m-row"><span class="m-row-label">vv-team</span><span class="m-row-val" style="color:var(--green);">Live</span></div>
+        <div class="m-row"><span class="m-row-label">vv-technologies</span><span class="m-row-val" style="color:var(--green);">Live</span></div>
+        <div class="m-row"><span class="m-row-label">vv-hi</span><span class="m-row-val" style="color:var(--gold);">Activ</span></div>
+        <div class="m-row"><span class="m-row-label">vv-hybrid-univers</span><span class="m-row-val" style="color:var(--green);">Live</span></div>
+        <div class="m-row"><span class="m-row-label">vv-nexus</span><span class="m-row-val" style="color:var(--green);">Live</span></div>
+        <a class="m-btn m-btn-white" href="vv-repos.html">Deschide VV Repos</a>
     </div>
 </div>
 </div>
 
 <script>
-// ── CLOCK ─────────────────────────────────────────────────────
-function updateClock() {
-    var now = new Date();
-    var h = String(now.getHours()).padStart(2,'0');
-    var m = String(now.getMinutes()).padStart(2,'0');
-    var s = String(now.getSeconds()).padStart(2,'0');
-    var el = document.getElementById('clock');
-    if (el) el.textContent = h + ':' + m + ':' + s;
+function lsGet(k){ try{return localStorage.getItem(k);}catch(e){return null;} }
+
+// CLOCK
+function tick(){
+    var n=new Date();
+    document.getElementById('clock').textContent=
+        String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0')+':'+String(n.getSeconds()).padStart(2,'0');
 }
-setInterval(updateClock, 1000);
-updateClock();
+setInterval(tick,1000); tick();
 
-// ── LOAD DATE DIN NEXUS ───────────────────────────────────────
-function lsGet(k) {
-    try { return localStorage.getItem(k); } catch(e) { return null; }
-}
+// LOAD DATA
+function load(){
+    // NEXUS msgs
+    var msgs=0;
+    try{var ch=JSON.parse(lsGet('nx_chat')||'[]');msgs=ch.filter(function(m){return m.role==='user';}).length;}catch(e){}
+    setEl('g-nexus-msgs',msgs);
+    setEl('m-nexus-msgs',msgs);
+    setEl('m-nexus-motor',(lsGet('nx_motor')||'AUTO').toUpperCase());
+    setEl('m-nexus-model',lsGet('nx_model')||'gemini-1.5-flash');
+    setEl('m-nexus-repo',lsGet('nx_repo')||'—');
+    setEl('m-nexus-groq',lsGet('nx_groq')?'✓ Activ':'✗ Neconfigurat');
 
-function loadData() {
-    // Mesaje NEXUS
-    var msgs = 0;
-    try { var ch = JSON.parse(lsGet('nx_chat')||'[]'); msgs = ch.filter(function(m){return m.role==='user';}).length; } catch(e){}
-    setEl('nexus-msgs', msgs);
-    setEl('m-nexus-msgs', msgs);
-
-    // Motor
-    var motor = lsGet('nx_motor') || 'AUTO';
-    setEl('nexus-motor', motor.toUpperCase());
-    setEl('m-nexus-motor', motor.toUpperCase());
-    setEl('m-nexus-model', lsGet('nx_model') || 'gemini-1.5-flash');
-    setEl('m-nexus-repo', lsGet('nx_repo') || '—');
-
-    // VVhi Memory
-    var mem = []; try { mem = JSON.parse(lsGet('nx_memory')||'[]'); } catch(e){}
-    var bugs = mem.filter(function(m){return m.type==='bug';}).length;
-    var fixes = mem.filter(function(m){return m.type==='fix';}).length;
-    setEl('vvhi-mem', mem.length);
-    setEl('m-vvhi-mem', mem.length);
-    setEl('m-vvhi-bugs', bugs);
-    setEl('m-vvhi-fixes', fixes);
-
-    // VVhi DNA log
-    var dnaEl = document.getElementById('vvhi-dna-log');
-    if (dnaEl && mem.length) {
-        var html = '<div class="m-title">ULTIMELE MEMORII</div>';
-        mem.slice(0,5).forEach(function(m){
-            html += '<div class="log-item"><span class="log-time">'+m.date+'</span><span class="log-text">['+m.type.toUpperCase()+'] '+esc(m.content.substring(0,80))+'</span></div>';
-        });
-        dnaEl.innerHTML = html;
-    }
-
-    // Gemini usage
-    var today = new Date().toDateString();
-    var usage = 0;
-    try { var u = JSON.parse(lsGet('nx_gemini_usage')||'{}'); usage = u[today]||0; } catch(e){}
-    var pct = Math.min(Math.round(usage/1500*100),100);
-    setEl('gemini-pct', pct+'%');
-    var prog = document.getElementById('gemini-prog');
-    if (prog) { prog.style.width=pct+'%'; prog.style.background = pct>80?'var(--red)':pct>50?'var(--orange)':'var(--green)'; }
+    // VVhi
+    var mem=[];try{mem=JSON.parse(lsGet('nx_memory')||'[]');}catch(e){}
+    var bugs=mem.filter(function(m){return m.type==='bug';}).length;
+    var fixes=mem.filter(function(m){return m.type==='fix';}).length;
+    var dec=mem.filter(function(m){return m.type==='decizie';}).length;
+    var pct=Math.min(Math.round(mem.length/100*100),100)+'%';
+    setEl('g-vvhi-mem',mem.length);
+    setEl('m-vvhi-total',mem.length);
+    setEl('m-vvhi-bugs',bugs);
+    setEl('m-vvhi-fixes',fixes);
+    setEl('m-vvhi-dec',dec);
+    setEl('m-vvhi-pct',pct);
 
     // Ghost
-    var ghost = null;
-    try { ghost = JSON.parse(lsGet('nx_ghost')||'null'); } catch(e){}
-    if (ghost) {
-        setEl('ghost-file', ghost.fn || '—');
-        setEl('m-ghost-file', ghost.fn || '—');
-        setEl('m-ghost-time', new Date(ghost.ts).toLocaleTimeString('ro-RO'));
-        setEl('m-ghost-avail', 'DA');
-        var avEl = document.getElementById('m-ghost-avail');
-        if (avEl) avEl.style.color = 'var(--green)';
+    var ghost=null;try{ghost=JSON.parse(lsGet('nx_ghost')||'null');}catch(e){}
+    if(ghost){
+        setEl('g-ghost',ghost.fn||'—');
+        setEl('m-ghost-file',ghost.fn||'—');
+        setEl('m-ghost-time',new Date(ghost.ts).toLocaleTimeString('ro-RO'));
+        var avEl=document.getElementById('m-ghost-avail');
+        if(avEl){avEl.textContent='Disponibil';avEl.style.color='var(--green)';}
     }
 
-    // Firebase Quota
-    var today2 = new Date().toDateString();
-    try {
-        var fq = JSON.parse(lsGet('nx_fq') || '{}');
-        if (fq.date === today2) {
-            var rp = Math.min(Math.round((fq.reads||0)/45000*100),100);
-            var wp = Math.min(Math.round((fq.writes||0)/18000*100),100);
-            setEl('fq-read-pct', rp+'%');
-            setEl('fq-write-pct', wp+'%');
-            setEl('fq-read-num', (fq.reads||0) + ' / 50.000');
-            setEl('fq-write-num', (fq.writes||0) + ' / 20.000');
-            var rb = document.getElementById('fq-read-bar');
-            var wb = document.getElementById('fq-write-bar');
-            if (rb) { rb.style.width=rp+'%'; rb.style.background=rp>80?'var(--red)':rp>50?'var(--orange)':'var(--blue)'; }
-            if (wb) { wb.style.width=wp+'%'; wb.style.background=wp>80?'var(--red)':wp>50?'var(--orange)':'var(--green)'; }
-        }
-    } catch(e) {}
-
-    // Ghost DNA log
-    var dna = []; try { dna = JSON.parse(lsGet('nx_dna')||'[]'); } catch(e){}
-    var dnaLog = document.getElementById('ghost-dna-log');
-    if (dnaLog && dna.length) {
-        dnaLog.innerHTML = dna.slice(0,8).map(function(e){
-            return '<div class="log-item"><span class="log-time">'+new Date(e.ts).toLocaleTimeString('ro-RO',{hour:'2-digit',minute:'2-digit'})+'</span><span class="log-text">'+(e.ok?'✓':'✗')+' '+esc(e.cmd)+'</span></div>';
-        }).join('');
+    // Status general
+    var hasKey=!!lsGet('nx_gk');
+    var statusEl=document.getElementById('status-text');
+    var dotEl=document.getElementById('status-dot');
+    if(!hasKey&&statusEl){
+        statusEl.textContent='Cheie API lipsă.';
+        if(dotEl){dotEl.style.background='var(--red)';dotEl.style.animation='none';}
+        setEl('status-sub','configurează NEXUS');
     }
 }
 
-function setEl(id, val) {
-    var el = document.getElementById(id);
-    if (el) el.textContent = val;
+function setEl(id,val){var el=document.getElementById(id);if(el)el.textContent=val;}
+
+// MODALS
+function openModal(name){
+    load();
+    var el=document.getElementById('modal-'+name);
+    if(el)el.classList.add('open');
+    document.body.style.overflow='hidden';
+}
+function closeModal(name){
+    var el=document.getElementById('modal-'+name);
+    if(el)el.classList.remove('open');
+    document.body.style.overflow='';
+}
+function closeBg(e,name){
+    if(e.target===document.getElementById('modal-'+name))closeModal(name);
 }
 
-function esc(t) {
-    return (t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
-
-// ── MODALS ────────────────────────────────────────────────────
-function openModal(name) {
-    loadData();
-    var el = document.getElementById('modal-'+name);
-    if (el) el.classList.add('open');
-    document.body.style.overflow = 'hidden';
-}
-
-function closeModal(name) {
-    var el = document.getElementById('modal-'+name);
-    if (el) el.classList.remove('open');
-    document.body.style.overflow = '';
-}
-
-function closeOnBg(e, name) {
-    if (e.target === document.getElementById('modal-'+name)) closeModal(name);
-}
-
-// Swipe down sa inchida modal
-document.querySelectorAll('.modal').forEach(function(modal) {
-    var startY = 0;
-    modal.addEventListener('touchstart', function(e){ startY = e.touches[0].clientY; }, {passive:true});
-    modal.addEventListener('touchend', function(e){
-        if (e.changedTouches[0].clientY - startY > 80) {
-            var overlay = modal.closest('.overlay');
-            if (overlay) overlay.classList.remove('open');
-            document.body.style.overflow = '';
+// Swipe down
+document.querySelectorAll('.modal').forEach(function(m){
+    var sy=0;
+    m.addEventListener('touchstart',function(e){sy=e.touches[0].clientY;},{passive:true});
+    m.addEventListener('touchend',function(e){
+        if(e.changedTouches[0].clientY-sy>80){
+            var o=m.closest('.overlay');
+            if(o)o.classList.remove('open');
+            document.body.style.overflow='';
         }
-    }, {passive:true});
+    },{passive:true});
 });
 
-// ── INIT ──────────────────────────────────────────────────────
-loadData();
-setInterval(loadData, 15000);
-
-// ── TOGGLE TOKEN ──────────────────────────────────────────────
-var tokenVisible = false;
-function toggleToken() {
-    tokenVisible = !tokenVisible;
-    var el = document.getElementById('gh-token-display');
-    if (!el) return;
-    if (tokenVisible) {
-        var tok = '';
-        try { tok = localStorage.getItem('nx_gt') || ''; } catch(e) {}
-        el.textContent = tok ? tok.substring(0,8)+'...' : 'Neconfigurat';
-        el.style.color = 'rgba(255,149,0,0.8)';
-    } else {
-        el.textContent = 'ccccccccc';
-        el.style.color = 'rgba(255,255,255,0.3)';
-    }
-}
-
-// ── RATE LIMITER DISPLAY ──────────────────────────────────────
-(function() {
-    // Estimam reads/writes din DNA
-    var dna = [];
-    try { dna = JSON.parse(localStorage.getItem('nx_dna')||'[]'); } catch(e) {}
-    var writes = dna.filter(function(e){ return e.ok; }).length * 3; // ~3 scrieri per operatie
-    var reads = dna.length * 5;
-    var readsEl = document.getElementById('reads-used');
-    var writesEl = document.getElementById('writes-used');
-    if (readsEl) readsEl.textContent = reads;
-    if (writesEl) writesEl.textContent = writes;
-})(); // refresh la 5 secunde
+load();
+setInterval(load, 20000);
 </script>
 </body>
 </html>
