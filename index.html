@@ -7,455 +7,502 @@
 <meta name="description" content="VV Hybrid Univers Little — Afacerea ta, gata în 2 minute.">
 <title>VV Hybrid Univers Little</title>
 <style>
-/* ── RESET ── */
-*, *::before, *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  -webkit-tap-highlight-color: transparent;
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#000;--gold:#D4AF37;--gold-dim:rgba(212,175,55,0.10);--gold-bd:rgba(212,175,55,0.22);
+  --green:#34c759;--blue:#0A84FF;
+  --t1:#fff;--t2:rgba(255,255,255,0.55);--t3:rgba(255,255,255,0.28);
+  --line:rgba(255,255,255,0.08);--glass:rgba(255,255,255,0.05);
+  --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --r-sm:10px;--r-md:14px;--r-lg:18px
 }
-
-/* ── TOKENS ── */
-:root {
-  --bg:       #000000;
-  --gold:     #D4AF37;
-  --gold-dim: rgba(212, 175, 55, 0.12);
-  --gold-bd:  rgba(212, 175, 55, 0.22);
-  --green:    #34c759;
-  --blue:     #0A84FF;
-  --t1:       #ffffff;
-  --t2:       rgba(255, 255, 255, 0.55);
-  --t3:       rgba(255, 255, 255, 0.28);
-  --line:     rgba(255, 255, 255, 0.08);
-  --glass:    rgba(255, 255, 255, 0.05);
-  --font:     -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  --r-sm:     10px;
-  --r-md:     14px;
-  --r-lg:     18px;
-}
-
-/* ── BASE ── */
-html {
-  font-size: 16px;
-  scroll-behavior: smooth;
-  -webkit-text-size-adjust: 100%;
-}
-
-body {
-  background: var(--bg);
-  font-family: var(--font);
-  color: var(--t1);
-  line-height: 1.5;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  /* safe areas */
-  padding-left:  env(safe-area-inset-left);
-  padding-right: env(safe-area-inset-right);
-  padding-bottom: env(safe-area-inset-bottom);
-}
-
-/* ── LAYOUT ── */
-.page {
-  max-width: 480px;
-  margin: 0 auto;
-  padding: 0 1.5rem 5rem;
-}
-
-/* ── NAV ── */
-nav {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1.25rem 0 0;
-  padding-top: max(1.25rem, env(safe-area-inset-top));
-}
-
-.nav-logo {
-  font-size: 1rem;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  color: var(--gold);
-}
-
-.nav-live {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.75rem;
-  color: var(--t3);
-}
-
-.dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--green);
-  will-change: opacity;
-  animation: blink 2s ease-in-out infinite;
-}
-
-@keyframes blink {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0.25; }
-}
-
-/* ── HERO ── */
-.hero {
-  padding: 3.5rem 0 2.5rem;
-  text-align: center;
-}
-
-.eyebrow {
-  font-size: 0.6875rem;
-  font-weight: 500;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--gold);
-  margin-bottom: 1.25rem;
-  will-change: transform, opacity;
-  animation: up 0.5s 0.1s ease both;
-}
-
-h1 {
-  font-size: clamp(2.25rem, 9vw, 3.25rem);
-  font-weight: 700;
-  line-height: 1.05;
-  letter-spacing: -0.04em;
-  margin-bottom: 1.25rem;
-  will-change: transform, opacity;
-  animation: up 0.5s 0.2s ease both;
-}
-
-h1 .dim {
-  color: var(--t2);
-  font-weight: 300;
-}
-
-.sub {
-  font-size: clamp(0.9375rem, 3.5vw, 1.0625rem);
-  font-weight: 400;
-  color: var(--t2);
-  line-height: 1.65;
-  max-width: 18rem;
-  margin: 0 auto 2.5rem;
-  will-change: transform, opacity;
-  animation: up 0.5s 0.3s ease both;
-}
-
-.sub strong {
-  color: var(--t1);
-  font-weight: 500;
-}
-
-@keyframes up {
-  from { opacity: 0; transform: translateY(14px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-/* ── BUTTONS ── */
-.cta-wrap {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.875rem;
-  will-change: transform, opacity;
-  animation: up 0.5s 0.4s ease both;
-}
-
-.btn-main {
-  width: 100%;
-  min-height: 52px;
-  border-radius: var(--r-md);
-  background: var(--gold);
-  color: #000;
-  font-family: var(--font);
-  font-size: 0.9375rem;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  border: none;
-  cursor: pointer;
-  will-change: transform;
-  transition: opacity 0.15s, transform 0.15s;
-}
-
-.btn-main:active {
-  opacity: 0.85;
-  transform: scale(0.99);
-}
-
-.btn-ghost {
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-family: var(--font);
-  font-size: 0.8125rem;
-  font-weight: 400;
-  color: var(--t3);
-  transition: color 0.2s;
-  min-height: 44px;
-  padding: 0 1rem;
-}
-
-.btn-ghost:hover { color: var(--t2); }
-.btn-ghost:active { color: var(--t1); }
-
-/* ── PILLS ── */
-.pills {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 0.5rem;
-  margin-top: 2rem;
-  will-change: transform, opacity;
-  animation: up 0.5s 0.5s ease both;
-}
-
-.pill {
-  font-size: 0.6875rem;
-  font-weight: 500;
-  letter-spacing: 0.02em;
-  padding: 0.3125rem 0.75rem;
-  border-radius: 20px;
-  background: var(--glass);
-  border: 0.5px solid var(--line);
-  color: var(--t2);
-}
-
-/* ── DIVIDER ── */
-.divider {
-  height: 0.5px;
-  background: var(--line);
-  margin: 2.5rem 0;
-}
-
-/* ── FEATURES ── */
-.features {
-  will-change: transform, opacity;
-  animation: up 0.5s 0.55s ease both;
-}
-
-.feat {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 1.125rem 0;
-  border-bottom: 0.5px solid var(--line);
-}
-
-.feat:last-child { border-bottom: none; }
-
-.feat-icon {
-  width: 38px;
-  height: 38px;
-  border-radius: var(--r-sm);
-  background: var(--glass);
-  border: 0.5px solid var(--line);
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.125rem;
-}
-
-.feat-body { flex: 1; }
-
-.feat-title {
-  font-size: 0.875rem;
-  font-weight: 500;
-  letter-spacing: -0.01em;
-  margin-bottom: 0.1875rem;
-}
-
-.feat-desc {
-  font-size: 0.75rem;
-  color: var(--t3);
-  line-height: 1.5;
-}
-
-.badge {
-  flex-shrink: 0;
-  font-size: 0.625rem;
-  font-weight: 500;
-  padding: 0.1875rem 0.5rem;
-  border-radius: 6px;
-  letter-spacing: 0.03em;
-}
-
-.badge-free { background: rgba(52,199,89,.13); color: var(--green); }
-.badge-soon { background: var(--glass); color: var(--t3); }
-
-/* ── QUOTE ── */
-.quote {
-  text-align: center;
-  padding: 2rem 0;
-  will-change: transform, opacity;
-  animation: up 0.5s 0.6s ease both;
-}
-
-.quote-text {
-  font-size: clamp(0.9375rem, 3.5vw, 1.0625rem);
-  font-weight: 400;
-  color: var(--t2);
-  line-height: 1.6;
-  letter-spacing: -0.02em;
-  margin-bottom: 0.75rem;
-}
-
-.quote-text strong {
-  color: var(--t1);
-  font-weight: 500;
-}
-
-.quote-from {
-  font-size: 0.75rem;
-  color: var(--t3);
-}
-
-/* ── BOTTOM CTA ── */
-.bottom {
-  background: var(--gold-dim);
-  border: 0.5px solid var(--gold-bd);
-  border-radius: var(--r-lg);
-  padding: 1.75rem 1.25rem;
-  text-align: center;
-  will-change: transform, opacity;
-  animation: up 0.5s 0.65s ease both;
-}
-
-.bottom h2 {
-  font-size: clamp(1.25rem, 5vw, 1.5rem);
-  font-weight: 700;
-  letter-spacing: -0.04em;
-  margin-bottom: 0.5rem;
-}
-
-.bottom p {
-  font-size: 0.8125rem;
-  color: var(--t3);
-  margin-bottom: 1.375rem;
-  line-height: 1.65;
-}
-
-/* ── FOOTER ── */
-footer {
-  text-align: center;
-  padding-top: 2rem;
-  will-change: transform, opacity;
-  animation: up 0.5s 0.7s ease both;
-}
-
-footer p {
-  font-size: 0.6875rem;
-  color: rgba(255,255,255,.18);
-  letter-spacing: 0.03em;
-  line-height: 2;
-}
-
-/* ── TABLET+ ── */
-@media (min-width: 600px) {
-  .page { padding: 0 2rem 6rem; }
-
-  h1 { letter-spacing: -0.05em; }
-
-  .feat-icon { width: 44px; height: 44px; font-size: 1.25rem; }
-
-  .btn-main { max-width: 320px; margin: 0 auto; display: block; }
-
-  .cta-wrap { flex-direction: row; justify-content: center; }
-  .cta-wrap .btn-main { width: auto; padding: 0 2rem; }
-}
+html{font-size:16px;scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{background:var(--bg);font-family:var(--font);color:var(--t1);line-height:1.5;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right);padding-bottom:env(safe-area-inset-bottom)}
+.page{max-width:480px;margin:0 auto;padding:0 1.5rem 5rem}
+nav{display:flex;justify-content:space-between;align-items:center;padding-top:max(1.25rem,env(safe-area-inset-top))}
+.nav-logo{font-size:1rem;font-weight:700;letter-spacing:.5px;color:var(--gold)}
+.nav-right{display:flex;align-items:center;gap:10px}
+.nav-status{display:flex;align-items:center;gap:6px;font-size:.75rem;color:var(--t3)}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:blink 2s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
+.btn-key{background:none;border:.5px solid var(--line);border-radius:20px;color:var(--t3);font-family:var(--font);font-size:.6875rem;padding:4px 10px;cursor:pointer;transition:border-color .2s,color .2s}
+.btn-key.active{border-color:var(--gold-bd);color:var(--gold)}
+.user-badge{display:inline-flex;align-items:center;gap:6px;background:var(--glass);border:.5px solid var(--line);border-radius:20px;padding:4px 10px;font-size:.6875rem;color:var(--t3);margin-top:.75rem}
+.user-badge.github{color:var(--gold);border-color:var(--gold-bd);background:var(--gold-dim)}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:100;display:none;align-items:center;justify-content:center;padding:1.5rem}
+.modal-overlay.active{display:flex}
+.modal{background:#0a0a0a;border:.5px solid var(--line);border-radius:var(--r-lg);padding:1.5rem;width:100%;max-width:360px}
+.modal-title{font-size:1rem;font-weight:700;margin-bottom:.5rem}
+.modal-desc{font-size:.8125rem;color:var(--t3);line-height:1.6;margin-bottom:1.25rem}
+.modal-desc a{color:var(--blue);text-decoration:none}
+.modal-input{width:100%;background:rgba(255,255,255,.04);border:.5px solid var(--line);border-radius:var(--r-sm);color:var(--t1);font-family:var(--font);font-size:.875rem;padding:.75rem;outline:none;margin-bottom:.75rem}
+.modal-input:focus{border-color:rgba(212,175,55,.4)}
+.modal-actions{display:flex;gap:.5rem}
+.btn-modal-save{flex:1;min-height:44px;border-radius:var(--r-sm);background:var(--gold);color:#000;font-family:var(--font);font-size:.875rem;font-weight:600;border:none;cursor:pointer}
+.btn-modal-cancel{min-height:44px;padding:0 1rem;border-radius:var(--r-sm);background:none;border:.5px solid var(--line);color:var(--t3);font-family:var(--font);font-size:.875rem;cursor:pointer}
+.modal-note{font-size:.6875rem;color:var(--t3);margin-top:.75rem;line-height:1.6;padding:.625rem;background:rgba(255,255,255,.03);border-radius:var(--r-sm)}
+.hero{padding:3rem 0 2rem;text-align:center}
+.eyebrow{font-size:.6875rem;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:1.25rem;animation:up .5s .1s ease both}
+h1{font-size:clamp(2.25rem,9vw,3.25rem);font-weight:700;line-height:1.05;letter-spacing:-.04em;margin-bottom:1.25rem;animation:up .5s .2s ease both}
+h1 .dim{color:var(--t2);font-weight:300}
+.sub{font-size:clamp(.9375rem,3.5vw,1.0625rem);color:var(--t2);line-height:1.65;max-width:18rem;margin:0 auto 2.5rem;animation:up .5s .3s ease both}
+.sub strong{color:var(--t1);font-weight:500}
+@keyframes up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.rate-bar{background:var(--glass);border:.5px solid var(--line);border-radius:var(--r-md);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;animation:up .5s .35s ease both}
+.rate-label{font-size:.6875rem;color:var(--t3)}
+.rate-dots{display:flex;gap:5px}
+.rate-dot{width:8px;height:8px;border-radius:50%;background:var(--line)}
+.rate-dot.used{background:var(--gold)}
+.nexus-box{background:var(--glass);border:.5px solid var(--line);border-radius:var(--r-lg);padding:1.25rem;margin-bottom:1rem;animation:up .5s .4s ease both}
+.nexus-label{font-size:.6875rem;color:var(--t3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.75rem}
+textarea{width:100%;background:rgba(255,255,255,.04);border:.5px solid var(--line);border-radius:var(--r-sm);color:var(--t1);font-family:var(--font);font-size:.875rem;line-height:1.6;padding:.75rem;resize:none;outline:none;min-height:80px;transition:border-color .2s}
+textarea:focus{border-color:rgba(212,175,55,.4)}
+textarea::placeholder{color:var(--t3)}
+.nexus-output{min-height:60px;font-size:.875rem;color:var(--t2);line-height:1.7;margin-top:.75rem;white-space:pre-wrap;border-top:.5px solid var(--line);padding-top:.75rem;display:none}
+.nexus-output.active{display:block}
+.cursor{display:inline-block;width:2px;height:14px;background:var(--gold);margin-left:2px;animation:cur .7s ease-in-out infinite;vertical-align:middle}
+@keyframes cur{0%,100%{opacity:1}50%{opacity:0}}
+.cta-wrap{display:flex;flex-direction:column;align-items:center;gap:.875rem;animation:up .5s .45s ease both}
+.btn-main{width:100%;min-height:52px;border-radius:var(--r-md);background:var(--gold);color:#000;font-family:var(--font);font-size:.9375rem;font-weight:600;border:none;cursor:pointer;transition:opacity .15s,transform .15s;will-change:transform}
+.btn-main:active{opacity:.85;transform:scale(.99)}
+.btn-main:disabled{opacity:.4;cursor:not-allowed}
+.btn-ghost{background:none;border:none;cursor:pointer;font-family:var(--font);font-size:.8125rem;color:var(--t3);transition:color .2s;min-height:44px;padding:0 1rem}
+.btn-ghost:hover{color:var(--t2)}
+.btn-secondary{width:100%;min-height:48px;border-radius:var(--r-md);background:transparent;border:.5px solid var(--line);color:var(--t2);font-family:var(--font);font-size:.875rem;font-weight:500;cursor:pointer;transition:border-color .2s,color .2s}
+.btn-secondary:hover{border-color:var(--gold-bd);color:var(--t1)}
+.pills{display:flex;flex-wrap:wrap;justify-content:center;gap:.5rem;margin-top:1.5rem;animation:up .5s .5s ease both}
+.pill{font-size:.6875rem;font-weight:500;padding:.3125rem .75rem;border-radius:20px;background:var(--glass);border:.5px solid var(--line);color:var(--t2)}
+.divider{height:.5px;background:var(--line);margin:2rem 0}
+.features{animation:up .5s .55s ease both}
+.feat{display:flex;align-items:center;gap:1rem;padding:1.125rem 0;border-bottom:.5px solid var(--line)}
+.feat:last-child{border-bottom:none}
+.feat-icon{width:38px;height:38px;border-radius:var(--r-sm);background:var(--glass);border:.5px solid var(--line);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.125rem}
+.feat-body{flex:1}
+.feat-title{font-size:.875rem;font-weight:500;margin-bottom:.1875rem}
+.feat-desc{font-size:.75rem;color:var(--t3);line-height:1.5}
+.badge{flex-shrink:0;font-size:.625rem;font-weight:500;padding:.1875rem .5rem;border-radius:6px}
+.badge-free{background:rgba(52,199,89,.13);color:var(--green)}
+.badge-soon{background:var(--glass);color:var(--t3)}
+.section-title{font-size:.6875rem;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--t3);margin-bottom:1rem}
+.beta-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:1.5rem}
+.beta-card{background:var(--glass);border:.5px solid var(--line);border-radius:var(--r-md);padding:14px}
+.beta-card-icon{font-size:1.25rem;margin-bottom:8px}
+.beta-card-title{font-size:.8125rem;font-weight:600;margin-bottom:3px}
+.beta-card-desc{font-size:.6875rem;color:var(--t3);line-height:1.5}
+.founders-card{position:relative;overflow:hidden;background:#080800;border:.5px solid var(--gold-bd);border-radius:20px;padding:1.75rem 1.5rem;animation:up .5s .62s ease both}
+.founders-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(212,175,55,.5),transparent)}
+.founders-eyebrow{font-size:.625rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:1rem}
+.founders-title{font-size:1.375rem;font-weight:800;letter-spacing:-.04em;margin-bottom:.5rem;line-height:1.2}
+.founders-sub{font-size:.8125rem;color:var(--t2);line-height:1.65;margin-bottom:1.25rem}
+.progress-wrap{margin-bottom:1.25rem}
+.progress-header{display:flex;justify-content:space-between;margin-bottom:.5rem}
+.progress-label{font-size:.75rem;color:var(--t3)}
+.progress-count{font-size:.75rem;font-weight:600;color:var(--gold)}
+.progress-track{height:4px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden}
+.progress-fill{height:100%;background:var(--gold);border-radius:2px;transition:width .5s ease;width:0%}
+.perks{display:flex;flex-direction:column;gap:.625rem;margin-bottom:1.25rem}
+.perk{display:flex;align-items:center;gap:.75rem;font-size:.8125rem;color:var(--t2)}
+.perk-check{width:18px;height:18px;border-radius:50%;background:var(--gold-dim);border:.5px solid var(--gold-bd);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.625rem;color:var(--gold)}
+.price-row{display:flex;align-items:center;gap:.75rem;margin-bottom:1rem}
+.price-amount{font-size:2rem;font-weight:800;letter-spacing:-.05em;color:var(--gold)}
+.price-period{font-size:.75rem;color:var(--t3);line-height:1.4}
+.btn-founders{width:100%;min-height:52px;border-radius:var(--r-md);background:var(--gold);color:#000;font-family:var(--font);font-size:.9375rem;font-weight:700;border:none;cursor:pointer;transition:opacity .15s,transform .15s;margin-bottom:.75rem}
+.btn-founders:active{opacity:.85;transform:scale(.99)}
+.founders-disclaimer{font-size:.625rem;color:var(--t3);line-height:1.7;text-align:center}
+.bug-box{background:rgba(255,59,48,.05);border:.5px solid rgba(255,59,48,.2);border-radius:var(--r-md);padding:1rem}
+.bug-title{font-size:.8125rem;font-weight:600;margin-bottom:.5rem}
+.bug-desc{font-size:.6875rem;color:var(--t3);line-height:1.6;margin-bottom:.75rem}
+.bug-select{width:100%;background:rgba(255,255,255,.04);border:.5px solid var(--line);border-radius:var(--r-sm);color:var(--t1);font-family:var(--font);font-size:.8125rem;padding:.5rem .75rem;outline:none;margin-bottom:.5rem;-webkit-appearance:none}
+.bug-textarea{min-height:60px;margin-bottom:.75rem}
+.btn-bug{width:100%;min-height:44px;border-radius:var(--r-sm);background:rgba(255,59,48,.15);border:.5px solid rgba(255,59,48,.3);color:rgba(255,100,90,1);font-family:var(--font);font-size:.8125rem;font-weight:600;cursor:pointer}
+.quote{text-align:center;padding:2rem 0}
+.quote-text{font-size:clamp(.9375rem,3.5vw,1.0625rem);color:var(--t2);line-height:1.6;margin-bottom:.75rem}
+.quote-text strong{color:var(--t1);font-weight:500}
+.quote-from{font-size:.75rem;color:var(--t3)}
+.bottom{background:var(--gold-dim);border:.5px solid var(--gold-bd);border-radius:var(--r-lg);padding:1.75rem 1.25rem;text-align:center}
+.bottom h2{font-size:clamp(1.25rem,5vw,1.5rem);font-weight:700;letter-spacing:-.04em;margin-bottom:.5rem}
+.bottom p{font-size:.8125rem;color:var(--t3);margin-bottom:1.375rem;line-height:1.65}
+footer{text-align:center;padding-top:2rem}
+footer p{font-size:.6875rem;color:rgba(255,255,255,.18);letter-spacing:.03em;line-height:2}
+#maintenance{display:none;position:fixed;inset:0;background:#000;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:2rem;z-index:9999}
+#maintenance.active{display:flex}
+.maint-logo{font-size:1rem;font-weight:700;color:var(--gold);letter-spacing:2px;margin-bottom:1.5rem}
+.maint-title{font-size:1.5rem;font-weight:700;margin-bottom:.5rem}
+.maint-sub{font-size:.875rem;color:var(--t3)}
+.toast{position:fixed;bottom:calc(1.5rem + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%) translateY(20px);background:rgba(30,30,30,.95);border:.5px solid var(--line);border-radius:var(--r-md);padding:.625rem 1.25rem;font-size:.8125rem;color:var(--t1);white-space:nowrap;opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;z-index:1000}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+@media(min-width:600px){.page{padding:0 2rem 6rem}.btn-main{max-width:320px;margin:0 auto;display:block}.cta-wrap{flex-direction:row;justify-content:center}.cta-wrap .btn-main{width:auto;padding:0 2rem}}
 </style>
 </head>
 <body>
-<div class="page">
 
-  <!-- NAV -->
+<div id="maintenance">
+  <div class="maint-logo">VV</div>
+  <div class="maint-title">Sistem în mentenanță</div>
+  <div class="maint-sub">Revenim în curând. Stay tuned.</div>
+</div>
+
+<div class="modal-overlay" id="key-modal">
+  <div class="modal">
+    <div class="modal-title">🔐 Activează Nexus</div>
+    <div class="modal-desc">Introdu cheia ta Groq pentru a activa generarea AI. Cheia se salvează doar pe dispozitivul tău — nu pe server, nu pe GitHub.<br><br>Obții cheia gratuit de la <a href="https://console.groq.com" target="_blank">console.groq.com</a></div>
+    <input class="modal-input" type="password" id="key-input" placeholder="gsk_..." autocomplete="off" autocorrect="off" spellcheck="false">
+    <div class="modal-actions">
+      <button class="btn-modal-save" onclick="saveGroqKey()">Salvează</button>
+      <button class="btn-modal-cancel" onclick="closeKeyModal()">Anulează</button>
+    </div>
+    <div class="modal-note">🛡 Cheia nu părăsește niciodată browserul tău. Nimeni nu o poate vedea sau folosi în afara dispozitivului tău.</div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="page">
   <nav>
     <span class="nav-logo">VV</span>
-    <span class="nav-live"><span class="dot"></span>Public Beta</span>
+    <div class="nav-right">
+      <button class="btn-key" id="btn-key-nav" onclick="openKeyModal()">⚡ Cheie Groq</button>
+      <span class="nav-status"><span class="dot"></span>Beta</span>
+    </div>
   </nav>
+  <div style="text-align:center">
+    <span class="user-badge" id="user-badge">Se conectează...</span>
+  </div>
 
-  <!-- HERO -->
   <section class="hero">
     <p class="eyebrow">VV Hybrid Univers Little</p>
     <h1>Afacerea ta.<br><span class="dim">Gata în<br>2 minute.</span></h1>
     <p class="sub">Fără programatori. Fără agenții.<br><strong>Doar ideea ta</strong> și AI-ul nostru.</p>
+    <div class="rate-bar">
+      <span class="rate-label">Generări rămase azi</span>
+      <div class="rate-dots">
+        <div class="rate-dot" id="dot1"></div>
+        <div class="rate-dot" id="dot2"></div>
+        <div class="rate-dot" id="dot3"></div>
+      </div>
+    </div>
+    <div class="nexus-box">
+      <div class="nexus-label">Nexus Lite — Descrie ideea ta</div>
+      <textarea id="idea-input" placeholder="Ex: Vreau să deschid o cofetărie în Sectorul 3..." rows="3"></textarea>
+      <div class="nexus-output" id="nexus-output"></div>
+    </div>
     <div class="cta-wrap">
-      <button class="btn-main" onclick="location.href='nexus.html'">
-        Încearcă gratuit
-      </button>
-      <button class="btn-ghost" onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})">
-        Cum funcționează ↓
-      </button>
+      <button class="btn-main" id="btn-generate" onclick="generateWithGroq()">Generează planul ⚡</button>
+      <button class="btn-ghost" onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})">Cum funcționează ↓</button>
     </div>
     <div class="pills">
-      <span class="pill">0 cod necesar</span>
-      <span class="pill">100% gratuit</span>
+      <span class="pill">3 generări/zi gratuit</span>
       <span class="pill">Română nativă</span>
+      <span class="pill">0 cod necesar</span>
       <span class="pill">Made în București</span>
     </div>
   </section>
 
   <div class="divider"></div>
 
-  <!-- FEATURES -->
   <section class="features" id="features">
-    <div class="feat">
-      <div class="feat-icon">🧠</div>
-      <div class="feat-body">
-        <div class="feat-title">Nexus Lite</div>
-        <div class="feat-desc">Plan de afaceri + site în 2 minute</div>
-      </div>
-      <span class="badge badge-free">Gratuit</span>
-    </div>
-    <div class="feat">
-      <div class="feat-icon">🗺</div>
-      <div class="feat-body">
-        <div class="feat-title">VV Beta Map</div>
-        <div class="feat-desc">Harta urbană P2P — București live</div>
-      </div>
-      <span class="badge badge-free">Gratuit</span>
-    </div>
-    <div class="feat">
-      <div class="feat-icon">🪙</div>
-      <div class="feat-body">
-        <div class="feat-title">VV Coin</div>
-        <div class="feat-desc">Câștigă tokeni pentru task-uri mici</div>
-      </div>
-      <span class="badge badge-soon">Curând</span>
-    </div>
-    <div class="feat">
-      <div class="feat-icon">🚀</div>
-      <div class="feat-body">
-        <div class="feat-title">VV Pro</div>
-        <div class="feat-desc">Upgrade când ești gata să scalezi</div>
-      </div>
-      <span class="badge badge-soon">Upgrade</span>
-    </div>
+    <div class="feat"><div class="feat-icon">🧠</div><div class="feat-body"><div class="feat-title">Nexus Lite</div><div class="feat-desc">Plan de afaceri + idei de site în 2 minute</div></div><span class="badge badge-free">Gratuit</span></div>
+    <div class="feat"><div class="feat-icon">🗺</div><div class="feat-body"><div class="feat-title">VV Beta Map</div><div class="feat-desc">Harta urbană P2P — București live</div></div><span class="badge badge-free">Gratuit</span></div>
+    <div class="feat"><div class="feat-icon">🪙</div><div class="feat-body"><div class="feat-title">VV Coin</div><div class="feat-desc">Câștigă tokeni pentru misiuni și validări</div></div><span class="badge badge-soon">Curând</span></div>
+    <div class="feat"><div class="feat-icon">🚀</div><div class="feat-body"><div class="feat-title">VV Pro</div><div class="feat-desc">Nivel 3-5 Nexus + repo GitHub automat</div></div><span class="badge badge-soon">Upgrade</span></div>
   </section>
 
   <div class="divider"></div>
 
-  <!-- QUOTE -->
+  <div>
+    <div class="section-title">VV Beta — Ce poți face acum</div>
+    <div class="beta-grid">
+      <div class="beta-card"><div class="beta-card-icon">🗺</div><div class="beta-card-title">Validare locații</div><div class="beta-card-desc">Marchează puncte urbane în București</div></div>
+      <div class="beta-card"><div class="beta-card-icon">🪙</div><div class="beta-card-title">Câștigă VV Coin</div><div class="beta-card-desc">Fiecare misiune = tokeni în contul tău</div></div>
+      <div class="beta-card"><div class="beta-card-icon">⏱</div><div class="beta-card-title">Economisești timp</div><div class="beta-card-desc">Rute optimizate, info live</div></div>
+      <div class="beta-card"><div class="beta-card-icon">🤝</div><div class="beta-card-title">P2P Urban</div><div class="beta-card-desc">Tu ești rețeaua</div></div>
+    </div>
+    <button class="btn-secondary" onclick="location.href='https://vv-technologies.github.io/ceo.html'">Intră în VV Beta →</button>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="founders-card">
+    <div class="founders-eyebrow">VV Insider · Acces Anticipat</div>
+    <div class="founders-title">Fii unul dintre<br>primii fondatori.</div>
+    <div class="founders-sub">VV Hybrid Univers se construiește acum, în timp real. Susții direct dezvoltarea și intri primul când lansăm.</div>
+    <div class="progress-wrap">
+      <div class="progress-header">
+        <span class="progress-label">Locuri rezervate</span>
+        <span class="progress-count" id="founders-count">Se încarcă...</span>
+      </div>
+      <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+    </div>
+    <div class="perks">
+      <div class="perk"><div class="perk-check">✓</div>Acces la Nexus Standard la lansare</div>
+      <div class="perk"><div class="perk-check">✓</div>Numele tău în pagina fondatorilor VV</div>
+      <div class="perk"><div class="perk-check">✓</div>Subdomeniu propriu la lansarea 1.0</div>
+      <div class="perk"><div class="perk-check">✓</div>Badge „Fondator VV" permanent în cont</div>
+    </div>
+    <div class="price-row">
+      <div class="price-amount">29 <span style="font-size:1rem">lei</span></div>
+      <div class="price-period">o singură dată<br><span style="color:var(--gold);font-size:.6875rem">contribuție de susținere</span></div>
+    </div>
+    <button class="btn-founders" onclick="copyIBAN()">Copiază IBAN Susținere</button>
+    <div class="founders-disclaimer">
+      Transfer bancar către <strong style="color:var(--t2)">VV Technologies</strong><br>
+      Menționează la detalii: <span style="color:var(--gold)">Sustinere proiect</span><br><br>
+      Susținere benevolă pentru dezvoltarea ecosistemului VV.<br>
+      Accesul anticipat va fi livrat pe măsura dezvoltării modulelor.<br>
+      Contact &amp; colaborări: <span style="color:var(--gold)">vv.technologies.ro@gmail.com</span>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div>
+    <div class="section-title">Ai găsit o problemă?</div>
+    <div class="bug-box">
+      <div class="bug-title">Raportează o eroare</div>
+      <div class="bug-desc">AI-ul nostru categorizează automat problema și o trimite echipei.</div>
+      <select class="bug-select" id="bug-type">
+        <option value="">Tipul problemei...</option>
+        <option value="ui">Interfață / Design</option>
+        <option value="ai">Răspuns AI incorect</option>
+        <option value="auth">Autentificare</option>
+        <option value="map">Hartă / Locații</option>
+        <option value="coin">VV Coin</option>
+        <option value="other">Altceva</option>
+      </select>
+      <textarea class="bug-textarea" id="bug-text" placeholder="Descrie ce s-a întâmplat..." rows="3"></textarea>
+      <button class="btn-bug" onclick="submitBugReport()">Trimite raportul →</button>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
   <div class="quote">
     <p class="quote-text">„Am pus ideea și în 3 minute aveam<br><strong>planul, locațiile și site-ul draft."</strong></p>
     <p class="quote-from">Utilizator VV Beta · București</p>
   </div>
 
-  <!-- BOTTOM CTA -->
   <div class="bottom">
     <h2>Intră în ecosistem.</h2>
     <p>Mii de antreprenori români nu au<br>mai așteptat. Tu de ce mai stai?</p>
-    <button class="btn-main" onclick="location.href='nexus.html'">
-      Începe gratuit →
-    </button>
+    <button class="btn-main" onclick="loginWithGitHub()">Conectează-te cu GitHub →</button>
   </div>
 
-  <!-- FOOTER -->
   <footer>
     <p>VV Technologies · 2025<br>GDPR Compliant · Firebase Secured · Made în România</p>
   </footer>
-
 </div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, signInAnonymously, signInWithPopup, GithubAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc, increment, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const DAILY_LIMIT = 3;
+const FOUNDERS_MAX = 10;
+const IBAN = "RO98ROIN4021D97CHECQLBSC";
+
+const app = initializeApp({
+  apiKey:"AIzaSyDGv4kEClO0RHCLvXVLOT-vyPHw6bsxYVc",
+  authDomain:"vv-ep-beta.firebaseapp.com",
+  projectId:"vv-ep-beta",
+  storageBucket:"vv-ep-beta.firebasestorage.app",
+  messagingSenderId:"641117018598",
+  appId:"1:641117018598:web:7cd522ef48db46ad58de27"
+});
+const auth = getAuth(app);
+const db = getFirestore(app);
+let currentUser = null;
+let usedToday = 0;
+
+function showToast(msg,dur=3000){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),dur);
+}
+
+function updateDots(used){
+  for(let i=1;i<=3;i++){
+    const d=document.getElementById('dot'+i);
+    if(d) d.classList.toggle('used',i<=(DAILY_LIMIT-used));
+  }
+}
+
+function todayKey(){return new Date().toISOString().slice(0,10);}
+
+async function checkKillSwitch(){
+  try{
+    const s=await getDoc(doc(db,"config","maintenance"));
+    if(s.exists()&&s.data().isLive===false){
+      document.getElementById('maintenance').classList.add('active');
+      return true;
+    }
+  }catch(e){}
+  return false;
+}
+
+async function loadUsage(uid){
+  try{
+    const s=await getDoc(doc(db,"usage",uid));
+    if(s.exists()){const d=s.data();usedToday=d.date===todayKey()?(d.count||0):0;}
+  }catch(e){usedToday=0;}
+  updateDots(usedToday);
+  const btn=document.getElementById('btn-generate');
+  if(btn) btn.disabled=usedToday>=DAILY_LIMIT;
+}
+
+async function incrementUsage(uid){
+  await setDoc(doc(db,"usage",uid),{date:todayKey(),count:increment(1),lastUsed:serverTimestamp()},{merge:true});
+  usedToday++;
+  updateDots(usedToday);
+  if(usedToday>=DAILY_LIMIT){
+    const btn=document.getElementById('btn-generate');
+    if(btn) btn.disabled=true;
+    showToast('Ai atins limita de azi. Revino mâine!');
+  }
+}
+
+async function loadFounders(){
+  try{
+    const s=await getDoc(doc(db,"config","founders"));
+    const count=s.exists()?(s.data().count||0):0;
+    const el=document.getElementById('founders-count');
+    const fill=document.getElementById('progress-fill');
+    if(el) el.textContent=count+'/'+FOUNDERS_MAX+' locuri';
+    if(fill) fill.style.width=Math.min((count/FOUNDERS_MAX)*100,100)+'%';
+  }catch(e){
+    const el=document.getElementById('founders-count');
+    if(el) el.textContent='0/'+FOUNDERS_MAX+' locuri';
+  }
+}
+
+onAuthStateChanged(auth,async(user)=>{
+  currentUser=user;
+  const badge=document.getElementById('user-badge');
+  if(user){
+    badge.textContent=user.isAnonymous?'👤 Vizitator anonim':'✓ '+(user.displayName||user.email||'Utilizator');
+    badge.className=user.isAnonymous?'user-badge':'user-badge github';
+    await loadUsage(user.uid);
+  }
+});
+
+async function initAuth(){
+  const killed=await checkKillSwitch();
+  if(killed)return;
+  await loadFounders();
+  onAuthStateChanged(auth,(user)=>{if(!user)signInAnonymously(auth);});
+}
+
+window.loginWithGitHub=async function(){
+  try{
+    await signInWithPopup(auth,new GithubAuthProvider());
+    showToast('Conectat cu GitHub!');
+  }catch(e){showToast('Eroare la conectare.');}
+};
+
+window.openKeyModal=function(){
+  const k=localStorage.getItem('vv_groq_key');
+  const inp=document.getElementById('key-input');
+  if(k)inp.value=k;
+  document.getElementById('key-modal').classList.add('active');
+};
+
+window.closeKeyModal=function(){
+  document.getElementById('key-modal').classList.remove('active');
+};
+
+window.saveGroqKey=function(){
+  const key=document.getElementById('key-input').value.trim();
+  if(!key||!key.startsWith('gsk_')){showToast('Cheia trebuie să înceapă cu gsk_');return;}
+  localStorage.setItem('vv_groq_key',key);
+  const btn=document.getElementById('btn-key-nav');
+  btn.classList.add('active');btn.textContent='✓ Cheie activă';
+  closeKeyModal();showToast('Cheie salvată! Nexus e activ.');
+};
+
+function checkKeyOnLoad(){
+  const k=localStorage.getItem('vv_groq_key');
+  if(k&&k.startsWith('gsk_')){
+    const btn=document.getElementById('btn-key-nav');
+    btn.classList.add('active');btn.textContent='✓ Cheie activă';
+  }
+}
+
+window.generateWithGroq=async function(){
+  if(!currentUser){showToast('Se conectează...');return;}
+  if(usedToday>=DAILY_LIMIT){showToast('Limita de azi atinsă. Revino mâine!');return;}
+  const groqKey=localStorage.getItem('vv_groq_key');
+  if(!groqKey){showToast('Adaugă cheia Groq mai întâi!');openKeyModal();return;}
+  const idea=document.getElementById('idea-input').value.trim();
+  if(!idea){showToast('Scrie mai întâi ideea ta!');return;}
+  const btn=document.getElementById('btn-generate');
+  const output=document.getElementById('nexus-output');
+  btn.disabled=true;btn.textContent='Se generează...';
+  output.className='nexus-output active';
+  output.innerHTML='<span class="cursor"></span>';
+  try{
+    await incrementUsage(currentUser.uid);
+    const res=await fetch('https://api.groq.com/openai/v1/chat/completions',{
+      method:'POST',
+      headers:{'Authorization':'Bearer '+groqKey,'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'llama3-8b-8192',
+        messages:[
+          {role:'system',content:'Ești Nexus Lite, asistentul de business al VV Technologies. Răspunzi în română, concis și practic. Dai un mini-plan de afaceri în 5 pași clari. Fii direct și motivant.'},
+          {role:'user',content:idea}
+        ],
+        stream:true,max_tokens:500,temperature:0.7
+      })
+    });
+    const reader=res.body.getReader();
+    const decoder=new TextDecoder();
+    let text='';
+    while(true){
+      const {done,value}=await reader.read();
+      if(done)break;
+      for(const line of decoder.decode(value).split('\n')){
+        if(line.startsWith('data: ')&&line!=='data: [DONE]'){
+          try{
+            const delta=JSON.parse(line.slice(6)).choices?.[0]?.delta?.content||'';
+            text+=delta;
+            output.innerHTML=text+'<span class="cursor"></span>';
+          }catch(e){}
+        }
+      }
+    }
+    output.innerHTML=text;
+    btn.textContent='Generează planul ⚡';
+    if(usedToday<DAILY_LIMIT)btn.disabled=false;
+  }catch(e){
+    output.innerHTML='Eroare la generare. Verifică cheia Groq.';
+    btn.textContent='Generează planul ⚡';btn.disabled=false;
+  }
+};
+
+window.copyIBAN=function(){
+  navigator.clipboard.writeText(IBAN).then(()=>{
+    showToast('IBAN Copiat! Te așteptăm în aplicația bancară.');
+  }).catch(()=>{
+    prompt('Copiază IBAN-ul:',IBAN);
+  });
+};
+
+window.submitBugReport=async function(){
+  const type=document.getElementById('bug-type').value;
+  const text=document.getElementById('bug-text').value.trim();
+  if(!type||!text){showToast('Completează tipul și descrierea!');return;}
+  try{
+    await setDoc(doc(db,"bug_reports",Date.now().toString()),{
+      type,text,uid:currentUser?.uid||'anonim',
+      timestamp:serverTimestamp(),status:'nou'
+    });
+    document.getElementById('bug-type').value='';
+    document.getElementById('bug-text').value='';
+    showToast('Raport trimis! Mulțumim.');
+  }catch(e){showToast('Eroare la trimitere.');}
+};
+
+checkKeyOnLoad();
+initAuth();
+</script>
 </body>
 </html>
