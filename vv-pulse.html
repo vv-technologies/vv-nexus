@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<title>VV Pulse · The Presence Layer</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#000;--gold:#D4AF37;--gold-dim:rgba(212,175,55,0.12);
+  --gold-bd:rgba(212,175,55,0.28);--green:#34c759;--t1:#fff;
+  --t2:rgba(255,255,255,0.55);--t3:rgba(255,255,255,0.28);
+  --line:rgba(255,255,255,0.08);
+  --font:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif
+}
+html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--font);color:var(--t1);-webkit-font-smoothing:antialiased}
+
+/* ── NAV ── */
+.vv-nav{
+  position:fixed;top:0;left:0;right:0;z-index:500;
+  display:flex;justify-content:space-between;align-items:center;
+  padding:max(.875rem,env(safe-area-inset-top)) 1.25rem .875rem;
+  background:linear-gradient(to bottom,rgba(0,0,0,.95),rgba(0,0,0,.6),transparent);
+  pointer-events:none
+}
+.nav-brand{pointer-events:auto}
+.nav-logo{font-size:.9375rem;font-weight:700;letter-spacing:.5px;color:var(--gold)}
+.nav-sub{font-size:.5rem;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--t3);margin-top:1px}
+.nav-right{display:flex;align-items:center;gap:8px;pointer-events:auto}
+.nav-badge{
+  display:flex;align-items:center;gap:5px;
+  background:rgba(0,0,0,.7);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  border:.5px solid rgba(255,255,255,.1);border-radius:20px;
+  padding:5px 10px;font-size:.5625rem;color:var(--t3)
+}
+.pulse-dot-nav{width:5px;height:5px;border-radius:50%;background:var(--green);box-shadow:0 0 6px rgba(52,199,89,.8);animation:blink 2s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
+.btn-locate{
+  background:rgba(0,0,0,.7);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  border:.5px solid rgba(255,255,255,.12);border-radius:20px;
+  color:var(--t2);font-family:var(--font);font-size:.625rem;font-weight:600;
+  padding:5px 12px;cursor:pointer;min-height:30px;
+  transition:border-color .2s,color .2s
+}
+.btn-locate:active{color:var(--gold);border-color:var(--gold-bd)}
+
+/* ── MAP ── */
+#vv-map{
+  position:fixed;inset:0;width:100%;height:100%;
+  background:#000 !important
+}
+
+/* Leaflet dark overrides */
+.leaflet-tile{filter:brightness(.15) saturate(.2) hue-rotate(180deg)}
+.leaflet-container{background:#000}
+.leaflet-control-zoom,.leaflet-control-attribution{display:none!important}
+
+/* ── VIGNETTE ── */
+.vignette{
+  position:fixed;inset:0;pointer-events:none;z-index:100;
+  background:radial-gradient(ellipse at center,transparent 30%,rgba(0,0,0,.7) 100%)
+}
+
+/* ── BOTTOM CARD ── */
+.bottom-card{
+  position:fixed;bottom:0;left:0;right:0;z-index:600;
+  padding:0 1rem calc(1.5rem + env(safe-area-inset-bottom));
+  transform:translateY(100%);
+  transition:transform .35s cubic-bezier(.4,0,.2,1)
+}
+.bottom-card.open{transform:translateY(0)}
+.card-inner{
+  background:rgba(8,8,10,.92);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  border:.5px solid rgba(255,255,255,.1);border-radius:20px;
+  padding:1.125rem 1.25rem;position:relative;overflow:hidden
+}
+.card-inner::before{
+  content:'';position:absolute;top:0;left:15%;right:15%;height:1px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);
+  opacity:.5
+}
+.card-handle{width:36px;height:3px;background:rgba(255,255,255,.15);border-radius:2px;margin:0 auto .875rem}
+.card-header{display:flex;align-items:center;gap:.75rem;margin-bottom:.75rem}
+.card-pulse-ring{
+  width:40px;height:40px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  position:relative
+}
+.card-pulse-ring::before{
+  content:'';position:absolute;inset:0;border-radius:50%;
+  animation:ring-pulse 2s ease-in-out infinite
+}
+.ring-gold::before{background:rgba(212,175,55,.15);box-shadow:0 0 0 0 rgba(212,175,55,.4)}
+.ring-silver::before{background:rgba(255,255,255,.08);box-shadow:0 0 0 0 rgba(255,255,255,.2)}
+.ring-grey::before{background:rgba(255,255,255,.04)}
+@keyframes ring-pulse{
+  0%{box-shadow:0 0 0 0 rgba(212,175,55,.4)}
+  70%{box-shadow:0 0 0 10px rgba(212,175,55,0)}
+  100%{box-shadow:0 0 0 0 rgba(212,175,55,0)}
+}
+.card-dot-inner{width:14px;height:14px;border-radius:50%}
+.dot-gold{background:var(--gold);box-shadow:0 0 8px rgba(212,175,55,.8)}
+.dot-silver{background:rgba(255,255,255,.45);box-shadow:0 0 5px rgba(255,255,255,.3)}
+.dot-grey{background:rgba(255,255,255,.15)}
+
+.card-info{flex:1;min-width:0}
+.card-name{font-size:.9375rem;font-weight:700;letter-spacing:-.02em;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card-meta{font-size:.6875rem;color:var(--t3);display:flex;align-items:center;gap:6px}
+.card-vibe{
+  margin-left:auto;flex-shrink:0;
+  font-size:.5625rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  padding:3px 8px;border-radius:6px
+}
+.vibe-hot{background:rgba(212,175,55,.13);color:var(--gold);border:.5px solid rgba(212,175,55,.25)}
+.vibe-warm{background:rgba(255,255,255,.06);color:rgba(255,255,255,.55);border:.5px solid rgba(255,255,255,.1)}
+.vibe-cold{background:rgba(255,255,255,.03);color:rgba(255,255,255,.25);border:.5px solid rgba(255,255,255,.06)}
+
+.card-divider{height:.5px;background:rgba(255,255,255,.06);margin:.75rem 0}
+
+.card-stats{display:flex;gap:1.25rem}
+.stat-item{}
+.stat-val{font-size:.875rem;font-weight:700;color:var(--t1)}
+.stat-lbl{font-size:.5625rem;color:var(--t3);letter-spacing:.05em;text-transform:uppercase;margin-top:1px}
+
+.card-close{
+  position:absolute;top:.875rem;right:.875rem;
+  width:28px;height:28px;border-radius:50%;
+  background:rgba(255,255,255,.06);border:.5px solid rgba(255,255,255,.1);
+  display:flex;align-items:center;justify-content:center;
+  color:var(--t3);font-size:.75rem;cursor:pointer
+}
+
+/* ── STATS BOTTOM ── */
+.map-stats{
+  position:fixed;bottom:calc(1.25rem + env(safe-area-inset-bottom));
+  left:50%;transform:translateX(-50%);
+  z-index:400;display:flex;gap:8px;
+  transition:opacity .3s,transform .3s
+}
+.map-stats.hidden{opacity:0;pointer-events:none;transform:translateX(-50%) translateY(10px)}
+.map-stat-pill{
+  background:rgba(0,0,0,.75);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  border:.5px solid rgba(255,255,255,.1);border-radius:20px;
+  padding:5px 12px;display:flex;align-items:center;gap:6px;
+  font-size:.5625rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--t3)
+}
+.map-stat-pill b{font-size:.6875rem;font-weight:800;color:var(--t1)}
+.pill-gold b{color:var(--gold)}
+.pill-green b{color:var(--green)}
+
+/* ── LEGEND ── */
+.map-legend{
+  position:fixed;top:max(5rem,calc(env(safe-area-inset-top) + 4rem));
+  right:1rem;z-index:400;
+  background:rgba(0,0,0,.75);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  border:.5px solid rgba(255,255,255,.08);border-radius:12px;
+  padding:.625rem .75rem;display:flex;flex-direction:column;gap:6px
+}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:.5rem;color:var(--t3);letter-spacing:.05em;text-transform:uppercase}
+.legend-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.ld-gold{background:var(--gold);box-shadow:0 0 5px rgba(212,175,55,.8)}
+.ld-silver{background:rgba(255,255,255,.45)}
+.ld-grey{background:rgba(255,255,255,.15)}
+
+/* ── TOAST ── */
+.toast{
+  position:fixed;top:calc(5rem + env(safe-area-inset-top));left:50%;
+  transform:translateX(-50%) translateY(-8px);
+  background:rgba(20,20,22,.95);border:.5px solid rgba(255,255,255,.12);
+  border-radius:12px;padding:.5rem 1rem;font-size:.75rem;color:var(--t1);
+  white-space:nowrap;opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;z-index:700
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ── CUSTOM MARKERS (CSS) ── */
+.vv-marker{position:relative;cursor:pointer}
+.vv-marker-core{
+  width:12px;height:12px;border-radius:50%;
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  transition:transform .2s
+}
+.vv-marker:hover .vv-marker-core{transform:translate(-50%,-50%) scale(1.4)}
+.vv-marker-ring{
+  border-radius:50%;position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%);opacity:.35;
+  animation:marker-pulse 2.5s ease-in-out infinite
+}
+@keyframes marker-pulse{
+  0%,100%{transform:translate(-50%,-50%) scale(1);opacity:.35}
+  50%{transform:translate(-50%,-50%) scale(1.8);opacity:0}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="vv-nav">
+  <div class="nav-brand">
+    <div class="nav-logo">VV</div>
+    <div class="nav-sub">Pulse · The Presence Layer</div>
+  </div>
+  <div class="nav-right">
+    <div class="nav-badge"><span class="pulse-dot-nav"></span><span id="active-count">—</span> active</div>
+    <button class="btn-locate" onclick="locateUser()">📍 Locația mea</button>
+  </div>
+</nav>
+
+<!-- MAP -->
+<div id="vv-map"></div>
+<div class="vignette"></div>
+
+<!-- LEGEND -->
+<div class="map-legend">
+  <div class="legend-item"><div class="legend-dot ld-gold"></div>< 24h</div>
+  <div class="legend-item"><div class="legend-dot ld-silver"></div>< 7 zile</div>
+  <div class="legend-item"><div class="legend-dot ld-grey"></div>> 30 zile</div>
+</div>
+
+<!-- MAP STATS -->
+<div class="map-stats" id="map-stats">
+  <div class="map-stat-pill pill-gold"><b id="stat-hot">—</b> auriu</div>
+  <div class="map-stat-pill pill-green"><b id="stat-total">—</b> locații</div>
+  <div class="map-stat-pill"><b id="stat-area">București</b></div>
+</div>
+
+<!-- BOTTOM CARD -->
+<div class="bottom-card" id="bottom-card">
+  <div class="card-inner">
+    <div class="card-handle"></div>
+    <div class="card-header">
+      <div class="card-pulse-ring" id="card-ring">
+        <div class="card-dot-inner" id="card-dot"></div>
+      </div>
+      <div class="card-info">
+        <div class="card-name" id="card-name">—</div>
+        <div class="card-meta">
+          <span id="card-time">—</span>
+          <span>·</span>
+          <span id="card-coords">—</span>
+        </div>
+      </div>
+      <div class="card-vibe" id="card-vibe">—</div>
+      <div class="card-close" onclick="closeCard()">✕</div>
+    </div>
+    <div class="card-divider"></div>
+    <div class="card-stats">
+      <div class="stat-item">
+        <div class="stat-val" id="card-score">—</div>
+        <div class="stat-lbl">Vibe Score</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-val" id="card-freshness">—</div>
+        <div class="stat-lbl">Prospețime</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-val" id="card-validations">—</div>
+        <div class="stat-lbl">Validări</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, getDocs, onSnapshot, doc, setDoc, serverTimestamp, increment } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+/* ── FIREBASE ── */
+const app = initializeApp({
+  apiKey:"AIzaSyDGv4kEClO0RHCLvXVLOT-vyPHw6bsxYVc",
+  authDomain:"vv-ep-beta.firebaseapp.com",
+  projectId:"vv-ep-beta",
+  storageBucket:"vv-ep-beta.firebasestorage.app",
+  messagingSenderId:"641117018598",
+  appId:"1:641117018598:web:7cd522ef48db46ad58de27"
+});
+const db = getFirestore(app);
+
+/* ── TOAST ── */
+function showToast(msg,dur=2500){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),dur);
+}
+
+/* ── MAP INIT ── */
+const map = L.map('vv-map',{
+  center:[44.4268,26.1025], // București
+  zoom:13,
+  zoomControl:false,
+  attributionControl:false,
+  preferCanvas:true
+});
+
+/* Dark tile layer */
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{
+  maxZoom:19,
+  opacity:.6
+}).addTo(map);
+
+/* ── FRESHNESS ── */
+function getFreshness(ts){
+  if(!ts)return'grey';
+  const diff=(Date.now()-ts.toMillis())/1000/3600; // ore
+  if(diff<24)return'gold';
+  if(diff<168)return'silver'; // 7 zile
+  return'grey';
+}
+
+function getFreshnessLabel(ts){
+  if(!ts)return'Necunoscut';
+  const diff=Math.floor((Date.now()-ts.toMillis())/1000);
+  if(diff<60)return'Acum';
+  if(diff<3600)return Math.floor(diff/60)+' min ago';
+  if(diff<86400)return Math.floor(diff/3600)+'h ago';
+  if(diff<604800)return Math.floor(diff/86400)+'z ago';
+  return Math.floor(diff/604800)+' săpt. ago';
+}
+
+function getVibeLabel(score){
+  if(score>=80)return{label:'FIERBINTE',cls:'vibe-hot'};
+  if(score>=40)return{label:'ACTIV',cls:'vibe-warm'};
+  return{label:'RECE',cls:'vibe-cold'};
+}
+
+/* ── CREATE MARKER ── */
+function createMarker(loc){
+  const fresh=getFreshness(loc.lastUpdate);
+
+  const colors={
+    gold:{core:var_gold,ring:'rgba(212,175,55,0.4)',size:12},
+    silver:{core:'rgba(255,255,255,0.5)',ring:'rgba(255,255,255,0.2)',size:10},
+    grey:{core:'rgba(255,255,255,0.18)',ring:'rgba(255,255,255,0.05)',size:8}
+  };
+  const c=colors[fresh];
+
+  const html=`
+    <div class="vv-marker" style="width:${c.size*3}px;height:${c.size*3}px">
+      <div class="vv-marker-ring" style="width:${c.size*2.5}px;height:${c.size*2.5}px;background:${c.ring}"></div>
+      <div class="vv-marker-core" style="width:${c.size}px;height:${c.size}px;background:${c.core};${fresh==='gold'?'box-shadow:0 0 8px rgba(212,175,55,0.9)':''}"></div>
+    </div>
+  `;
+
+  const icon=L.divIcon({
+    html,
+    className:'',
+    iconSize:[c.size*3,c.size*3],
+    iconAnchor:[c.size*1.5,c.size*1.5]
+  });
+
+  const marker=L.marker([loc.lat,loc.lng],{icon}).addTo(map);
+  marker.on('click',()=>openCard(loc,fresh));
+  return marker;
+}
+
+const var_gold='#D4AF37';
+
+/* ── OPEN CARD ── */
+function openCard(loc,fresh){
+  const vibe=getVibeLabel(loc.vibeScore||50);
+  const ring=document.getElementById('card-ring');
+  const dot=document.getElementById('card-dot');
+  const cardStats=document.getElementById('map-stats');
+
+  /* Ring color */
+  ring.className='card-pulse-ring '+(fresh==='gold'?'ring-gold':fresh==='silver'?'ring-silver':'ring-grey');
+  dot.className='card-dot-inner '+(fresh==='gold'?'dot-gold':fresh==='silver'?'dot-silver':'dot-grey');
+  if(fresh==='gold'){
+    const style=ring.querySelector('::before');
+  }
+
+  document.getElementById('card-name').textContent=loc.name||'Locație VV';
+  document.getElementById('card-time').textContent='Validat '+getFreshnessLabel(loc.lastUpdate);
+  document.getElementById('card-coords').textContent=loc.lat.toFixed(4)+', '+loc.lng.toFixed(4);
+  document.getElementById('card-vibe').textContent=vibe.label;
+  document.getElementById('card-vibe').className='card-vibe '+vibe.cls;
+  document.getElementById('card-score').textContent=(loc.vibeScore||50)+'/100';
+  document.getElementById('card-freshness').textContent=fresh==='gold'?'🔥 Proaspăt':fresh==='silver'?'🕐 Recent':'❄️ Vechi';
+  document.getElementById('card-validations').textContent=(loc.validations||1)+'x';
+
+  /* Hide bottom stats, show card */
+  cardStats.classList.add('hidden');
+  document.getElementById('bottom-card').classList.add('open');
+}
+
+window.closeCard=function(){
+  document.getElementById('bottom-card').classList.remove('open');
+  document.getElementById('map-stats').classList.remove('hidden');
+};
+
+/* ── LOAD LOCATIONS ── */
+let hotCount=0;
+let totalCount=0;
+
+async function loadLocations(){
+  try{
+    /* Real-time listener */
+    onSnapshot(collection(db,'locations'),(snap)=>{
+      /* Clear existing markers */
+      map.eachLayer(l=>{if(l instanceof L.Marker)map.removeLayer(l);});
+      hotCount=0;totalCount=0;
+
+      if(snap.empty){
+        /* Demo locations se non ci sono dati */
+        loadDemoLocations();
+        return;
+      }
+
+      snap.forEach(d=>{
+        const loc={id:d.id,...d.data()};
+        if(!loc.lat||!loc.lng)return;
+        createMarker(loc);
+        totalCount++;
+        if(getFreshness(loc.lastUpdate)==='gold')hotCount++;
+      });
+
+      updateStats();
+    });
+  }catch(e){
+    loadDemoLocations();
+  }
+}
+
+function updateStats(){
+  document.getElementById('active-count').textContent=totalCount;
+  document.getElementById('stat-hot').textContent=hotCount;
+  document.getElementById('stat-total').textContent=totalCount;
+}
+
+/* ── DEMO LOCATIONS (fallback) ── */
+function loadDemoLocations(){
+  const now=new Date();
+  const h1=new Date(now-2*3600*1000); // 2 ore ago
+  const h2=new Date(now-18*3600*1000); // 18 ore ago
+  const d3=new Date(now-3*24*3600*1000); // 3 zile ago
+  const d10=new Date(now-10*24*3600*1000); // 10 zile ago
+  const d35=new Date(now-35*24*3600*1000); // 35 zile ago
+
+  const toTs=(d)=>({toMillis:()=>d.getTime()});
+
+  const demos=[
+    {id:'d1',lat:44.4395,lng:26.0975,name:'Piața Victoriei',lastUpdate:toTs(h1),vibeScore:92,validations:8},
+    {id:'d2',lat:44.4268,lng:26.1025,name:'Universitate',lastUpdate:toTs(h2),vibeScore:78,validations:5},
+    {id:'d3',lat:44.4478,lng:26.0715,name:'Floreasca',lastUpdate:toTs(d3),vibeScore:65,validations:3},
+    {id:'d4',lat:44.4178,lng:26.1225,name:'Tineretului',lastUpdate:toTs(h1),vibeScore:88,validations:6},
+    {id:'d5',lat:44.4328,lng:26.0845,name:'Cișmigiu',lastUpdate:toTs(d10),vibeScore:45,validations:2},
+    {id:'d6',lat:44.4548,lng:26.1125,name:'Băneasa',lastUpdate:toTs(d35),vibeScore:20,validations:1},
+    {id:'d7',lat:44.4098,lng:26.0925,name:'Tânărul din Sector 4',lastUpdate:toTs(h2),vibeScore:71,validations:4},
+    {id:'d8',lat:44.4618,lng:26.0625,name:'Herăstrău',lastUpdate:toTs(h1),vibeScore:95,validations:12},
+    {id:'d9',lat:44.4198,lng:26.1425,name:'Dristor',lastUpdate:toTs(d3),vibeScore:58,validations:3},
+    {id:'d10',lat:44.4368,lng:26.1315,name:'Iancului',lastUpdate:toTs(h1),vibeScore:83,validations:7},
+  ];
+
+  demos.forEach(loc=>{
+    createMarker(loc);
+    totalCount++;
+    if(getFreshness(loc.lastUpdate)==='gold')hotCount++;
+  });
+
+  updateStats();
+  showToast('Demo mode · Conectează Firebase pentru date live');
+}
+
+/* ── LOCATE USER ── */
+window.locateUser=function(){
+  if(!navigator.geolocation){showToast('Geolocation indisponibilă');return;}
+  showToast('Se localizează...');
+  navigator.geolocation.getCurrentPosition(
+    pos=>{
+      const{latitude:lat,longitude:lng}=pos.coords;
+      map.flyTo([lat,lng],15,{duration:1.2});
+
+      /* Marker utilizator */
+      const userHtml=`
+        <div style="width:24px;height:24px;position:relative">
+          <div style="position:absolute;inset:0;border-radius:50%;background:rgba(10,132,255,.2);animation:marker-pulse 2s ease-in-out infinite"></div>
+          <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:10px;height:10px;border-radius:50%;background:#0A84FF;box-shadow:0 0 8px rgba(10,132,255,.9)"></div>
+        </div>
+      `;
+      L.marker([lat,lng],{
+        icon:L.divIcon({html:userHtml,className:'',iconSize:[24,24],iconAnchor:[12,12]}),
+        zIndexOffset:1000
+      }).addTo(map);
+      showToast('Localizat · '+lat.toFixed(4)+', '+lng.toFixed(4));
+    },
+    ()=>showToast('Localizare refuzată'),
+    {enableHighAccuracy:true,timeout:8000}
+  );
+};
+
+/* ── CLOSE CARD ON MAP TAP ── */
+map.on('click',()=>{
+  if(document.getElementById('bottom-card').classList.contains('open')){
+    closeCard();
+  }
+});
+
+/* ── INIT ── */
+loadLocations();
+
+/* ── LOG VISIT TO PULSE ── */
+try{
+  await setDoc(doc(db,"stats","map_visits"),{
+    total:increment(1),
+    [new Date().toISOString().slice(0,10)]:increment(1)
+  },{merge:true});
+}catch(e){}
+</script>
+</body>
+</html>
