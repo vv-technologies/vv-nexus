@@ -69,6 +69,10 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fon
 .vibe-cold{background:rgba(255,255,255,.03);color:var(--t3);border:.5px solid rgba(255,255,255,.06)}
 .card-divider{height:.5px;background:rgba(255,255,255,.06);margin:.625rem 0}
 .card-stats{display:flex;gap:1.25rem}
+.btn-nav{width:100%;min-height:50px;border-radius:14px;background:var(--gold);color:#000;font-family:var(--font);font-size:.9375rem;font-weight:800;border:none;cursor:pointer;margin-top:.875rem;display:flex;align-items:center;justify-content:center;gap:.5rem;letter-spacing:-.01em;transition:opacity .15s}
+.btn-nav:active{opacity:.85}
+.btn-nav-maps{width:100%;min-height:44px;border-radius:14px;background:rgba(255,255,255,.05);border:.5px solid rgba(255,255,255,.1);color:var(--t2);font-family:var(--font);font-size:.8125rem;font-weight:600;cursor:pointer;margin-top:.5rem;display:flex;align-items:center;justify-content:center;gap:.5rem;transition:all .2s}
+.btn-nav-maps:active{background:rgba(255,255,255,.1)}
 .s-val{font-size:.875rem;font-weight:700}
 .s-lbl{font-size:.5rem;color:var(--t3);letter-spacing:.05em;text-transform:uppercase;margin-top:1px}
 .card-close{position:absolute;top:.875rem;right:.875rem;width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,.06);border:.5px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;color:var(--t3);font-size:.6875rem;cursor:pointer}
@@ -174,6 +178,8 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fon
       <div><div class="s-val" id="cfr">—</div><div class="s-lbl" id="lf">Prospețime</div></div>
       <div><div class="s-val" id="cva">—</div><div class="s-lbl" id="ll">Validări</div></div>
     </div>
+    <button class="btn-nav" id="btn-nav-main" onclick="navigateTo()">🧭 <span id="nav-txt">Navighează</span></button>
+    <button class="btn-nav-maps" id="btn-gmaps" onclick="openGMaps()">🗺 <span id="gmaps-txt">Deschide în Google Maps</span></button>
   </div>
 </div>
 
@@ -288,7 +294,7 @@ function mkMarker(loc){
   const fr=fresh(loc.lastUpdate);
   const isPrem=loc.type==='premium';
   const isHid=loc.type==='hidden';
-  const sz=isPrem?13:isHid?11:9;
+  const sz=isPrem?16:isHid?14:11;
   const col=fr==='gold'?(isHid?'#a78bfa':isPrem?'#D4AF37':'#34c759'):fr==='silver'?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.18)';
   const ring=fr==='gold'?(isHid?'rgba(167,139,250,0.35)':isPrem?'rgba(212,175,55,0.35)':'rgba(52,199,89,0.35)'):fr==='silver'?'rgba(255,255,255,0.18)':'rgba(255,255,255,0.05)';
   const glow=fr==='gold'?'box-shadow:0 0 8px '+col+';':'';
@@ -354,11 +360,50 @@ function openCard(loc){
   const desc=lang==='en'&&loc.descEn?loc.descEn:(loc.descRo||loc.description||'');
   document.getElementById('cdesc').textContent=desc;
   document.getElementById('cdesc').style.display=desc?'block':'none';
+  // Update nav button text
+  const navTxt=lang==='en'?'Navigate':'Navighează';
+  const gmapsTxt=lang==='en'?'Open in Google Maps':'Deschide în Google Maps';
+  const navEl=document.getElementById('nav-txt');
+  const gmEl=document.getElementById('gmaps-txt');
+  if(navEl)navEl.textContent=navTxt;
+  if(gmEl)gmEl.textContent=gmapsTxt;
   document.getElementById('mstats').classList.add('hidden');
   document.getElementById('bcard').classList.add('open');
 }
 
 window.closeCard=function(){document.getElementById('bcard').classList.remove('open');document.getElementById('mstats').classList.remove('hidden');selLoc=null};
+
+window.navigateTo=function(){
+  if(!selLoc)return;
+  const lat=selLoc.lat,lng=selLoc.lng;
+  const name=lang==='en'&&selLoc.nameEn?selLoc.nameEn:selLoc.name;
+  // Apple Maps deeplink — nativ pe iPhone, legal 100%
+  const appleUrl='maps://maps.apple.com/?daddr='+lat+','+lng+'&dirflg=w&t=m';
+  // Fallback web Apple Maps pentru iPad/desktop
+  const appleWebUrl='https://maps.apple.com/?daddr='+lat+','+lng+'&dirflg=w';
+  const isIOS=/iPhone|iPad|iPod/i.test(navigator.userAgent);
+  if(isIOS){
+    // Incearca Apple Maps nativ, fallback web
+    window.location.href=appleUrl;
+    setTimeout(()=>window.open(appleWebUrl,'_blank'),1500);
+  } else {
+    window.open('https://www.openstreetmap.org/directions?to='+lat+'%2C'+lng+'&from=&type=foot','_blank');
+  }
+  // Log in pulse
+  try{
+    import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js").then(({addDoc,collection,serverTimestamp})=>{
+      addDoc(collection(db,'pulse_events'),{type:'navigation',icon:'🧭',message:'Navigare pornită spre <b>'+name+'</b>',tagClass:'tag-nexus',tagText:'NAV',timestamp:serverTimestamp()});
+    });
+  }catch(e){}
+};
+
+window.openGMaps=function(){
+  if(!selLoc)return;
+  const lat=selLoc.lat,lng=selLoc.lng;
+  const name=lang==='en'&&selLoc.nameEn?selLoc.nameEn:selLoc.name;
+  // Google Maps URL universal — legal, redirecteaza la app sau web
+  window.open('https://www.google.com/maps/dir/?api=1&destination='+lat+','+lng+'&travelmode=walking','_blank');
+};
 
 map.on('click',()=>{if(document.getElementById('bcard').classList.contains('open'))window.closeCard()});
 
