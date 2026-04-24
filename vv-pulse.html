@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#000000">
 <title>VV Pulse · The Presence Layer</title>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
@@ -54,9 +54,10 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fon
 }
 
 /* Leaflet dark overrides */
-.leaflet-tile{filter:brightness(.15) saturate(.2) hue-rotate(180deg)}
-.leaflet-container{background:#000}
+.leaflet-tile{filter:brightness(.45) saturate(.3)}
+.leaflet-container{background:#000 !important}
 .leaflet-control-zoom,.leaflet-control-attribution{display:none!important}
+.leaflet-tile-pane{opacity:.7}
 
 /* ── VIGNETTE ── */
 .vignette{
@@ -297,9 +298,10 @@ const map = L.map('vv-map',{
 });
 
 /* Dark tile layer */
-L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png',{
   maxZoom:19,
-  opacity:.6
+  subdomains:'abcd',
+  crossOrigin:true
 }).addTo(map);
 
 /* ── FRESHNESS ── */
