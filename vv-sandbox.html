@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<title>VV Sandbox · Deploy Control</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#000;--panel:#0a0a0c;--gold:#D4AF37;--gold-dim:rgba(212,175,55,0.10);
+  --gold-bd:rgba(212,175,55,0.25);--green:#34c759;--blue:#0A84FF;--red:#FF3B30;
+  --t1:#fff;--t2:rgba(255,255,255,0.55);--t3:rgba(255,255,255,0.3);
+  --line:rgba(255,255,255,0.08);--glass:rgba(255,255,255,0.04);
+  --font:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif
+}
+html,body{min-height:100%;background:var(--bg);font-family:var(--font);color:var(--t1);-webkit-font-smoothing:antialiased}
+body{padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right);padding-bottom:env(safe-area-inset-bottom)}
+
+/* ── NAV ── */
+.top-nav{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:max(1rem,env(safe-area-inset-top)) 1.25rem .875rem;
+  background:rgba(0,0,0,.9);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-bottom:.5px solid var(--line);position:sticky;top:0;z-index:100
+}
+.nav-logo{font-size:.9375rem;font-weight:700;color:var(--gold)}
+.nav-logo span{display:block;font-size:.5rem;letter-spacing:.2em;text-transform:uppercase;color:var(--t3);margin-top:1px}
+.version-badge{
+  background:var(--gold-dim);border:.5px solid var(--gold-bd);
+  border-radius:20px;padding:4px 10px;font-size:.625rem;font-weight:700;
+  color:var(--gold);letter-spacing:.05em;font-family:monospace
+}
+
+/* ── LAYOUT ── */
+.page{max-width:480px;margin:0 auto;padding:1.25rem 1.25rem 4rem}
+
+/* ── SECTION LABEL ── */
+.s-label{font-size:.5625rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--t3);margin-bottom:.875rem;padding-left:2px}
+
+/* ── CARDS ── */
+.card{background:var(--glass);border:.5px solid var(--line);border-radius:16px;padding:1.125rem;margin-bottom:.75rem}
+.card-gold{background:var(--gold-dim);border:.5px solid var(--gold-bd);border-radius:16px;padding:1.125rem;margin-bottom:.75rem}
+.card-red{background:rgba(255,59,48,.05);border:.5px solid rgba(255,59,48,.2);border-radius:16px;padding:1.125rem;margin-bottom:.75rem}
+.card-green{background:rgba(52,199,89,.05);border:.5px solid rgba(52,199,89,.2);border-radius:16px;padding:1.125rem;margin-bottom:.75rem}
+
+/* ── FILE SLOT ── */
+.file-slot{
+  border:.5px dashed rgba(255,255,255,.18);border-radius:12px;
+  padding:1.125rem;margin-bottom:.625rem;
+  transition:border-color .2s,background .2s;cursor:pointer;
+  display:flex;align-items:center;gap:.875rem
+}
+.file-slot:hover{border-color:rgba(212,175,55,.4);background:rgba(212,175,55,.04)}
+.file-slot.loaded{border-color:rgba(52,199,89,.4);border-style:solid;background:rgba(52,199,89,.04)}
+.file-slot.loaded .slot-icon{color:var(--green)}
+.slot-icon{font-size:1.25rem;flex-shrink:0;width:32px;text-align:center;color:var(--t3)}
+.slot-body{flex:1;min-width:0}
+.slot-name{font-size:.8125rem;font-weight:600;color:var(--t1);margin-bottom:2px}
+.slot-meta{font-size:.625rem;color:var(--t3)}
+.slot-action{font-size:.625rem;font-weight:700;color:var(--t3);flex-shrink:0}
+.file-slot.loaded .slot-action{color:var(--green)}
+
+/* hidden file inputs */
+input[type=file]{display:none}
+
+/* ── PREVIEW ── */
+#preview-frame{
+  width:100%;border-radius:12px;border:.5px solid var(--line);
+  background:#111;display:none;
+  aspect-ratio:9/16;max-height:600px
+}
+#preview-frame.active{display:block}
+.preview-placeholder{
+  border:.5px dashed rgba(255,255,255,.12);border-radius:12px;
+  padding:2.5rem 1rem;text-align:center;color:var(--t3);font-size:.8125rem;
+  background:rgba(255,255,255,.02)
+}
+.preview-placeholder .icon{font-size:2rem;margin-bottom:.5rem;display:block}
+
+/* ── CHECKLIST ── */
+.check-item{
+  display:flex;align-items:center;gap:.875rem;
+  padding:.875rem 0;border-bottom:.5px solid var(--line);cursor:pointer
+}
+.check-item:last-child{border-bottom:none}
+.check-box{
+  width:24px;height:24px;border-radius:7px;flex-shrink:0;
+  background:rgba(255,255,255,.05);border:.5px solid rgba(255,255,255,.2);
+  display:flex;align-items:center;justify-content:center;
+  transition:all .2s;font-size:.75rem
+}
+.check-box.on{background:var(--green);border-color:var(--green)}
+.check-label{flex:1}
+.check-title{font-size:.8125rem;font-weight:600;color:var(--t1)}
+.check-desc{font-size:.625rem;color:var(--t3);margin-top:1px}
+
+/* ── VERSION ── */
+.version-row{display:flex;align-items:center;gap:.75rem;padding:.875rem 0}
+.v-input{
+  background:rgba(255,255,255,.05);border:.5px solid var(--line);
+  border-radius:8px;color:var(--t1);font-family:monospace;
+  font-size:.875rem;padding:.5rem .75rem;outline:none;width:90px;text-align:center;
+  transition:border-color .2s
+}
+.v-input:focus{border-color:rgba(212,175,55,.5)}
+.v-arrow{color:var(--t3);font-size:.75rem}
+.v-new{
+  background:var(--gold-dim);border:.5px solid var(--gold-bd);
+  border-radius:8px;font-family:monospace;font-size:.875rem;font-weight:700;
+  color:var(--gold);padding:.5rem .75rem;letter-spacing:.05em
+}
+.v-label{font-size:.6875rem;color:var(--t3)}
+
+/* ── BUTTONS ── */
+.btn{
+  width:100%;min-height:52px;border-radius:14px;font-family:var(--font);
+  font-size:.9375rem;font-weight:700;border:none;cursor:pointer;
+  transition:opacity .15s,transform .15s;letter-spacing:-.01em;
+  display:flex;align-items:center;justify-content:center;gap:.5rem
+}
+.btn:active{opacity:.85;transform:scale(.99)}
+.btn:disabled{opacity:.3;cursor:not-allowed;transform:none}
+.btn-gold{background:var(--gold);color:#000}
+.btn-green{background:var(--green);color:#fff}
+.btn-glass{background:var(--glass);border:.5px solid var(--line);color:var(--t2)}
+.btn-red{background:rgba(255,59,48,.15);border:.5px solid rgba(255,59,48,.3);color:var(--red)}
+.btn-sm{min-height:40px;font-size:.8125rem;border-radius:10px}
+
+/* ── STATUS ── */
+.status-bar{
+  border-radius:12px;padding:.875rem 1rem;margin-bottom:.75rem;
+  display:flex;align-items:center;gap:.75rem;font-size:.8125rem
+}
+.status-idle{background:rgba(255,255,255,.03);border:.5px solid var(--line)}
+.status-ok{background:rgba(52,199,89,.08);border:.5px solid rgba(52,199,89,.2);color:var(--green)}
+.status-warn{background:rgba(255,149,0,.08);border:.5px solid rgba(255,149,0,.2);color:#ff9500}
+.status-err{background:rgba(255,59,48,.08);border:.5px solid rgba(255,59,48,.2);color:var(--red)}
+.status-icon{font-size:1rem;flex-shrink:0}
+
+/* ── HISTORY ── */
+.history-item{
+  display:flex;align-items:center;gap:.75rem;
+  padding:.75rem 0;border-bottom:.5px solid var(--line)
+}
+.history-item:last-child{border-bottom:none}
+.h-ver{font-family:monospace;font-size:.75rem;font-weight:700;color:var(--gold);width:40px;flex-shrink:0}
+.h-info{flex:1;min-width:0}
+.h-files{font-size:.6875rem;color:var(--t2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.h-date{font-size:.5625rem;color:var(--t3);margin-top:1px}
+.h-status{font-size:.5625rem;font-weight:700;padding:2px 7px;border-radius:5px;flex-shrink:0}
+.hs-ok{background:rgba(52,199,89,.12);color:var(--green)}
+.hs-rb{background:rgba(255,59,48,.12);color:var(--red)}
+
+/* ── ROLLBACK MODAL ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:200;display:none;align-items:flex-end;justify-content:center}
+.modal-overlay.active{display:flex}
+.modal-sheet{
+  background:#0c0c0e;border:.5px solid rgba(255,255,255,.1);
+  border-radius:24px 24px 0 0;padding:1.25rem 1.5rem calc(1.5rem + env(safe-area-inset-bottom));
+  width:100%;max-width:480px;animation:slideUp .3s ease
+}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.modal-handle{width:36px;height:3px;background:rgba(255,255,255,.15);border-radius:2px;margin:0 auto 1.125rem}
+.modal-title{font-size:1rem;font-weight:800;text-align:center;margin-bottom:.375rem}
+.modal-sub{font-size:.8125rem;color:var(--t3);text-align:center;margin-bottom:1.25rem;line-height:1.6}
+
+/* ── TOAST ── */
+.toast{
+  position:fixed;bottom:calc(1.5rem + env(safe-area-inset-bottom));left:50%;
+  transform:translateX(-50%) translateY(20px);
+  background:rgba(20,20,22,.96);border:.5px solid rgba(255,255,255,.12);
+  border-radius:12px;padding:.625rem 1.25rem;font-size:.8125rem;color:var(--t1);
+  white-space:nowrap;opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;z-index:300
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+.divider{height:.5px;background:var(--line);margin:1.25rem 0}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<div class="top-nav">
+  <div class="nav-logo">VV Sandbox <span>Deploy Control Center</span></div>
+  <div class="version-badge" id="nav-version">v1.0</div>
+</div>
+
+<!-- ROLLBACK MODAL -->
+<div class="modal-overlay" id="rb-modal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">🔄 Rollback</div>
+    <div class="modal-sub" id="rb-modal-sub">Ești sigur că vrei să revii la versiunea anterioară?</div>
+    <div id="rb-list"></div>
+    <button class="btn btn-glass btn-sm" style="margin-top:.75rem" onclick="closeRbModal()">Anulează</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="page">
+
+  <!-- STATUS -->
+  <div class="status-bar status-idle" id="main-status">
+    <span class="status-icon">💤</span>
+    <span id="status-text">Gata de lucru. Încarcă fișierele.</span>
+  </div>
+
+  <!-- ── STEP 1: FIȘIERE ── -->
+  <div class="s-label">Pas 1 — Fișierele tale</div>
+
+  <!-- HTML SLOT -->
+  <div class="file-slot" id="slot-html" onclick="document.getElementById('input-html').click()">
+    <div class="slot-icon">📄</div>
+    <div class="slot-body">
+      <div class="slot-name" id="html-name">index.html</div>
+      <div class="slot-meta" id="html-meta">Apasă pentru a încărca</div>
+    </div>
+    <div class="slot-action" id="html-action">+ Încarcă</div>
+  </div>
+  <input type="file" id="input-html" accept=".html,.htm" onchange="loadFile('html',this)">
+
+  <!-- CSS SLOT -->
+  <div class="file-slot" id="slot-css" onclick="document.getElementById('input-css').click()">
+    <div class="slot-icon">🎨</div>
+    <div class="slot-body">
+      <div class="slot-name" id="css-name">style.css</div>
+      <div class="slot-meta" id="css-meta">Apasă pentru a încărca</div>
+    </div>
+    <div class="slot-action" id="css-action">+ Încarcă</div>
+  </div>
+  <input type="file" id="input-css" accept=".css" onchange="loadFile('css',this)">
+
+  <!-- EXTRA SLOT -->
+  <div class="file-slot" id="slot-extra" onclick="document.getElementById('input-extra').click()">
+    <div class="slot-icon">📎</div>
+    <div class="slot-body">
+      <div class="slot-name" id="extra-name">alt-fisier (opțional)</div>
+      <div class="slot-meta" id="extra-meta">JS, JSON, orice altceva</div>
+    </div>
+    <div class="slot-action" id="extra-action">+ Încarcă</div>
+  </div>
+  <input type="file" id="input-extra" onchange="loadFile('extra',this)">
+
+  <div class="divider"></div>
+
+  <!-- ── STEP 2: PREVIEW ── -->
+  <div class="s-label">Pas 2 — Preview vizual</div>
+  <div id="preview-wrap">
+    <div class="preview-placeholder" id="preview-placeholder">
+      <span class="icon">👁</span>
+      Încarcă HTML-ul mai sus pentru a vedea preview-ul live
+    </div>
+    <iframe id="preview-frame" sandbox="allow-scripts allow-same-origin"></iframe>
+  </div>
+  <div style="display:flex;gap:.5rem;margin-top:.625rem">
+    <button class="btn btn-glass btn-sm" style="flex:1" onclick="refreshPreview()">🔄 Reîncarcă preview</button>
+    <button class="btn btn-glass btn-sm" style="flex:1" onclick="clearFiles()">🗑 Șterge tot</button>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ── STEP 3: VALIDARE ── -->
+  <div class="s-label">Pas 3 — Validare manuală (tu decizi)</div>
+  <div class="card">
+    <div class="check-item" onclick="toggleCheck('c1')">
+      <div class="check-box" id="c1">✓</div>
+      <div class="check-label">
+        <div class="check-title">HTML arată corect în preview</div>
+        <div class="check-desc">Design-ul e cum îl voiai, fără elemente stricate</div>
+      </div>
+    </div>
+    <div class="check-item" onclick="toggleCheck('c2')">
+      <div class="check-box" id="c2">✓</div>
+      <div class="check-label">
+        <div class="check-title">CSS aplicat corect</div>
+        <div class="check-desc">Culorile, fonturile și layout-ul sunt ok</div>
+      </div>
+    </div>
+    <div class="check-item" onclick="toggleCheck('c3')">
+      <div class="check-box" id="c3">✓</div>
+      <div class="check-label">
+        <div class="check-title">Fișierele sunt cele corecte</div>
+        <div class="check-desc">Numele fișierelor se potrivesc cu repo-ul</div>
+      </div>
+    </div>
+    <div class="check-item" onclick="toggleCheck('c4')">
+      <div class="check-box" id="c4">✓</div>
+      <div class="check-label">
+        <div class="check-title">Nu există erori vizibile</div>
+        <div class="check-desc">Niciun text rupt, niciun element lipsă</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ── STEP 4: VERSIUNE ── -->
+  <div class="s-label">Pas 4 — Versiune automată</div>
+  <div class="card">
+    <div class="version-row">
+      <div>
+        <div class="v-label">Versiune curentă</div>
+        <input class="v-input" id="v-current" value="1.0" oninput="updateVersion()">
+      </div>
+      <div class="v-arrow">→</div>
+      <div>
+        <div class="v-label">Versiune nouă</div>
+        <div class="v-new" id="v-new">1.1</div>
+      </div>
+      <div style="flex:1;font-size:.625rem;color:var(--t3);line-height:1.6">
+        CSS-ul va fi linkat cu<br><code style="color:var(--gold);font-family:monospace">?v=1.1</code><br>Safari va vedea versiunea nouă
+      </div>
+    </div>
+    <div style="height:.5px;background:var(--line);margin:.5rem 0"></div>
+    <div style="font-size:.6875rem;color:var(--t3);line-height:1.7">
+      📝 <strong style="color:var(--t2)">Notă deploy:</strong> <span id="deploy-note">index.html + style.css?v=1.1</span>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ── STEP 5: DEPLOY ── -->
+  <div class="s-label">Pas 5 — Deploy pe GitHub</div>
+
+  <div id="deploy-checklist-warn" class="status-bar status-warn" style="display:none">
+    <span class="status-icon">⚠️</span>
+    <span>Bifează toate validările înainte de deploy</span>
+  </div>
+
+  <!-- REPO CONFIG -->
+  <div class="card" style="margin-bottom:.625rem">
+    <div style="font-size:.6875rem;color:var(--t3);margin-bottom:.5rem;letter-spacing:.1em;text-transform:uppercase">Repo GitHub</div>
+    <input id="gh-repo" placeholder="ex: vv-technologies/vv-nexus" style="width:100%;background:rgba(255,255,255,.05);border:.5px solid var(--line);border-radius:8px;color:var(--t1);font-family:var(--font);font-size:.8125rem;padding:.5rem .75rem;outline:none;margin-bottom:.5rem" oninput="saveConfig()">
+    <input id="gh-token" type="password" placeholder="GitHub Personal Access Token" style="width:100%;background:rgba(255,255,255,.05);border:.5px solid var(--line);border-radius:8px;color:var(--t1);font-family:var(--font);font-size:.8125rem;padding:.5rem .75rem;outline:none" oninput="saveConfig()">
+    <div style="font-size:.5625rem;color:var(--t3);margin-top:.5rem;line-height:1.6">Token-ul se salvează doar în localStorage pe device-ul tău. Nu iese din browser.</div>
+  </div>
+
+  <button class="btn btn-gold" id="btn-deploy" onclick="doDeploy()" disabled>
+    🚀 Deploy pe GitHub
+  </button>
+
+  <div class="divider"></div>
+
+  <!-- ── HISTORY & ROLLBACK ── -->
+  <div class="s-label">Istoric deployuri · Rollback</div>
+  <div class="card" id="history-list">
+    <div style="text-align:center;color:var(--t3);font-size:.8125rem;padding:.5rem">Niciun deploy încă</div>
+  </div>
+
+</div>
+
+<script>
+/* ── STATE ── */
+const state = {
+  files: { html: null, css: null, extra: null },
+  checks: { c1: false, c2: false, c3: false, c4: false },
+  vCurrent: '1.0',
+  history: JSON.parse(localStorage.getItem('vv_deploy_history') || '[]')
+};
+
+/* ── INIT ── */
+document.addEventListener('DOMContentLoaded', () => {
+  loadConfig();
+  renderHistory();
+  updateVersion();
+  updateDeployBtn();
+  // Restore current version from last deploy
+  if (state.history.length > 0) {
+    const last = state.history[0];
+    document.getElementById('v-current').value = last.version;
+    state.vCurrent = last.version;
+    document.getElementById('nav-version').textContent = 'v' + last.version;
+    updateVersion();
+  }
+});
+
+/* ── TOAST ── */
+function showToast(msg, dur = 2800) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), dur);
+}
+
+/* ── STATUS ── */
+function setStatus(type, msg) {
+  const bar = document.getElementById('main-status');
+  const txt = document.getElementById('status-text');
+  bar.className = 'status-bar status-' + type;
+  const icons = { idle: '💤', ok: '✅', warn: '⚠️', err: '❌' };
+  bar.querySelector('.status-icon').textContent = icons[type] || '💤';
+  txt.textContent = msg;
+}
+
+/* ── LOAD FILE ── */
+function loadFile(type, input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    state.files[type] = { name: file.name, content: e.target.result, size: file.size };
+    updateSlot(type, file);
+    if (type === 'html') buildPreview();
+    if (type === 'css') buildPreview();
+    updateDeployBtn();
+    setStatus('idle', 'File caricato: ' + file.name + ' · ' + (file.size / 1024).toFixed(1) + ' KB');
+    showToast('✓ ' + file.name + ' încărcat');
+  };
+  reader.readAsText(file);
+}
+
+function updateSlot(type, file) {
+  const slot = document.getElementById('slot-' + type);
+  const nameEl = document.getElementById(type + '-name');
+  const metaEl = document.getElementById(type + '-meta');
+  const actionEl = document.getElementById(type + '-action');
+  slot.classList.add('loaded');
+  nameEl.textContent = file.name;
+  metaEl.textContent = (file.size / 1024).toFixed(1) + ' KB · ' + new Date().toLocaleTimeString('ro');
+  actionEl.textContent = '✓ Încărcat';
+}
+
+/* ── PREVIEW ── */
+function buildPreview() {
+  if (!state.files.html) return;
+  let html = state.files.html.content;
+  const frame = document.getElementById('preview-frame');
+  const placeholder = document.getElementById('preview-placeholder');
+  // Inject CSS if present
+  if (state.files.css) {
+    const styleTag = '<style>' + state.files.css.content + '</style>';
+    html = html.replace('</head>', styleTag + '</head>');
+  }
+  frame.srcdoc = html;
+  frame.classList.add('active');
+  placeholder.style.display = 'none';
+  setStatus('ok', 'Preview aggiornato · ' + new Date().toLocaleTimeString('ro'));
+}
+
+function refreshPreview() {
+  buildPreview();
+  showToast('Preview reîncărcat');
+}
+
+/* ── CLEAR ── */
+function clearFiles() {
+  state.files = { html: null, css: null, extra: null };
+  ['html', 'css', 'extra'].forEach(t => {
+    const slot = document.getElementById('slot-' + t);
+    slot.classList.remove('loaded');
+    document.getElementById(t + '-action').textContent = '+ Încarcă';
+  });
+  document.getElementById('html-name').textContent = 'index.html';
+  document.getElementById('html-meta').textContent = 'Apasă pentru a încărca';
+  document.getElementById('css-name').textContent = 'style.css';
+  document.getElementById('css-meta').textContent = 'Apasă pentru a încărca';
+  document.getElementById('extra-name').textContent = 'alt-fisier (opțional)';
+  document.getElementById('extra-meta').textContent = 'JS, JSON, orice altceva';
+  const frame = document.getElementById('preview-frame');
+  frame.classList.remove('active');
+  frame.srcdoc = '';
+  document.getElementById('preview-placeholder').style.display = '';
+  ['c1','c2','c3','c4'].forEach(c => {
+    state.checks[c] = false;
+    document.getElementById(c).classList.remove('on');
+  });
+  updateDeployBtn();
+  setStatus('idle', 'Resetat. Încarcă fișierele noi.');
+  showToast('Sandbox resetat');
+}
+
+/* ── CHECKS ── */
+function toggleCheck(id) {
+  state.checks[id] = !state.checks[id];
+  const el = document.getElementById(id);
+  if (state.checks[id]) el.classList.add('on');
+  else el.classList.remove('on');
+  updateDeployBtn();
+}
+
+/* ── VERSION ── */
+function updateVersion() {
+  const current = document.getElementById('v-current').value.trim() || '1.0';
+  state.vCurrent = current;
+  const parts = current.split('.');
+  let major = parseInt(parts[0]) || 1;
+  let minor = parseInt(parts[1]) || 0;
+  minor++;
+  if (minor >= 10) { major++; minor = 0; }
+  const next = major + '.' + minor;
+  document.getElementById('v-new').textContent = next;
+  const htmlName = state.files.html ? state.files.html.name : 'index.html';
+  const cssName = state.files.css ? state.files.css.name : 'style.css';
+  document.getElementById('deploy-note').textContent = htmlName + ' + ' + cssName + '?v=' + next;
+  document.getElementById('nav-version').textContent = 'v' + current;
+  return next;
+}
+
+/* ── DEPLOY BTN STATE ── */
+function updateDeployBtn() {
+  const allChecks = state.checks.c1 && state.checks.c2 && state.checks.c3 && state.checks.c4;
+  const hasHtml = !!state.files.html;
+  const hasRepo = document.getElementById('gh-repo').value.trim().length > 5;
+  const hasToken = document.getElementById('gh-token').value.trim().length > 10;
+  const btn = document.getElementById('btn-deploy');
+  const warn = document.getElementById('deploy-checklist-warn');
+  if (hasHtml && !allChecks) {
+    warn.style.display = 'flex';
+  } else {
+    warn.style.display = 'none';
+  }
+  btn.disabled = !(allChecks && hasHtml && hasRepo && hasToken);
+}
+
+/* ── SAVE/LOAD CONFIG ── */
+function saveConfig() {
+  localStorage.setItem('vv_repo', document.getElementById('gh-repo').value);
+  localStorage.setItem('vv_token', document.getElementById('gh-token').value);
+  updateDeployBtn();
+}
+function loadConfig() {
+  const repo = localStorage.getItem('vv_repo') || '';
+  const token = localStorage.getItem('vv_token') || '';
+  document.getElementById('gh-repo').value = repo;
+  document.getElementById('gh-token').value = token;
+}
+
+/* ── DEPLOY ── */
+async function doDeploy() {
+  const repo = document.getElementById('gh-repo').value.trim();
+  const token = document.getElementById('gh-token').value.trim();
+  const newVersion = updateVersion();
+  const btn = document.getElementById('btn-deploy');
+  btn.disabled = true;
+  btn.textContent = '⏳ Deploy in corso...';
+  setStatus('warn', 'Deploy in corso su GitHub...');
+
+  const filesToDeploy = [];
+  if (state.files.html) {
+    let htmlContent = state.files.html.content;
+    // Inject version in CSS link
+    if (state.files.css) {
+      const cssName = state.files.css.name;
+      htmlContent = htmlContent.replace(
+        new RegExp(cssName.replace('.', '\\.') + '(\\?v=[^"\']+)?', 'g'),
+        cssName + '?v=' + newVersion
+      );
+    }
+    filesToDeploy.push({ path: state.files.html.name, content: htmlContent });
+  }
+  if (state.files.css) {
+    filesToDeploy.push({ path: state.files.css.name, content: state.files.css.content });
+  }
+  if (state.files.extra) {
+    filesToDeploy.push({ path: state.files.extra.name, content: state.files.extra.content });
+  }
+
+  const results = [];
+  for (const f of filesToDeploy) {
+    try {
+      const res = await pushToGithub(repo, token, f.path, f.content, newVersion);
+      results.push({ file: f.path, ok: true, sha: res.sha });
+    } catch (e) {
+      results.push({ file: f.path, ok: false, err: e.message });
+    }
+  }
+
+  const allOk = results.every(r => r.ok);
+  const deployEntry = {
+    version: newVersion,
+    date: new Date().toLocaleString('ro'),
+    files: filesToDeploy.map(f => f.path),
+    results,
+    snapshots: {}
+  };
+  // Save snapshots for rollback
+  if (state.files.html) deployEntry.snapshots.html = { name: state.files.html.name, content: state.files.html.content };
+  if (state.files.css) deployEntry.snapshots.css = { name: state.files.css.name, content: state.files.css.content };
+
+  state.history.unshift(deployEntry);
+  if (state.history.length > 10) state.history.pop();
+  localStorage.setItem('vv_deploy_history', JSON.stringify(state.history));
+
+  if (allOk) {
+    setStatus('ok', '✅ Deploy reușit · v' + newVersion + ' · ' + filesToDeploy.length + ' fișiere');
+    showToast('✅ Deploy reușit! v' + newVersion);
+    document.getElementById('v-current').value = newVersion;
+    document.getElementById('nav-version').textContent = 'v' + newVersion;
+    updateVersion();
+  } else {
+    const failed = results.filter(r => !r.ok);
+    setStatus('err', '❌ Erori: ' + failed.map(r => r.file).join(', '));
+    showToast('❌ Deploy parțial — verifică token/repo');
+  }
+
+  btn.textContent = '🚀 Deploy pe GitHub';
+  updateDeployBtn();
+  renderHistory();
+}
+
+/* ── GITHUB API ── */
+async function pushToGithub(repo, token, path, content, version) {
+  const url = 'https://api.github.com/repos/' + repo + '/contents/' + path;
+  // Get current SHA if file exists
+  let sha = null;
+  try {
+    const get = await fetch(url, {
+      headers: { 'Authorization': 'token ' + token, 'Accept': 'application/vnd.github.v3+json' }
+    });
+    if (get.ok) {
+      const data = await get.json();
+      sha = data.sha;
+    }
+  } catch (e) {}
+
+  const body = {
+    message: 'VV Sandbox deploy v' + version + ' · ' + path,
+    content: btoa(unescape(encodeURIComponent(content))),
+    branch: 'main'
+  };
+  if (sha) body.sha = sha;
+
+  const res = await fetch(url, {
+    method: 'PUT',
+    headers: {
+      'Authorization': 'token ' + token,
+      'Content-Type': 'application/json',
+      'Accept': 'application/vnd.github.v3+json'
+    },
+    body: JSON.stringify(body)
+  });
+
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.message || 'GitHub API error ' + res.status);
+  }
+  const data = await res.json();
+  return { sha: data.content?.sha };
+}
+
+/* ── HISTORY ── */
+function renderHistory() {
+  const el = document.getElementById('history-list');
+  if (state.history.length === 0) {
+    el.innerHTML = '<div style="text-align:center;color:var(--t3);font-size:.8125rem;padding:.5rem">Niciun deploy încă</div>';
+    return;
+  }
+  el.innerHTML = state.history.map((d, i) => `
+    <div class="history-item">
+      <div class="h-ver">v${d.version}</div>
+      <div class="h-info">
+        <div class="h-files">${d.files.join(' + ')}</div>
+        <div class="h-date">${d.date}</div>
+      </div>
+      <span class="h-status ${d.results.every(r => r.ok) ? 'hs-ok' : 'hs-rb'}">${d.results.every(r => r.ok) ? '✓ OK' : '⚠️'}</span>
+      ${i > 0 && d.snapshots ? `<button onclick="doRollback(${i})" style="margin-left:8px;background:rgba(255,59,48,.1);border:.5px solid rgba(255,59,48,.25);color:var(--red);border-radius:8px;padding:4px 8px;font-size:.5625rem;font-weight:700;cursor:pointer;font-family:var(--font)">↩ Rollback</button>` : ''}
+    </div>
+  `).join('');
+}
+
+/* ── ROLLBACK ── */
+function doRollback(idx) {
+  const entry = state.history[idx];
+  if (!entry || !entry.snapshots) { showToast('Nu există snapshot pentru rollback'); return; }
+  const modal = document.getElementById('rb-modal');
+  const sub = document.getElementById('rb-modal-sub');
+  const list = document.getElementById('rb-list');
+  sub.textContent = 'Vrei să revii la versiunea v' + entry.version + ' din ' + entry.date + '?';
+  list.innerHTML = Object.entries(entry.snapshots).map(([k, f]) =>
+    `<div style="background:rgba(255,255,255,.03);border:.5px solid var(--line);border-radius:8px;padding:.625rem .875rem;margin-bottom:.5rem;font-size:.75rem;color:var(--t2)">📄 ${f.name} · ${(new Blob([f.content]).size/1024).toFixed(1)} KB</div>`
+  ).join('');
+  list.innerHTML += `<button class="btn btn-red btn-sm" style="margin-top:.25rem" onclick="confirmRollback(${idx})">↩ Confirmă Rollback la v${entry.version}</button>`;
+  modal.classList.add('active');
+}
+
+async function confirmRollback(idx) {
+  closeRbModal();
+  const entry = state.history[idx];
+  const repo = document.getElementById('gh-repo').value.trim();
+  const token = document.getElementById('gh-token').value.trim();
+  if (!repo || !token) { showToast('Configurează repo și token mai întâi'); return; }
+  setStatus('warn', 'Rollback în curs la v' + entry.version + '...');
+  try {
+    for (const [k, f] of Object.entries(entry.snapshots)) {
+      await pushToGithub(repo, token, f.name, f.content, entry.version + '-rollback');
+    }
+    setStatus('ok', '✅ Rollback reușit la v' + entry.version);
+    showToast('✅ Rollback la v' + entry.version + ' reușit!');
+    document.getElementById('v-current').value = entry.version;
+    updateVersion();
+  } catch (e) {
+    setStatus('err', '❌ Rollback eșuat: ' + e.message);
+    showToast('❌ Rollback eșuat');
+  }
+}
+
+function closeRbModal() {
+  document.getElementById('rb-modal').classList.remove('active');
+}
+document.getElementById('rb-modal').addEventListener('click', e => {
+  if (e.target === document.getElementById('rb-modal')) closeRbModal();
+});
+</script>
+</body>
+</html>
