@@ -1243,7 +1243,7 @@ async function doSearch(query) {
         results.push({
           icon: loc.icon, name: loc.name, meta: loc.meta,
           type: 'loc', iconClass: 'sri-loc', tagClass: 'tag-loc', tagText: 'LOCAȚIE',
-          action: () => window.open('https://vv-technologies.github.io/vv-nexus/vv-pulse.html', '_blank')
+          action: () => window.open('https://vv-technologies.github.io/vv-nexus/vv-pulse.html?lat=' + loc.lat + '&lng=' + loc.lng + '&name=' + encodeURIComponent(loc.name), '_blank')
         });
       }
     });
