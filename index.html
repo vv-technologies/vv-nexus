@@ -304,6 +304,50 @@ footer p{font-size:.5625rem;color:rgba(255,255,255,.18);letter-spacing:.04em;lin
   .cta-wrap{flex-direction:row;justify-content:center}
   .cta-wrap .btn-main{width:auto;padding:0 2rem;flex:1;max-width:240px}
 }
+
+/* ── VV SEARCH ── */
+.search-section{margin:1.5rem 0}
+.search-wrap{position:relative;margin-bottom:.875rem}
+.search-input{
+  width:100%;background:rgba(255,255,255,0.06);
+  border:.5px solid rgba(255,255,255,0.15);border-radius:16px;
+  color:var(--t1);font-family:var(--font);font-size:.9375rem;
+  padding:.875rem 1rem .875rem 3rem;outline:none;
+  transition:border-color .2s,background .2s;
+  -webkit-appearance:none;appearance:none
+}
+.search-input:focus{border-color:rgba(212,175,55,.5);background:rgba(255,255,255,0.08)}
+.search-input::placeholder{color:var(--t3)}
+.search-icon{position:absolute;left:1rem;top:50%;transform:translateY(-50%);font-size:1rem;pointer-events:none}
+.search-clear{position:absolute;right:1rem;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--t3);font-size:1rem;cursor:pointer;padding:4px;display:none}
+.search-clear.visible{display:block}
+.search-filters{display:flex;gap:6px;margin-bottom:.875rem;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.search-filters::-webkit-scrollbar{display:none}
+.sf-btn{flex-shrink:0;background:rgba(255,255,255,.05);border:.5px solid rgba(255,255,255,.1);border-radius:20px;color:var(--t3);font-family:var(--font);font-size:.5625rem;font-weight:600;padding:4px 12px;cursor:pointer;transition:all .2s;white-space:nowrap;min-height:26px}
+.sf-btn.active{background:rgba(212,175,55,.12);border-color:rgba(212,175,55,.35);color:var(--gold)}
+.search-results{display:none}
+.search-results.active{display:block}
+.search-result-item{
+  display:flex;align-items:center;gap:.875rem;
+  padding:.875rem;margin-bottom:.5rem;
+  background:rgba(255,255,255,.04);border:.5px solid rgba(255,255,255,.08);
+  border-radius:14px;cursor:pointer;transition:all .2s
+}
+.search-result-item:active{background:rgba(255,255,255,.07)}
+.sri-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.125rem;flex-shrink:0}
+.sri-loc{background:rgba(212,175,55,.1);border:.5px solid rgba(212,175,55,.2)}
+.sri-mission{background:rgba(52,199,89,.1);border:.5px solid rgba(52,199,89,.2)}
+.sri-pulse{background:rgba(10,132,255,.1);border:.5px solid rgba(10,132,255,.2)}
+.sri-body{flex:1;min-width:0}
+.sri-name{font-size:.875rem;font-weight:600;color:var(--t1);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sri-meta{font-size:.625rem;color:var(--t3)}
+.sri-tag{font-size:.5rem;font-weight:700;padding:2px 7px;border-radius:5px;flex-shrink:0}
+.tag-loc{background:rgba(212,175,55,.12);color:var(--gold)}
+.tag-mission{background:rgba(52,199,89,.12);color:var(--green)}
+.tag-pulse{background:rgba(10,132,255,.12);color:var(--blue)}
+.search-empty{text-align:center;padding:2rem 1rem;color:var(--t3);font-size:.875rem}
+.search-empty .se-icon{font-size:2rem;margin-bottom:.5rem;display:block}
+.search-loading{text-align:center;padding:1rem;color:var(--t3);font-size:.8125rem}
 </style>
 </head>
 <body>
@@ -485,6 +529,32 @@ footer p{font-size:.5625rem;color:rgba(255,255,255,.18);letter-spacing:.04em;lin
 
   <div class="divider"></div>
 
+  <!-- VV SEARCH -->
+  <div class="search-section">
+    <div class="s-label" style="font-size:.5625rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--t3);margin-bottom:.875rem;padding-left:2px">VV Search · Ecosistem</div>
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input class="search-input" id="vv-search-input" 
+        placeholder="Caută locații, misiuni, activitate..."
+        oninput="onSearchInput(this.value)"
+        autocomplete="off" autocorrect="off" spellcheck="false">
+      <button class="search-clear" id="search-clear" onclick="clearSearch()">✕</button>
+    </div>
+    <div class="search-filters">
+      <button class="sf-btn active" id="sf-all" onclick="setSearchFilter('all')">⬡ Tot</button>
+      <button class="sf-btn" id="sf-loc" onclick="setSearchFilter('loc')">📍 Locații</button>
+      <button class="sf-btn" id="sf-mission" onclick="setSearchFilter('mission')">🎯 Misiuni</button>
+      <button class="sf-btn" id="sf-pulse" onclick="setSearchFilter('pulse')">⚡ Pulse</button>
+    </div>
+    <div class="search-results" id="search-results">
+      <div class="search-loading" id="search-loading" style="display:none">Se caută...</div>
+      <div id="search-results-list"></div>
+    </div>
+  </div>
+
+
+  <div class="divider"></div>
+
   <!-- FEATURES -->
   <div id="features" style="animation:up .5s .5s ease both">
     <div class="section-label">Ce include</div>
@@ -610,7 +680,7 @@ footer p{font-size:.5625rem;color:rgba(255,255,255,.18);letter-spacing:.04em;lin
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, signInAnonymously, signInWithPopup, GithubAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, addDoc, collection, increment, serverTimestamp, onSnapshot, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, doc, getDoc, setDoc, addDoc, collection, increment, serverTimestamp, onSnapshot, query as query_fb, orderBy, limit as limit_fb, where as where_fb, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx1T8_uL8FoN6C9_SbT8YRiDF72lsqHD3d-sDpAhQMdLl97xpyhp-Xk3rSCnBSxbyEcBA/exec";
 const BETA_URL = "https://vv-technologies.github.io/ceo.html";
@@ -1088,6 +1158,154 @@ window.submitBugReport=async function(){
   }catch(e){showToast('Salvat local. Conexiune slabă.');}
   btn.disabled=false;btn.textContent='Trimite raportul →';
 };
+
+
+/* ── VV SEARCH ── */
+const PULSE_LOCATIONS = [
+  {id:'p1',name:'Ateneul Român',type:'loc',meta:'Premium · Vibe 98/100',icon:'⭐',lat:44.4413,lng:26.0973},
+  {id:'p2',name:'Palatul Parlamentului',type:'loc',meta:'Premium · Vibe 90/100',icon:'⭐',lat:44.4275,lng:26.0872},
+  {id:'p3',name:'Arcul de Triumf',type:'loc',meta:'Premium · Vibe 92/100',icon:'⭐',lat:44.4673,lng:26.0784},
+  {id:'p4',name:'Calea Victoriei',type:'loc',meta:'Premium · Vibe 95/100',icon:'⭐',lat:44.4410,lng:26.0950},
+  {id:'p5',name:'Parcul Herăstrău',type:'loc',meta:'Premium · Vibe 94/100',icon:'⭐',lat:44.4710,lng:26.0820},
+  {id:'p6',name:'Piața Universității',type:'loc',meta:'Premium · Vibe 88/100',icon:'⭐',lat:44.4355,lng:26.1025},
+  {id:'p7',name:'Hanul lui Manuc',type:'loc',meta:'Premium · Vibe 91/100',icon:'⭐',lat:44.4293,lng:26.1023},
+  {id:'p8',name:'Muzeul Satului',type:'loc',meta:'Premium · Vibe 85/100',icon:'⭐',lat:44.4715,lng:26.0760},
+  {id:'p9',name:'Biserica Stavropoleos',type:'loc',meta:'Premium · Vibe 96/100',icon:'⭐',lat:44.4318,lng:26.0998},
+  {id:'p10',name:'Pasajul Macca-Vilacrosse',type:'loc',meta:'Premium · Vibe 89/100',icon:'⭐',lat:44.4331,lng:26.0988},
+  {id:'p11',name:'Piața Revoluției',type:'loc',meta:'Premium · Vibe 87/100',icon:'⭐',lat:44.4390,lng:26.0970},
+  {id:'p12',name:'Grădina Cișmigiu',type:'loc',meta:'Premium · Vibe 82/100',icon:'⭐',lat:44.4370,lng:26.0910},
+  {id:'p13',name:'Palatul CEC',type:'loc',meta:'Premium · Vibe 93/100',icon:'⭐',lat:44.4323,lng:26.0965},
+  {id:'p14',name:'Fântânile Unirii',type:'loc',meta:'Premium · Vibe 88/100',icon:'⭐',lat:44.4265,lng:26.1020},
+  {id:'p15',name:'Parcul Carol',type:'loc',meta:'Premium · Vibe 84/100',icon:'⭐',lat:44.4110,lng:26.0950},
+  {id:'p16',name:'Muzeul Național de Artă',type:'loc',meta:'Premium · Vibe 91/100',icon:'⭐',lat:44.4395,lng:26.0960},
+  {id:'p17',name:'Piața Victoriei',type:'loc',meta:'Premium · Vibe 80/100',icon:'⭐',lat:44.4520,lng:26.0860},
+  {id:'p18',name:'Zona Floreasca',type:'loc',meta:'Premium · Vibe 97/100',icon:'⭐',lat:44.4650,lng:26.1050},
+  {id:'p19',name:'Zona Dorobanți',type:'loc',meta:'Premium · Vibe 96/100',icon:'⭐',lat:44.4580,lng:26.0920},
+  {id:'p20',name:'Parcul Regele Mihai I',type:'loc',meta:'Premium · Vibe 89/100',icon:'⭐',lat:44.4650,lng:26.0780},
+  {id:'h1',name:'Strada Xenofon',type:'loc',meta:'Hidden Gem · Vibe 88/100',icon:'👁',lat:44.4305,lng:26.0945},
+  {id:'h2',name:'Pasajul Englez',type:'loc',meta:'Hidden Gem · Vibe 85/100',icon:'👁',lat:44.4335,lng:26.0980},
+  {id:'h3',name:'Casa Melik',type:'loc',meta:'Hidden Gem · Vibe 92/100',icon:'👁',lat:44.4290,lng:26.1005},
+  {id:'h4',name:'Strada Arthur Verona',type:'loc',meta:'Hidden Gem · Vibe 90/100',icon:'👁',lat:44.4360,lng:26.1015},
+  {id:'h5',name:'Grădina Verona',type:'loc',meta:'Hidden Gem · Vibe 87/100',icon:'👁',lat:44.4355,lng:26.1000},
+  {id:'h6',name:'Insula Îngerilor',type:'loc',meta:'Hidden Gem · Vibe 94/100',icon:'👁',lat:44.4458,lng:26.0372},
+  {id:'h7',name:'Parcul Văcărești',type:'loc',meta:'Hidden Gem · Vibe 96/100',icon:'👁',lat:44.4048,lng:26.1197}
+];
+
+let searchFilter = 'all';
+let searchTimeout = null;
+
+window.setSearchFilter = function(f) {
+  searchFilter = f;
+  ['all','loc','mission','pulse'].forEach(k => {
+    const el = document.getElementById('sf-'+k);
+    if (el) el.classList.toggle('active', k === f);
+  });
+  const val = document.getElementById('vv-search-input')?.value;
+  if (val && val.length >= 1) doSearch(val);
+};
+
+window.onSearchInput = function(val) {
+  const clearBtn = document.getElementById('search-clear');
+  const results = document.getElementById('search-results');
+  if (clearBtn) clearBtn.classList.toggle('visible', val.length > 0);
+  if (val.length === 0) {
+    if (results) results.classList.remove('active');
+    return;
+  }
+  if (results) results.classList.add('active');
+  clearTimeout(searchTimeout);
+  searchTimeout = setTimeout(() => doSearch(val), 250);
+};
+
+window.clearSearch = function() {
+  const input = document.getElementById('vv-search-input');
+  const results = document.getElementById('search-results');
+  const clearBtn = document.getElementById('search-clear');
+  if (input) input.value = '';
+  if (results) results.classList.remove('active');
+  if (clearBtn) clearBtn.classList.remove('visible');
+};
+
+async function doSearch(query) {
+  const q = query.toLowerCase().trim();
+  const list = document.getElementById('search-results-list');
+  const loading = document.getElementById('search-loading');
+  if (!list) return;
+  if (loading) loading.style.display = 'block';
+  list.innerHTML = '';
+
+  let results = [];
+
+  // Cauta in locatii locale
+  if (searchFilter === 'all' || searchFilter === 'loc') {
+    PULSE_LOCATIONS.forEach(loc => {
+      if (loc.name.toLowerCase().includes(q) || loc.meta.toLowerCase().includes(q)) {
+        results.push({
+          icon: loc.icon, name: loc.name, meta: loc.meta,
+          type: 'loc', iconClass: 'sri-loc', tagClass: 'tag-loc', tagText: 'LOCAȚIE',
+          action: () => window.open('https://vv-technologies.github.io/vv-nexus/vv-pulse.html', '_blank')
+        });
+      }
+    });
+  }
+
+  // Cauta in Firebase missions
+  if (searchFilter === 'all' || searchFilter === 'mission') {
+    try {
+      const snap = await getDocs(query_fb(collection(db, 'missions'), where_fb('status', '==', 'pending'), limit_fb(20)));
+      snap.forEach(doc => {
+        const m = doc.data();
+        const text = (m.description || m.message || '').toLowerCase();
+        const loc = (m.location || '').toLowerCase();
+        if (text.includes(q) || loc.includes(q) || q.length <= 2) {
+          results.push({
+            icon: '🎯', name: m.description || m.message || 'Misiune activă',
+            meta: '📍 ' + (m.location || 'București') + ' · 🪙 ' + (m.reward || 10) + ' VVC',
+            type: 'mission', iconClass: 'sri-mission', tagClass: 'tag-mission', tagText: 'MISIUNE',
+            action: () => window.open('https://vv-technologies.github.io/vv-technologies/ceo.html', '_blank')
+          });
+        }
+      });
+    } catch(e) {}
+  }
+
+  // Cauta in pulse events
+  if (searchFilter === 'all' || searchFilter === 'pulse') {
+    try {
+      const snap = await getDocs(query_fb(collection(db, 'pulse_events'), orderBy('timestamp', 'desc'), limit_fb(10)));
+      snap.forEach(doc => {
+        const p = doc.data();
+        const msg = (p.message || '').replace(/<[^>]*>/g,'').toLowerCase();
+        if (msg.includes(q) || q.length <= 2) {
+          results.push({
+            icon: p.icon || '⚡', name: (p.message || '').replace(/<b>/g,'').replace(/<\/b>/g,''),
+            meta: 'Pulse · ' + (p.tagText || 'VV'),
+            type: 'pulse', iconClass: 'sri-pulse', tagClass: 'tag-pulse', tagText: 'PULSE',
+            action: null
+          });
+        }
+      });
+    } catch(e) {}
+  }
+
+  if (loading) loading.style.display = 'none';
+
+  if (results.length === 0) {
+    list.innerHTML = '<div class="search-empty"><span class="se-icon">🔍</span>Niciun rezultat pentru „' + query + '"</div>';
+    return;
+  }
+
+  // Limiteaza la 8 rezultate
+  results.slice(0, 8).forEach(r => {
+    const div = document.createElement('div');
+    div.className = 'search-result-item';
+    div.innerHTML = '<div class="sri-icon ' + r.iconClass + '">' + r.icon + '</div>' +
+      '<div class="sri-body"><div class="sri-name">' + r.name + '</div><div class="sri-meta">' + r.meta + '</div></div>' +
+      '<span class="sri-tag ' + r.tagClass + '">' + r.tagText + '</span>';
+    if (r.action) div.onclick = r.action;
+    list.appendChild(div);
+  });
+}
 
 init();
 </script>
