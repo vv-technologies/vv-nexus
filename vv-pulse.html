@@ -437,6 +437,38 @@ if(!localStorage.getItem('vv_welcomed')){
 applyLang();
 renderMarkers();
 
+// Fly-to daca vine din VV Search
+const urlParams = new URLSearchParams(window.location.search);
+const flyLat = parseFloat(urlParams.get('lat'));
+const flyLng = parseFloat(urlParams.get('lng'));
+const flyName = urlParams.get('name');
+if (flyLat && flyLng) {
+  setTimeout(() => {
+    map.flyTo([flyLat, flyLng], 16, {duration: 1.5});
+    // Gaseste locatia si deschide cardul
+    setTimeout(() => {
+      const loc = [...LOCS, ...fbLocs].find(l => 
+        Math.abs(l.lat - flyLat) < 0.001 && Math.abs(l.lng - flyLng) < 0.001
+      );
+      if (loc) { selLoc = loc; openCard(loc); }
+      else if (flyName) {
+        // Creeaza un card minimal cu datele din URL
+        document.getElementById('cn').textContent = decodeURIComponent(flyName);
+        document.getElementById('cv').textContent = 'VERIFICAT';
+        document.getElementById('ctm').textContent = 'acum';
+        document.getElementById('cvb').textContent = 'ACTIV';
+        document.getElementById('cvb').className = 'card-vibe vibe-warm';
+        document.getElementById('csc').textContent = '—';
+        document.getElementById('cfr').textContent = '🔥';
+        document.getElementById('cva').textContent = '—';
+        document.getElementById('cdesc').style.display = 'none';
+        document.getElementById('mstats').classList.add('hidden');
+        document.getElementById('bcard').classList.add('open');
+      }
+    }, 1600);
+  }, 500);
+}
+
 try{await setDoc(doc(db,"stats","map_visits"),{total:increment(1),[new Date().toISOString().slice(0,10)]:increment(1)},{merge:true});}catch(e){}
 </script>
 </body>
