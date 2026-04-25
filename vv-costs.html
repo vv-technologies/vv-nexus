@@ -7,460 +7,654 @@
 <meta name="apple-mobile-web-app-title" content="VV Costs">
 <title>VV COSTS</title>
 <style>
-* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-body {
-    background:#03030a; color:#fff;
-    font-family:-apple-system,sans-serif;
-    min-height:100dvh;
-    padding-top:env(safe-area-inset-top,0px);
-    padding-bottom:env(safe-area-inset-bottom,20px);
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#03030a;--panel:#080810;--gold:#D4AF37;--green:#34c759;
+  --red:#ff3b30;--orange:#ff9500;--blue:#0A84FF;
+  --t1:#fff;--t2:rgba(255,255,255,0.5);--t3:rgba(255,255,255,0.25);
+  --line:rgba(255,255,255,0.08);--font:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif
 }
-.hdr {
-    background:#080810; border-bottom:1px solid rgba(255,255,255,0.08);
-    padding:14px 18px; display:flex; align-items:center; justify-content:space-between;
-    position:sticky; top:0; z-index:10;
-}
-.hdr-title { font-size:16px; font-weight:900; color:#D4AF37; letter-spacing:2px; }
-.hdr-sub { font-size:10px; color:rgba(255,255,255,0.3); margin-top:2px; }
-.total-badge { font-size:13px; font-weight:800; color:#ff3b30; }
+body{background:var(--bg);color:var(--t1);font-family:var(--font);min-height:100dvh;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,20px)}
 
-.content { padding:16px; max-width:600px; margin:0 auto; }
+/* HDR */
+.hdr{background:var(--panel);border-bottom:.5px solid var(--line);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10}
+.hdr-left{}
+.hdr-title{font-size:16px;font-weight:900;color:var(--gold);letter-spacing:2px}
+.hdr-sub{font-size:10px;color:var(--t3);margin-top:2px}
+.hdr-right{display:flex;flex-direction:column;align-items:flex-end;gap:3px}
+.total-badge{font-size:15px;font-weight:900}
+.live-badge{display:flex;align-items:center;gap:4px;font-size:9px;color:var(--green);letter-spacing:.08em}
+.live-dot{width:5px;height:5px;border-radius:50%;background:var(--green);animation:blink 2s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
 
-.section-title {
-    font-size:10px; color:rgba(255,255,255,0.25);
-    letter-spacing:3px; font-weight:700;
-    margin:20px 0 10px;
-}
-.section-title:first-child { margin-top:8px; }
+.content{padding:16px;max-width:600px;margin:0 auto}
 
-.cost-card {
-    background:rgba(255,255,255,0.04);
-    border:1px solid rgba(255,255,255,0.08);
-    border-radius:16px; padding:16px;
-    margin-bottom:10px;
-}
-.cost-card.red { border-color:rgba(255,59,48,0.2); background:rgba(255,59,48,0.04); }
-.cost-card.green { border-color:rgba(52,199,89,0.2); background:rgba(52,199,89,0.04); }
-.cost-card.gold { border-color:rgba(212,175,55,0.2); background:rgba(212,175,55,0.04); }
-.cost-card.blue { border-color:rgba(10,132,255,0.2); background:rgba(10,132,255,0.04); }
-
-.cost-header { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:10px; }
-.cost-name { font-size:14px; font-weight:700; color:#fff; }
-.cost-provider { font-size:11px; color:rgba(255,255,255,0.3); margin-top:2px; }
-.cost-price { font-size:16px; font-weight:900; text-align:right; flex-shrink:0; margin-left:10px; }
-.cost-price.free { color:#34c759; }
-.cost-price.paid { color:#ff3b30; }
-.cost-price.low { color:#ff9500; }
-
-.cost-details { font-size:11px; color:rgba(255,255,255,0.35); line-height:1.7; margin-bottom:8px; }
-.cost-limit { display:flex; align-items:center; gap:6px; }
-.limit-bar-bg { flex:1; height:6px; background:rgba(255,255,255,0.08); border-radius:3px; overflow:hidden; }
-.limit-bar { height:100%; border-radius:3px; transition:width 0.3s; }
-.limit-label { font-size:10px; color:rgba(255,255,255,0.3); flex-shrink:0; min-width:60px; text-align:right; }
-
-.status-pill {
-    display:inline-block; padding:3px 9px;
-    border-radius:20px; font-size:10px; font-weight:700;
-    letter-spacing:1px; margin-top:6px;
-}
-.status-pill.active { background:rgba(52,199,89,0.12); border:1px solid rgba(52,199,89,0.25); color:#34c759; }
-.status-pill.free { background:rgba(52,199,89,0.08); border:1px solid rgba(52,199,89,0.2); color:#34c759; }
-.status-pill.watch { background:rgba(255,149,0,0.1); border:1px solid rgba(255,149,0,0.22); color:#ff9500; }
-.status-pill.upgrade { background:rgba(255,59,48,0.1); border:1px solid rgba(255,59,48,0.2); color:#ff3b30; }
+/* FIREBASE MONITOR */
+.fb-monitor{background:rgba(10,132,255,0.06);border:.5px solid rgba(10,132,255,0.2);border-radius:18px;padding:16px;margin-bottom:16px}
+.fb-monitor-title{font-size:9px;color:rgba(10,132,255,0.6);letter-spacing:3px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.fb-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.fb-stat{background:rgba(255,255,255,0.03);border:.5px solid rgba(255,255,255,0.07);border-radius:12px;padding:12px}
+.fb-stat-val{font-size:20px;font-weight:800;line-height:1;margin-bottom:3px}
+.fb-stat-lbl{font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.08em}
+.fb-stat-sub{font-size:9px;color:var(--t3);margin-top:2px}
+.fb-bar-wrap{margin-top:8px}
+.fb-bar-bg{height:4px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden}
+.fb-bar{height:100%;border-radius:2px;transition:width .6s ease}
+.fb-bar-label{font-size:9px;color:var(--t3);margin-top:3px;display:flex;justify-content:space-between}
 
 /* SUMMARY */
-.summary-card {
-    background:rgba(212,175,55,0.06);
-    border:1px solid rgba(212,175,55,0.18);
-    border-radius:18px; padding:20px;
-    margin:16px 0;
-}
-.summary-row { display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.05); }
-.summary-row:last-child { border-bottom:none; padding-bottom:0; }
-.summary-label { font-size:13px; color:rgba(255,255,255,0.5); }
-.summary-val { font-size:14px; font-weight:800; }
+.summary-card{background:rgba(212,175,55,0.06);border:.5px solid rgba(212,175,55,0.18);border-radius:18px;padding:18px;margin-bottom:16px}
+.summary-label-top{font-size:9px;color:rgba(212,175,55,0.5);letter-spacing:3px;font-weight:700;margin-bottom:14px}
+.summary-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:.5px solid rgba(255,255,255,0.05)}
+.summary-row:last-child{border-bottom:none;padding-bottom:0}
+.summary-label{font-size:13px;color:var(--t2)}
+.summary-val{font-size:14px;font-weight:800}
 
-/* ALERT */
-.alert-box {
-    background:rgba(255,59,48,0.08);
-    border:1px solid rgba(255,59,48,0.2);
-    border-radius:14px; padding:14px 16px;
-    font-size:12px; color:rgba(255,59,48,0.8);
-    line-height:1.7; margin-bottom:12px;
-}
-.ok-box {
-    background:rgba(52,199,89,0.06);
-    border:1px solid rgba(52,199,89,0.15);
-    border-radius:14px; padding:14px 16px;
-    font-size:12px; color:rgba(52,199,89,0.7);
-    line-height:1.7; margin-bottom:12px;
-}
+/* SECTION */
+.section-title{font-size:9px;color:var(--t3);letter-spacing:3px;font-weight:700;margin:20px 0 10px;text-transform:uppercase}
+.section-title:first-child{margin-top:8px}
+
+/* COST CARD */
+.cost-card{background:rgba(255,255,255,0.04);border:.5px solid rgba(255,255,255,0.08);border-radius:16px;padding:16px;margin-bottom:10px}
+.cost-card.green{border-color:rgba(52,199,89,0.2);background:rgba(52,199,89,0.04)}
+.cost-card.gold{border-color:rgba(212,175,55,0.2);background:rgba(212,175,55,0.04)}
+.cost-card.blue{border-color:rgba(10,132,255,0.2);background:rgba(10,132,255,0.04)}
+.cost-card.red{border-color:rgba(255,59,48,0.2);background:rgba(255,59,48,0.04)}
+.cost-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px}
+.cost-name{font-size:14px;font-weight:700}
+.cost-provider{font-size:11px;color:var(--t3);margin-top:2px}
+.cost-price{font-size:16px;font-weight:900;text-align:right;flex-shrink:0;margin-left:10px}
+.cost-price.free{color:var(--green)}
+.cost-price.paid{color:var(--red)}
+.cost-price.low{color:var(--orange)}
+.cost-price.blue{color:var(--blue)}
+.cost-details{font-size:11px;color:var(--t3);line-height:1.7;margin-bottom:8px}
+.cost-limit{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.limit-bar-bg{flex:1;height:5px;background:rgba(255,255,255,0.07);border-radius:3px;overflow:hidden}
+.limit-bar{height:100%;border-radius:3px;transition:width .4s}
+.limit-label{font-size:9px;color:var(--t3);flex-shrink:0;min-width:65px;text-align:right}
+.status-pill{display:inline-block;padding:3px 9px;border-radius:20px;font-size:9px;font-weight:700;letter-spacing:1px;margin-top:4px}
+.status-pill.active{background:rgba(52,199,89,0.12);border:.5px solid rgba(52,199,89,0.25);color:var(--green)}
+.status-pill.free{background:rgba(52,199,89,0.08);border:.5px solid rgba(52,199,89,0.2);color:var(--green)}
+.status-pill.watch{background:rgba(255,149,0,0.1);border:.5px solid rgba(255,149,0,0.22);color:var(--orange)}
+.status-pill.upgrade{background:rgba(255,59,48,0.1);border:.5px solid rgba(255,59,48,0.2);color:var(--red)}
+.updated-tag{font-size:9px;color:var(--t3);margin-left:6px}
+
+/* ALERTS */
+.alert-box{background:rgba(255,59,48,0.08);border:.5px solid rgba(255,59,48,0.2);border-radius:14px;padding:14px 16px;font-size:12px;color:rgba(255,59,48,0.8);line-height:1.7;margin-bottom:10px}
+.ok-box{background:rgba(52,199,89,0.06);border:.5px solid rgba(52,199,89,0.15);border-radius:14px;padding:14px 16px;font-size:12px;color:rgba(52,199,89,0.7);line-height:1.7;margin-bottom:12px}
+.tip-box{background:rgba(212,175,55,0.06);border:.5px solid rgba(212,175,55,0.15);border-radius:14px;padding:14px 16px;font-size:12px;color:rgba(212,175,55,0.7);line-height:1.7;margin-bottom:10px}
+
+/* BREAKEVEN */
+.breakeven{background:rgba(52,199,89,0.06);border:.5px solid rgba(52,199,89,0.18);border-radius:18px;padding:16px;margin-bottom:16px}
+.breakeven-title{font-size:9px;color:rgba(52,199,89,0.5);letter-spacing:3px;font-weight:700;margin-bottom:12px}
+.be-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:.5px solid rgba(255,255,255,0.05);font-size:12px}
+.be-row:last-child{border-bottom:none}
+.be-label{color:var(--t2)}
+.be-val{font-weight:700;color:var(--green)}
 
 /* BTN */
-.btn {
-    display:block; width:100%; padding:15px;
-    border-radius:13px; font-size:14px; font-weight:800;
-    cursor:pointer; touch-action:manipulation;
-    text-align:center; margin-bottom:8px;
-    min-height:50px; font-family:-apple-system,sans-serif;
-    -webkit-appearance:none; text-decoration:none;
-}
-.btn-gold { background:rgba(212,175,55,0.12); border:1px solid rgba(212,175,55,0.28); color:#D4AF37; }
-.btn-gray { background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); color:rgba(255,255,255,0.5); }
+.btn{display:block;width:100%;padding:15px;border-radius:13px;font-size:14px;font-weight:800;cursor:pointer;touch-action:manipulation;text-align:center;margin-bottom:8px;min-height:50px;font-family:var(--font);-webkit-appearance:none;border:none}
+.btn-gold{background:rgba(212,175,55,0.12);border:.5px solid rgba(212,175,55,0.28) !important;color:var(--gold)}
+.btn-gray{background:rgba(255,255,255,0.06);border:.5px solid rgba(255,255,255,0.1) !important;color:var(--t2)}
+.btn-green{background:rgba(52,199,89,0.12);border:.5px solid rgba(52,199,89,0.28) !important;color:var(--green)}
 
-/* ADD COST */
-.add-form { display:none; }
-.add-form.open { display:block; }
-.inp {
-    display:block; width:100%;
-    background:rgba(255,255,255,0.07);
-    border:1px solid rgba(255,255,255,0.12);
-    border-radius:11px; padding:13px 14px;
-    color:#fff; font-size:16px;
-    font-family:-apple-system,sans-serif;
-    outline:none; -webkit-appearance:none;
-    margin-bottom:10px;
-}
-select.inp { cursor:pointer; }
+/* FORM */
+.add-form{display:none}
+.add-form.open{display:block}
+.inp{display:block;width:100%;background:rgba(255,255,255,0.07);border:.5px solid rgba(255,255,255,0.12);border-radius:11px;padding:13px 14px;color:#fff;font-size:16px;font-family:var(--font);outline:none;-webkit-appearance:none;margin-bottom:10px}
+select.inp{cursor:pointer}
 
-.toast-el { position:fixed; top:calc(16px + env(safe-area-inset-top,0px)); left:50%; transform:translateX(-50%); z-index:9999; padding:11px 20px; border-radius:14px; font-size:12px; font-weight:700; white-space:nowrap; max-width:90vw; pointer-events:none; }
-.toast-el.g { background:rgba(52,199,89,0.2); border:1px solid rgba(52,199,89,0.4); color:#34c759; }
-.toast-el.r { background:rgba(255,59,48,0.2); border:1px solid rgba(255,59,48,0.4); color:#ff3b30; }
+/* TOAST */
+.toast-el{position:fixed;top:calc(16px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);z-index:9999;padding:11px 20px;border-radius:14px;font-size:12px;font-weight:700;white-space:nowrap;max-width:90vw;pointer-events:none}
+.toast-el.g{background:rgba(52,199,89,0.2);border:.5px solid rgba(52,199,89,0.4);color:var(--green)}
+.toast-el.r{background:rgba(255,59,48,0.2);border:.5px solid rgba(255,59,48,0.4);color:var(--red)}
 </style>
 </head>
 <body>
 
 <div class="hdr">
-    <div>
-        <div class="hdr-title">VV COSTS</div>
-        <div class="hdr-sub">COSTURI & SERVICII · VV Technologies</div>
-    </div>
-    <div class="total-badge" id="total-lunar">0€/lună</div>
+  <div class="hdr-left">
+    <div class="hdr-title">VV COSTS</div>
+    <div class="hdr-sub">COSTURI & SERVICII · VV Technologies</div>
+  </div>
+  <div class="hdr-right">
+    <div class="total-badge" id="total-lunar" style="color:var(--green)">0€/lună</div>
+    <div class="live-badge"><span class="live-dot"></span>LIVE</div>
+  </div>
 </div>
 
 <div class="content">
 
-    <!-- SUMMARY -->
-    <div class="summary-card">
-        <div style="font-size:10px;color:rgba(212,175,55,0.5);letter-spacing:2px;font-weight:700;margin-bottom:14px;">REZUMAT FINANCIAR</div>
-        <div class="summary-row">
-            <div class="summary-label">Costuri lunare</div>
-            <div class="summary-val" id="sum-lunar" style="color:#ff3b30;">0€</div>
-        </div>
-        <div class="summary-row">
-            <div class="summary-label">Costuri anuale</div>
-            <div class="summary-val" id="sum-anual" style="color:#ff9500;">0€</div>
-        </div>
-        <div class="summary-row">
-            <div class="summary-label">Servicii gratuite</div>
-            <div class="summary-val" id="sum-free" style="color:#34c759;">0</div>
-        </div>
-        <div class="summary-row">
-            <div class="summary-label">Venituri necesare</div>
-            <div class="summary-val" id="sum-necesar" style="color:#D4AF37;">0€/lună</div>
-        </div>
+  <!-- FIREBASE MONITOR REAL-TIME -->
+  <div class="fb-monitor">
+    <div class="fb-monitor-title">
+      <span class="live-dot"></span>
+      FIREBASE MONITOR · REAL-TIME
+    </div>
+    <div class="fb-grid">
+      <div class="fb-stat">
+        <div class="fb-stat-val" id="fb-users" style="color:var(--blue)">—</div>
+        <div class="fb-stat-lbl">Utilizatori</div>
+        <div class="fb-stat-sub" id="fb-users-sub">se încarcă...</div>
+      </div>
+      <div class="fb-stat">
+        <div class="fb-stat-val" id="fb-missions" style="color:var(--gold)">—</div>
+        <div class="fb-stat-lbl">Misiuni</div>
+        <div class="fb-stat-sub" id="fb-missions-sub">total în sistem</div>
+      </div>
+      <div class="fb-stat">
+        <div class="fb-stat-val" id="fb-pulse" style="color:var(--green)">—</div>
+        <div class="fb-stat-lbl">Pulse Events</div>
+        <div class="fb-stat-sub" id="fb-pulse-sub">activitate live</div>
+      </div>
+      <div class="fb-stat">
+        <div class="fb-stat-val" id="fb-feedback" style="color:var(--orange)">—</div>
+        <div class="fb-stat-lbl">Feedback</div>
+        <div class="fb-stat-sub" id="fb-feedback-sub">de rezolvat</div>
+      </div>
     </div>
 
-    <!-- ALERTE -->
-    <div id="alerts-container"></div>
-
-    <!-- SERVICII GRATUITE -->
-    <div class="section-title">✅ SERVICII GRATUITE (acum)</div>
-
-    <div class="cost-card green">
-        <div class="cost-header">
-            <div><div class="cost-name">GitHub Pages</div><div class="cost-provider">github.com · Hosting static</div></div>
-            <div class="cost-price free">GRATUIT</div>
-        </div>
-        <div class="cost-details">Hosting pentru VV Beta, VV TEAM, VV Hybrid Univers, NEXUS. Limită: 1GB spațiu, 100GB bandwidth/lună.</div>
-        <div class="cost-limit">
-            <div class="limit-bar-bg"><div class="limit-bar" style="width:5%;background:#34c759;"></div></div>
-            <div class="limit-label">~5% folosit</div>
-        </div>
-        <div><span class="status-pill free">ACTIV · GRATUIT</span></div>
+    <!-- Citiri Firestore azi -->
+    <div style="margin-top:12px">
+      <div style="font-size:9px;color:var(--t3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px">Limită Firestore Gratuită / Zi</div>
+      <div style="margin-bottom:8px">
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--t2);margin-bottom:3px"><span>Citiri</span><span id="fb-reads-label">0 / 50,000</span></div>
+        <div class="fb-bar-bg"><div class="fb-bar" id="fb-reads-bar" style="background:var(--green);width:0%"></div></div>
+      </div>
+      <div style="margin-bottom:8px">
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--t2);margin-bottom:3px"><span>Scrieri</span><span id="fb-writes-label">0 / 20,000</span></div>
+        <div class="fb-bar-bg"><div class="fb-bar" id="fb-writes-bar" style="background:var(--green);width:0%"></div></div>
+      </div>
+      <div>
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--t2);margin-bottom:3px"><span>Stocare</span><span id="fb-storage-label">0 / 1 GB</span></div>
+        <div class="fb-bar-bg"><div class="fb-bar" id="fb-storage-bar" style="background:var(--green);width:0%"></div></div>
+      </div>
     </div>
+    <div style="font-size:9px;color:var(--t3);margin-top:8px;text-align:right" id="fb-last-update">Ultima actualizare: —</div>
+  </div>
 
-    <div class="cost-card green">
-        <div class="cost-header">
-            <div><div class="cost-name">Firebase Spark (Gratuit)</div><div class="cost-provider">firebase.google.com · vv-ep-beta</div></div>
-            <div class="cost-price free">GRATUIT</div>
-        </div>
-        <div class="cost-details">Firestore: 50k citiri/zi, 20k scrieri/zi, 1GB stocare. Auth: nelimitat. Storage: 5GB. Suficient pentru faza Beta.</div>
-        <div class="cost-limit">
-            <div class="limit-bar-bg"><div class="limit-bar" style="width:15%;background:#34c759;"></div></div>
-            <div class="limit-label">~15% limită</div>
-        </div>
-        <div><span class="status-pill free">ACTIV · GRATUIT</span></div>
+  <!-- SUMMARY -->
+  <div class="summary-card">
+    <div class="summary-label-top">REZUMAT FINANCIAR</div>
+    <div class="summary-row"><div class="summary-label">Costuri lunare</div><div class="summary-val" id="sum-lunar" style="color:var(--red)">0€</div></div>
+    <div class="summary-row"><div class="summary-label">Costuri anuale</div><div class="summary-val" id="sum-anual" style="color:var(--orange)">0€</div></div>
+    <div class="summary-row"><div class="summary-label">Servicii gratuite</div><div class="summary-val" id="sum-free" style="color:var(--green)">0</div></div>
+    <div class="summary-row"><div class="summary-label">Buffer siguranță (x3)</div><div class="summary-val" id="sum-necesar" style="color:var(--gold)">0€/lună</div></div>
+  </div>
+
+  <!-- BREAKEVEN -->
+  <div class="breakeven">
+    <div class="breakeven-title">💰 CÂT TREBUIE SĂ VINZI SĂ ACOPERI COSTURILE</div>
+    <div class="be-row"><div class="be-label">1 landing page (150€)</div><div class="be-val" id="be-landing">— buc</div></div>
+    <div class="be-row"><div class="be-label">1 site prezentare (400€)</div><div class="be-val" id="be-site">— buc</div></div>
+    <div class="be-row"><div class="be-label">Fondatori VV (29 lei/buc)</div><div class="be-val" id="be-fondatori">— buc</div></div>
+    <div class="be-row"><div class="be-label">Abonament VV Pro (29€/lună)</div><div class="be-val" id="be-pro">— abonați</div></div>
+  </div>
+
+  <!-- ALERTE -->
+  <div id="alerts-container"></div>
+
+  <!-- SERVICII GRATUITE -->
+  <div class="section-title">✅ SERVICII GRATUITE (acum · 2025)</div>
+
+  <div class="cost-card green">
+    <div class="cost-header">
+      <div><div class="cost-name">GitHub Pages</div><div class="cost-provider">github.com · Hosting static</div></div>
+      <div class="cost-price free">GRATUIT</div>
     </div>
-
-    <div class="cost-card green">
-        <div class="cost-header">
-            <div><div class="cost-name">Google Gemini API</div><div class="cost-provider">aistudio.google.com · NEXUS AI</div></div>
-            <div class="cost-price free">GRATUIT</div>
-        </div>
-        <div class="cost-details">Gemini 1.5 Flash: 15 req/min, 1500 req/zi gratuit. Suficient pentru uz personal NEXUS.</div>
-        <div class="cost-limit">
-            <div class="limit-bar-bg"><div class="limit-bar" id="gemini-bar" style="width:0%;background:#34c759;"></div></div>
-            <div class="limit-label" id="gemini-label">0/1500 azi</div>
-        </div>
-        <div><span class="status-pill free">ACTIV · GRATUIT</span></div>
+    <div class="cost-details">Hosting pentru VV Nexus, VV Team, VV Technologies, VV Pulse Map. Limită: 1GB spațiu, 100GB bandwidth/lună. SSL inclus.</div>
+    <div class="cost-limit">
+      <div class="limit-bar-bg"><div class="limit-bar" style="width:5%;background:var(--green)"></div></div>
+      <div class="limit-label">~5% folosit</div>
     </div>
+    <span class="status-pill free">ACTIV · GRATUIT</span>
+  </div>
 
-    <!-- COSTURI VIITOARE -->
-    <div class="section-title">⚠️ COSTURI VIITOARE (de planificat)</div>
-
-    <div class="cost-card gold">
-        <div class="cost-header">
-            <div><div class="cost-name">Domeniu Custom</div><div class="cost-provider">rotld.ro sau namecheap.com</div></div>
-            <div class="cost-price low">~50 RON/an</div>
-        </div>
-        <div class="cost-details">vv-beta.ro sau vvtechnologies.ro. Necesar pentru: localStorage persistent pe Safari iOS, credibilitate clienți, email profesional.</div>
-        <div><span class="status-pill watch">RECOMANDAT</span></div>
+  <div class="cost-card green">
+    <div class="cost-header">
+      <div><div class="cost-name">Firebase Spark Plan</div><div class="cost-provider">firebase.google.com · vv-ep-beta</div></div>
+      <div class="cost-price free">GRATUIT</div>
     </div>
-
-    <div class="cost-card gold">
-        <div class="cost-header">
-            <div><div class="cost-name">Claude API (Anthropic)</div><div class="cost-provider">console.anthropic.com · Motor AI premium</div></div>
-            <div class="cost-price low">~5€ credit start</div>
-        </div>
-        <div class="cost-details">Claude Haiku: $0.25/1M tokeni input. Cu $5 credit gratuit la înregistrare poți face ~500 conversații complexe. Mai precis decât Gemini pe cod JS.</div>
-        <div><span class="status-pill watch">OPȚIONAL · RECOMANDAT</span></div>
+    <div class="cost-details">Firestore: 50k citiri/zi, 20k scrieri/zi, 1GB stocare. Auth: utilizatori nelimitați. Hosting: 10GB/lună. Suficient pentru faza Beta cu câteva sute de utilizatori.</div>
+    <div class="cost-limit">
+      <div class="limit-bar-bg"><div class="limit-bar" id="firebase-use-bar" style="width:10%;background:var(--green)"></div></div>
+      <div class="limit-label" id="firebase-use-label">~10% limită</div>
     </div>
+    <span class="status-pill free">ACTIV · GRATUIT</span>
+  </div>
 
-    <div class="cost-card gold">
-        <div class="cost-header">
-            <div><div class="cost-name">Firebase Blaze (Pay-as-you-go)</div><div class="cost-provider">firebase.google.com · Upgrade plan</div></div>
-            <div class="cost-price low">0€ dacă nu depășești</div>
-        </div>
-        <div class="cost-details">Necesar când VV Beta crește peste limitele gratuite. Blaze plan are același nivel gratuit + plătești doar ce depășești. Cloud Functions necesită Blaze.</div>
-        <div><span class="status-pill watch">CÂND CREȘTI</span></div>
+  <div class="cost-card green">
+    <div class="cost-header">
+      <div><div class="cost-name">Google Gemini API</div><div class="cost-provider">aistudio.google.com · NEXUS AI backup</div></div>
+      <div class="cost-price free">GRATUIT</div>
     </div>
-
-    <!-- COSTURI CLIENȚI -->
-    <div class="section-title">💰 COSTURI PENTRU CLIENȚI (ce le percepi)</div>
-
-    <div class="cost-card blue">
-        <div class="cost-header">
-            <div><div class="cost-name">Site prezentare simplu</div><div class="cost-provider">5 pagini, contact, mobil</div></div>
-            <div class="cost-price" style="color:#0A84FF;">300-500€</div>
-        </div>
-        <div class="cost-details">Livrare: 24-48h cu NEXUS. Costul tău real: 0€ (GitHub Pages gratuit). Profit: 300-500€.</div>
-        <div><span class="status-pill active">VINDE ACUM</span></div>
+    <div class="cost-details">Gemini 1.5 Flash: 15 req/min, 1500 req/zi gratuit. Gemini 2.0 Flash: disponibil gratuit în AI Studio. Limitat dar funcțional pentru testare.</div>
+    <div class="cost-limit">
+      <div class="limit-bar-bg"><div class="limit-bar" id="gemini-bar" style="width:0%;background:var(--green)"></div></div>
+      <div class="limit-label" id="gemini-label">0/1500 azi</div>
     </div>
+    <span class="status-pill free">ACTIV · GRATUIT</span>
+  </div>
 
-    <div class="cost-card blue">
-        <div class="cost-header">
-            <div><div class="cost-name">Landing page + WhatsApp</div><div class="cost-provider">O pagină, conversie, rapid</div></div>
-            <div class="cost-price" style="color:#0A84FF;">150-250€</div>
-        </div>
-        <div class="cost-details">Cel mai ușor de vândut. Frizerii, cafenele, mecanici. Livrare: 2-4h.</div>
-        <div><span class="status-pill active">VINDE ACUM</span></div>
+  <div class="cost-card green">
+    <div class="cost-header">
+      <div><div class="cost-name">Groq API</div><div class="cost-provider">console.groq.com · NEXUS Lite (principal)</div></div>
+      <div class="cost-price free">GRATUIT</div>
     </div>
-
-    <div class="cost-card blue">
-        <div class="cost-header">
-            <div><div class="cost-name">Aplicație web cu Firebase</div><div class="cost-provider">Auth + DB + Admin panel</div></div>
-            <div class="cost-price" style="color:#0A84FF;">800-1500€</div>
-        </div>
-        <div class="cost-details">Exact ce ai construit pentru VV Beta. Livrare: 3-5 zile.</div>
-        <div><span class="status-pill watch">CÂND NEXUS E STABIL</span></div>
+    <div class="cost-details">LLaMA 3 8B: 14,400 req/zi gratuit. Viteză: răspuns în &lt;1s — perfect pentru TikTok. Motor principal al Nexus Lite în hub.</div>
+    <div class="cost-limit">
+      <div class="limit-bar-bg"><div class="limit-bar" style="width:3%;background:var(--green)"></div></div>
+      <div class="limit-label">~3% azi</div>
     </div>
+    <span class="status-pill free">ACTIV · GRATUIT</span>
+  </div>
 
-    <!-- COSTURI CUSTOM -->
-    <div class="section-title">➕ COSTURILE TALE CUSTOM</div>
-
-    <div id="custom-costs"></div>
-
-    <button class="btn btn-gold" onclick="toggleAddForm()">+ ADAUGĂ COST NOU</button>
-
-    <div class="add-form" id="add-form">
-        <div class="cost-card" style="margin-top:0;">
-            <input class="inp" id="c-name" type="text" placeholder="Numele serviciului" autocomplete="off">
-            <input class="inp" id="c-provider" type="text" placeholder="Provider (ex: Namecheap)" autocomplete="off">
-            <input class="inp" id="c-price" type="number" placeholder="Preț (€)" step="0.01">
-            <select class="inp" id="c-period">
-                <option value="lunar">Lunar</option>
-                <option value="anual">Anual</option>
-                <option value="odata">O dată</option>
-                <option value="gratuit">Gratuit</option>
-            </select>
-            <input class="inp" id="c-desc" type="text" placeholder="Descriere scurtă" autocomplete="off">
-            <select class="inp" id="c-status">
-                <option value="active">Activ acum</option>
-                <option value="watch">De urmărit</option>
-                <option value="upgrade">Necesită upgrade</option>
-                <option value="free">Gratuit</option>
-            </select>
-            <button class="btn btn-gold" onclick="addCost()" style="margin-bottom:8px;">SALVEAZĂ</button>
-            <button class="btn btn-gray" onclick="toggleAddForm()">ANULEAZĂ</button>
-        </div>
+  <div class="cost-card green">
+    <div class="cost-header">
+      <div><div class="cost-name">Google Apps Script + Sheets</div><div class="cost-provider">google.com · Sistem chei VV Beta</div></div>
+      <div class="cost-price free">GRATUIT</div>
     </div>
+    <div class="cost-details">Generare și validare chei VV Beta. 6 min execuție/min, 100 req/100s. Suficient pentru sute de chei/zi.</div>
+    <span class="status-pill free">ACTIV · GRATUIT</span>
+  </div>
 
-    <button class="btn btn-gray" onclick="exportCosts()">📥 EXPORTĂ RAPORT COSTURI</button>
+  <div class="cost-card green">
+    <div class="cost-header">
+      <div><div class="cost-name">Leaflet.js + CartoDB Tiles</div><div class="cost-provider">leafletjs.com · VV Pulse Map</div></div>
+      <div class="cost-price free">GRATUIT</div>
+    </div>
+    <div class="cost-details">Hartă dark void pentru VV Pulse Map. CartoDB oferă tile-uri dark gratuite fără limită pentru uz non-comercial. Leaflet: open source MIT.</div>
+    <span class="status-pill free">ACTIV · GRATUIT</span>
+  </div>
 
-    <div style="height:20px;"></div>
+  <!-- COSTURI VIITOARE -->
+  <div class="section-title">⚠️ COSTURI VIITOARE (de planificat)</div>
+
+  <div class="cost-card gold">
+    <div class="cost-header">
+      <div><div class="cost-name">Domeniu Custom <span class="updated-tag">· PRIORITAR</span></div><div class="cost-provider">rotld.ro sau namecheap.com</div></div>
+      <div class="cost-price low">~50 RON/an</div>
+    </div>
+    <div class="cost-details">vv-beta.ro sau vvtechnologies.ro. Necesar pentru: localStorage persistent pe Safari iOS (GitHub Pages șterge cookies), credibilitate clienți, email profesional @vv-beta.ro. ROI instant.</div>
+    <span class="status-pill watch">PRIORITAR · ~4€/AN</span>
+  </div>
+
+  <div class="cost-card gold">
+    <div class="cost-header">
+      <div><div class="cost-name">Firebase Blaze (Pay-as-you-go)</div><div class="cost-provider">firebase.google.com · Upgrade plan</div></div>
+      <div class="cost-price low">0€ dacă nu depășești</div>
+    </div>
+    <div class="cost-details">Activezi când crești peste limitele gratuite. Blaze păstrează același nivel gratuit + plătești doar surplusul. La 1000 utilizatori activi: estimat ~5-15€/lună. Cloud Functions necesită Blaze obligatoriu.</div>
+    <span class="status-pill watch">CÂND DEPĂȘEȘTI 500 UTILIZATORI</span>
+  </div>
+
+  <div class="cost-card gold">
+    <div class="cost-header">
+      <div><div class="cost-name">OpenWeatherMap API</div><div class="cost-provider">openweathermap.org · VV NOW meteo</div></div>
+      <div class="cost-price free">GRATUIT</div>
+    </div>
+    <div class="cost-details">1,000 req/zi gratuit. Suficient pentru meteo live în VV NOW. Înregistrezi cont gratuit, primești API key instant. Un singur req la 10 min = 144 req/zi.</div>
+    <span class="status-pill watch">ÎNREGISTREAZĂ-TE GRATUIT</span>
+  </div>
+
+  <div class="cost-card gold">
+    <div class="cost-header">
+      <div><div class="cost-name">MacBook M3 (recomandat)</div><div class="cost-provider">apple.com · Tool de lucru</div></div>
+      <div class="cost-price low">1,299€+</div>
+    </div>
+    <div class="cost-details">512GB recomandat față de 256GB. Motivul: proiectele cresc, 256GB se umple în 6-12 luni. Cu MacBook: tot ce azi durează 2h pe iPhone X durează 10 minute. ROI real în productivitate.</div>
+    <span class="status-pill watch">INVESTIȚIE VIITOARE</span>
+  </div>
+
+  <!-- COSTURI CLIENȚI -->
+  <div class="section-title">💰 CE POȚI FACTURA CLIENȚILOR (prețuri reale piață RO 2025)</div>
+
+  <div class="cost-card blue">
+    <div class="cost-header">
+      <div><div class="cost-name">Landing page simplu</div><div class="cost-provider">1 pagină, WhatsApp, mobil</div></div>
+      <div class="cost-price blue">150-250€</div>
+    </div>
+    <div class="cost-details">Cel mai ușor de vândut. Frizerii, cafenele, mecanici auto, cabinete. Livrare cu NEXUS: 2-4h. Costul tău: 0€. Profit: 150-250€ net.</div>
+    <span class="status-pill active">VINDE ACUM</span>
+  </div>
+
+  <div class="cost-card blue">
+    <div class="cost-header">
+      <div><div class="cost-name">Site prezentare (5 pagini)</div><div class="cost-provider">Complet, animat, contact</div></div>
+      <div class="cost-price blue">300-500€</div>
+    </div>
+    <div class="cost-details">Livrare: 24-48h. Hosting gratuit GitHub Pages. Costul tău: 0€. Profit: 300-500€ net. Target: firme mici, avocați, medici, consultanți.</div>
+    <span class="status-pill active">VINDE ACUM</span>
+  </div>
+
+  <div class="cost-card blue">
+    <div class="cost-header">
+      <div><div class="cost-name">Aplicație web cu Firebase</div><div class="cost-provider">Auth + DB + Panou admin</div></div>
+      <div class="cost-price blue">800-1,500€</div>
+    </div>
+    <div class="cost-details">Exact ce ai construit pentru VV. Auth, bază de date, panou de control, real-time. Livrare: 3-5 zile. Cel mai valoros produs al tău acum.</div>
+    <span class="status-pill watch">DUPĂ STABILIZARE VV</span>
+  </div>
+
+  <div class="cost-card blue">
+    <div class="cost-header">
+      <div><div class="cost-name">Mentenanță lunară</div><div class="cost-provider">Updates, hosting, suport</div></div>
+      <div class="cost-price blue">30-80€/lună</div>
+    </div>
+    <div class="cost-details">Venit recurent pasiv. 10 clienți × 50€/lună = 500€/lună pasivi. Acesta e modelul de scalare fără a munci mai mult.</div>
+    <span class="status-pill active">PROPUNE LA FIECARE CLIENT</span>
+  </div>
+
+  <!-- COSTURI CUSTOM -->
+  <div class="section-title">➕ COSTURILE TALE CUSTOM</div>
+  <div id="custom-costs"></div>
+  <button class="btn btn-gold" onclick="toggleAddForm()">+ ADAUGĂ COST NOU</button>
+
+  <div class="add-form" id="add-form">
+    <div class="cost-card" style="margin-top:0">
+      <input class="inp" id="c-name" type="text" placeholder="Numele serviciului" autocomplete="off">
+      <input class="inp" id="c-provider" type="text" placeholder="Provider (ex: Namecheap)" autocomplete="off">
+      <input class="inp" id="c-price" type="number" placeholder="Preț (€)" step="0.01" min="0">
+      <select class="inp" id="c-period">
+        <option value="lunar">Lunar</option>
+        <option value="anual">Anual</option>
+        <option value="odata">O dată</option>
+        <option value="gratuit">Gratuit</option>
+      </select>
+      <input class="inp" id="c-desc" type="text" placeholder="Descriere scurtă" autocomplete="off">
+      <select class="inp" id="c-status">
+        <option value="active">Activ acum</option>
+        <option value="watch">De urmărit</option>
+        <option value="upgrade">Necesită upgrade</option>
+        <option value="free">Gratuit</option>
+      </select>
+      <button class="btn btn-gold" onclick="addCost()">SALVEAZĂ</button>
+      <button class="btn btn-gray" onclick="toggleAddForm()">ANULEAZĂ</button>
+    </div>
+  </div>
+
+  <button class="btn btn-green" onclick="exportCosts()">📥 EXPORTĂ RAPORT PDF</button>
+  <button class="btn btn-gray" onclick="resetCustom()">🗑 Șterge costuri custom</button>
+
+  <div style="height:30px"></div>
 </div>
 
-<script>
-var customCosts = [];
+<!-- Firebase + JS -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 
-(function init() {
-    try { customCosts = JSON.parse(localStorage.getItem('vv_costs') || '[]'); } catch(e) { customCosts = []; }
-    renderCustomCosts();
-    calcTotals();
-    checkAlerts();
-    updateGeminiUsage();
+<script>
+firebase.initializeApp({
+  apiKey:"AIzaSyDGv4kEClO0RHCLvXVLOT-vyPHw6bsxYVc",
+  authDomain:"vv-ep-beta.firebaseapp.com",
+  projectId:"vv-ep-beta",
+  storageBucket:"vv-ep-beta.firebasestorage.app",
+  messagingSenderId:"641117018598",
+  appId:"1:641117018598:web:7cd522ef48db46ad58de27"
+});
+const db = firebase.firestore();
+
+var customCosts = [];
+var fbReads = 0;
+var fbWrites = 0;
+
+// INIT
+(function init(){
+  try{ customCosts = JSON.parse(localStorage.getItem('vv_costs')||'[]'); }catch(e){ customCosts=[]; }
+  renderCustomCosts();
+  calcTotals();
+  checkAlerts();
+  updateGeminiUsage();
+  loadFirebaseStats();
 })();
 
-function updateGeminiUsage() {
-    // Citim din localStorage câte requesturi Gemini am făcut azi
-    var today = new Date().toDateString();
-    var usage = 0;
-    try {
-        var stored = JSON.parse(localStorage.getItem('nx_gemini_usage') || '{}');
-        usage = stored[today] || 0;
-    } catch(e) {}
-    var pct = Math.min(Math.round(usage / 1500 * 100), 100);
-    var bar = document.getElementById('gemini-bar');
-    var lbl = document.getElementById('gemini-label');
-    if (bar) { bar.style.width = pct + '%'; bar.style.background = pct > 80 ? '#ff3b30' : pct > 50 ? '#ff9500' : '#34c759'; }
-    if (lbl) lbl.textContent = usage + '/1500 azi';
-}
+// ── FIREBASE MONITOR REAL-TIME ──
+function loadFirebaseStats(){
+  var today = new Date().toISOString().slice(0,10);
 
-function calcTotals() {
-    var lunar = 0;
-    var anual = 0;
-    var freeCount = 3; // GitHub + Firebase + Gemini
+  // Utilizatori in users collection
+  db.collection('users').get().then(function(s){
+    fbReads++;
+    var total = s.size;
+    document.getElementById('fb-users').textContent = total;
+    document.getElementById('fb-users-sub').textContent = total + ' în ecosistem';
+    updateReadBar();
+  }).catch(function(){ document.getElementById('fb-users').textContent = '—'; });
 
-    customCosts.forEach(function(c) {
-        if (c.period === 'lunar') lunar += parseFloat(c.price) || 0;
-        else if (c.period === 'anual') anual += parseFloat(c.price) || 0;
-        else if (c.period === 'gratuit') freeCount++;
-    });
+  // Misiuni
+  db.collection('missions').get().then(function(s){
+    fbReads++;
+    var total = s.size;
+    var pending = 0;
+    s.forEach(function(d){ if(d.data().status==='pending') pending++; });
+    document.getElementById('fb-missions').textContent = total;
+    document.getElementById('fb-missions-sub').textContent = pending + ' în așteptare';
+    updateReadBar();
+  }).catch(function(){ document.getElementById('fb-missions').textContent = '—'; });
 
-    var totalLunar = lunar + (anual / 12);
+  // Pulse Events - real-time listener
+  db.collection('pulse_events').orderBy('timestamp','desc').limit(50).onSnapshot(function(s){
+    fbReads++;
+    document.getElementById('fb-pulse').textContent = s.size;
+    document.getElementById('fb-pulse-sub').textContent = 'ultimele 50 events';
+    document.getElementById('fb-last-update').textContent = 'Ultima actualizare: ' + new Date().toLocaleTimeString('ro');
+    updateReadBar();
+  }, function(){ document.getElementById('fb-pulse').textContent = '—'; });
 
-    document.getElementById('sum-lunar').textContent = totalLunar.toFixed(2) + '€';
-    document.getElementById('sum-anual').textContent = (lunar * 12 + anual).toFixed(2) + '€';
-    document.getElementById('sum-free').textContent = freeCount + ' servicii';
-    document.getElementById('sum-necesar').textContent = (totalLunar * 3).toFixed(2) + '€ (x3 safety)';
-    document.getElementById('total-lunar').textContent = totalLunar.toFixed(2) + '€/lună';
-    document.getElementById('total-lunar').style.color = totalLunar > 50 ? '#ff3b30' : totalLunar > 20 ? '#ff9500' : '#34c759';
-}
+  // Feedback nou
+  db.collection('feedback').where('status','==','nou').get().then(function(s){
+    fbReads++;
+    var count = s.size;
+    document.getElementById('fb-feedback').textContent = count;
+    document.getElementById('fb-feedback-sub').textContent = count > 0 ? count + ' de rezolvat ⚠️' : 'totul rezolvat ✓';
+    document.getElementById('fb-feedback').style.color = count > 0 ? 'var(--red)' : 'var(--green)';
+    updateReadBar();
+  }).catch(function(){ document.getElementById('fb-feedback').textContent = '—'; });
 
-function checkAlerts() {
-    var container = document.getElementById('alerts-container');
-    var alerts = [];
-
-    // Verificăm dacă are domeniu
-    var hasDomain = customCosts.some(function(c) { return c.name && c.name.toLowerCase().indexOf('domeniu') > -1; });
-    if (!hasDomain) {
-        alerts.push('⚠️ Nu ai un domeniu custom. Safari iOS șterge localStorage pe GitHub Pages. Un domeniu .ro (~50 RON/an) rezolvă problema cu cheile care se pierd.');
+  // Stats vizitatori
+  db.collection('stats').doc('visitors').get().then(function(s){
+    fbReads++;
+    if(s.exists){
+      var total = s.data().total || 0;
+      // Estimare stocare
+      var storageKB = (s.size || 0.1);
+      updateStorageBar(storageKB);
     }
+    updateReadBar();
+  }).catch(function(){});
 
-    if (alerts.length === 0) {
-        container.innerHTML = '<div class="ok-box">✅ Totul arată bine! Costuri sub control.</div>';
-    } else {
-        container.innerHTML = alerts.map(function(a) { return '<div class="alert-box">' + a + '</div>'; }).join('');
-    }
+  // Refresh automat la 60s
+  setTimeout(loadFirebaseStats, 60000);
 }
 
-function toggleAddForm() {
-    var f = document.getElementById('add-form');
-    f.classList.toggle('open');
+function updateReadBar(){
+  var limit = 50000;
+  var pct = Math.min((fbReads/limit)*100, 100);
+  var bar = document.getElementById('fb-reads-bar');
+  var lbl = document.getElementById('fb-reads-label');
+  if(bar){ bar.style.width = Math.max(pct,1)+'%'; bar.style.background = pct>80?'var(--red)':pct>50?'var(--orange)':'var(--green)'; }
+  if(lbl) lbl.textContent = fbReads.toLocaleString() + ' / 50,000';
+
+  var writePct = Math.min((fbWrites/20000)*100,100);
+  var wbar = document.getElementById('fb-writes-bar');
+  var wlbl = document.getElementById('fb-writes-label');
+  if(wbar){ wbar.style.width = Math.max(writePct,0.5)+'%'; wbar.style.background = writePct>80?'var(--red)':writePct>50?'var(--orange)':'var(--green)'; }
+  if(wlbl) wlbl.textContent = fbWrites.toLocaleString() + ' / 20,000';
 }
 
-function addCost() {
-    var name     = document.getElementById('c-name').value.trim();
-    var provider = document.getElementById('c-provider').value.trim();
-    var price    = parseFloat(document.getElementById('c-price').value) || 0;
-    var period   = document.getElementById('c-period').value;
-    var desc     = document.getElementById('c-desc').value.trim();
-    var status   = document.getElementById('c-status').value;
-
-    if (!name) { toast('Introdu numele serviciului.', 'r'); return; }
-
-    customCosts.push({ name:name, provider:provider, price:price, period:period, desc:desc, status:status, ts:Date.now() });
-    localStorage.setItem('vv_costs', JSON.stringify(customCosts));
-    renderCustomCosts();
-    calcTotals();
-    checkAlerts();
-    toggleAddForm();
-
-    // Reset form
-    ['c-name','c-provider','c-price','c-desc'].forEach(function(id) {
-        var el = document.getElementById(id);
-        if (el) el.value = '';
-    });
-    toast('Cost adăugat ✅', 'g');
+function updateStorageBar(kb){
+  var limitKB = 1024*1024; // 1GB in KB
+  var pct = Math.min((kb/limitKB)*100,100);
+  var bar = document.getElementById('fb-storage-bar');
+  var lbl = document.getElementById('fb-storage-label');
+  if(bar){ bar.style.width = Math.max(pct,0.5)+'%'; bar.style.background = pct>80?'var(--red)':'var(--green)'; }
+  if(lbl){
+    var display = kb < 1024 ? kb.toFixed(0)+' KB' : (kb/1024).toFixed(1)+' MB';
+    lbl.textContent = display + ' / 1 GB';
+  }
 }
 
-function removeCost(i) {
-    if (!confirm('Ștergi ' + customCosts[i].name + '?')) return;
-    customCosts.splice(i, 1);
-    localStorage.setItem('vv_costs', JSON.stringify(customCosts));
-    renderCustomCosts();
-    calcTotals();
-    checkAlerts();
+// ── GEMINI USAGE ──
+function updateGeminiUsage(){
+  var today = new Date().toDateString();
+  var usage = 0;
+  try{ var s=JSON.parse(localStorage.getItem('nx_gemini_usage')||'{}'); usage=s[today]||0; }catch(e){}
+  var pct = Math.min(Math.round(usage/1500*100),100);
+  var bar = document.getElementById('gemini-bar');
+  var lbl = document.getElementById('gemini-label');
+  if(bar){ bar.style.width=pct+'%'; bar.style.background=pct>80?'var(--red)':pct>50?'var(--orange)':'var(--green)'; }
+  if(lbl) lbl.textContent = usage+'/1500 azi';
 }
 
-function renderCustomCosts() {
-    var el = document.getElementById('custom-costs');
-    if (!customCosts.length) { el.innerHTML = '<div style="font-size:12px;color:rgba(255,255,255,0.2);text-align:center;padding:12px;">Niciun cost custom adăugat.</div>'; return; }
+// ── TOTALS ──
+function calcTotals(){
+  var lunar = 0;
+  var anual = 0;
+  var freeCount = 6; // GitHub + Firebase + Gemini + Groq + Apps Script + Leaflet
 
-    var statusColors = { active:'#34c759', watch:'#ff9500', upgrade:'#ff3b30', free:'#34c759' };
-    var statusLabels = { active:'ACTIV', watch:'DE URMĂRIT', upgrade:'NECESITĂ UPGRADE', free:'GRATUIT' };
-    var periodLabels = { lunar:'lună', anual:'an', odata:'o dată', gratuit:'gratuit' };
+  customCosts.forEach(function(c){
+    if(c.period==='lunar') lunar += parseFloat(c.price)||0;
+    else if(c.period==='anual') anual += parseFloat(c.price)||0;
+    else if(c.period==='gratuit') freeCount++;
+  });
 
-    el.innerHTML = customCosts.map(function(c, i) {
-        var color = statusColors[c.status] || '#fff';
-        var isGratuit = c.period === 'gratuit' || c.price === 0;
-        return '<div class="cost-card" style="border-color:rgba(255,255,255,0.06);">'
-            + '<div class="cost-header">'
-            + '<div><div class="cost-name">' + esc(c.name) + '</div>'
-            + (c.provider ? '<div class="cost-provider">' + esc(c.provider) + '</div>' : '')
-            + '</div>'
-            + '<div class="cost-price ' + (isGratuit?'free':c.price<20?'low':'paid') + '">'
-            + (isGratuit ? 'GRATUIT' : c.price + '€/' + (periodLabels[c.period]||c.period))
-            + '</div></div>'
-            + (c.desc ? '<div class="cost-details">' + esc(c.desc) + '</div>' : '')
-            + '<div style="display:flex;align-items:center;justify-content:space-between;">'
-            + '<span class="status-pill ' + c.status + '">' + (statusLabels[c.status]||c.status) + '</span>'
-            + '<button onclick="removeCost('+i+')" style="background:rgba(255,59,48,0.08);border:1px solid rgba(255,59,48,0.15);border-radius:7px;color:rgba(255,59,48,0.5);font-size:11px;padding:4px 10px;cursor:pointer;touch-action:manipulation;">✕</button>'
-            + '</div></div>';
-    }).join('');
+  var totalLunar = lunar + (anual/12);
+
+  var el = function(id){ return document.getElementById(id); };
+  if(el('sum-lunar')) el('sum-lunar').textContent = totalLunar.toFixed(2)+'€';
+  if(el('sum-anual')) el('sum-anual').textContent = (lunar*12+anual).toFixed(2)+'€';
+  if(el('sum-free')) el('sum-free').textContent = freeCount+' servicii';
+  if(el('sum-necesar')) el('sum-necesar').textContent = (totalLunar*3).toFixed(2)+'€/lună';
+
+  var badge = el('total-lunar');
+  if(badge){
+    badge.textContent = totalLunar.toFixed(2)+'€/lună';
+    badge.style.color = totalLunar>50?'var(--red)':totalLunar>20?'var(--orange)':'var(--green)';
+  }
+
+  // Breakeven
+  if(el('be-landing')) el('be-landing').textContent = totalLunar<=0 ? '0 buc' : Math.ceil(totalLunar/150)+' buc';
+  if(el('be-site')) el('be-site').textContent = totalLunar<=0 ? '0 buc' : Math.ceil(totalLunar/400)+' buc';
+  if(el('be-fondatori')) el('be-fondatori').textContent = totalLunar<=0 ? '0 buc' : Math.ceil((totalLunar*5)/29)+' buc (×5 RON/€)';
+  if(el('be-pro')) el('be-pro').textContent = totalLunar<=0 ? '0' : Math.ceil(totalLunar/29)+' abonați';
 }
 
-function exportCosts() {
-    var lines = ['VV COSTS — Raport ' + new Date().toLocaleDateString('ro-RO'), ''];
-    lines.push('SERVICII GRATUITE:');
-    lines.push('- GitHub Pages: 0€');
-    lines.push('- Firebase Spark: 0€');
-    lines.push('- Google Gemini API: 0€');
-    if (customCosts.length) {
-        lines.push(''); lines.push('COSTURI CUSTOM:');
-        customCosts.forEach(function(c) {
-            lines.push('- ' + c.name + ': ' + (c.period==='gratuit'?'GRATUIT':c.price+'€/'+c.period));
-        });
-    }
-    var lunar = customCosts.filter(function(c){return c.period==='lunar';}).reduce(function(s,c){return s+c.price;},0);
-    lines.push(''); lines.push('TOTAL LUNAR: ' + lunar.toFixed(2) + '€');
-    var blob = new Blob([lines.join('\n')], {type:'text/plain'});
-    var url = URL.createObjectURL(blob);
-    var a = document.createElement('a'); a.href=url; a.download='vv_costuri.txt'; a.click();
-    URL.revokeObjectURL(url);
-    toast('Raport exportat ✅', 'g');
+// ── ALERTS ──
+function checkAlerts(){
+  var container = document.getElementById('alerts-container');
+  var html = '';
+
+  var hasDomain = customCosts.some(function(c){ return c.name&&c.name.toLowerCase().indexOf('domeniu')>-1; });
+  if(!hasDomain){
+    html += '<div class="alert-box">⚠️ <strong>Safari iOS + GitHub Pages:</strong> localStorage se șterge periodic. Un domeniu custom (~50 RON/an) rezolvă definitiv problema cu cheile care dispar pe iPhone.</div>';
+  }
+
+  html += '<div class="tip-box">💡 <strong>Strategie 0€:</strong> Toate serviciile VV sunt gratuite acum. Primul euro cheltuit ar trebui să fie domeniul .ro — aduce credibilitate imediată și rezolvă Safari iOS.</div>';
+
+  if(!html.includes('alert-box')){
+    html = '<div class="ok-box">✅ Costurile sunt sub control. Ecosistemul VV rulează 100% gratuit în faza Beta.</div>' + html;
+  }
+
+  container.innerHTML = html;
 }
 
-function toast(msg, type) {
-    var old = document.getElementById('nx-t'); if (old) old.remove();
-    var t = document.createElement('div');
-    t.id='nx-t'; t.className='toast-el '+(type||'g'); t.textContent=msg;
-    document.body.appendChild(t);
-    setTimeout(function(){ t.style.opacity='0'; t.style.transition='opacity .3s'; setTimeout(function(){t.remove();},300); },3000);
+// ── CUSTOM COSTS ──
+function toggleAddForm(){
+  document.getElementById('add-form').classList.toggle('open');
 }
 
-function esc(t) { return (t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function addCost(){
+  var name = document.getElementById('c-name').value.trim();
+  var provider = document.getElementById('c-provider').value.trim();
+  var price = parseFloat(document.getElementById('c-price').value)||0;
+  var period = document.getElementById('c-period').value;
+  var desc = document.getElementById('c-desc').value.trim();
+  var status = document.getElementById('c-status').value;
+  if(!name){ toast('Introdu numele serviciului.','r'); return; }
+  customCosts.push({name:name,provider:provider,price:price,period:period,desc:desc,status:status,ts:Date.now()});
+  localStorage.setItem('vv_costs',JSON.stringify(customCosts));
+  renderCustomCosts();
+  calcTotals();
+  checkAlerts();
+  toggleAddForm();
+  ['c-name','c-provider','c-price','c-desc'].forEach(function(id){ var el=document.getElementById(id); if(el)el.value=''; });
+  toast('Cost adăugat ✅','g');
+}
+
+function removeCost(i){
+  if(!confirm('Ștergi '+customCosts[i].name+'?')) return;
+  customCosts.splice(i,1);
+  localStorage.setItem('vv_costs',JSON.stringify(customCosts));
+  renderCustomCosts();
+  calcTotals();
+  checkAlerts();
+}
+
+function resetCustom(){
+  if(!confirm('Ștergi toate costurile custom?')) return;
+  customCosts=[];
+  localStorage.setItem('vv_costs','[]');
+  renderCustomCosts();
+  calcTotals();
+  checkAlerts();
+  toast('Costuri custom șterse','g');
+}
+
+function renderCustomCosts(){
+  var el = document.getElementById('custom-costs');
+  if(!customCosts.length){
+    el.innerHTML = '<div style="font-size:12px;color:var(--t3);text-align:center;padding:12px">Niciun cost custom adăugat.</div>';
+    return;
+  }
+  var sColors={active:'var(--green)',watch:'var(--orange)',upgrade:'var(--red)',free:'var(--green)'};
+  var sLabels={active:'ACTIV',watch:'DE URMĂRIT',upgrade:'UPGRADE NECESAR',free:'GRATUIT'};
+  var pLabels={lunar:'lună',anual:'an',odata:'o dată',gratuit:'gratuit'};
+  el.innerHTML = customCosts.map(function(c,i){
+    var isFree = c.period==='gratuit'||c.price===0;
+    return '<div class="cost-card">'
+      +'<div class="cost-header">'
+      +'<div><div class="cost-name">'+esc(c.name)+'</div>'+(c.provider?'<div class="cost-provider">'+esc(c.provider)+'</div>':'')+'</div>'
+      +'<div class="cost-price '+(isFree?'free':c.price<20?'low':'paid')+'">'+(isFree?'GRATUIT':c.price+'€/'+(pLabels[c.period]||c.period))+'</div>'
+      +'</div>'
+      +(c.desc?'<div class="cost-details">'+esc(c.desc)+'</div>':'')
+      +'<div style="display:flex;align-items:center;justify-content:space-between;">'
+      +'<span class="status-pill '+c.status+'">'+(sLabels[c.status]||c.status)+'</span>'
+      +'<button onclick="removeCost('+i+')" style="background:rgba(255,59,48,0.08);border:.5px solid rgba(255,59,48,0.15);border-radius:7px;color:rgba(255,59,48,0.5);font-size:11px;padding:4px 10px;cursor:pointer;touch-action:manipulation">✕</button>'
+      +'</div></div>';
+  }).join('');
+}
+
+// ── EXPORT ──
+function exportCosts(){
+  var lines=['VV COSTS — Raport '+new Date().toLocaleDateString('ro-RO'),''];
+  lines.push('SERVICII GRATUITE (2025):');
+  lines.push('- GitHub Pages: 0€');
+  lines.push('- Firebase Spark: 0€');
+  lines.push('- Google Gemini API: 0€');
+  lines.push('- Groq API: 0€');
+  lines.push('- Google Apps Script: 0€');
+  lines.push('- Leaflet.js + CartoDB: 0€');
+  if(customCosts.length){ lines.push(''); lines.push('COSTURI CUSTOM:'); customCosts.forEach(function(c){ lines.push('- '+c.name+': '+(c.period==='gratuit'?'GRATUIT':c.price+'€/'+c.period)); }); }
+  var lunar = customCosts.filter(function(c){return c.period==='lunar';}).reduce(function(s,c){return s+(parseFloat(c.price)||0);},0);
+  lines.push(''); lines.push('TOTAL LUNAR: '+lunar.toFixed(2)+'€');
+  lines.push('STATUS: Ecosistem VV rulează GRATUIT în faza Beta.');
+  var blob = new Blob([lines.join('\n')],{type:'text/plain'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a'); a.href=url; a.download='vv_costuri_'+new Date().toISOString().slice(0,10)+'.txt'; a.click();
+  URL.revokeObjectURL(url);
+  toast('Raport exportat ✅','g');
+}
+
+function toast(msg,type){
+  var old=document.getElementById('nx-t'); if(old)old.remove();
+  var t=document.createElement('div'); t.id='nx-t'; t.className='toast-el '+(type||'g'); t.textContent=msg;
+  document.body.appendChild(t);
+  setTimeout(function(){ t.style.opacity='0'; t.style.transition='opacity .3s'; setTimeout(function(){t.remove();},300); },3000);
+}
+
+function esc(t){ return (t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 </script>
 </body>
 </html>
