@@ -494,40 +494,6 @@ footer p{font-size:.5625rem;color:rgba(255,255,255,.18);letter-spacing:.04em;lin
   </div>
 
 
-  <!-- VV NOW BANNER -->
-  <div class="vv-now-banner">
-    <div class="now-top">
-      <div class="now-badge"><span class="now-badge-dot"></span>VV NOW</div>
-      <span class="now-beta">BETA</span>
-    </div>
-    <div class="now-title">Ecosistemul VV<br><span>în timp real.</span></div>
-    <div class="now-desc">VV NOW este stratul inteligent al Universului VV — caută locații, misiuni active și activitate live într-un singur loc. Cu cât mai mulți utilizatori validează, cu atât informația devine mai precisă.</div>
-    <div class="now-weather" id="now-weather">
-      <span class="now-weather-icon" id="w-icon">🌡</span>
-      <div>
-        <div style="display:flex;align-items:baseline;gap:6px">
-          <span class="now-weather-temp" id="w-temp">—°C</span>
-          <span style="font-size:.625rem;color:var(--t3)" id="w-city">București</span>
-        </div>
-        <div class="now-weather-desc" id="w-desc">Se încarcă vremea...</div>
-      </div>
-      <div style="margin-left:auto;text-align:right">
-        <div style="font-size:.5625rem;color:var(--t3)" id="w-feel">Simțit: —°C</div>
-        <div style="font-size:.5625rem;color:var(--t3)" id="w-vibe">—</div>
-      </div>
-    </div>
-    <div class="now-pills">
-      <div class="now-pill" onclick="quickSearch('cafea')"><span class="now-pill-icon">☕</span>Cafea</div>
-      <div class="now-pill" onclick="quickSearch('parc')"><span class="now-pill-icon">🌳</span>Parc</div>
-      <div class="now-pill" onclick="quickSearch('hidden')"><span class="now-pill-icon">👁</span>Hidden Gems</div>
-      <div class="now-pill" id="now-time-pill"><span class="now-pill-icon">⭐</span>Premium</div>
-      <div class="now-pill" onclick="quickSearch('misiune')"><span class="now-pill-icon">🎯</span>Misiuni</div>
-    </div>
-    <button class="now-cta" onclick="document.getElementById('vv-search-input').focus();document.getElementById('vv-search-input').scrollIntoView({behavior:'smooth'})">
-      🔍 Caută în Universul VV →
-    </button>
-  </div>
-
   <!-- KEY STATUS BAR -->
   <div class="rate-bar glass-card" id="key-status-bar-inactive" style="margin-top:.75rem">
     <div style="display:flex;align-items:center;gap:8px">
@@ -613,6 +579,42 @@ footer p{font-size:.5625rem;color:rgba(255,255,255,.18);letter-spacing:.04em;lin
       </div>
     </div>
   </div>
+
+
+  <!-- VV NOW BANNER -->
+  <div class="vv-now-banner">
+    <div class="now-top">
+      <div class="now-badge"><span class="now-badge-dot"></span>VV NOW</div>
+      <span class="now-beta">BETA</span>
+    </div>
+    <div class="now-title">Ecosistemul VV<br><span>în timp real.</span></div>
+    <div class="now-desc">VV NOW este stratul inteligent al Universului VV — caută locații, misiuni active și activitate live într-un singur loc. Cu cât mai mulți utilizatori validează, cu atât informația devine mai precisă.</div>
+    <div class="now-weather" id="now-weather">
+      <span class="now-weather-icon" id="w-icon">🌡</span>
+      <div>
+        <div style="display:flex;align-items:baseline;gap:6px">
+          <span class="now-weather-temp" id="w-temp">—°C</span>
+          <span style="font-size:.625rem;color:var(--t3)" id="w-city">București</span>
+        </div>
+        <div class="now-weather-desc" id="w-desc">Se încarcă vremea...</div>
+      </div>
+      <div style="margin-left:auto;text-align:right">
+        <div style="font-size:.5625rem;color:var(--t3)" id="w-feel">Simțit: —°C</div>
+        <div style="font-size:.5625rem;color:var(--t3)" id="w-vibe">—</div>
+      </div>
+    </div>
+    <div class="now-pills">
+      <div class="now-pill" onclick="quickSearch('cafea')"><span class="now-pill-icon">☕</span>Cafea</div>
+      <div class="now-pill" onclick="quickSearch('parc')"><span class="now-pill-icon">🌳</span>Parc</div>
+      <div class="now-pill" onclick="quickSearch('hidden')"><span class="now-pill-icon">👁</span>Hidden Gems</div>
+      <div class="now-pill" id="now-time-pill"><span class="now-pill-icon">⭐</span>Premium</div>
+      <div class="now-pill" onclick="quickSearch('misiune')"><span class="now-pill-icon">🎯</span>Misiuni</div>
+    </div>
+    <button class="now-cta" onclick="scrollToSearch()">
+      🔍 Caută în Universul VV →
+    </button>
+  </div>
+
 
   <div class="divider"></div>
 
@@ -1435,6 +1437,15 @@ function updateTimePills(){
     pill.onclick = () => quickSearch('non-stop');
   }
 }
+
+window.scrollToSearch = function(){
+  const el = document.getElementById('vv-search-input');
+  if(!el) return;
+  const rect = el.getBoundingClientRect();
+  const offset = window.pageYOffset + rect.top - 16;
+  window.scrollTo({top: offset, behavior: 'smooth'});
+  setTimeout(() => el.focus(), 400);
+};
 
 window.quickSearch = function(term){
   const input = document.getElementById('vv-search-input');
