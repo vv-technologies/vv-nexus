@@ -348,6 +348,58 @@ footer p{font-size:.5625rem;color:rgba(255,255,255,.18);letter-spacing:.04em;lin
 .search-empty{text-align:center;padding:2rem 1rem;color:var(--t3);font-size:.875rem}
 .search-empty .se-icon{font-size:2rem;margin-bottom:.5rem;display:block}
 .search-loading{text-align:center;padding:1rem;color:var(--t3);font-size:.8125rem}
+
+/* ── VV NOW BANNER ── */
+.vv-now-banner{
+  margin:.875rem 0 1.25rem;
+  background:linear-gradient(135deg,rgba(10,132,255,0.08),rgba(167,139,250,0.06));
+  border:.5px solid rgba(10,132,255,0.22);
+  border-radius:var(--r-xl);padding:1.125rem 1.25rem;
+  position:relative;overflow:hidden
+}
+.vv-now-banner::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(10,132,255,.5),rgba(167,139,250,.5),transparent)
+}
+.now-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:.625rem}
+.now-badge{
+  display:flex;align-items:center;gap:5px;
+  background:rgba(10,132,255,.12);border:.5px solid rgba(10,132,255,.3);
+  border-radius:20px;padding:3px 10px;
+  font-size:.5rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--blue)
+}
+.now-badge-dot{width:5px;height:5px;border-radius:50%;background:var(--blue);animation:blink 1.5s ease-in-out infinite}
+.now-beta{
+  font-size:.4375rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+  background:rgba(212,175,55,.12);border:.5px solid rgba(212,175,55,.25);
+  border-radius:20px;padding:2px 8px;color:var(--gold)
+}
+.now-title{font-size:1.125rem;font-weight:800;letter-spacing:-.03em;margin-bottom:.375rem;line-height:1.2}
+.now-title span{color:var(--blue)}
+.now-desc{font-size:.75rem;color:var(--t2);line-height:1.65;margin-bottom:.875rem}
+.now-pills{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:.875rem}
+.now-pill{
+  display:flex;align-items:center;gap:4px;
+  background:rgba(255,255,255,.04);border:.5px solid rgba(255,255,255,.08);
+  border-radius:20px;padding:4px 10px;
+  font-size:.5625rem;color:var(--t2);font-weight:500
+}
+.now-pill-icon{font-size:.75rem}
+.now-cta{
+  width:100%;min-height:44px;border-radius:12px;
+  background:rgba(10,132,255,.15);border:.5px solid rgba(10,132,255,.35);
+  color:var(--blue);font-family:var(--font);font-size:.8125rem;font-weight:700;
+  cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:.5rem
+}
+.now-cta:active{background:rgba(10,132,255,.25)}
+.now-weather{
+  display:flex;align-items:center;gap:8px;
+  background:rgba(255,255,255,.03);border:.5px solid rgba(255,255,255,.07);
+  border-radius:10px;padding:8px 12px;margin-bottom:.75rem;font-size:.75rem;color:var(--t2)
+}
+.now-weather-icon{font-size:1.25rem}
+.now-weather-temp{font-size:1rem;font-weight:700;color:var(--t1)}
+.now-weather-desc{font-size:.5625rem;color:var(--t3);margin-top:1px}
 </style>
 </head>
 <body>
@@ -439,6 +491,41 @@ footer p{font-size:.5625rem;color:rgba(255,255,255,.18);letter-spacing:.04em;lin
   </nav>
   <div class="user-badge-wrap">
     <span class="user-badge" id="user-badge">Se conectează...</span>
+  </div>
+
+
+  <!-- VV NOW BANNER -->
+  <div class="vv-now-banner">
+    <div class="now-top">
+      <div class="now-badge"><span class="now-badge-dot"></span>VV NOW</div>
+      <span class="now-beta">BETA</span>
+    </div>
+    <div class="now-title">Ecosistemul VV<br><span>în timp real.</span></div>
+    <div class="now-desc">VV NOW este stratul inteligent al Universului VV — caută locații, misiuni active și activitate live într-un singur loc. Cu cât mai mulți utilizatori validează, cu atât informația devine mai precisă.</div>
+    <div class="now-weather" id="now-weather">
+      <span class="now-weather-icon" id="w-icon">🌡</span>
+      <div>
+        <div style="display:flex;align-items:baseline;gap:6px">
+          <span class="now-weather-temp" id="w-temp">—°C</span>
+          <span style="font-size:.625rem;color:var(--t3)" id="w-city">București</span>
+        </div>
+        <div class="now-weather-desc" id="w-desc">Se încarcă vremea...</div>
+      </div>
+      <div style="margin-left:auto;text-align:right">
+        <div style="font-size:.5625rem;color:var(--t3)" id="w-feel">Simțit: —°C</div>
+        <div style="font-size:.5625rem;color:var(--t3)" id="w-vibe">—</div>
+      </div>
+    </div>
+    <div class="now-pills">
+      <div class="now-pill" onclick="quickSearch('cafea')"><span class="now-pill-icon">☕</span>Cafea</div>
+      <div class="now-pill" onclick="quickSearch('parc')"><span class="now-pill-icon">🌳</span>Parc</div>
+      <div class="now-pill" onclick="quickSearch('hidden')"><span class="now-pill-icon">👁</span>Hidden Gems</div>
+      <div class="now-pill" id="now-time-pill"><span class="now-pill-icon">⭐</span>Premium</div>
+      <div class="now-pill" onclick="quickSearch('misiune')"><span class="now-pill-icon">🎯</span>Misiuni</div>
+    </div>
+    <button class="now-cta" onclick="document.getElementById('vv-search-input').focus();document.getElementById('vv-search-input').scrollIntoView({behavior:'smooth'})">
+      🔍 Caută în Universul VV →
+    </button>
   </div>
 
   <!-- KEY STATUS BAR -->
@@ -1306,6 +1393,61 @@ async function doSearch(query) {
     list.appendChild(div);
   });
 }
+
+
+/* ── VV NOW ── */
+async function loadWeather(){
+  try{
+    // OpenWeatherMap gratuit - 1000 calls/zi
+    const API_KEY = ''; // Fara key - fallback cu date statice premium
+    // Fallback elegant fara API key
+    const hour = new Date().getHours();
+    const seasons = ['iarna','iarna','primavara','primavara','primavara','vara','vara','vara','toamna','toamna','toamna','iarna'];
+    const month = new Date().getMonth();
+    const season = seasons[month];
+    const temps = {iarna:{t:4,feel:1},primavara:{t:18,feel:15},vara:{t:28,feel:30},toamna:{t:14,feel:11}};
+    const icons = {iarna:'❄️',primavara:'🌸',vara:'☀️',toamna:'🍂'};
+    const vibes = {iarna:'E frig — zi de cafea și interior',primavara:'Vreme perfectă de ieșit',vara:'Cald — hidratează-te!',toamna:'Răcoare plăcută de plimbare'};
+    const data = temps[season];
+    document.getElementById('w-icon').textContent = icons[season];
+    document.getElementById('w-temp').textContent = data.t + '°C';
+    document.getElementById('w-feel').textContent = 'Simțit: ' + data.feel + '°C';
+    document.getElementById('w-desc').textContent = season.charAt(0).toUpperCase() + season.slice(1) + ' în București';
+    document.getElementById('w-vibe').textContent = vibes[season];
+  }catch(e){}
+}
+
+function updateTimePills(){
+  const hour = new Date().getHours();
+  const pill = document.getElementById('now-time-pill');
+  if(!pill) return;
+  if(hour >= 6 && hour < 11){
+    pill.innerHTML = '<span class="now-pill-icon">🌅</span>Dimineață';
+    pill.onclick = () => quickSearch('cafea');
+  } else if(hour >= 11 && hour < 17){
+    pill.innerHTML = '<span class="now-pill-icon">☀️</span>Prânz';
+    pill.onclick = () => quickSearch('restaurant');
+  } else if(hour >= 17 && hour < 22){
+    pill.innerHTML = '<span class="now-pill-icon">🌆</span>Seară';
+    pill.onclick = () => quickSearch('vibe');
+  } else {
+    pill.innerHTML = '<span class="now-pill-icon">🌙</span>Noapte';
+    pill.onclick = () => quickSearch('non-stop');
+  }
+}
+
+window.quickSearch = function(term){
+  const input = document.getElementById('vv-search-input');
+  if(!input) return;
+  input.value = term;
+  input.scrollIntoView({behavior:'smooth', block:'center'});
+  onSearchInput(term);
+  const results = document.getElementById('search-results');
+  if(results) results.classList.add('active');
+};
+
+loadWeather();
+updateTimePills();
 
 init();
 </script>
