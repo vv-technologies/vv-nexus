@@ -689,38 +689,33 @@ footer p{font-size:.5625rem;color:rgba(255,255,255,.18);letter-spacing:.04em;lin
 
   <!-- FOUNDERS CARD -->
   <div class="founders-card glass-gold">
-    <div class="founders-eyebrow">VV Insider · Acces Anticipat</div>
-    <div class="founders-title">Fii unul dintre<br>primii fondatori.</div>
-    <div class="founders-sub">VV Hybrid Univers se construiește acum, în timp real. Susții direct dezvoltarea.</div>
-    <div class="progress-wrap">
-      <div class="progress-header">
-        <span class="progress-label">Locuri rezervate</span>
-        <span class="progress-count" id="founders-count">0/10 locuri</span>
+    <div style="font-size:.5625rem;color:rgba(212,175,55,.5);letter-spacing:.2em;font-weight:700;margin-bottom:.5rem">VV INNER CIRCLE · ACT DE CONTRIBUȚIE</div>
+    <div class="founders-title">Nucleul<br><span style="color:var(--gold)">Universului VV.</span></div>
+    <div style="font-size:.8125rem;color:var(--t2);line-height:1.65;margin-bottom:1rem">Nu cumperi un produs. Pui o cărămidă la fundația a ceva ce nu a existat încă. Recunoștința noastră e permanentă.</div>
+    <div class="progress-bar-wrap" style="margin-bottom:1.25rem">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.4rem">
+        <span style="font-size:.625rem;color:var(--t3);letter-spacing:.1em">LOCURI REZERVATE</span>
+        <span class="progress-count" id="founders-count" style="font-size:.625rem;color:var(--gold);font-weight:700">0/100 locuri</span>
       </div>
-      <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="founders-fill"></div></div>
     </div>
     <div class="perks">
-      <div class="perk"><div class="perk-check">✓</div>Acces la Nexus Standard la lansare</div>
-      <div class="perk"><div class="perk-check">✓</div>Numele tău în pagina fondatorilor VV</div>
-      <div class="perk"><div class="perk-check">✓</div>Subdomeniu propriu la lansarea 1.0</div>
-      <div class="perk"><div class="perk-check">✓</div>Badge „Fondator VV" permanent în cont</div>
+      <div class="perk"><div class="perk-check">✓</div>Identitate VV·CORE unică în ecosistem</div>
+      <div class="perk"><div class="perk-check">✓</div>Prezență pe Zidul Contribuitorilor live</div>
+      <div class="perk"><div class="perk-check">✓</div>3 chei de invitație exclusive</div>
+      <div class="perk"><div class="perk-check">✓</div>Early access la fiecare update VV</div>
     </div>
-    <div class="price-row">
-      <div class="price-amount">29 <span style="font-size:1.1rem">lei</span></div>
-      <div class="price-period">o singură dată<br><span class="price-note">contribuție de susținere</span></div>
+    <div style="display:flex;align-items:baseline;gap:.375rem;margin-bottom:1.25rem">
+      <span style="font-size:2.5rem;font-weight:900;color:var(--gold);line-height:1">29</span>
+      <span style="font-size:.9375rem;color:var(--t2)">lei</span>
+      <span style="font-size:.75rem;color:var(--t3);margin-left:.25rem">o singură dată · contribuție voluntară</span>
     </div>
-    <button class="btn-iban" id="btn-iban" onclick="copyIBAN()">
-      <span id="iban-btn-text">Copiază IBAN Susținere</span>
+    <button class="btn-iban" onclick="window.open('vv-inner-circle.html','_blank')" style="margin-bottom:.75rem">
+      ⬡ INTRĂ ÎN NUCLEUL VV
     </button>
-    <div class="iban-instructions">
-      Transfer bancar către <strong>VV Hybrid Univers</strong><br>
-      Menționează la detalii: <strong>Sustinere proiect</strong><br>
-      Confirmă transferul la <strong>vv.ep.team@gmail.com</strong>
-    </div>
-    <div class="founders-disclaimer">
-      Susținere benevolă pentru dezvoltarea ecosistemului VV Hybrid Univers.<br>
-      Accesul anticipat va fi livrat pe măsura dezvoltării modulelor.<br>
-      Contact: <span style="color:var(--gold)">vv.ep.team@gmail.com</span>
+    <div style="font-size:.6875rem;color:var(--t3);line-height:1.6;text-align:center">
+      Susținere benevolă · GDPR conform · maxim 100 locuri<br>
+      <span style="color:rgba(212,175,55,.4)">vv.ep.team@gmail.com</span>
     </div>
   </div>
 
@@ -774,7 +769,7 @@ import { getFirestore, doc, getDoc, setDoc, addDoc, collection, increment, serve
 const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx1T8_uL8FoN6C9_SbT8YRiDF72lsqHD3d-sDpAhQMdLl97xpyhp-Xk3rSCnBSxbyEcBA/exec";
 const BETA_URL = "https://vv-technologies.github.io/ceo.html";
 const DAILY_LIMIT = 3;
-const FOUNDERS_MAX = 10;
+const FOUNDERS_MAX = 100;
 const IBAN = "PUNE_IBAN_SALT_AICI";
 
 const app = initializeApp({
