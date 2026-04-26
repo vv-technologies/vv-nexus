@@ -140,8 +140,8 @@ body{background:var(--bg);color:var(--t1);font-family:var(--font);
 
 <!-- IBAN -->
 <div class="iban-box">
-  <div class="iban-label">CONT SALT BANK · VV TECHNOLOGIES</div>
-  <div class="iban-number" id="iban-display">PUNE_IBAN_SALT_AICI</div>
+  <div class="iban-label">CONT SALT BANK · VV HYBRID UNIVERS</div>
+  <div class="iban-number" id="iban-display">RO98ROIN4021D97CHECQLBSC</div>
   <button class="iban-copy" onclick="copyIban()">COPIAZĂ IBAN</button>
   <div style="margin-top:12px;font-size:11px;color:rgba(255,255,255,0.3);line-height:1.7">
     <div style="margin-bottom:4px">1. Copiază IBAN-ul de mai sus</div>
@@ -227,7 +227,7 @@ firebase.initializeApp({
 const db = firebase.firestore();
 const auth = firebase.auth();
 
-const IBAN = 'PUNE_IBAN_SALT_AICI'; // Inlocuieste cu IBAN-ul tau real
+const IBAN = 'RO98ROIN4021D97CHECQLBSC'; // Inlocuieste cu IBAN-ul tau real
 document.getElementById('iban-display').textContent = IBAN;
 
 var currentUid = null;
