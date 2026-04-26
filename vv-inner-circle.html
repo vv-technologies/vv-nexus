@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="VV Inner Circle">
+<title>VV · Inner Circle</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#03030a;--gold:#D4AF37;--t1:#fff;--t2:rgba(255,255,255,0.5);
+  --t3:rgba(255,255,255,0.25);--line:rgba(255,255,255,0.08);
+  --font:-apple-system,BlinkMacSystemFont,sans-serif
+}
+body{background:var(--bg);color:var(--t1);font-family:var(--font);
+  min-height:100dvh;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,30px);
+  overflow-x:hidden}
+
+/* ── HEADER ── */
+.hdr{padding:18px 20px 0;display:flex;align-items:center;justify-content:space-between}
+.hdr-back{width:36px;height:36px;background:rgba(255,255,255,0.06);border:.5px solid var(--line);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;text-decoration:none;color:var(--t2)}
+.hdr-title{font-size:13px;font-weight:700;letter-spacing:.15em;color:var(--t3);text-transform:uppercase}
+
+/* ── HERO ── */
+.hero{padding:32px 20px 24px;text-align:center}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(212,175,55,0.08);border:.5px solid rgba(212,175,55,0.2);border-radius:20px;padding:5px 14px;font-size:9px;font-weight:700;letter-spacing:.2em;color:var(--gold);margin-bottom:20px}
+.hero-badge-dot{width:5px;height:5px;border-radius:50%;background:var(--gold);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.8)}}
+.hero-title{font-size:clamp(28px,8vw,42px);font-weight:900;letter-spacing:-.03em;line-height:1.1;margin-bottom:12px}
+.hero-title span{color:var(--gold)}
+.hero-sub{font-size:14px;color:var(--t2);line-height:1.7;max-width:320px;margin:0 auto 28px}
+
+/* ── PRICE CARD ── */
+.price-card{margin:0 20px 24px;background:linear-gradient(135deg,rgba(212,175,55,0.08),rgba(212,175,55,0.02));border:.5px solid rgba(212,175,55,0.25);border-radius:24px;padding:24px;position:relative;overflow:hidden}
+.price-card::before{content:'';position:absolute;top:0;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,rgba(212,175,55,0.5),transparent)}
+.price-amount{font-size:48px;font-weight:900;letter-spacing:-.03em;color:var(--t1)}
+.price-amount span{font-size:20px;font-weight:400;color:var(--t2);margin-left:4px}
+.price-label{font-size:10px;color:rgba(212,175,55,0.5);letter-spacing:.2em;font-weight:700;margin-bottom:16px}
+.price-features{display:flex;flex-direction:column;gap:10px}
+.feature{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--t2)}
+.feature-icon{width:28px;height:28px;background:rgba(212,175,55,0.1);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+
+/* ── IBAN BOX ── */
+.iban-box{margin:0 20px 16px;background:rgba(255,255,255,0.04);border:.5px solid var(--line);border-radius:16px;padding:16px 20px}
+.iban-label{font-size:9px;color:var(--t3);letter-spacing:.2em;font-weight:700;margin-bottom:8px}
+.iban-number{font-family:'Courier New',monospace;font-size:15px;font-weight:700;color:var(--t1);letter-spacing:.05em;word-break:break-all;margin-bottom:10px}
+.iban-copy{width:100%;min-height:40px;background:rgba(212,175,55,0.08);border:.5px solid rgba(212,175,55,0.2);border-radius:10px;color:var(--gold);font-family:var(--font);font-size:12px;font-weight:700;cursor:pointer;letter-spacing:.05em}
+
+/* ── LEGAL BOX ── */
+.legal-box{margin:0 20px 20px;background:rgba(255,255,255,0.02);border:.5px solid rgba(255,255,255,0.06);border-radius:14px;padding:14px 16px;font-size:11px;color:var(--t3);line-height:1.7}
+.legal-box strong{color:var(--t2)}
+
+/* ── CTA BUTTON ── */
+.cta-btn{display:block;margin:0 20px 12px;min-height:54px;background:rgba(212,175,55,0.12);border:.5px solid rgba(212,175,55,0.35);border-radius:16px;color:var(--gold);font-family:var(--font);font-size:15px;font-weight:800;cursor:pointer;letter-spacing:.03em;width:calc(100% - 40px)}
+.cta-btn:active{opacity:.8}
+
+/* ── PENDING STATE ── */
+.pending-screen{display:none;position:fixed;inset:0;background:#03030a;z-index:9999;flex-direction:column;align-items:center;justify-content:center;padding:40px}
+.pending-logo{font-size:72px;font-weight:900;letter-spacing:-4px;color:#fff;margin-bottom:4px;animation:breathe 4s ease-in-out infinite}
+@keyframes breathe{0%,100%{opacity:.6;text-shadow:none}50%{opacity:1;text-shadow:0 0 40px rgba(212,175,55,0.3)}}
+.pending-sub{font-size:9px;letter-spacing:.3em;color:rgba(212,175,55,0.4);font-weight:700;margin-bottom:48px}
+.pending-text{font-size:13px;color:var(--t3);text-align:center;line-height:1.8;max-width:280px;font-style:italic}
+
+/* ── ID CARD ── */
+.id-screen{display:none;position:fixed;inset:0;background:#03030a;z-index:9999;flex-direction:column;align-items:center;justify-content:center;padding:20px;overflow-y:auto}
+.id-card{width:100%;max-width:340px;background:linear-gradient(135deg,#0a0a0f,#111118);border:.5px solid rgba(212,175,55,0.25);border-radius:24px;padding:32px 28px;position:relative;overflow:hidden}
+.id-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(212,175,55,0.6),transparent)}
+.id-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(212,175,55,0.2),transparent)}
+.id-card-glow{position:absolute;top:-60px;right:-60px;width:180px;height:180px;background:radial-gradient(circle,rgba(212,175,55,0.08),transparent 70%);border-radius:50%;pointer-events:none}
+.id-vv{font-size:36px;font-weight:900;letter-spacing:-2px;color:#fff;margin-bottom:2px}
+.id-ecosystem{font-size:8px;letter-spacing:.3em;color:rgba(212,175,55,0.5);font-weight:700;margin-bottom:24px}
+.id-label{font-size:8px;letter-spacing:.2em;color:var(--t3);font-weight:700;margin-bottom:6px}
+.id-code{font-family:'Courier New',monospace;font-size:22px;font-weight:700;color:var(--gold);letter-spacing:.15em;margin-bottom:20px}
+.id-alias{font-size:13px;color:var(--t2);margin-bottom:4px}
+.id-date{font-size:10px;color:var(--t3)}
+.id-status{display:inline-flex;align-items:center;gap:6px;background:rgba(52,199,89,0.1);border:.5px solid rgba(52,199,89,0.2);border-radius:20px;padding:4px 12px;font-size:9px;font-weight:700;letter-spacing:.15em;color:#34c759;margin-top:16px}
+.id-status-dot{width:5px;height:5px;border-radius:50%;background:#34c759;animation:pulse 2s infinite}
+.id-watermark{position:absolute;bottom:14px;right:16px;font-size:8px;color:rgba(255,255,255,0.1);letter-spacing:.05em}
+
+/* ── CARD ACTIONS ── */
+.card-actions{margin-top:20px;width:100%;max-width:340px;display:flex;flex-direction:column;gap:10px}
+.card-btn{min-height:48px;border-radius:14px;font-family:var(--font);font-size:13px;font-weight:700;cursor:pointer;letter-spacing:.03em}
+.card-btn-save{background:rgba(212,175,55,0.12);border:.5px solid rgba(212,175,55,0.3);color:var(--gold)}
+.card-btn-hub{background:rgba(255,255,255,0.06);border:.5px solid var(--line);color:var(--t2)}
+
+/* ── WALL ── */
+.wall-section{padding:0 20px 32px}
+.section-label{font-size:9px;color:var(--t3);letter-spacing:.2em;font-weight:700;margin-bottom:16px;text-transform:uppercase}
+.wall-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.wall-count{font-size:11px;color:var(--t3)}
+.constellation{background:rgba(255,255,255,0.02);border:.5px solid var(--line);border-radius:20px;padding:24px;min-height:200px;position:relative;overflow:hidden}
+.star-dot{position:absolute;width:6px;height:6px;border-radius:50%;background:rgba(212,175,55,0.4);border:.5px solid rgba(212,175,55,0.6);cursor:default;transition:all .3s}
+.star-dot.online{background:rgba(212,175,55,0.9);box-shadow:0 0 8px rgba(212,175,55,0.6);animation:starPulse 2s infinite}
+.star-dot.offline{background:rgba(255,255,255,0.15);border-color:rgba(255,255,255,0.2)}
+@keyframes starPulse{0%,100%{box-shadow:0 0 4px rgba(212,175,55,0.4)}50%{box-shadow:0 0 12px rgba(212,175,55,0.8)}}
+.wall-empty{text-align:center;padding:40px 20px;color:var(--t3);font-size:13px}
+.wall-legend{display:flex;gap:16px;margin-top:12px;font-size:10px;color:var(--t3)}
+.legend-item{display:flex;align-items:center;gap:6px}
+.legend-dot{width:6px;height:6px;border-radius:50%}
+
+/* ── TOAST ── */
+.toast{position:fixed;top:calc(16px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);background:rgba(212,175,55,0.15);border:.5px solid rgba(212,175,55,0.3);color:var(--gold);padding:10px 20px;border-radius:14px;font-size:12px;font-weight:700;z-index:99999;pointer-events:none;opacity:0;transition:opacity .3s;white-space:nowrap}
+.toast.show{opacity:1}
+
+<br>
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="hdr">
+  <a class="hdr-back" href="https://vv-technologies.github.io/vv-nexus/">←</a>
+  <div class="hdr-title">VV · Inner Circle</div>
+  <div style="width:36px"></div>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-badge"><span class="hero-badge-dot"></span>100 LOCURI · LIMITAT</div>
+  <div class="hero-title">Nucleul<br><span>Universului VV</span></div>
+  <div class="hero-sub">Nu cumperi un produs. Pui o cărămidă la fundația a ceva ce nu a existat încă. Recunoștința noastră e permanentă.</div>
+</div>
+
+<!-- PRICE -->
+<div class="price-card">
+  <div class="price-label">ACT DE CONTRIBUȚIE · O SINGURĂ DATĂ</div>
+  <div class="price-amount">29 <span>LEI</span></div>
+  <div style="height:20px"></div>
+  <div class="price-features">
+    <div class="feature"><div class="feature-icon">⬡</div>Identitate VV·CORE unică în ecosistem</div>
+    <div class="feature"><div class="feature-icon">🌌</div>Prezență pe Zidul Contribuitorilor</div>
+    <div class="feature"><div class="feature-icon">🔑</div>3 chei de invitație exclusive</div>
+    <div class="feature"><div class="feature-icon">⚡</div>Early access la fiecare update VV</div>
+    <div class="feature"><div class="feature-icon">🤝</div>Primul la masă când VV 1.0 se lansează</div>
+  </div>
+</div>
+
+<!-- IBAN -->
+<div class="iban-box">
+  <div class="iban-label">TRANSFERĂ LA</div>
+  <div class="iban-number" id="iban-display">PUNE_IBAN_SALT_AICI</div>
+  <button class="iban-copy" onclick="copyIban()">COPIAZĂ IBAN</button>
+</div>
+
+<!-- LEGAL -->
+<div class="legal-box">
+  <strong>Act de contribuție voluntară.</strong> Prin această acțiune susții dezvoltarea ecosistemului VV Hybrid Univers. Nu reprezintă achiziția unui produs finit, acțiuni sau garanții financiare. Recunoștința oferită (identitate digitală, acces prioritar) este un gest al echipei VV față de susținătorii fondatori. Datele sunt procesate conform GDPR · Reg. UE 679/2016.
+</div>
+
+<!-- CTA -->
+<button class="cta-btn" onclick="showConfirmFlow()">AM TRANSFERAT · NOTIFICĂ VV TEAM</button>
+<div style="margin:0 20px 32px;font-size:11px;color:var(--t3);text-align:center;line-height:1.6">
+  VV Team verifică transferul și activează identitatea ta în maxim 24h.<br>Vei simți când se întâmplă — fără refresh.
+</div>
+
+<!-- WALL -->
+<div class="wall-section">
+  <div class="wall-header">
+    <div class="section-label">Zidul Contribuitorilor</div>
+    <div class="wall-count" id="wall-count">0 / 100</div>
+  </div>
+  <div class="constellation" id="constellation">
+    <div class="wall-empty" id="wall-empty">Primul nucleu se formează...<br><span style="font-size:11px;color:rgba(255,255,255,0.15)">Fii primul.</span></div>
+  </div>
+  <div class="wall-legend">
+    <div class="legend-item"><div class="legend-dot" style="background:rgba(212,175,55,0.9);box-shadow:0 0 6px rgba(212,175,55,0.5)"></div>Online acum</div>
+    <div class="legend-item"><div class="legend-dot" style="background:rgba(255,255,255,0.15)"></div>Contributor</div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- PENDING SCREEN -->
+<div class="pending-screen" id="pending-screen">
+  <div class="pending-logo">VV</div>
+  <div class="pending-sub">HYBRID UNIVERS</div>
+  <div style="width:60px;height:60px;border-radius:50%;border:1px solid rgba(212,175,55,0.2);display:flex;align-items:center;justify-content:center;margin-bottom:32px;animation:breathe 3s ease-in-out infinite">
+    <div style="width:8px;height:8px;border-radius:50%;background:rgba(212,175,55,0.5)"></div>
+  </div>
+  <div class="pending-text">„Frecvențele tale sunt în curs de aliniere cu Nucleul VV..."</div>
+  <div style="margin-top:24px;font-size:10px;color:rgba(255,255,255,0.15);letter-spacing:.1em">Verificăm transferul · maxim 24h</div>
+</div>
+
+<!-- ID SCREEN -->
+<div class="id-screen" id="id-screen">
+  <div class="id-card" id="id-card-el">
+    <div class="id-card-glow"></div>
+    <div class="id-vv">VV</div>
+    <div class="id-ecosystem">HYBRID UNIVERS · INNER CIRCLE</div>
+    <div class="id-label">IDENTITATE CONTRIBUTOR</div>
+    <div class="id-code" id="id-code-display">VV·CORE·----</div>
+    <div class="id-alias" id="id-alias-display">—</div>
+    <div class="id-date" id="id-date-display">—</div>
+    <div class="id-status"><span class="id-status-dot"></span>NUCLEU ACTIV</div>
+    <div class="id-watermark">vv-technologies.github.io</div>
+  </div>
+  <div class="card-actions">
+    <button class="card-btn card-btn-save" onclick="saveCardAsImage()">📱 SALVEAZĂ CARDUL ÎN GALERIE</button>
+    <button class="card-btn card-btn-hub" onclick="goToHub()">← ÎNAPOI ÎN HUB</button>
+  </div>
+</div>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
+<script>
+firebase.initializeApp({
+  apiKey:"AIzaSyDGv4kEClO0RHCLvXVLOT-vyPHw6bsxYVc",
+  authDomain:"vv-ep-beta.firebaseapp.com",
+  projectId:"vv-ep-beta",
+  storageBucket:"vv-ep-beta.firebasestorage.app",
+  messagingSenderId:"641117018598",
+  appId:"1:641117018598:web:7cd522ef48db46ad58de27"
+});
+const db = firebase.firestore();
+const auth = firebase.auth();
+
+const IBAN = 'PUNE_IBAN_SALT_AICI';
+document.getElementById('iban-display').textContent = IBAN;
+
+var currentUid = null;
+var currentAlias = localStorage.getItem('vv_alias') || 'INSIDER';
+
+// Auth anonim
+auth.signInAnonymously().then(function(c){ currentUid = c.user.uid; checkExistingContributor(); }).catch(function(){});
+auth.onAuthStateChanged(function(u){ if(u){ currentUid = u.uid; checkExistingContributor(); } });
+
+// ── Verifică dacă userul e deja contributor ──
+function checkExistingContributor() {
+  if (!currentUid) return;
+  db.collection('contributors').doc(currentUid).onSnapshot(function(doc) {
+    if (!doc.exists) return;
+    var data = doc.data();
+    if (data.status === 'pending') {
+      showPending();
+    } else if (data.status === 'active') {
+      showIdCard(data.vvCoreId, data.alias, data.activatedAt);
+    }
+  });
+}
+
+// ── Copy IBAN ──
+function copyIban() {
+  navigator.clipboard.writeText(IBAN).then(function(){ showToast('IBAN copiat! ✓'); }).catch(function(){ showToast('IBAN: ' + IBAN); });
+}
+
+// ── Confirm Flow ──
+function showConfirmFlow() {
+  if (!currentUid) { showToast('Conectare în curs...'); return; }
+
+  // Verifică dacă există deja
+  db.collection('contributors').doc(currentUid).get().then(function(doc) {
+    if (doc.exists) {
+      var s = doc.data().status;
+      if (s === 'pending') { showPending(); return; }
+      if (s === 'active') { showIdCard(doc.data().vvCoreId, doc.data().alias, doc.data().activatedAt); return; }
+    }
+
+    // Salvează în Firestore ca pending
+    db.collection('contributors').doc(currentUid).set({
+      uid: currentUid,
+      alias: currentAlias,
+      status: 'pending',
+      submittedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      vvCoreId: null,
+      activatedAt: null
+    }).then(function() {
+      // Notificare pentru CEO în inbox
+      db.collection('inbox').add({
+        to: 'CEO',
+        from: currentUid,
+        alias: currentAlias,
+        type: 'contributor_pending',
+        message: '🌟 ' + currentAlias + ' a confirmat transferul de 29 lei pentru VV Inner Circle. Verifică Salt Bank și activează din CEO Panel.',
+        read: false,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      showPending();
+    });
+  });
+}
+
+// ── Pending Screen ──
+function showPending() {
+  document.getElementById('pending-screen').style.display = 'flex';
+  // Ascultă real-time pentru activare
+  if (!currentUid) return;
+  db.collection('contributors').doc(currentUid).onSnapshot(function(doc) {
+    if (doc.exists && doc.data().status === 'active') {
+      var d = doc.data();
+      showIdCard(d.vvCoreId, d.alias, d.activatedAt);
+    }
+  });
+}
+
+// ── ID Card Screen ──
+function showIdCard(vvId, alias, activatedAt) {
+  document.getElementById('pending-screen').style.display = 'none';
+  var screen = document.getElementById('id-screen');
+  screen.style.display = 'flex';
+  screen.style.opacity = '0';
+  document.getElementById('id-code-display').textContent = vvId || 'VV·CORE·----';
+  document.getElementById('id-alias-display').textContent = alias || currentAlias;
+  var dateStr = activatedAt ? activatedAt.toDate().toLocaleDateString('ro-RO', {day:'2-digit',month:'long',year:'numeric'}) : new Date().toLocaleDateString('ro-RO');
+  document.getElementById('id-date-display').textContent = 'Contributor din ' + dateStr;
+  setTimeout(function(){ screen.style.transition = 'opacity .8s ease'; screen.style.opacity = '1'; }, 50);
+}
+
+// ── Salvare card ca imagine ──
+function saveCardAsImage() {
+  var card = document.getElementById('id-card-el');
+  // Folosim html2canvas dacă e disponibil, altfel screenshot manual
+  showToast('📱 Fă screenshot și salvează!');
+  // Instrucțiune pentru user — pe iOS nu poți salva programatic
+  setTimeout(function(){
+    showToast('Ține apăsat pe card → Salvează imaginea');
+  }, 1800);
+}
+
+function goToHub() {
+  window.location.href = 'https://vv-technologies.github.io/vv-nexus/';
+}
+
+// ── Zidul Contribuitorilor ── 
+function loadWall() {
+  db.collection('contributors').where('status','==','active').onSnapshot(function(snap) {
+    var count = snap.size;
+    document.getElementById('wall-count').textContent = count + ' / 100';
+    var constellation = document.getElementById('constellation');
+    var empty = document.getElementById('wall-empty');
+
+    if (count === 0) {
+      if (empty) empty.style.display = 'block';
+      // Șterge stele vechi
+      constellation.querySelectorAll('.star-dot').forEach(function(s){ s.remove(); });
+      return;
+    }
+
+    if (empty) empty.style.display = 'none';
+    constellation.querySelectorAll('.star-dot').forEach(function(s){ s.remove(); });
+
+    var cWidth = constellation.clientWidth || 300;
+    var cHeight = constellation.clientHeight || 200;
+
+    // Generăm poziții stabile bazate pe UID (deterministice)
+    snap.forEach(function(doc) {
+      var data = doc.data();
+      var uid = doc.id;
+
+      // Poziție deterministică bazată pe uid
+      var hash = 0;
+      for (var i = 0; i < uid.length; i++) hash = uid.charCodeAt(i) + ((hash << 5) - hash);
+      var x = Math.abs(hash % (cWidth - 30)) + 10;
+      var y = Math.abs((hash >> 8) % (cHeight - 30)) + 10;
+
+      // Verifică dacă e online (lastActive în ultimele 5 min)
+      var isOnline = false;
+      if (data.lastActive) {
+        var fiveMinAgo = new Date(Date.now() - 5 * 60 * 1000);
+        isOnline = data.lastActive.toDate() > fiveMinAgo;
+      }
+
+      var dot = document.createElement('div');
+      dot.className = 'star-dot ' + (isOnline ? 'online' : 'offline');
+      dot.style.left = x + 'px';
+      dot.style.top = y + 'px';
+      dot.title = data.vvCoreId || 'VV·CORE';
+      constellation.appendChild(dot);
+    });
+  });
+}
+
+// ── Update lastActive pentru contributors ──
+function updateContributorOnline() {
+  if (!currentUid) return;
+  db.collection('contributors').doc(currentUid).get().then(function(doc) {
+    if (doc.exists && doc.data().status === 'active') {
+      db.collection('contributors').doc(currentUid).update({
+        lastActive: firebase.firestore.FieldValue.serverTimestamp()
+      }).catch(function(){});
+    }
+  }).catch(function(){});
+}
+
+// ── Toast ──
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 2800);
+}
+
+// Init
+loadWall();
+setInterval(updateContributorOnline, 3 * 60 * 1000);
+setTimeout(updateContributorOnline, 2000);
+</script>
+</body>
+</html>
