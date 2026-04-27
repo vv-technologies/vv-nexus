@@ -595,103 +595,158 @@ function generateCardCanvas(){
   var motto =document.getElementById('id-motto').textContent;
   var fnNum =document.getElementById('id-founder-num').textContent;
 
-  var W=680,H=480,R=32,dpr=2;
+  // ── Portrait 9:16 — perfect pentru Instagram Story ──
+  var W=1080, H=1920;
   var cv=document.createElement('canvas');
-  cv.width=W*dpr; cv.height=H*dpr;
+  cv.width=W; cv.height=H;
   var cx=cv.getContext('2d');
-  cx.scale(dpr,dpr);
 
-  // Fundal
-  var bg=cx.createLinearGradient(0,0,W,H);
-  bg.addColorStop(0,'#0f0f14'); bg.addColorStop(0.5,'#141420'); bg.addColorStop(1,'#0a0a0f');
-  rr(cx,0,0,W,H,R); cx.fillStyle=bg; cx.fill();
+  // ── FUNDAL COMPLET ──
+  var bgFull=cx.createLinearGradient(0,0,W,H);
+  bgFull.addColorStop(0,'#03030a');
+  bgFull.addColorStop(0.5,'#07070f');
+  bgFull.addColorStop(1,'#03030a');
+  cx.fillStyle=bgFull; cx.fillRect(0,0,W,H);
 
-  // Border
-  rr(cx,0,0,W,H,R); cx.strokeStyle='rgba(212,175,55,0.4)'; cx.lineWidth=1; cx.stroke();
+  // Glow ambient stânga sus
+  var glA=cx.createRadialGradient(0,0,0,0,0,700);
+  glA.addColorStop(0,'rgba(212,175,55,0.07)'); glA.addColorStop(1,'transparent');
+  cx.fillStyle=glA; cx.fillRect(0,0,W,H);
 
-  // Shine top
-  var sh=cx.createLinearGradient(0,0,W,0);
-  sh.addColorStop(0,'transparent'); sh.addColorStop(0.3,'rgba(255,255,255,0.1)');
-  sh.addColorStop(0.5,'rgba(212,175,55,0.45)'); sh.addColorStop(0.7,'rgba(255,255,255,0.1)');
-  sh.addColorStop(1,'transparent');
-  cx.fillStyle=sh; cx.fillRect(0,0,W,1.5);
+  // Glow ambient dreapta jos
+  var glB=cx.createRadialGradient(W,H,0,W,H,600);
+  glB.addColorStop(0,'rgba(212,175,55,0.05)'); glB.addColorStop(1,'transparent');
+  cx.fillStyle=glB; cx.fillRect(0,0,W,H);
 
-  // Glow
-  var gl=cx.createRadialGradient(W,0,0,W,0,260);
-  gl.addColorStop(0,'rgba(212,175,55,0.12)'); gl.addColorStop(1,'transparent');
-  cx.fillStyle=gl; cx.fillRect(0,0,W,H);
+  // ── CARD CENTRAT — ocupa zona centrala ──
+  var CX=80, CY=320, CW=W-160, CH=880, CR=48;
 
-  var PL=42,y=50;
+  // Card background
+  var cbg=cx.createLinearGradient(CX,CY,CX+CW,CY+CH);
+  cbg.addColorStop(0,'rgba(255,255,255,0.07)');
+  cbg.addColorStop(0.4,'rgba(255,255,255,0.03)');
+  cbg.addColorStop(1,'rgba(212,175,55,0.06)');
+  rr(cx,CX,CY,CW,CH,CR); cx.fillStyle=cbg; cx.fill();
 
-  // VV
-  cx.font='900 46px -apple-system,sans-serif';
-  cx.fillStyle='#ffffff'; cx.letterSpacing='6px';
-  cx.fillText('VV',PL,y); y+=22;
+  // Card border auriu
+  rr(cx,CX,CY,CW,CH,CR);
+  cx.strokeStyle='rgba(212,175,55,0.35)'; cx.lineWidth=1.5; cx.stroke();
 
-  // Eco
-  cx.font='700 9px -apple-system,sans-serif';
-  cx.fillStyle='rgba(212,175,55,0.55)'; cx.letterSpacing='3px';
-  cx.fillText('HYBRID UNIVERS  ·  INNER CIRCLE',PL,y); y+=20;
+  // Shine linie top card
+  var csh=cx.createLinearGradient(CX,0,CX+CW,0);
+  csh.addColorStop(0,'transparent');
+  csh.addColorStop(0.25,'rgba(255,255,255,0.15)');
+  csh.addColorStop(0.5,'rgba(212,175,55,0.55)');
+  csh.addColorStop(0.75,'rgba(255,255,255,0.15)');
+  csh.addColorStop(1,'transparent');
+  cx.fillStyle=csh; cx.fillRect(CX+CR,CY,CW-CR*2,2);
+
+  // Glow card interior
+  var cglow=cx.createRadialGradient(CX+CW,CY,0,CX+CW,CY,500);
+  cglow.addColorStop(0,'rgba(212,175,55,0.1)'); cglow.addColorStop(1,'transparent');
+  rr(cx,CX,CY,CW,CH,CR); cx.fillStyle=cglow; cx.fill();
+
+  // ── CONȚINUT CARD ──
+  var PL=CX+64, y=CY+90;
+
+  // VV logo mare
+  cx.font='900 110px -apple-system,sans-serif';
+  cx.fillStyle='#ffffff';
+  cx.letterSpacing='16px';
+  cx.shadowColor='rgba(255,255,255,0.15)'; cx.shadowBlur=30;
+  cx.fillText('VV',PL,y); cx.shadowBlur=0;
+  y+=28;
+
+  // Eco label
+  cx.font='700 22px -apple-system,sans-serif';
+  cx.fillStyle='rgba(212,175,55,0.6)'; cx.letterSpacing='5px';
+  cx.fillText('HYBRID UNIVERS  ·  INNER CIRCLE',PL,y); y+=44;
 
   // Divider
-  var dv=cx.createLinearGradient(PL,0,W-PL,0);
-  dv.addColorStop(0,'rgba(212,175,55,0.4)'); dv.addColorStop(1,'transparent');
-  cx.strokeStyle=dv; cx.lineWidth=0.5;
-  cx.beginPath(); cx.moveTo(PL,y); cx.lineTo(W-PL,y); cx.stroke(); y+=18;
+  var dv=cx.createLinearGradient(PL,0,CX+CW-64,0);
+  dv.addColorStop(0,'rgba(212,175,55,0.5)'); dv.addColorStop(1,'transparent');
+  cx.strokeStyle=dv; cx.lineWidth=1;
+  cx.beginPath(); cx.moveTo(PL,y); cx.lineTo(CX+CW-64,y); cx.stroke(); y+=40;
 
-  // Label
-  cx.font='700 9px -apple-system,sans-serif';
-  cx.fillStyle='rgba(255,255,255,0.25)'; cx.letterSpacing='2.5px';
-  cx.fillText('IDENTITATE FONDATOR',PL,y); y+=28;
+  // Label IDENTITATE FONDATOR
+  cx.font='700 20px -apple-system,sans-serif';
+  cx.fillStyle='rgba(255,255,255,0.3)'; cx.letterSpacing='5px';
+  cx.fillText('IDENTITATE FONDATOR',PL,y); y+=54;
 
-  // Code
-  cx.font='700 28px Courier New,monospace';
-  cx.fillStyle='#D4AF37'; cx.letterSpacing='2px';
-  cx.shadowColor='rgba(212,175,55,0.4)'; cx.shadowBlur=14;
-  cx.fillText(code,PL,y); cx.shadowBlur=0; y+=22;
+  // VV·CORE·ID
+  cx.font='700 56px Courier New,monospace';
+  cx.fillStyle='#D4AF37'; cx.letterSpacing='3px';
+  cx.shadowColor='rgba(212,175,55,0.5)'; cx.shadowBlur=24;
+  cx.fillText(code,PL,y); cx.shadowBlur=0; y+=36;
 
   // Founder num
-  cx.font='600 10px -apple-system,sans-serif';
-  cx.fillStyle='rgba(212,175,55,0.5)'; cx.letterSpacing='1.5px';
-  cx.fillText(fnNum,PL,y); y+=20;
+  cx.font='600 22px -apple-system,sans-serif';
+  cx.fillStyle='rgba(212,175,55,0.55)'; cx.letterSpacing='3px';
+  cx.fillText(fnNum,PL,y); y+=44;
 
   // Alias
-  cx.font='700 16px -apple-system,sans-serif';
-  cx.fillStyle='rgba(255,255,255,0.82)'; cx.letterSpacing='0';
-  cx.fillText(al,PL,y); y+=18;
+  cx.font='700 38px -apple-system,sans-serif';
+  cx.fillStyle='rgba(255,255,255,0.88)'; cx.letterSpacing='1px';
+  cx.fillText(al,PL,y); y+=34;
 
-  // Date
-  cx.font='400 11px -apple-system,sans-serif';
-  cx.fillStyle='rgba(255,255,255,0.3)';
-  cx.fillText(dt,PL,y); y+=26;
+  // Data
+  cx.font='400 22px -apple-system,sans-serif';
+  cx.fillStyle='rgba(255,255,255,0.35)'; cx.letterSpacing='0';
+  cx.fillText(dt,PL,y); y+=52;
 
-  // Motto
-  cx.strokeStyle='rgba(212,175,55,0.4)'; cx.lineWidth=2;
-  var mlines=wrapTxt(cx,motto,W-PL-60,12);
-  cx.beginPath(); cx.moveTo(PL,y-13); cx.lineTo(PL,y+mlines.length*18-2); cx.stroke();
-  cx.font='italic 12px -apple-system,sans-serif';
-  cx.fillStyle='rgba(255,255,255,0.4)';
-  for(var li=0;li<mlines.length;li++){cx.fillText(mlines[li],PL+12,y+li*18);}
-  y+=mlines.length*18+22;
+  // Motto cu border stânga
+  cx.strokeStyle='rgba(212,175,55,0.45)'; cx.lineWidth=4;
+  var mlines=wrapTxt(cx,motto,CW-160,26);
+  cx.beginPath(); cx.moveTo(PL,y-24); cx.lineTo(PL,y+mlines.length*38-6); cx.stroke();
+  cx.font='italic 26px -apple-system,sans-serif';
+  cx.fillStyle='rgba(255,255,255,0.45)'; cx.letterSpacing='0';
+  for(var li=0;li<mlines.length;li++){cx.fillText(mlines[li],PL+20,y+li*38);}
+  y+=mlines.length*38+44;
 
-  // Badge
-  var bx=PL,by=y-16,bw=136,bh=24;
-  rr(cx,bx,by,bw,bh,12); cx.fillStyle='rgba(52,199,89,0.1)'; cx.fill();
-  rr(cx,bx,by,bw,bh,12); cx.strokeStyle='rgba(52,199,89,0.3)'; cx.lineWidth=0.5; cx.stroke();
-  cx.beginPath(); cx.arc(bx+14,by+bh/2,3,0,Math.PI*2); cx.fillStyle='#34c759'; cx.fill();
-  cx.font='700 9px -apple-system,sans-serif'; cx.fillStyle='#34c759'; cx.letterSpacing='1.5px';
-  cx.fillText('NUCLEU ACTIV',bx+22,by+bh/2+3.5);
+  // Badge NUCLEU ACTIV
+  var bx=PL, by=y, bw=270, bh=46;
+  rr(cx,bx,by,bw,bh,23); cx.fillStyle='rgba(52,199,89,0.1)'; cx.fill();
+  rr(cx,bx,by,bw,bh,23); cx.strokeStyle='rgba(52,199,89,0.35)'; cx.lineWidth=1; cx.stroke();
+  cx.beginPath(); cx.arc(bx+26,by+bh/2,6,0,Math.PI*2); cx.fillStyle='#34c759'; cx.fill();
+  cx.font='700 18px -apple-system,sans-serif'; cx.fillStyle='#34c759'; cx.letterSpacing='3px';
+  cx.fillText('NUCLEU ACTIV',bx+42,by+bh/2+6);
 
-  // Footer
-  var fy=H-34;
-  cx.strokeStyle='rgba(255,255,255,0.06)'; cx.lineWidth=0.5;
-  cx.beginPath(); cx.moveTo(PL,fy); cx.lineTo(W-PL,fy); cx.stroke();
-  cx.font='400 9px -apple-system,sans-serif';
+  // Footer card
+  var cfy=CY+CH-50;
+  cx.strokeStyle='rgba(255,255,255,0.07)'; cx.lineWidth=1;
+  cx.beginPath(); cx.moveTo(CX+40,cfy); cx.lineTo(CX+CW-40,cfy); cx.stroke();
+  cx.font='400 18px -apple-system,sans-serif';
   cx.fillStyle='rgba(255,255,255,0.12)'; cx.letterSpacing='0';
-  cx.fillText('vv-technologies.github.io',PL,H-16);
-  cx.font='400 8px -apple-system,sans-serif';
+  cx.fillText('vv-technologies.github.io',PL,CY+CH-18);
+  cx.font='400 16px -apple-system,sans-serif';
   cx.fillStyle='rgba(255,255,255,0.08)'; cx.textAlign='right';
-  cx.fillText('Contribuție voluntară  ·  GDPR · UE 679/2016',W-PL,H-16);
+  cx.fillText('Contribuție voluntară · GDPR · UE 679/2016',CX+CW-64,CY+CH-18);
+  cx.textAlign='left';
+
+  // ── ZONA DE JOS — CTA ──
+  var ctaY=CY+CH+80;
+
+  // Linie subtire aurie
+  var ctaLine=cx.createLinearGradient(W/2-200,0,W/2+200,0);
+  ctaLine.addColorStop(0,'transparent');
+  ctaLine.addColorStop(0.5,'rgba(212,175,55,0.3)');
+  ctaLine.addColorStop(1,'transparent');
+  cx.strokeStyle=ctaLine; cx.lineWidth=1;
+  cx.beginPath(); cx.moveTo(W/2-200,ctaY); cx.lineTo(W/2+200,ctaY); cx.stroke();
+
+  ctaY+=50;
+  cx.font='700 28px -apple-system,sans-serif';
+  cx.fillStyle='rgba(212,175,55,0.5)'; cx.letterSpacing='4px';
+  cx.textAlign='center';
+  cx.fillText('VV HYBRID UNIVERS',W/2,ctaY); ctaY+=38;
+
+  cx.font='400 22px -apple-system,sans-serif';
+  cx.fillStyle='rgba(255,255,255,0.25)'; cx.letterSpacing='2px';
+  cx.fillText('100 fondatori · Inner Circle',W/2,ctaY); ctaY+=38;
+
+  cx.font='400 20px -apple-system,sans-serif';
+  cx.fillStyle='rgba(255,255,255,0.15)'; cx.letterSpacing='1px';
+  cx.fillText('vv-technologies.github.io/vv-nexus',W/2,ctaY);
   cx.textAlign='left';
 
   var dataUrl=cv.toDataURL('image/png');
@@ -729,7 +784,7 @@ function wrapTxt(ctx,text,maxW,fs){
     else line=test;
   }
   if(line)lines.push(line);
-  return lines.slice(0,3);
+  return lines.slice(0,4);
 }
 
 function closeSave(){
