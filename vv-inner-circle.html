@@ -232,7 +232,7 @@ body{background:var(--bg);color:var(--t1);font-family:var(--font);
 <!-- ═══ SCREEN MAIN ═══ -->
 <div class="screen active" id="screen-main">
   <div class="hdr">
-    <a class="hdr-back" href="https://vv-technologies.github.io/vv-nexus/">←</a>
+    <a class="hdr-back" onclick="goHub()" style="cursor:pointer">←</a>
     <div class="hdr-title">VV · Inner Circle</div>
     <div style="width:36px"></div>
   </div>
@@ -329,8 +329,7 @@ body{background:var(--bg);color:var(--t1);font-family:var(--font);
   <div class="pend-alias" id="pend-alias-display"></div>
   <div class="pend-text">„Frecvențele tale sunt în curs de aliniere cu Nucleul VV..."</div>
   <div class="pend-note">Verificăm transferul · maxim 24h</div>
-  <button class="cbtn cbtn-hub" style="width:100%;max-width:300px"
-    onclick="window.location.href='https://vv-technologies.github.io/vv-nexus/'">
+  <button class="cbtn cbtn-hub" style="width:100%;max-width:300px" onclick="goHub()">
     ← Înapoi în Hub
   </button>
   <div style="margin-top:12px;font-size:11px;color:rgba(255,255,255,0.15);text-align:center">
@@ -369,7 +368,7 @@ body{background:var(--bg);color:var(--t1);font-family:var(--font);
     <button class="cbtn cbtn-save" onclick="startSave()">📱 Salvează cardul în galerie</button>
     <button class="cbtn cbtn-share" onclick="shareCard()">↗ Distribuie experiența</button>
     <button class="cbtn cbtn-circle" onclick="showScreen('main')">⬡ Înapoi în Inner Circle</button>
-    <button class="cbtn cbtn-hub" onclick="window.location.href='https://vv-technologies.github.io/vv-nexus/'">← Înapoi în Hub</button>
+    <button class="cbtn cbtn-hub" onclick="goHub()">← Înapoi în Hub</button>
   </div>
 </div>
 
@@ -761,8 +760,14 @@ function shareCard(){
   }
 }
 
+
 function copyIban(){
   navigator.clipboard.writeText(IBAN).then(function(){toast('IBAN copiat ✓');}).catch(function(){toast('IBAN: '+IBAN);});
+}
+
+// ── location.replace = fără tab nou pe Safari iOS ──
+function goHub(){
+  window.location.replace('https://vv-technologies.github.io/vv-nexus/');
 }
 
 function toast(msg,isErr){
