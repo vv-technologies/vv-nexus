@@ -8,166 +8,338 @@
 <title>VV · Inner Circle</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-:root{--bg:#03030a;--gold:#D4AF37;--t1:#fff;--t2:rgba(255,255,255,0.5);--t3:rgba(255,255,255,0.25);--line:rgba(255,255,255,0.08);--font:-apple-system,BlinkMacSystemFont,sans-serif}
-body{background:var(--bg);color:var(--t1);font-family:var(--font);min-height:100dvh;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,30px);overflow-x:hidden}
-.hdr{padding:18px 20px 0;display:flex;align-items:center;justify-content:space-between}
-.hdr-back{width:36px;height:36px;background:rgba(255,255,255,0.06);border:.5px solid var(--line);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;text-decoration:none;color:var(--t2)}
+:root{
+  --bg:#03030a;--gold:#D4AF37;--t1:#fff;
+  --t2:rgba(255,255,255,0.5);--t3:rgba(255,255,255,0.25);
+  --line:rgba(255,255,255,0.08);--font:-apple-system,BlinkMacSystemFont,sans-serif;
+  --green:#34c759;--danger:#ff3b30
+}
+body{background:var(--bg);color:var(--t1);font-family:var(--font);
+  min-height:100dvh;padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,30px);overflow-x:hidden}
+
+/* ── SCREEN SYSTEM ── */
+.screen{display:none;position:fixed;inset:0;z-index:100;overflow-y:auto;
+  padding-top:env(safe-area-inset-top,0px)}
+.screen.active{display:flex;flex-direction:column}
+
+/* ── HDR ── */
+.hdr{padding:18px 20px 0;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.hdr-back{width:36px;height:36px;background:rgba(255,255,255,0.06);
+  border:.5px solid var(--line);border-radius:50%;display:flex;align-items:center;
+  justify-content:center;font-size:18px;cursor:pointer;color:var(--t2);
+  -webkit-tap-highlight-color:transparent}
 .hdr-title{font-size:13px;font-weight:700;letter-spacing:.15em;color:var(--t3);text-transform:uppercase}
+
+/* ── PAGINA PRINCIPALA ── */
+#screen-main{background:var(--bg);overflow-y:auto}
 .hero{padding:32px 20px 24px;text-align:center}
-.hero-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(212,175,55,0.08);border:.5px solid rgba(212,175,55,0.2);border-radius:20px;padding:5px 14px;font-size:9px;font-weight:700;letter-spacing:.2em;color:var(--gold);margin-bottom:20px}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(212,175,55,0.08);
+  border:.5px solid rgba(212,175,55,0.2);border-radius:20px;padding:5px 14px;
+  font-size:9px;font-weight:700;letter-spacing:.2em;color:var(--gold);margin-bottom:20px}
 .hero-badge-dot{width:5px;height:5px;border-radius:50%;background:var(--gold);animation:pulse 2s infinite}
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.8)}}
 .hero-title{font-size:clamp(28px,8vw,42px);font-weight:900;letter-spacing:-.03em;line-height:1.1;margin-bottom:12px}
 .hero-title span{color:var(--gold)}
 .hero-sub{font-size:14px;color:var(--t2);line-height:1.7;max-width:320px;margin:0 auto 28px}
-.price-card{margin:0 20px 24px;background:linear-gradient(135deg,rgba(212,175,55,0.08),rgba(212,175,55,0.02));border:.5px solid rgba(212,175,55,0.25);border-radius:24px;padding:24px;position:relative;overflow:hidden}
-.price-card::before{content:'';position:absolute;top:0;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,rgba(212,175,55,0.5),transparent)}
+
+.price-card{margin:0 20px 24px;background:linear-gradient(135deg,rgba(212,175,55,0.08),rgba(212,175,55,0.02));
+  border:.5px solid rgba(212,175,55,0.25);border-radius:24px;padding:24px;position:relative;overflow:hidden}
+.price-card::before{content:'';position:absolute;top:0;left:10%;right:10%;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(212,175,55,0.5),transparent)}
 .price-amount{font-size:48px;font-weight:900;letter-spacing:-.03em}
 .price-amount span{font-size:20px;font-weight:400;color:var(--t2);margin-left:4px}
 .price-label{font-size:10px;color:rgba(212,175,55,0.5);letter-spacing:.2em;font-weight:700;margin-bottom:16px}
 .price-features{display:flex;flex-direction:column;gap:10px}
 .feature{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--t2)}
-.feature-icon{width:28px;height:28px;background:rgba(212,175,55,0.1);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
-.iban-box{margin:0 20px 16px;background:rgba(255,255,255,0.04);border:.5px solid var(--line);border-radius:16px;padding:16px 20px}
+.feature-icon{width:28px;height:28px;background:rgba(212,175,55,0.1);border-radius:8px;
+  display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+
+.iban-box{margin:0 20px 16px;background:rgba(255,255,255,0.04);border:.5px solid var(--line);
+  border-radius:16px;padding:16px 20px}
 .iban-label{font-size:9px;color:var(--t3);letter-spacing:.2em;font-weight:700;margin-bottom:8px}
-.iban-number{font-family:'Courier New',monospace;font-size:15px;font-weight:700;letter-spacing:.05em;word-break:break-all;margin-bottom:10px}
-.iban-copy{width:100%;min-height:40px;background:rgba(212,175,55,0.08);border:.5px solid rgba(212,175,55,0.2);border-radius:10px;color:var(--gold);font-family:var(--font);font-size:12px;font-weight:700;cursor:pointer}
-.legal-box{margin:0 20px 20px;background:rgba(255,255,255,0.02);border:.5px solid rgba(255,255,255,0.06);border-radius:14px;padding:14px 16px;font-size:11px;color:var(--t3);line-height:1.7}
+.iban-number{font-family:'Courier New',monospace;font-size:15px;font-weight:700;
+  letter-spacing:.05em;word-break:break-all;margin-bottom:10px}
+.iban-copy{width:100%;min-height:40px;background:rgba(212,175,55,0.08);
+  border:.5px solid rgba(212,175,55,0.2);border-radius:10px;color:var(--gold);
+  font-family:var(--font);font-size:12px;font-weight:700;cursor:pointer}
+
+.legal-box{margin:0 20px 20px;background:rgba(255,255,255,0.02);
+  border:.5px solid rgba(255,255,255,0.06);border-radius:14px;padding:14px 16px;
+  font-size:11px;color:var(--t3);line-height:1.7}
 .legal-box strong{color:var(--t2)}
-.cta-btn{display:block;margin:0 20px 12px;min-height:54px;background:rgba(212,175,55,0.12);border:.5px solid rgba(212,175,55,0.35);border-radius:16px;color:var(--gold);font-family:var(--font);font-size:15px;font-weight:800;cursor:pointer;width:calc(100% - 40px)}
-.cta-btn:active{opacity:.8}
-.pending-screen{display:none;position:fixed;inset:0;background:#03030a;z-index:9999;flex-direction:column;align-items:center;justify-content:center;padding:40px}
-.pending-logo{font-size:72px;font-weight:900;letter-spacing:-4px;color:#fff;margin-bottom:4px;animation:breathe 4s ease-in-out infinite}
-@keyframes breathe{0%,100%{opacity:.6}50%{opacity:1;text-shadow:0 0 40px rgba(212,175,55,0.3)}}
-.pending-sub{font-size:9px;letter-spacing:.3em;color:rgba(212,175,55,0.4);font-weight:700;margin-bottom:48px}
-.pending-text{font-size:13px;color:var(--t3);text-align:center;line-height:1.8;max-width:280px;font-style:italic}
-.id-screen{display:none;position:fixed;inset:0;background:#03030a;z-index:9999;flex-direction:column;align-items:center;justify-content:flex-start;padding:20px;overflow-y:auto;padding-top:calc(20px + env(safe-area-inset-top,0px))}
-.id-card{width:100%;max-width:340px;background:linear-gradient(135deg,rgba(255,255,255,0.07),rgba(255,255,255,0.03) 40%,rgba(212,175,55,0.06));backdrop-filter:blur(24px) saturate(1.4);-webkit-backdrop-filter:blur(24px) saturate(1.4);border:.5px solid rgba(212,175,55,0.3);border-radius:28px;padding:34px 30px 28px;position:relative;overflow:hidden;flex-shrink:0;box-shadow:0 2px 0 rgba(255,255,255,0.08) inset,0 -1px 0 rgba(0,0,0,0.3) inset,0 20px 60px rgba(0,0,0,0.6)}
-.id-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.2),rgba(212,175,55,0.5),rgba(255,255,255,0.2),transparent)}
-.id-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(212,175,55,0.2),transparent)}
-.id-glow{position:absolute;top:-80px;right:-80px;width:220px;height:220px;background:radial-gradient(circle,rgba(212,175,55,0.12),transparent 65%);border-radius:50%;pointer-events:none}
-.id-glow2{position:absolute;bottom:-60px;left:-60px;width:180px;height:180px;background:radial-gradient(circle,rgba(212,175,55,0.06),transparent 65%);border-radius:50%;pointer-events:none}
-.id-vv{font-size:38px;font-weight:900;letter-spacing:5px;color:#fff;margin-bottom:2px;text-shadow:0 0 20px rgba(255,255,255,0.1)}
-.id-eco{font-size:8px;letter-spacing:.28em;color:rgba(212,175,55,0.55);font-weight:700;margin-bottom:20px}
-.id-div{height:.5px;background:linear-gradient(90deg,rgba(212,175,55,0.3),transparent);margin-bottom:16px}
-.id-lbl{font-size:8px;letter-spacing:.2em;color:var(--t3);font-weight:700;margin-bottom:5px}
-.id-code{font-family:'Courier New',monospace;font-size:21px;font-weight:700;color:var(--gold);letter-spacing:.12em;margin-bottom:16px;text-shadow:0 0 12px rgba(212,175,55,0.3)}
-.id-alias{font-size:13px;color:rgba(255,255,255,0.7);margin-bottom:3px;font-weight:600}
-.id-date{font-size:10px;color:var(--t3);margin-bottom:14px}
-.id-motto{font-size:11px;color:rgba(255,255,255,0.4);line-height:1.6;font-style:italic;border-left:2px solid rgba(212,175,55,0.3);padding-left:10px;margin-bottom:16px}
-.id-status{display:inline-flex;align-items:center;gap:6px;background:rgba(52,199,89,0.08);border:.5px solid rgba(52,199,89,0.25);border-radius:20px;padding:4px 12px;font-size:9px;font-weight:700;letter-spacing:.15em;color:#34c759}
-.id-status-dot{width:5px;height:5px;border-radius:50%;background:#34c759;animation:pulse 2s infinite}
-.id-footer{display:flex;justify-content:space-between;align-items:flex-end;margin-top:16px;padding-top:12px;border-top:.5px solid rgba(255,255,255,0.06)}
-.id-wm{font-size:8px;color:rgba(255,255,255,0.1);letter-spacing:.05em}
-.id-legal-sm{font-size:7px;color:rgba(255,255,255,0.08);text-align:right;line-height:1.5}
-.congrats-box{background:rgba(212,175,55,0.04);border:.5px solid rgba(212,175,55,0.12);border-radius:18px;padding:22px 20px;margin-bottom:10px}
-.congrats-title{font-size:18px;font-weight:900;color:#fff;margin-bottom:10px;letter-spacing:-.02em}
-.congrats-body{font-size:13px;color:rgba(255,255,255,0.5);line-height:1.8}
-.congrats-body em{color:rgba(212,175,55,0.7);font-style:normal;font-weight:600}
-.card-actions{margin-top:16px;width:100%;max-width:340px;display:flex;flex-direction:column;gap:10px;padding-bottom:40px}
-.cbtn{min-height:50px;border-radius:14px;font-family:var(--font);font-size:13px;font-weight:700;cursor:pointer;letter-spacing:.03em;-webkit-tap-highlight-color:transparent;transition:opacity .15s,transform .15s}
-.cbtn:active{opacity:.75;transform:scale(.98)}
-.cbtn-save{background:rgba(212,175,55,0.12);border:.5px solid rgba(212,175,55,0.3);color:var(--gold)}
-.cbtn-share{background:rgba(255,255,255,0.07);border:.5px solid rgba(255,255,255,0.14);color:rgba(255,255,255,0.85)}
-.cbtn-hub{background:transparent;border:.5px solid rgba(255,255,255,0.06);color:var(--t3);font-size:12px}
 
-/* SAVE OVERLAY */
-#sov{display:none;position:fixed;inset:0;background:#000;z-index:99999;flex-direction:column;align-items:center;justify-content:center;padding:24px;gap:16px}
-#sov.show{display:flex}
-#sv-img{display:none;width:100%;max-width:340px;border-radius:24px;-webkit-user-select:none;user-select:none;box-shadow:0 0 40px rgba(212,175,55,0.15)}
-.sv-spinner{width:48px;height:48px;border:2px solid rgba(212,175,55,0.2);border-top-color:rgba(212,175,55,0.8);border-radius:50%;animation:spin .8s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.sv-msg{font-size:14px;color:rgba(255,255,255,0.5);text-align:center;line-height:1.7;max-width:280px}
-.sv-msg strong{color:rgba(212,175,55,0.85);display:block;font-size:16px;margin-bottom:6px}
-.sv-close{padding:12px 36px;background:transparent;border:.5px solid rgba(255,255,255,0.12);border-radius:12px;color:rgba(255,255,255,0.35);font-size:12px;cursor:pointer;font-family:var(--font);display:none;-webkit-tap-highlight-color:transparent;min-height:44px}
+/* ── ALIAS INPUT SECTION ── */
+.alias-section{margin:0 20px 16px;background:rgba(212,175,55,0.04);
+  border:.5px solid rgba(212,175,55,0.2);border-radius:16px;padding:18px 20px}
+.alias-label{font-size:10px;color:var(--gold);letter-spacing:.15em;font-weight:700;
+  text-transform:uppercase;margin-bottom:10px}
+.alias-desc{font-size:12px;color:var(--t3);margin-bottom:12px;line-height:1.6}
+.alias-input{width:100%;background:rgba(255,255,255,0.06);border:.5px solid rgba(212,175,55,0.3);
+  border-radius:10px;padding:12px 16px;color:#fff;font-size:16px;font-family:var(--font);
+  outline:none;letter-spacing:.05em;-webkit-appearance:none}
+.alias-input::placeholder{color:rgba(255,255,255,0.25)}
+.alias-input:focus{border-color:rgba(212,175,55,0.6);background:rgba(255,255,255,0.08)}
+.alias-input:-webkit-autofill{-webkit-box-shadow:0 0 0 100px #0a0a10 inset!important;
+  -webkit-text-fill-color:#fff!important}
 
+.cta-btn{display:block;margin:0 20px 12px;min-height:54px;background:rgba(212,175,55,0.12);
+  border:.5px solid rgba(212,175,55,0.35);border-radius:16px;color:var(--gold);
+  font-family:var(--font);font-size:15px;font-weight:800;cursor:pointer;width:calc(100% - 40px);
+  -webkit-tap-highlight-color:transparent}
+.cta-btn:active{opacity:.8;transform:scale(.99)}
+
+/* Counter pe pagina principală */
+.founder-counter{margin:0 20px 24px;display:flex;align-items:center;justify-content:center;
+  gap:12px;padding:12px 20px;background:rgba(52,199,89,0.06);
+  border:.5px solid rgba(52,199,89,0.15);border-radius:12px}
+.counter-num{font-size:22px;font-weight:900;color:var(--green)}
+.counter-txt{font-size:12px;color:var(--t3);line-height:1.4}
+.counter-urgent{font-size:11px;color:rgba(212,175,55,0.6);font-weight:600}
+
+/* ── WALL ── */
 .wall-section{padding:0 20px 32px}
 .wall-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
 .wall-lbl{font-size:9px;color:var(--t3);letter-spacing:.2em;font-weight:700;text-transform:uppercase}
 .wall-count{font-size:11px;color:var(--t3)}
-.constellation{background:rgba(255,255,255,0.02);border:.5px solid var(--line);border-radius:20px;padding:24px;min-height:200px;position:relative;overflow:hidden}
-.star-dot{position:absolute;width:6px;height:6px;border-radius:50%;transition:all .3s}
-.star-dot.online{background:rgba(212,175,55,0.9);border:.5px solid rgba(212,175,55,0.6);box-shadow:0 0 8px rgba(212,175,55,0.6);animation:sp 2s infinite}
-.star-dot.offline{background:rgba(255,255,255,0.15);border:.5px solid rgba(255,255,255,0.2)}
+.constellation{background:rgba(255,255,255,0.02);border:.5px solid var(--line);
+  border-radius:20px;padding:24px;min-height:180px;position:relative;overflow:hidden}
+.star-dot{position:absolute;width:7px;height:7px;border-radius:50%;cursor:default;transition:all .3s}
+.star-dot.online{background:rgba(212,175,55,0.9);border:.5px solid rgba(212,175,55,0.6);
+  box-shadow:0 0 8px rgba(212,175,55,0.6);animation:sp 2s infinite}
+.star-dot.offline{background:rgba(255,255,255,0.2);border:.5px solid rgba(255,255,255,0.3)}
+.star-dot.pending-dot{background:rgba(255,149,0,0.6);border:.5px solid rgba(255,149,0,0.4)}
 @keyframes sp{0%,100%{box-shadow:0 0 4px rgba(212,175,55,0.4)}50%{box-shadow:0 0 12px rgba(212,175,55,0.8)}}
-.wall-empty{text-align:center;padding:40px 20px;color:var(--t3);font-size:13px}
-.wall-legend{display:flex;gap:16px;margin-top:12px;font-size:10px;color:var(--t3)}
+.wall-empty{text-align:center;padding:30px 20px;color:var(--t3);font-size:13px}
+.wall-legend{display:flex;gap:16px;margin-top:12px;font-size:10px;color:var(--t3);flex-wrap:wrap}
 .leg-item{display:flex;align-items:center;gap:6px}
 .leg-dot{width:6px;height:6px;border-radius:50%}
-.toast{position:fixed;top:calc(16px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);background:rgba(212,175,55,0.15);border:.5px solid rgba(212,175,55,0.3);color:var(--gold);padding:10px 20px;border-radius:14px;font-size:12px;font-weight:700;z-index:199999;pointer-events:none;opacity:0;transition:opacity .3s;white-space:nowrap}
+
+/* ── SCREEN PENDING ── */
+#screen-pending{background:#03030a;align-items:center;justify-content:center;padding:40px}
+.pend-logo{font-size:64px;font-weight:900;letter-spacing:-3px;color:#fff;
+  margin-bottom:4px;animation:breathe 4s ease-in-out infinite}
+@keyframes breathe{0%,100%{opacity:.6}50%{opacity:1;text-shadow:0 0 40px rgba(212,175,55,0.3)}}
+.pend-sub{font-size:9px;letter-spacing:.3em;color:rgba(212,175,55,0.4);font-weight:700;margin-bottom:32px}
+.pend-ring{width:60px;height:60px;border-radius:50%;border:1px solid rgba(212,175,55,0.2);
+  display:flex;align-items:center;justify-content:center;margin-bottom:28px;
+  animation:breathe 3s ease-in-out infinite}
+.pend-dot{width:8px;height:8px;border-radius:50%;background:rgba(212,175,55,0.5)}
+.pend-text{font-size:13px;color:var(--t3);text-align:center;line-height:1.8;
+  max-width:280px;font-style:italic;margin-bottom:12px}
+.pend-note{font-size:10px;color:rgba(255,255,255,0.15);letter-spacing:.1em;margin-bottom:40px;text-align:center}
+.pend-alias{font-size:14px;font-weight:700;color:rgba(212,175,55,0.7);margin-bottom:8px;text-align:center}
+
+/* ── SCREEN CARD ── */
+#screen-card{background:#03030a;align-items:center;justify-content:flex-start;
+  padding:20px;padding-top:calc(20px + env(safe-area-inset-top,0px))}
+
+/* GLASS CARD */
+.id-card{width:100%;max-width:340px;
+  background:linear-gradient(135deg,rgba(255,255,255,0.07),rgba(255,255,255,0.03) 40%,rgba(212,175,55,0.06));
+  backdrop-filter:blur(24px) saturate(1.4);-webkit-backdrop-filter:blur(24px) saturate(1.4);
+  border:.5px solid rgba(212,175,55,0.3);border-radius:28px;padding:34px 30px 28px;
+  position:relative;overflow:hidden;flex-shrink:0;
+  box-shadow:0 2px 0 rgba(255,255,255,0.08) inset,0 -1px 0 rgba(0,0,0,0.3) inset,
+    0 20px 60px rgba(0,0,0,0.6)}
+.id-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.2),rgba(212,175,55,0.5),rgba(255,255,255,0.2),transparent)}
+.id-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(212,175,55,0.2),transparent)}
+.id-glow{position:absolute;top:-80px;right:-80px;width:220px;height:220px;
+  background:radial-gradient(circle,rgba(212,175,55,0.12),transparent 65%);border-radius:50%;pointer-events:none}
+.id-glow2{position:absolute;bottom:-60px;left:-60px;width:180px;height:180px;
+  background:radial-gradient(circle,rgba(212,175,55,0.06),transparent 65%);border-radius:50%;pointer-events:none}
+.id-vv{font-size:38px;font-weight:900;letter-spacing:5px;color:#fff;margin-bottom:2px;
+  text-shadow:0 0 20px rgba(255,255,255,0.1)}
+.id-eco{font-size:8px;letter-spacing:.28em;color:rgba(212,175,55,0.55);font-weight:700;margin-bottom:16px}
+.id-div{height:.5px;background:linear-gradient(90deg,rgba(212,175,55,0.3),transparent);margin-bottom:14px}
+.id-lbl{font-size:8px;letter-spacing:.2em;color:var(--t3);font-weight:700;margin-bottom:4px}
+.id-code{font-family:'Courier New',monospace;font-size:20px;font-weight:700;color:var(--gold);
+  letter-spacing:.1em;margin-bottom:6px;text-shadow:0 0 12px rgba(212,175,55,0.3)}
+.id-founder-num{font-size:10px;color:rgba(212,175,55,0.5);letter-spacing:.1em;
+  font-weight:700;margin-bottom:12px}
+.id-alias{font-size:14px;color:rgba(255,255,255,0.8);margin-bottom:3px;font-weight:700}
+.id-date{font-size:10px;color:var(--t3);margin-bottom:12px}
+.id-motto{font-size:11px;color:rgba(255,255,255,0.4);line-height:1.6;font-style:italic;
+  border-left:2px solid rgba(212,175,55,0.3);padding-left:10px;margin-bottom:14px}
+.id-status{display:inline-flex;align-items:center;gap:6px;background:rgba(52,199,89,0.08);
+  border:.5px solid rgba(52,199,89,0.25);border-radius:20px;padding:4px 12px;
+  font-size:9px;font-weight:700;letter-spacing:.15em;color:var(--green)}
+.id-status-dot{width:5px;height:5px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+.id-footer{display:flex;justify-content:space-between;align-items:flex-end;
+  margin-top:14px;padding-top:10px;border-top:.5px solid rgba(255,255,255,0.06)}
+.id-wm{font-size:8px;color:rgba(255,255,255,0.1);letter-spacing:.05em}
+.id-legal-sm{font-size:7px;color:rgba(255,255,255,0.08);text-align:right;line-height:1.5}
+
+/* Congrats + actions */
+.congrats-box{background:rgba(212,175,55,0.04);border:.5px solid rgba(212,175,55,0.12);
+  border-radius:18px;padding:20px;margin-bottom:10px}
+.congrats-title{font-size:17px;font-weight:900;color:#fff;margin-bottom:8px;letter-spacing:-.02em}
+.congrats-body{font-size:13px;color:rgba(255,255,255,0.5);line-height:1.8}
+.congrats-body em{color:rgba(212,175,55,0.7);font-style:normal;font-weight:600}
+.card-actions{margin-top:14px;width:100%;max-width:340px;display:flex;flex-direction:column;
+  gap:10px;padding-bottom:40px}
+.cbtn{min-height:50px;border-radius:14px;font-family:var(--font);font-size:13px;font-weight:700;
+  cursor:pointer;letter-spacing:.03em;-webkit-tap-highlight-color:transparent;
+  transition:opacity .15s,transform .15s}
+.cbtn:active{opacity:.75;transform:scale(.98)}
+.cbtn-save{background:rgba(212,175,55,0.12);border:.5px solid rgba(212,175,55,0.3);color:var(--gold)}
+.cbtn-share{background:rgba(255,255,255,0.07);border:.5px solid rgba(255,255,255,0.14);color:rgba(255,255,255,0.85)}
+.cbtn-circle{background:rgba(212,175,55,0.06);border:.5px solid rgba(212,175,55,0.15);
+  color:rgba(212,175,55,0.6);font-size:12px}
+.cbtn-hub{background:transparent;border:.5px solid var(--line);color:var(--t3);font-size:12px}
+
+/* ── SAVE OVERLAY ── */
+#sov{display:none;position:fixed;inset:0;background:#000;z-index:99999;
+  flex-direction:column;align-items:center;justify-content:center;padding:24px;gap:16px}
+#sov.show{display:flex}
+#sv-img{display:none;width:100%;max-width:340px;border-radius:24px;
+  -webkit-user-select:none;user-select:none;box-shadow:0 0 40px rgba(212,175,55,0.15)}
+.sv-spinner{width:44px;height:44px;border:2px solid rgba(212,175,55,0.2);
+  border-top-color:rgba(212,175,55,0.8);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.sv-msg{font-size:14px;color:rgba(255,255,255,0.5);text-align:center;line-height:1.7;max-width:280px}
+.sv-msg strong{color:rgba(212,175,55,0.85);display:block;font-size:16px;margin-bottom:6px}
+.sv-close{padding:12px 36px;background:transparent;border:.5px solid rgba(255,255,255,0.12);
+  border-radius:12px;color:rgba(255,255,255,0.35);font-size:12px;cursor:pointer;
+  font-family:var(--font);display:none;-webkit-tap-highlight-color:transparent;min-height:44px}
+
+/* ── RECOVER SCREEN ── */
+#screen-recover{background:#03030a;align-items:center;justify-content:center;padding:40px}
+.recover-title{font-size:20px;font-weight:900;margin-bottom:8px}
+.recover-sub{font-size:13px;color:var(--t3);margin-bottom:24px;text-align:center;line-height:1.6}
+.recover-input{width:100%;max-width:300px;background:rgba(255,255,255,0.06);
+  border:.5px solid rgba(255,255,255,0.15);border-radius:12px;padding:14px 18px;
+  color:#fff;font-size:16px;font-family:var(--font);outline:none;margin-bottom:14px;
+  -webkit-appearance:none;text-align:center;letter-spacing:.05em}
+.recover-btn{width:100%;max-width:300px;min-height:48px;background:rgba(212,175,55,0.12);
+  border:.5px solid rgba(212,175,55,0.3);border-radius:12px;color:var(--gold);
+  font-family:var(--font);font-size:14px;font-weight:700;cursor:pointer;margin-bottom:12px}
+.recover-back{font-size:12px;color:var(--t3);cursor:pointer;padding:10px}
+
+/* ── TOAST ── */
+.toast{position:fixed;top:calc(16px + env(safe-area-inset-top,0px));left:50%;
+  transform:translateX(-50%);background:rgba(20,20,22,0.96);border:.5px solid rgba(255,255,255,0.12);
+  color:#fff;padding:10px 20px;border-radius:14px;font-size:12px;font-weight:700;
+  z-index:199999;pointer-events:none;opacity:0;transition:opacity .3s;white-space:nowrap;
+  max-width:90vw;text-align:center}
 .toast.show{opacity:1}
 </style>
 </head>
 <body>
 
-<div class="hdr">
-  <a class="hdr-back" href="https://vv-technologies.github.io/vv-nexus/">←</a>
-  <div class="hdr-title">VV · Inner Circle</div>
-  <div style="width:36px"></div>
-</div>
-<div class="hero">
-  <div class="hero-badge"><span class="hero-badge-dot"></span>100 LOCURI · LIMITAT</div>
-  <div class="hero-title">Nucleul<br><span>Universului VV</span></div>
-  <div class="hero-sub">Nu cumperi un produs. Pui o cărămidă la fundația a ceva ce nu a existat încă. Recunoștința noastră e permanentă.</div>
-</div>
-<div class="price-card">
-  <div class="price-label">ACT DE CONTRIBUȚIE · O SINGURĂ DATĂ</div>
-  <div class="price-amount">29 <span>LEI</span></div>
-  <div style="height:20px"></div>
-  <div class="price-features">
-    <div class="feature"><div class="feature-icon">⬡</div>Identitate VV·CORE unică în ecosistem</div>
-    <div class="feature"><div class="feature-icon">🌌</div>Prezență permanentă pe Zidul Fondatorilor</div>
-    <div class="feature"><div class="feature-icon">🔑</div>3 chei de invitație exclusive</div>
-    <div class="feature"><div class="feature-icon">⚡</div>Early access la fiecare update VV</div>
-    <div class="feature"><div class="feature-icon">🤝</div>Primul la masă când VV 1.0 se lansează</div>
+<!-- ═══ SCREEN MAIN ═══ -->
+<div class="screen active" id="screen-main">
+  <div class="hdr">
+    <a class="hdr-back" href="https://vv-technologies.github.io/vv-nexus/">←</a>
+    <div class="hdr-title">VV · Inner Circle</div>
+    <div style="width:36px"></div>
   </div>
-</div>
-<div class="iban-box">
-  <div class="iban-label">CONT SALT BANK · VV HYBRID UNIVERS</div>
-  <div class="iban-number" id="iban-display">RO98ROIN4021D97CHECQLBSC</div>
-  <button class="iban-copy" onclick="copyIban()">COPIAZĂ IBAN</button>
-  <div style="margin-top:12px;font-size:11px;color:rgba(255,255,255,0.3);line-height:1.7">
-    <div style="margin-bottom:4px">1. Copiază IBAN-ul de mai sus</div>
-    <div style="margin-bottom:4px">2. Deschide aplicația bancară</div>
-    <div style="margin-bottom:4px">3. La detalii transfer scrie: <span style="color:rgba(212,175,55,0.6);font-weight:600">Sustinere VV</span></div>
-    <div>4. Revino și apasă butonul de confirmare</div>
-  </div>
-</div>
-<div class="legal-box">
-  <strong>Act de contribuție voluntară.</strong> Prin această acțiune susții dezvoltarea ecosistemului VV Hybrid Univers. Nu reprezintă achiziția unui produs finit, acțiuni sau garanții financiare. Recunoștința oferită (identitate digitală, acces prioritar) este un gest al echipei VV față de susținătorii fondatori. Datele sunt procesate conform GDPR · Reg. UE 679/2016.
-</div>
-<button class="cta-btn" onclick="showConfirmFlow()">AM TRANSFERAT · NOTIFICĂ VV TEAM</button>
-<div style="margin:0 20px 32px;font-size:11px;color:var(--t3);text-align:center;line-height:1.6">
-  VV Team verifică transferul și activează identitatea ta în maxim 24h.<br>Vei simți când se întâmplă — fără refresh.
-</div>
-<div class="wall-section">
-  <div class="wall-header">
-    <div class="wall-lbl">Zidul Fondatorilor</div>
-    <div class="wall-count" id="wall-count">0 / 100</div>
-  </div>
-  <div class="constellation" id="constellation">
-    <div class="wall-empty" id="wall-empty">Primul nucleu se formează...<br><span style="font-size:11px;color:rgba(255,255,255,0.15)">Fii primul.</span></div>
-  </div>
-  <div class="wall-legend">
-    <div class="leg-item"><div class="leg-dot" style="background:rgba(212,175,55,0.9)"></div>Online acum</div>
-    <div class="leg-item"><div class="leg-dot" style="background:rgba(255,255,255,0.15)"></div>Fondator</div>
-  </div>
-</div>
-<div class="toast" id="toast"></div>
 
-<!-- PENDING -->
-<div class="pending-screen" id="pending-screen">
-  <div class="pending-logo">VV</div>
-  <div class="pending-sub">HYBRID UNIVERS</div>
-  <div style="width:60px;height:60px;border-radius:50%;border:1px solid rgba(212,175,55,0.2);display:flex;align-items:center;justify-content:center;margin-bottom:32px;animation:breathe 3s ease-in-out infinite">
-    <div style="width:8px;height:8px;border-radius:50%;background:rgba(212,175,55,0.5)"></div>
+  <div class="hero">
+    <div class="hero-badge"><span class="hero-badge-dot"></span>100 LOCURI · LIMITAT</div>
+    <div class="hero-title">Nucleul<br><span>Universului VV</span></div>
+    <div class="hero-sub">Nu cumperi un produs. Pui o cărămidă la fundația a ceva ce nu a existat încă. Recunoștința noastră e permanentă.</div>
   </div>
-  <div class="pending-text">„Frecvențele tale sunt în curs de aliniere cu Nucleul VV..."</div>
-  <div style="margin-top:24px;font-size:10px;color:rgba(255,255,255,0.15);letter-spacing:.1em">Verificăm transferul · maxim 24h</div>
+
+  <!-- Counter fondatori -->
+  <div class="founder-counter">
+    <div class="counter-num" id="main-counter">—</div>
+    <div>
+      <div class="counter-txt">fondatori activi din 100</div>
+      <div class="counter-urgent" id="counter-urgent"></div>
+    </div>
+  </div>
+
+  <div class="price-card">
+    <div class="price-label">ACT DE CONTRIBUȚIE · O SINGURĂ DATĂ</div>
+    <div class="price-amount">29 <span>LEI</span></div>
+    <div style="height:20px"></div>
+    <div class="price-features">
+      <div class="feature"><div class="feature-icon">⬡</div>Identitate VV·CORE unică în ecosistem</div>
+      <div class="feature"><div class="feature-icon">🌌</div>Prezență permanentă pe Zidul Fondatorilor</div>
+      <div class="feature"><div class="feature-icon">🔑</div>3 chei de invitație exclusive</div>
+      <div class="feature"><div class="feature-icon">⚡</div>Early access la fiecare update VV</div>
+      <div class="feature"><div class="feature-icon">🤝</div>Primul la masă când VV 1.0 se lansează</div>
+    </div>
+  </div>
+
+  <div class="iban-box">
+    <div class="iban-label">CONT SALT BANK · VV HYBRID UNIVERS</div>
+    <div class="iban-number" id="iban-display">RO98ROIN4021D97CHECQLBSC</div>
+    <button class="iban-copy" onclick="copyIban()">COPIAZĂ IBAN</button>
+    <div style="margin-top:12px;font-size:11px;color:rgba(255,255,255,0.3);line-height:1.7">
+      <div style="margin-bottom:4px">1. Copiază IBAN-ul de mai sus</div>
+      <div style="margin-bottom:4px">2. Deschide aplicația bancară</div>
+      <div style="margin-bottom:4px">3. La detalii transfer scrie: <span style="color:rgba(212,175,55,0.6);font-weight:600">Sustinere VV</span></div>
+      <div>4. Revino și completează formularul de jos</div>
+    </div>
+  </div>
+
+  <!-- Alias input -->
+  <div class="alias-section">
+    <div class="alias-label">Alege-ți identitatea</div>
+    <div class="alias-desc">Acesta e numele tău în ecosistemul VV — va apărea pe cardul de fondator și pe Zidul Contribuitorilor.</div>
+    <input class="alias-input" id="alias-input" type="text" maxlength="20"
+      placeholder="ex: Antonio_, Maria_V, Mihai..."
+      oninput="this.value=this.value.replace(/[^a-zA-Z0-9_.\-àáâãäåæçèéêëìíîïðñòóôõöùúûüýÿĂăÂâÎîȘșȚțŞşŢţ ]/g,'')">
+  </div>
+
+  <div class="legal-box">
+    <strong>Act de contribuție voluntară.</strong> Prin această acțiune susții dezvoltarea ecosistemului VV Hybrid Univers. Nu reprezintă achiziția unui produs finit, acțiuni sau garanții financiare. Recunoștința oferită (identitate digitală, acces prioritar) este un gest al echipei VV față de susținătorii fondatori. Datele sunt procesate conform GDPR · Reg. UE 679/2016.
+  </div>
+
+  <button class="cta-btn" onclick="handleTransfer()">AM TRANSFERAT · NOTIFICĂ VV TEAM</button>
+  <div style="margin:0 20px 12px;font-size:11px;color:var(--t3);text-align:center;line-height:1.6">
+    VV Team verifică transferul și activează identitatea ta în maxim 24h.<br>Vei simți când se întâmplă — fără refresh.
+  </div>
+
+  <!-- Recover link -->
+  <div style="text-align:center;margin:0 20px 24px">
+    <span onclick="showScreen('recover')"
+      style="font-size:11px;color:rgba(255,255,255,0.2);cursor:pointer;text-decoration:underline">
+      Ai contribuit deja dar nu-ți apare cardul?
+    </span>
+  </div>
+
+  <!-- Wall -->
+  <div class="wall-section">
+    <div class="wall-header">
+      <div class="wall-lbl">Zidul Fondatorilor</div>
+      <div class="wall-count" id="wall-count">0 / 100</div>
+    </div>
+    <div class="constellation" id="constellation">
+      <div class="wall-empty" id="wall-empty">Primul nucleu se formează...<br>
+        <span style="font-size:11px;color:rgba(255,255,255,0.15)">Fii primul.</span></div>
+    </div>
+    <div class="wall-legend">
+      <div class="leg-item"><div class="leg-dot" style="background:rgba(212,175,55,0.9)"></div>Activ</div>
+      <div class="leg-item"><div class="leg-dot" style="background:rgba(255,149,0,0.6)"></div>În așteptare</div>
+      <div class="leg-item"><div class="leg-dot" style="background:rgba(255,255,255,0.2)"></div>Fondator</div>
+    </div>
+  </div>
 </div>
 
-<!-- ID SCREEN -->
-<div class="id-screen" id="id-screen">
+<!-- ═══ SCREEN PENDING ═══ -->
+<div class="screen" id="screen-pending">
+  <div class="pend-logo">VV</div>
+  <div class="pend-sub">HYBRID UNIVERS</div>
+  <div class="pend-ring"><div class="pend-dot"></div></div>
+  <div class="pend-alias" id="pend-alias-display"></div>
+  <div class="pend-text">„Frecvențele tale sunt în curs de aliniere cu Nucleul VV..."</div>
+  <div class="pend-note">Verificăm transferul · maxim 24h</div>
+  <button class="cbtn cbtn-hub" style="width:100%;max-width:300px"
+    onclick="window.location.href='https://vv-technologies.github.io/vv-nexus/'">
+    ← Înapoi în Hub
+  </button>
+  <div style="margin-top:12px;font-size:11px;color:rgba(255,255,255,0.15);text-align:center">
+    Poți închide această pagină. Vei fi notificat.
+  </div>
+</div>
+
+<!-- ═══ SCREEN CARD ═══ -->
+<div class="screen" id="screen-card">
   <div class="id-card">
     <div class="id-glow"></div><div class="id-glow2"></div>
     <div class="id-vv">VV</div>
@@ -175,6 +347,7 @@ body{background:var(--bg);color:var(--t1);font-family:var(--font);min-height:100
     <div class="id-div"></div>
     <div class="id-lbl">IDENTITATE FONDATOR</div>
     <div class="id-code" id="id-code">VV·CORE·----</div>
+    <div class="id-founder-num" id="id-founder-num">FONDATOR #— DIN 100</div>
     <div class="id-alias" id="id-alias">—</div>
     <div class="id-date" id="id-date">—</div>
     <div class="id-motto" id="id-motto"></div>
@@ -187,15 +360,29 @@ body{background:var(--bg);color:var(--t1);font-family:var(--font);min-height:100
   <div class="card-actions">
     <div class="congrats-box">
       <div class="congrats-title">Ești parte din nucleu.</div>
-      <div class="congrats-body">Nu ai cumpărat un produs. Ai ales să crezi în ceva înainte ca restul lumii să știe că există.<br><br><em>VV Hybrid Univers</em> e un ecosistem construit de oameni, pentru oameni — misiuni reale în orașe reale, identități digitale suverane, o comunitate care nu aparține niciunei corporații.<br><br>Cardul tău VV·CORE e dovada că ai fost la fundație. Poartă-l oriunde ești — pe Instagram, pe story, în bio. Nu e reclamă. E o amprentă reală într-un univers care abia începe.</div>
+      <div class="congrats-body">
+        Nu ai cumpărat un produs. Ai ales să crezi în ceva înainte ca restul lumii să știe că există.<br><br>
+        <em>VV Hybrid Univers</em> e un ecosistem construit de oameni, pentru oameni — misiuni reale în orașe reale, identități digitale suverane, o comunitate care nu aparține niciunei corporații.<br><br>
+        Cardul tău VV·CORE e dovada că ai fost la fundație. Poartă-l oriunde ești.
+      </div>
     </div>
     <button class="cbtn cbtn-save" onclick="startSave()">📱 Salvează cardul în galerie</button>
     <button class="cbtn cbtn-share" onclick="shareCard()">↗ Distribuie experiența</button>
-    <button class="cbtn cbtn-hub" onclick="goHub()">← Înapoi în Hub</button>
+    <button class="cbtn cbtn-circle" onclick="showScreen('main')">⬡ Înapoi în Inner Circle</button>
+    <button class="cbtn cbtn-hub" onclick="window.location.href='https://vv-technologies.github.io/vv-nexus/'">← Înapoi în Hub</button>
   </div>
 </div>
 
-<!-- SAVE OVERLAY -->
+<!-- ═══ SCREEN RECOVER ═══ -->
+<div class="screen" id="screen-recover">
+  <div class="recover-title">Recuperează accesul</div>
+  <div class="recover-sub">Introdu aliasul pe care l-ai ales când ai contribuit și îți găsim identitatea VV·CORE.</div>
+  <input class="recover-input" id="recover-input" type="text" placeholder="Aliasul tău (ex: Antonio_)">
+  <button class="recover-btn" onclick="recoverAccess()">Caută identitatea mea</button>
+  <div class="recover-back" onclick="showScreen('main')">← Înapoi</div>
+</div>
+
+<!-- ═══ SAVE OVERLAY ═══ -->
 <div id="sov">
   <div class="sv-spinner" id="sv-spinner"></div>
   <img id="sv-img" src="" alt="VV CORE Card">
@@ -203,22 +390,39 @@ body{background:var(--bg);color:var(--t1);font-family:var(--font);min-height:100
   <button class="sv-close" id="sv-close" onclick="closeSave()">✕ Închide</button>
 </div>
 
+<div class="toast" id="toast"></div>
+
 <!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script>
-firebase.initializeApp({apiKey:"AIzaSyDGv4kEClO0RHCLvXVLOT-vyPHw6bsxYVc",authDomain:"vv-ep-beta.firebaseapp.com",projectId:"vv-ep-beta",storageBucket:"vv-ep-beta.firebasestorage.app",messagingSenderId:"641117018598",appId:"1:641117018598:web:7cd522ef48db46ad58de27"});
-var db=firebase.firestore(),auth=firebase.auth();
+firebase.initializeApp({
+  apiKey:"AIzaSyDGv4kEClO0RHCLvXVLOT-vyPHw6bsxYVc",
+  authDomain:"vv-ep-beta.firebaseapp.com",projectId:"vv-ep-beta",
+  storageBucket:"vv-ep-beta.firebasestorage.app",
+  messagingSenderId:"641117018598",appId:"1:641117018598:web:7cd522ef48db46ad58de27"
+});
+var db=firebase.firestore(), auth=firebase.auth();
 var IBAN='RO98ROIN4021D97CHECQLBSC';
 document.getElementById('iban-display').textContent=IBAN;
-var uid=null,alias=(typeof localStorage!=='undefined'&&localStorage.getItem('vv_alias'))||'INSIDER';
-var isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent);
-var svBusy=false;
 
+var uid=null, svBusy=false;
+var isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent);
+
+// ── 100 MOTTO-URI ──
 var M=["Primul pas e singurul care contează.","Unii construiesc. Tu ai construit.","Înainte de val, era cineva pe plajă.","Nucleul a început cu tine.","Cei care cred primii schimbă tot.","Nu ai așteptat dovezi. Ai fost dovada.","Rădăcinile nu se văd, dar țin totul.","Ai pus o piatră când alții întrebau unde e clădirea.","Fiecare mare lucru a avut un prim om.","Tu ai fost acel om.","Viziunea ta a precedat realitatea.","Ai ales să fii real înainte ca restul să fie gata.","Fondatorii nu găsesc drumuri. Le fac.","Curajul tău a marcat un început.","Înainte de aplauze, există tăcerea fondatorilor.","Ai semnat înainte ca lumea să știe ce semnează.","Orice mișcare mare a început cu o decizie mică.","Ai luat-o tu.","Cei care vin după vor ști că tu ai fost primul.","Nu oricine vede potențialul. Tu l-ai văzut.","Contribuția ta e invizibilă pentru mulți, eternă pentru noi.","Ai construit fără să știi exact ce construiești. Asta e curaj.","Ești dovada că lucrurile bune încep discret.","Fundațiile nu se văd niciodată. Dar țin totul în picioare.","Ai crezut când era cel mai ușor să nu crezi.","Unii oameni aprind lumina. Tu ai adus becul.","Ai intrat pe o ușă pe care alții o vor găsi deschisă datorită ție.","Momentul tău de curaj a creat un moment pentru alții.","Ai ales să construiești, nu să aștepți.","Cei care fondează nu urmează hărți. Le desenează.","Ai pus primul punct pe o hartă goală.","Lumea nu știe încă ce ai făcut. Noi știm.","Acțiunile tale de azi sunt istoria de mâine.","Ai semănat înainte de ploaie.","Nu toți fondatorii sunt în cărți. Unii sunt în cod.","Ai ales să faci parte dintr-un univers în formare.","Prezența ta în nucleu nu e un număr. E o decizie.","Ai văzut ceva acolo unde alții vedeau nimic.","Ideile mari au nevoie de oameni mici care cred mare.","Tu ești acel om.","Ai adăugat greutate unui vis ca să devină real.","Fiecare ecosistem are un nucleu. Tu ești parte din el.","Lucrurile care durează au nevoie de oameni care rezistă.","Ai ales să rezistezi de la început.","Înainte de mulțime, există cei care merg singuri.","Ai mers.","Contribuția ta nu are preț. Prețul e simbolic.","Ai transformat o idee în ceva tangibil cu o singură acțiune.","Fondatorii nu primesc medalii. Ei dau direcție.","Ai dat direcție.","Nu știai exact unde duce drumul. Ai pornit oricum.","Asta e tot ce contează.","Ai ales substanța în locul spectacolului.","Ai ales realul în locul promisiunii.","Ai văzut dincolo de ce exista.","Ești parte din ce va exista.","Lucrurile mari nu se anunță. Se construiesc în tăcere.","Tu ai ales tăcerea constructivă.","Ai adăugat ceva permanent într-o lume efemeră.","Curajul tău e acum cod, identitate și comunitate.","Ai transformat 29 de lei într-un loc în istorie.","Nu oricine face asta. Tu ai făcut-o.","Ai ales să faci parte din ceva înainte ca toți să vrea.","Momentul tău contează mai mult decât crezi.","Ești acolo unde lucrurile încep, nu unde ajung.","Începuturile sunt rare. Tu ești unul dintre ele.","Ai semnat un angajament față de ceva mai mare decât tine.","Și asta e cel mai frumos lucru pe care îl poți face.","Oamenii care construiesc nu vorbesc mult. Fac.","Tu ai făcut.","Ai ales să crezi în potențial, nu în dovezi.","Dovezile vin după. Tu ai venit primul.","Ai pus baza fără să știi înălțimea clădirii.","Asta cere mai mult curaj decât orice altceva.","Contribuția ta e o amprentă care nu dispare.","Ești parte din ADN-ul acestui univers.","Nu mulți pot spune asta. Tu poți.","Ai ales să fii real când era mai ușor să fii spectator.","Ai ales să construiești când era mai simplu să critici.","Asta te definește.","Fiecare fundație are nevoie de oameni care să creadă în ea.","Tu ai crezut.","Acțiunea ta mică a creat un efect mare.","Nu știi exact cât de mare. Noi îl vedem.","Ai transformat o clipă de decizie într-un loc permanent.","Locul tău în nucleu nu poate fi luat de nimeni altcineva.","E al tău. Pentru totdeauna.","Ai intrat în cerc când cercul era abia trasat.","Ești parte din prima linie.","Primii 100 scriu regulile. Tu ești unul dintre ei.","Nu ai urmat un trend. Ai anticipat unul.","Asta e diferența dintre fondatori și următori.","Ai ales să fondezi.","Universul VV a început cu oameni ca tine.","Și va continua datorită oamenilor ca tine.","Bine ai venit în nucleu. Ești acasă.","Ai ajuns. Iar asta contează enorm.","Prezența ta face diferența. Nu în viitor. Acum.","Ești parte din ce construim. Ești parte din noi."];
 function mottoForUid(u){if(!u)return M[0];var h=0;for(var i=0;i<u.length;i++)h=u.charCodeAt(i)+((h<<5)-h);return M[Math.abs(h)%M.length];}
 
+// ══ SCREEN NAVIGATION ══
+function showScreen(name){
+  document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});
+  var el=document.getElementById('screen-'+name);
+  if(el) el.classList.add('active');
+  window.scrollTo(0,0);
+}
+
+// ══ AUTH ══
 auth.signInAnonymously().then(function(c){uid=c.user.uid;checkEx();}).catch(function(){});
 auth.onAuthStateChanged(function(u){if(u&&u.uid!==uid){uid=u.uid;checkEx();}});
 
@@ -227,205 +431,279 @@ function checkEx(){
   db.collection('contributors').doc(uid).onSnapshot(function(doc){
     if(!doc.exists)return;
     var d=doc.data();
-    if(d.status==='pending')showPending();
-    else if(d.status==='active')showCard(d.vvCoreId,d.alias,d.activatedAt,d.motto);
+    if(d.status==='pending'){
+      showPendingScreen(d.alias);
+    } else if(d.status==='active'){
+      showCardScreen(d.vvCoreId,d.alias,d.activatedAt,d.motto,d.founderNum);
+    }
   });
 }
-function copyIban(){navigator.clipboard.writeText(IBAN).then(function(){toast('IBAN copiat ✓');}).catch(function(){toast('IBAN: '+IBAN);});}
-function showConfirmFlow(){
-  if(!uid){toast('Conectare în curs...');return;}
+
+// ══ TRANSFER ══
+function handleTransfer(){
+  var aliasVal=(document.getElementById('alias-input').value||'').trim();
+  if(!aliasVal){
+    toast('Alege-ți mai întâi un alias ↑');
+    document.getElementById('alias-input').focus();
+    return;
+  }
+  if(aliasVal.length<2){
+    toast('Aliasul trebuie să aibă minim 2 caractere');
+    return;
+  }
+  if(!uid){toast('Conectare în curs, încearcă din nou...');return;}
+
+  // Salvare dublă: localStorage + Firebase
+  try{localStorage.setItem('vv_alias',aliasVal);}catch(e){}
+
   db.collection('contributors').doc(uid).get().then(function(doc){
-    if(doc.exists){var s=doc.data().status;if(s==='pending'){showPending();return;}if(s==='active'){var d=doc.data();showCard(d.vvCoreId,d.alias,d.activatedAt,d.motto);return;}}
-    db.collection('contributors').doc(uid).set({uid:uid,alias:alias,status:'pending',submittedAt:firebase.firestore.FieldValue.serverTimestamp(),vvCoreId:null,activatedAt:null,motto:null}).then(function(){
-      db.collection('inbox').add({to:'CEO',from:uid,alias:alias,type:'contributor_pending',message:'🌟 '+alias+' a confirmat transferul de 29 lei. Verifică Salt Bank și activează din CEO Panel.',read:false,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
-      showPending();
-    });
+    if(doc.exists){
+      var s=doc.data().status;
+      if(s==='pending'){showPendingScreen(doc.data().alias);return;}
+      if(s==='active'){var d=doc.data();showCardScreen(d.vvCoreId,d.alias,d.activatedAt,d.motto,d.founderNum);return;}
+    }
+    db.collection('contributors').doc(uid).set({
+      uid:uid, alias:aliasVal, status:'pending',
+      submittedAt:firebase.firestore.FieldValue.serverTimestamp(),
+      vvCoreId:null, activatedAt:null, motto:null, founderNum:null
+    }).then(function(){
+      db.collection('inbox').add({
+        to:'CEO', from:uid, alias:aliasVal, type:'contributor_pending',
+        message:'🌟 '+aliasVal+' a confirmat transferul de 29 lei. Verifică Salt Bank și activează din CEO Panel.',
+        read:false, createdAt:firebase.firestore.FieldValue.serverTimestamp()
+      });
+      showPendingScreen(aliasVal);
+    }).catch(function(e){toast('Eroare: '+e.message,true);});
   });
 }
-function showPending(){
-  document.getElementById('pending-screen').style.display='flex';
-  if(!uid)return;
-  db.collection('contributors').doc(uid).onSnapshot(function(doc){if(doc.exists&&doc.data().status==='active'){var d=doc.data();showCard(d.vvCoreId,d.alias,d.activatedAt,d.motto);}});
+
+function showPendingScreen(al){
+  document.getElementById('pend-alias-display').textContent=al||'';
+  showScreen('pending');
 }
-function showCard(id,al,at,mo){
-  document.getElementById('pending-screen').style.display='none';
-  var s=document.getElementById('id-screen');
-  s.style.display='flex';s.style.opacity='0';
+
+function showCardScreen(id,al,at,mo,fn){
   document.getElementById('id-code').textContent=id||'VV·CORE·----';
-  document.getElementById('id-alias').textContent=al||alias;
+  document.getElementById('id-alias').textContent=al||'—';
+  document.getElementById('id-founder-num').textContent='FONDATOR #'+(fn||'—')+' DIN 100';
   var ds=at?at.toDate().toLocaleDateString('ro-RO',{day:'2-digit',month:'long',year:'numeric'}):new Date().toLocaleDateString('ro-RO');
   document.getElementById('id-date').textContent='Fondator din '+ds;
   var m=mo||mottoForUid(uid);
   document.getElementById('id-motto').textContent='"'+m+'"';
-  setTimeout(function(){s.style.transition='opacity .8s ease';s.style.opacity='1';},50);
+  showScreen('card');
 }
 
-// ══ GENERARE CARD PNG CU CANVAS NATIV — fără librării externe ══
+// ══ RECOVER ══
+function recoverAccess(){
+  var a=(document.getElementById('recover-input').value||'').trim();
+  if(!a){toast('Introdu aliasul tău');return;}
+  toast('Se caută...');
+  db.collection('contributors').where('alias','==',a).limit(1).get().then(function(snap){
+    if(snap.empty){toast('Aliasul "'+a+'" nu a fost găsit');return;}
+    var d=snap.docs[0].data();
+    // Reatribuim UID-ul curent dacă e diferit
+    if(snap.docs[0].id!==uid && uid){
+      // Nu suprascriem documentul original, afișăm doar datele
+    }
+    if(d.status==='pending'){showPendingScreen(d.alias);}
+    else if(d.status==='active'){showCardScreen(d.vvCoreId,d.alias,d.activatedAt,d.motto,d.founderNum);}
+    else{toast('Statusul contului: '+d.status);}
+  }).catch(function(e){toast('Eroare: '+e.message,true);});
+}
+
+// ══ WALL + COUNTER ══
+function loadWall(){
+  // Activi
+  db.collection('contributors').where('status','==','active').onSnapshot(function(snap){
+    var activeCount=snap.size;
+    document.getElementById('main-counter').textContent=activeCount;
+    var left=100-activeCount;
+    var urg=document.getElementById('counter-urgent');
+    if(urg) urg.textContent=left>0?'Mai sunt '+left+' locuri disponibile':'Toate locurile ocupate!';
+    document.getElementById('wall-count').textContent=activeCount+' / 100';
+
+    var c=document.getElementById('constellation');
+    var e=document.getElementById('wall-empty');
+    c.querySelectorAll('.star-dot:not(.pending-dot)').forEach(function(s){s.remove();});
+
+    if(snap.size===0&&c.querySelectorAll('.star-dot').length===0){
+      if(e)e.style.display='block';
+    } else {
+      if(e)e.style.display='none';
+    }
+
+    var cW=c.clientWidth||300,cH=c.clientHeight||180;
+    snap.forEach(function(doc){
+      var u=doc.id,d=doc.data(),h=0;
+      for(var i=0;i<u.length;i++)h=u.charCodeAt(i)+((h<<5)-h);
+      var x=Math.abs(h%(cW-40))+16,y=Math.abs((h>>8)%(cH-40))+16;
+      var on=d.lastActive&&(d.lastActive.toDate()>new Date(Date.now()-5*60*1000));
+      var dot=document.createElement('div');
+      dot.className='star-dot '+(on?'online':'offline');
+      dot.style.left=x+'px';dot.style.top=y+'px';
+      dot.title=(d.alias||'VV·CORE')+' · '+(d.vvCoreId||'');
+      c.appendChild(dot);
+    });
+  });
+
+  // Pending — arată și ei pe zid cu culoare diferită
+  db.collection('contributors').where('status','==','pending').onSnapshot(function(snap){
+    var c=document.getElementById('constellation');
+    var e=document.getElementById('wall-empty');
+    c.querySelectorAll('.star-dot.pending-dot').forEach(function(s){s.remove();});
+    if(snap.size>0&&e)e.style.display='none';
+    var cW=c.clientWidth||300,cH=c.clientHeight||180;
+    snap.forEach(function(doc){
+      var u=doc.id,h=0;
+      for(var i=0;i<u.length;i++)h=u.charCodeAt(i)+((h<<5)-h);
+      // Offset usor ca să nu se suprapună cu activii
+      var x=Math.abs((h*3)%(cW-40))+16,y=Math.abs(((h>>4)*3)%(cH-40))+16;
+      var dot=document.createElement('div');
+      dot.className='star-dot pending-dot';
+      dot.style.left=x+'px';dot.style.top=y+'px';
+      dot.title=(doc.data().alias||'În așteptare');
+      c.appendChild(dot);
+    });
+  });
+}
+
+function updOnline(){
+  if(!uid)return;
+  db.collection('contributors').doc(uid).get().then(function(doc){
+    if(doc.exists&&doc.data().status==='active'){
+      db.collection('contributors').doc(uid).update({lastActive:firebase.firestore.FieldValue.serverTimestamp()}).catch(function(){});
+    }
+  }).catch(function(){});
+}
+
+// ══ CANVAS CARD SAVE ══
 function startSave(){
   if(svBusy)return;
   svBusy=true;
   document.getElementById('sv-spinner').style.display='block';
   document.getElementById('sv-img').style.display='none';
-  document.getElementById('sv-msg').innerHTML='Se generează cardul...';
+  document.getElementById('sv-img').src='';
+  document.getElementById('sv-msg').textContent='Se generează cardul...';
   document.getElementById('sv-close').style.display='none';
   document.getElementById('sov').classList.add('show');
-  // Mică întârziere ca overlay-ul să se afișeze înainte de canvas
-  setTimeout(function(){ generateCardCanvas(); }, 120);
+  setTimeout(generateCardCanvas,100);
 }
 
 function generateCardCanvas(){
-  var code   = document.getElementById('id-code').textContent;
-  var al     = document.getElementById('id-alias').textContent;
-  var dt     = document.getElementById('id-date').textContent;
-  var motto  = document.getElementById('id-motto').textContent;
+  var code  =document.getElementById('id-code').textContent;
+  var al    =document.getElementById('id-alias').textContent;
+  var dt    =document.getElementById('id-date').textContent;
+  var motto =document.getElementById('id-motto').textContent;
+  var fnNum =document.getElementById('id-founder-num').textContent;
 
-  // Dimensiuni card: 680x420 px (ratio 16:9.8, bun pentru share)
-  var W=680, H=460, R=32, dpr=2;
-  var canvas=document.createElement('canvas');
-  canvas.width=W*dpr; canvas.height=H*dpr;
-  var cx=canvas.getContext('2d');
+  var W=680,H=480,R=32,dpr=2;
+  var cv=document.createElement('canvas');
+  cv.width=W*dpr; cv.height=H*dpr;
+  var cx=cv.getContext('2d');
   cx.scale(dpr,dpr);
 
-  // ── Fundal gradient ──
+  // Fundal
   var bg=cx.createLinearGradient(0,0,W,H);
-  bg.addColorStop(0,'#0f0f14');
-  bg.addColorStop(0.5,'#141420');
-  bg.addColorStop(1,'#0a0a0f');
-  roundRect(cx,0,0,W,H,R);
-  cx.fillStyle=bg; cx.fill();
+  bg.addColorStop(0,'#0f0f14'); bg.addColorStop(0.5,'#141420'); bg.addColorStop(1,'#0a0a0f');
+  rr(cx,0,0,W,H,R); cx.fillStyle=bg; cx.fill();
 
-  // ── Border auriu ──
-  roundRect(cx,0,0,W,H,R);
-  cx.strokeStyle='rgba(212,175,55,0.4)'; cx.lineWidth=1; cx.stroke();
+  // Border
+  rr(cx,0,0,W,H,R); cx.strokeStyle='rgba(212,175,55,0.4)'; cx.lineWidth=1; cx.stroke();
 
-  // ── Shine top ──
-  var shine=cx.createLinearGradient(0,0,W,0);
-  shine.addColorStop(0,'transparent');
-  shine.addColorStop(0.3,'rgba(255,255,255,0.12)');
-  shine.addColorStop(0.5,'rgba(212,175,55,0.4)');
-  shine.addColorStop(0.7,'rgba(255,255,255,0.12)');
-  shine.addColorStop(1,'transparent');
-  cx.fillStyle=shine; cx.fillRect(0,0,W,1.5);
+  // Shine top
+  var sh=cx.createLinearGradient(0,0,W,0);
+  sh.addColorStop(0,'transparent'); sh.addColorStop(0.3,'rgba(255,255,255,0.1)');
+  sh.addColorStop(0.5,'rgba(212,175,55,0.45)'); sh.addColorStop(0.7,'rgba(255,255,255,0.1)');
+  sh.addColorStop(1,'transparent');
+  cx.fillStyle=sh; cx.fillRect(0,0,W,1.5);
 
-  // ── Glow radial dreapta sus ──
-  var glow=cx.createRadialGradient(W+60,−60,0,W+60,−60,260);
-  glow.addColorStop(0,'rgba(212,175,55,0.12)');
-  glow.addColorStop(1,'transparent');
-  cx.fillStyle=glow; cx.fillRect(0,0,W,H);
+  // Glow
+  var gl=cx.createRadialGradient(W,0,0,W,0,260);
+  gl.addColorStop(0,'rgba(212,175,55,0.12)'); gl.addColorStop(1,'transparent');
+  cx.fillStyle=gl; cx.fillRect(0,0,W,H);
 
-  var PL=40; // padding left
-  var y=46;
+  var PL=42,y=50;
 
-  // ── VV logo ──
-  cx.font='900 44px -apple-system, sans-serif';
-  cx.fillStyle='#ffffff';
-  cx.letterSpacing='6px';
-  cx.fillText('VV',PL,y);
-  y+=20;
+  // VV
+  cx.font='900 46px -apple-system,sans-serif';
+  cx.fillStyle='#ffffff'; cx.letterSpacing='6px';
+  cx.fillText('VV',PL,y); y+=22;
 
-  // ── Ecosystem label ──
-  cx.font='700 9px -apple-system, sans-serif';
-  cx.fillStyle='rgba(212,175,55,0.55)';
-  cx.letterSpacing='3px';
-  cx.fillText('HYBRID UNIVERS  ·  INNER CIRCLE',PL,y);
-  y+=20;
+  // Eco
+  cx.font='700 9px -apple-system,sans-serif';
+  cx.fillStyle='rgba(212,175,55,0.55)'; cx.letterSpacing='3px';
+  cx.fillText('HYBRID UNIVERS  ·  INNER CIRCLE',PL,y); y+=20;
 
-  // ── Divider ──
-  var div=cx.createLinearGradient(PL,0,PL+300,0);
-  div.addColorStop(0,'rgba(212,175,55,0.4)');
-  div.addColorStop(1,'transparent');
-  cx.strokeStyle=div; cx.lineWidth=0.5;
-  cx.beginPath(); cx.moveTo(PL,y); cx.lineTo(W-PL,y); cx.stroke();
-  y+=18;
+  // Divider
+  var dv=cx.createLinearGradient(PL,0,W-PL,0);
+  dv.addColorStop(0,'rgba(212,175,55,0.4)'); dv.addColorStop(1,'transparent');
+  cx.strokeStyle=dv; cx.lineWidth=0.5;
+  cx.beginPath(); cx.moveTo(PL,y); cx.lineTo(W-PL,y); cx.stroke(); y+=18;
 
-  // ── Label ──
-  cx.font='700 9px -apple-system, sans-serif';
-  cx.fillStyle='rgba(255,255,255,0.25)';
-  cx.letterSpacing='2.5px';
-  cx.fillText('IDENTITATE FONDATOR',PL,y);
-  y+=28;
+  // Label
+  cx.font='700 9px -apple-system,sans-serif';
+  cx.fillStyle='rgba(255,255,255,0.25)'; cx.letterSpacing='2.5px';
+  cx.fillText('IDENTITATE FONDATOR',PL,y); y+=28;
 
-  // ── VV·CORE ID ──
-  cx.font='700 26px Courier New, monospace';
-  cx.fillStyle='#D4AF37';
-  cx.letterSpacing='2px';
-  cx.shadowColor='rgba(212,175,55,0.4)';
-  cx.shadowBlur=12;
-  cx.fillText(code,PL,y);
-  cx.shadowBlur=0;
-  y+=26;
+  // Code
+  cx.font='700 28px Courier New,monospace';
+  cx.fillStyle='#D4AF37'; cx.letterSpacing='2px';
+  cx.shadowColor='rgba(212,175,55,0.4)'; cx.shadowBlur=14;
+  cx.fillText(code,PL,y); cx.shadowBlur=0; y+=22;
 
-  // ── Alias ──
-  cx.font='600 15px -apple-system, sans-serif';
-  cx.fillStyle='rgba(255,255,255,0.75)';
-  cx.letterSpacing='0';
-  cx.fillText(al,PL,y);
-  y+=18;
+  // Founder num
+  cx.font='600 10px -apple-system,sans-serif';
+  cx.fillStyle='rgba(212,175,55,0.5)'; cx.letterSpacing='1.5px';
+  cx.fillText(fnNum,PL,y); y+=20;
 
-  // ── Data ──
-  cx.font='400 11px -apple-system, sans-serif';
+  // Alias
+  cx.font='700 16px -apple-system,sans-serif';
+  cx.fillStyle='rgba(255,255,255,0.82)'; cx.letterSpacing='0';
+  cx.fillText(al,PL,y); y+=18;
+
+  // Date
+  cx.font='400 11px -apple-system,sans-serif';
   cx.fillStyle='rgba(255,255,255,0.3)';
-  cx.fillText(dt,PL,y);
-  y+=26;
+  cx.fillText(dt,PL,y); y+=26;
 
-  // ── Motto (cu border stânga auriu) ──
-  cx.strokeStyle='rgba(212,175,55,0.4)';
-  cx.lineWidth=2;
-  // Wrap motto pe max 2 rânduri
-  var mottoLines=wrapText(cx,motto,W-PL-60,12);
-  cx.beginPath();
-  cx.moveTo(PL,y-12);
-  cx.lineTo(PL,y+mottoLines.length*18);
-  cx.stroke();
-  cx.font='italic 12px -apple-system, sans-serif';
-  cx.fillStyle='rgba(255,255,255,0.42)';
-  for(var li=0;li<mottoLines.length;li++){
-    cx.fillText(mottoLines[li],PL+12,y+li*18);
-  }
-  y+=mottoLines.length*18+22;
+  // Motto
+  cx.strokeStyle='rgba(212,175,55,0.4)'; cx.lineWidth=2;
+  var mlines=wrapTxt(cx,motto,W-PL-60,12);
+  cx.beginPath(); cx.moveTo(PL,y-13); cx.lineTo(PL,y+mlines.length*18-2); cx.stroke();
+  cx.font='italic 12px -apple-system,sans-serif';
+  cx.fillStyle='rgba(255,255,255,0.4)';
+  for(var li=0;li<mlines.length;li++){cx.fillText(mlines[li],PL+12,y+li*18);}
+  y+=mlines.length*18+22;
 
-  // ── Status badge ──
-  var bx=PL, by=y-16, bw=130, bh=22;
-  roundRect(cx,bx,by,bw,bh,11);
-  cx.fillStyle='rgba(52,199,89,0.1)'; cx.fill();
-  roundRect(cx,bx,by,bw,bh,11);
-  cx.strokeStyle='rgba(52,199,89,0.3)'; cx.lineWidth=0.5; cx.stroke();
-  // dot
-  cx.beginPath(); cx.arc(bx+14,by+bh/2,3,0,Math.PI*2);
-  cx.fillStyle='#34c759'; cx.fill();
-  cx.font='700 9px -apple-system, sans-serif';
-  cx.fillStyle='#34c759'; cx.letterSpacing='1.5px';
+  // Badge
+  var bx=PL,by=y-16,bw=136,bh=24;
+  rr(cx,bx,by,bw,bh,12); cx.fillStyle='rgba(52,199,89,0.1)'; cx.fill();
+  rr(cx,bx,by,bw,bh,12); cx.strokeStyle='rgba(52,199,89,0.3)'; cx.lineWidth=0.5; cx.stroke();
+  cx.beginPath(); cx.arc(bx+14,by+bh/2,3,0,Math.PI*2); cx.fillStyle='#34c759'; cx.fill();
+  cx.font='700 9px -apple-system,sans-serif'; cx.fillStyle='#34c759'; cx.letterSpacing='1.5px';
   cx.fillText('NUCLEU ACTIV',bx+22,by+bh/2+3.5);
 
-  // ── Footer divider ──
-  var fy=H-32;
+  // Footer
+  var fy=H-34;
   cx.strokeStyle='rgba(255,255,255,0.06)'; cx.lineWidth=0.5;
   cx.beginPath(); cx.moveTo(PL,fy); cx.lineTo(W-PL,fy); cx.stroke();
-
-  // ── Watermark ──
-  cx.font='400 9px -apple-system, sans-serif';
+  cx.font='400 9px -apple-system,sans-serif';
   cx.fillStyle='rgba(255,255,255,0.12)'; cx.letterSpacing='0';
-  cx.fillText('vv-technologies.github.io',PL,H-14);
-
-  // ── Legal small ──
-  cx.font='400 8px -apple-system, sans-serif';
-  cx.fillStyle='rgba(255,255,255,0.08)';
-  cx.textAlign='right';
-  cx.fillText('Contribuție voluntară  ·  GDPR · UE 679/2016',W-PL,H-14);
+  cx.fillText('vv-technologies.github.io',PL,H-16);
+  cx.font='400 8px -apple-system,sans-serif';
+  cx.fillStyle='rgba(255,255,255,0.08)'; cx.textAlign='right';
+  cx.fillText('Contribuție voluntară  ·  GDPR · UE 679/2016',W-PL,H-16);
   cx.textAlign='left';
 
-  // ── Afișare rezultat ──
-  var dataUrl=canvas.toDataURL('image/png');
+  var dataUrl=cv.toDataURL('image/png');
   var imgEl=document.getElementById('sv-img');
-  imgEl.src=dataUrl;
-  imgEl.style.display='block';
+  imgEl.src=dataUrl; imgEl.style.display='block';
   document.getElementById('sv-spinner').style.display='none';
 
   if(isIOS){
     document.getElementById('sv-msg').innerHTML='<strong>Ține apăsat pe imagine ↑</strong>apoi „Adaugă în Poze"';
     document.getElementById('sv-close').style.display='block';
   } else {
-    // Android / Desktop — download automat
     var a=document.createElement('a');
     a.download='VV-CORE-'+code+'.png';
     a.href=dataUrl;
@@ -436,28 +714,23 @@ function generateCardCanvas(){
   }
 }
 
-// Helper: rounded rect
-function roundRect(ctx,x,y,w,h,r){
+function rr(ctx,x,y,w,h,r){
   ctx.beginPath();
-  ctx.moveTo(x+r,y);
-  ctx.lineTo(x+w-r,y); ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+  ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y); ctx.quadraticCurveTo(x+w,y,x+w,y+r);
   ctx.lineTo(x+w,y+h-r); ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
   ctx.lineTo(x+r,y+h); ctx.quadraticCurveTo(x,y+h,x,y+h-r);
-  ctx.lineTo(x,y+r); ctx.quadraticCurveTo(x,y,x+r,y);
-  ctx.closePath();
+  ctx.lineTo(x,y+r); ctx.quadraticCurveTo(x,y,x+r,y); ctx.closePath();
 }
-
-// Helper: wrap text
-function wrapText(ctx,text,maxW,fontSize){
-  ctx.font='italic '+fontSize+'px -apple-system, sans-serif';
-  var words=text.split(' '), lines=[], line='';
+function wrapTxt(ctx,text,maxW,fs){
+  ctx.font='italic '+fs+'px -apple-system,sans-serif';
+  var words=text.split(' '),lines=[],line='';
   for(var i=0;i<words.length;i++){
     var test=line+(line?' ':'')+words[i];
     if(ctx.measureText(test).width>maxW&&line){lines.push(line);line=words[i];}
     else line=test;
   }
   if(line)lines.push(line);
-  return lines.slice(0,3); // max 3 linii
+  return lines.slice(0,3);
 }
 
 function closeSave(){
@@ -470,38 +743,35 @@ function closeSave(){
   document.getElementById('sv-close').style.display='none';
 }
 
+// ══ SHARE ══
 function shareCard(){
   var al=document.getElementById('id-alias').textContent;
   var co=document.getElementById('id-code').textContent;
   var mo=document.getElementById('id-motto').textContent;
-  var t='Am pus o cărămidă la fundația VV Hybrid Univers.\n\nIdentitatea mea: '+co+'\n'+mo+'\n\nUn ecosistem construit de oameni, pentru oameni.\nMisiuni reale. Identități suverane. Zero corporații.\n\nvv-technologies.github.io/vv-nexus/';
-  if(navigator.share){navigator.share({title:'VV·CORE · '+al,text:t,url:'https://vv-technologies.github.io/vv-nexus/'}).catch(function(){});}
-  else{navigator.clipboard.writeText(t).then(function(){toast('Text copiat ✓');}).catch(function(){toast('Copiază manual');});}
+  var fn=document.getElementById('id-founder-num').textContent;
+  var t='Am pus o cărămidă la fundația VV Hybrid Univers.\n\n'
+    +fn+'\nIdentitatea mea: '+co+'\n'+mo+'\n\n'
+    +'Un ecosistem construit de oameni, pentru oameni.\n'
+    +'Misiuni reale. Identități suverane. Zero corporații.\n\n'
+    +'vv-technologies.github.io/vv-nexus/';
+  if(navigator.share){
+    navigator.share({title:'VV·CORE · '+al,text:t,url:'https://vv-technologies.github.io/vv-nexus/'}).catch(function(){});
+  } else {
+    navigator.clipboard.writeText(t).then(function(){toast('Text copiat ✓');}).catch(function(){toast('Copiază manual');});
+  }
 }
-function goHub(){window.location.href='https://vv-technologies.github.io/vv-nexus/';}
 
-function loadWall(){
-  db.collection('contributors').where('status','==','active').onSnapshot(function(snap){
-    document.getElementById('wall-count').textContent=snap.size+' / 100';
-    var c=document.getElementById('constellation'),e=document.getElementById('wall-empty');
-    if(snap.size===0){if(e)e.style.display='block';c.querySelectorAll('.star-dot').forEach(function(s){s.remove();});return;}
-    if(e)e.style.display='none'; c.querySelectorAll('.star-dot').forEach(function(s){s.remove();});
-    var cW=c.clientWidth||300,cH=c.clientHeight||200;
-    snap.forEach(function(doc){
-      var u=doc.id,d=doc.data(),h=0;
-      for(var i=0;i<u.length;i++)h=u.charCodeAt(i)+((h<<5)-h);
-      var x=Math.abs(h%(cW-30))+10,y=Math.abs((h>>8)%(cH-30))+10;
-      var on=d.lastActive&&(d.lastActive.toDate()>new Date(Date.now()-5*60*1000));
-      var dot=document.createElement('div');dot.className='star-dot '+(on?'online':'offline');
-      dot.style.left=x+'px';dot.style.top=y+'px';dot.title=d.vvCoreId||'VV·CORE';c.appendChild(dot);
-    });
-  });
+function copyIban(){
+  navigator.clipboard.writeText(IBAN).then(function(){toast('IBAN copiat ✓');}).catch(function(){toast('IBAN: '+IBAN);});
 }
-function updOnline(){
-  if(!uid)return;
-  db.collection('contributors').doc(uid).get().then(function(doc){if(doc.exists&&doc.data().status==='active')db.collection('contributors').doc(uid).update({lastActive:firebase.firestore.FieldValue.serverTimestamp()}).catch(function(){});}).catch(function(){});
+
+function toast(msg,isErr){
+  var t=document.getElementById('toast');
+  t.textContent=msg;
+  t.style.borderColor=isErr?'rgba(255,59,48,0.4)':'rgba(52,199,89,0.3)';
+  t.classList.add('show');
+  setTimeout(function(){t.classList.remove('show');},2800);
 }
-function toast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},2800);}
 
 loadWall();
 setInterval(updOnline,3*60*1000);
