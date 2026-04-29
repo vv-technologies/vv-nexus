@@ -30,6 +30,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fon
 .filter-btn{flex-shrink:0;background:rgba(0,0,0,.7);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:.5px solid rgba(255,255,255,.1);border-radius:20px;color:var(--t3);font-family:var(--font);font-size:.5625rem;font-weight:600;padding:4px 12px;cursor:pointer;transition:all .2s;white-space:nowrap;min-height:26px}
 .filter-btn.active{background:rgba(212,175,55,.15);border-color:rgba(212,175,55,.4);color:var(--gold)}
 .filter-btn.active.is-green{background:rgba(52,199,89,.15);border-color:rgba(52,199,89,.4);color:var(--green)}
+.filter-btn.active.is-blue{background:rgba(10,132,255,.15);border-color:rgba(10,132,255,.4);color:var(--blue)}
 .filter-btn.active.is-purple{background:rgba(167,139,250,.15);border-color:rgba(167,139,250,.4);color:var(--purple)}
 #vv-map{position:fixed;inset:0;width:100%;height:100%}
 .leaflet-tile{filter:brightness(.45) saturate(.3)}
@@ -43,12 +44,13 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fon
 .ld-gold{background:var(--gold);box-shadow:0 0 5px rgba(212,175,55,.8)}
 .ld-silver{background:rgba(255,255,255,.45)}
 .ld-grey{background:rgba(255,255,255,.15)}
+.ld-blue{background:var(--blue);box-shadow:0 0 5px rgba(10,132,255,.8)}
 .legend-icon{font-size:.5625rem}
 .map-stats{position:fixed;bottom:calc(1.125rem + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);z-index:400;display:flex;gap:6px;transition:opacity .3s,transform .3s}
 .map-stats.hidden{opacity:0;pointer-events:none;transform:translateX(-50%) translateY(10px)}
 .stat-pill{background:rgba(0,0,0,.75);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:.5px solid rgba(255,255,255,.1);border-radius:20px;padding:4px 10px;display:flex;align-items:center;gap:5px;font-size:.5rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--t3)}
 .stat-pill b{font-size:.625rem;font-weight:800;color:var(--t1)}
-.pill-gold b{color:var(--gold)}.pill-green b{color:var(--green)}
+.pill-gold b{color:var(--gold)}.pill-green b{color:var(--green)}.pill-blue b{color:var(--blue)}
 .bottom-card{position:fixed;bottom:0;left:0;right:0;z-index:600;padding:0 .875rem calc(1.125rem + env(safe-area-inset-bottom));transform:translateY(100%);transition:transform .35s cubic-bezier(.4,0,.2,1)}
 .bottom-card.open{transform:translateY(0)}
 .card-inner{background:rgba(6,6,8,.93);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);border:.5px solid rgba(255,255,255,.1);border-radius:22px;padding:1rem 1.125rem;position:relative;overflow:hidden}
@@ -59,14 +61,17 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fon
 .icon-premium{background:rgba(212,175,55,.12);border:.5px solid rgba(212,175,55,.25)}
 .icon-hidden{background:rgba(167,139,250,.12);border:.5px solid rgba(167,139,250,.25)}
 .icon-standard{background:rgba(255,255,255,.06);border:.5px solid rgba(255,255,255,.1)}
+.icon-pulse{background:rgba(10,132,255,.12);border:.5px solid rgba(10,132,255,.25)}
 .card-info{flex:1;min-width:0}
 .card-name{font-size:.9375rem;font-weight:700;letter-spacing:-.02em;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .card-status{font-size:.5625rem;display:flex;align-items:center;gap:5px;color:var(--t3)}
 .verified-badge{background:rgba(52,199,89,.12);border:.5px solid rgba(52,199,89,.25);color:var(--green);padding:1px 6px;border-radius:4px;font-size:.45rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.insider-badge{background:rgba(10,132,255,.12);border:.5px solid rgba(10,132,255,.25);color:var(--blue);padding:1px 6px;border-radius:4px;font-size:.45rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
 .card-vibe{flex-shrink:0;font-size:.5rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:6px}
 .vibe-hot{background:rgba(212,175,55,.12);color:var(--gold);border:.5px solid rgba(212,175,55,.25)}
 .vibe-warm{background:rgba(255,255,255,.05);color:var(--t2);border:.5px solid rgba(255,255,255,.1)}
 .vibe-cold{background:rgba(255,255,255,.03);color:var(--t3);border:.5px solid rgba(255,255,255,.06)}
+.vibe-live{background:rgba(10,132,255,.12);color:var(--blue);border:.5px solid rgba(10,132,255,.25)}
 .card-divider{height:.5px;background:rgba(255,255,255,.06);margin:.625rem 0}
 .card-stats{display:flex;gap:1.25rem}
 .btn-nav{width:100%;min-height:50px;border-radius:14px;background:var(--gold);color:#000;font-family:var(--font);font-size:.9375rem;font-weight:800;border:none;cursor:pointer;margin-top:.875rem;display:flex;align-items:center;justify-content:center;gap:.5rem;letter-spacing:-.01em;transition:opacity .15s}
@@ -97,6 +102,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fon
 .toast{position:fixed;top:calc(5.5rem + env(safe-area-inset-top));left:50%;transform:translateX(-50%) translateY(-8px);background:rgba(18,18,20,.96);border:.5px solid rgba(255,255,255,.12);border-radius:12px;padding:.5rem 1rem;font-size:.75rem;color:var(--t1);white-space:nowrap;opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;z-index:700}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 @keyframes mpulse{0%,100%{transform:translate(-50%,-50%) scale(1);opacity:.4}50%{transform:translate(-50%,-50%) scale(2.2);opacity:0}}
+@keyframes insiderPulse{0%,100%{transform:translate(-50%,-50%) scale(1);opacity:.6}50%{transform:translate(-50%,-50%) scale(2.8);opacity:0}}
 </style>
 </head>
 <body>
@@ -111,10 +117,10 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fon
     <div class="welcome-logo">VV</div>
     <div class="welcome-tag">Pulse · The Presence Layer</div>
     <div class="welcome-title" id="wt">Bun venit în București</div>
-    <div class="welcome-desc" id="wd">VV Pulse este harta vie a orașului. Fiecare punct auriu este o locație validată de comunitate în ultimele 24h. Nu e Google Maps — e energia reală a orașului.</div>
+    <div class="welcome-desc" id="wd">VV Pulse este harta vie a orașului. Fiecare punct auriu este o locație validată de comunitate. Punctele albastre sunt Insideri activi în timp real.</div>
     <div class="welcome-feats">
       <div class="wfeat"><div class="wfi">⭐</div><div class="wft">Premium</div><div class="wfd" id="wfd1">Cele mai valoroase locații</div></div>
-      <div class="wfeat"><div class="wfi">👁</div><div class="wft">Hidden Gems</div><div class="wfd" id="wfd2">Locuri secrete ale orașului</div></div>
+      <div class="wfeat"><div class="wfi">⬡</div><div class="wft">Insideri Live</div><div class="wfd" id="wfd2">Prezențe active în oraș</div></div>
       <div class="wfeat"><div class="wfi">🔥</div><div class="wft">Vibe Score</div><div class="wfd" id="wfd3">Energia locației validată live</div></div>
       <div class="wfeat"><div class="wfi">📍</div><div class="wft">Live</div><div class="wfd" id="wfd4">Date în timp real</div></div>
     </div>
@@ -136,6 +142,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fon
   </div>
   <div class="filters-row">
     <button class="filter-btn active" id="f-all" onclick="setFilter('all')">⬡ Toate</button>
+    <button class="filter-btn" id="f-insideri" onclick="setFilter('insideri')">⬡ Insideri Live</button>
     <button class="filter-btn" id="f-premium" onclick="setFilter('premium')">⭐ Premium</button>
     <button class="filter-btn" id="f-hidden" onclick="setFilter('hidden')">👁 Hidden Gems</button>
     <button class="filter-btn" id="f-fresh" onclick="setFilter('fresh')">🔥 Live 24h</button>
@@ -146,6 +153,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fon
 <div class="vignette"></div>
 
 <div class="map-legend">
+  <div class="legend-item"><div class="legend-dot ld-blue"></div><span>Insider activ</span></div>
   <div class="legend-item"><div class="legend-dot ld-gold"></div><span id="lg1">&lt; 24h</span></div>
   <div class="legend-item"><div class="legend-dot ld-silver"></div><span id="lg2">&lt; 7 zile</span></div>
   <div class="legend-item"><div class="legend-dot ld-grey"></div><span id="lg3">&gt; 30 zile</span></div>
@@ -154,9 +162,9 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fon
 </div>
 
 <div class="map-stats" id="mstats">
+  <div class="stat-pill pill-blue"><b id="si">0</b> insideri</div>
   <div class="stat-pill pill-gold"><b id="sh">—</b> <span id="sg">auriu</span></div>
   <div class="stat-pill pill-green"><b id="st">—</b> <span id="sl">locații</span></div>
-  <div class="stat-pill"><b>București</b></div>
 </div>
 
 <div class="bottom-card" id="bcard">
@@ -187,23 +195,33 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fon
 
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import{getFirestore,collection,onSnapshot,doc,setDoc,increment}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-const app=initializeApp({apiKey:"AIzaSyDGv4kEClO0RHCLvXVLOT-vyPHw6bsxYVc",authDomain:"vv-ep-beta.firebaseapp.com",projectId:"vv-ep-beta",storageBucket:"vv-ep-beta.firebasestorage.app",messagingSenderId:"641117018598",appId:"1:641117018598:web:7cd522ef48db46ad58de27"});
+import{getFirestore,collection,onSnapshot,doc,setDoc,increment,query,where,Timestamp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const app=initializeApp({
+  apiKey:"AIzaSyDGv4kEClO0RHCLvXVLOT-vyPHw6bsxYVc",
+  authDomain:"vv-ep-beta.firebaseapp.com",
+  projectId:"vv-ep-beta",
+  storageBucket:"vv-ep-beta.firebasestorage.app",
+  messagingSenderId:"641117018598",
+  appId:"1:641117018598:web:7cd522ef48db46ad58de27"
+});
 const db=getFirestore(app);
 
 const T={
-ro:{locate:'Locația mea',fall:'⬡ Toate',fprem:'⭐ Premium',fhid:'👁 Hidden Gems',ffr:'🔥 Live 24h',l1:'< 24h',l2:'< 7 zile',l3:'> 30 zile',l4:'Premium',l5:'Hidden',sg:'auriu',sl:'locații',lv:'Vibe Score',lf:'Prospețime',ll:'Validări',cv:'VERIFICAT',vhot:'FIERBINTE',vwarm:'ACTIV',vcold:'RECE',now:'Acum',min:'min',h:'h',d:'z',tloc:'Localizat',tdeny:'Localizare refuzată',wt:'Bun venit în București',wd:'VV Pulse este harta vie a orașului. Fiecare punct auriu este o locație validată de comunitate în ultimele 24h. Nu e Google Maps — e energia reală a orașului.',wb:'Explorează harta →',d1:'Cele mai valoroase locații',d2:'Locuri secrete ale orașului',d3:'Energia locației validată live',d4:'Date în timp real'},
-en:{locate:'My Location',fall:'⬡ All',fprem:'⭐ Premium',fhid:'👁 Hidden Gems',ffr:'🔥 Live 24h',l1:'< 24h',l2:'< 7 days',l3:'> 30 days',l4:'Premium',l5:'Hidden',sg:'golden',sl:'locations',lv:'Vibe Score',lf:'Freshness',ll:'Validations',cv:'VERIFIED',vhot:'HOT',vwarm:'ACTIVE',vcold:'COLD',now:'Now',min:'min',h:'h',d:'d',tloc:'Located',tdeny:'Location denied',wt:'Welcome to Bucharest',wd:"VV Pulse is the city's living map. Every golden dot is a community-validated location from the last 24h. Not Google Maps — the real energy of the city.",wb:'Explore the map →',d1:'The most valuable city spots',d2:"Secret places tourists don't know",d3:'Live-validated energy of each spot',d4:'Real-time community data'}
+ro:{locate:'Locația mea',fall:'⬡ Toate',fins:'⬡ Insideri Live',fprem:'⭐ Premium',fhid:'👁 Hidden Gems',ffr:'🔥 Live 24h',l1:'< 24h',l2:'< 7 zile',l3:'> 30 zile',l4:'Premium',l5:'Hidden',sg:'auriu',sl:'locații',lv:'Vibe Score',lf:'Prospețime',ll:'Validări',cv:'VERIFICAT',vhot:'FIERBINTE',vwarm:'ACTIV',vcold:'RECE',vlive:'LIVE',now:'Acum',min:'min',h:'h',d:'z',tloc:'Localizat',tdeny:'Localizare refuzată',wt:'Bun venit în București',wd:'VV Pulse este harta vie a orașului. Fiecare punct auriu este o locație validată de comunitate. Punctele albastre sunt Insideri activi în timp real.',wb:'Explorează harta →',d1:'Cele mai valoroase locații',d2:'Prezențe active în oraș',d3:'Energia locației validată live',d4:'Date în timp real'},
+en:{locate:'My Location',fall:'⬡ All',fins:'⬡ Live Insiders',fprem:'⭐ Premium',fhid:'👁 Hidden Gems',ffr:'🔥 Live 24h',l1:'< 24h',l2:'< 7 days',l3:'> 30 days',l4:'Premium',l5:'Hidden',sg:'golden',sl:'locations',lv:'Vibe Score',lf:'Freshness',ll:'Validations',cv:'VERIFIED',vhot:'HOT',vwarm:'ACTIVE',vcold:'COLD',vlive:'LIVE',now:'Now',min:'min',h:'h',d:'d',tloc:'Located',tdeny:'Location denied',wt:'Welcome to Bucharest',wd:"VV Pulse is the city's living map. Golden dots are community-validated locations. Blue dots are active Insiders in real time.",wb:'Explore the map →',d1:'The most valuable city spots',d2:'Active presences in the city',d3:'Live-validated energy of each spot',d4:'Real-time community data'}
 };
 
 let lang=localStorage.getItem('vv_lang')||'ro';
 let filter='all';
 let fbLocs=[];
 let selLoc=null;
+let insiderMarkers={};
 const now=Date.now();
 const h=(n)=>({toMillis:()=>now-n*3600000});
 const dys=(n)=>({toMillis:()=>now-n*86400000});
 
+// ── LOCATII STATICE ──────────────────────────────────────────
 const LOCS=[
 {id:'p1',lat:44.4413,lng:26.0973,name:'Ateneul Român',nameEn:'Romanian Athenaeum',type:'premium',vibeScore:98,validations:12,descRo:'Bijuteria arhitecturală a Bucureștiului. Concerte live și evenimente culturale de top.',descEn:"Bucharest's architectural gem. Live concerts and top cultural events.",lastUpdate:h(2)},
 {id:'p2',lat:44.4275,lng:26.0872,name:'Palatul Parlamentului',nameEn:'Palace of Parliament',type:'premium',vibeScore:90,validations:18,descRo:'Cea mai mare clădire administrativă din lume. Vizite ghidate disponibile.',descEn:"The world's largest administrative building. Guided tours available.",lastUpdate:h(5)},
@@ -241,6 +259,7 @@ function applyLang(){
   document.getElementById('lb-en').classList.toggle('active',lang==='en');
   document.getElementById('loc-txt').textContent=t('locate');
   document.getElementById('f-all').textContent=t('fall');
+  document.getElementById('f-insideri').textContent=t('fins');
   document.getElementById('f-premium').textContent=t('fprem');
   document.getElementById('f-hidden').textContent=t('fhid');
   document.getElementById('f-fresh').textContent=t('ffr');
@@ -310,6 +329,53 @@ function mkMarker(loc){
   return mk;
 }
 
+// ── MARKER INSIDER LIVE ──────────────────────────────────────
+function mkInsiderMarker(uid, lat, lng, alias){
+  // Sterge marker vechi daca exista
+  if(insiderMarkers[uid]){
+    try{map.removeLayer(insiderMarkers[uid]);}catch(e){}
+  }
+  const html=`<div style="width:48px;height:48px;position:relative;cursor:pointer">
+    <div style="position:absolute;border-radius:50%;top:50%;left:50%;width:40px;height:40px;background:rgba(10,132,255,0.2);animation:insiderPulse 1.8s ease-in-out infinite;"></div>
+    <div style="position:absolute;border-radius:50%;top:50%;left:50%;transform:translate(-50%,-50%);width:12px;height:12px;background:#0A84FF;box-shadow:0 0 10px rgba(10,132,255,0.9);"></div>
+    <div style="position:absolute;bottom:-14px;left:50%;transform:translateX(-50%);font-size:7px;color:rgba(10,132,255,0.7);font-weight:700;white-space:nowrap;letter-spacing:0.5px;">⬡</div>
+  </div>`;
+  const icon=L.divIcon({html,className:'',iconSize:[48,48],iconAnchor:[24,24]});
+  const mk=L.marker([lat,lng],{icon,zIndexOffset:2000}).addTo(map);
+  mk.on('click',()=>{
+    openInsiderCard(alias);
+  });
+  insiderMarkers[uid]=mk;
+  return mk;
+}
+
+function removeInsiderMarker(uid){
+  if(insiderMarkers[uid]){
+    try{map.removeLayer(insiderMarkers[uid]);}catch(e){}
+    delete insiderMarkers[uid];
+  }
+}
+
+function openInsiderCard(alias){
+  document.getElementById('ci').textContent='⬡';
+  document.getElementById('ci').className='card-icon icon-pulse';
+  document.getElementById('cn').textContent=alias||'Insider VV';
+  document.getElementById('cv').textContent='INSIDER';
+  document.getElementById('cv').className='insider-badge';
+  document.getElementById('ctm').textContent='acum';
+  document.getElementById('cvb').textContent=t('vlive');
+  document.getElementById('cvb').className='card-vibe vibe-live';
+  document.getElementById('csc').textContent='⬡';
+  document.getElementById('cfr').textContent='🔵';
+  document.getElementById('cva').textContent='—';
+  document.getElementById('cdesc').textContent='Insider VV activ în proximitate. Prezență verificată prin VV Pulse.';
+  document.getElementById('cdesc').style.display='block';
+  document.getElementById('btn-nav-main').style.display='none';
+  document.getElementById('btn-gmaps').style.display='none';
+  document.getElementById('mstats').classList.add('hidden');
+  document.getElementById('bcard').classList.add('open');
+}
+
 function renderMarkers(){
   markers.forEach(m=>map.removeLayer(m));
   markers=[];
@@ -317,6 +383,7 @@ function renderMarkers(){
   const combined=[...fbLocs];
   LOCS.forEach(l=>{if(!fbLocs.find(f=>f.id===l.id))combined.push(l)});
   combined.forEach(loc=>{
+    if(filter==='insideri')return; // la filtrul insideri nu aratam locatii
     if(filter==='premium'&&loc.type!=='premium')return;
     if(filter==='hidden'&&loc.type!=='hidden')return;
     if(filter==='fresh'&&fresh(loc.lastUpdate)!=='gold')return;
@@ -331,14 +398,15 @@ function renderMarkers(){
 
 window.setFilter=function(f){
   filter=f;
-  ['all','premium','hidden','fresh'].forEach(k=>{
+  ['all','insideri','premium','hidden','fresh'].forEach(k=>{
     const el=document.getElementById('f-'+k);
     if(!el)return;
     el.classList.toggle('active',k===f);
-    el.classList.remove('is-green','is-purple');
+    el.classList.remove('is-green','is-purple','is-blue');
   });
   if(f==='fresh')document.getElementById('f-fresh').classList.add('is-green');
   if(f==='hidden')document.getElementById('f-hidden').classList.add('is-purple');
+  if(f==='insideri')document.getElementById('f-insideri').classList.add('is-blue');
   renderMarkers();
 };
 
@@ -351,6 +419,7 @@ function openCard(loc){
   document.getElementById('ci').className='card-icon '+(isHid?'icon-hidden':isPrem?'icon-premium':'icon-standard');
   document.getElementById('cn').textContent=lang==='en'&&loc.nameEn?loc.nameEn:loc.name;
   document.getElementById('cv').textContent=t('cv');
+  document.getElementById('cv').className='verified-badge';
   document.getElementById('ctm').textContent=ago(loc.lastUpdate);
   document.getElementById('cvb').textContent=t('v'+vibe);
   document.getElementById('cvb').className='card-vibe vibe-'+vibe;
@@ -360,49 +429,37 @@ function openCard(loc){
   const desc=lang==='en'&&loc.descEn?loc.descEn:(loc.descRo||loc.description||'');
   document.getElementById('cdesc').textContent=desc;
   document.getElementById('cdesc').style.display=desc?'block':'none';
-  // Update nav button text
+  document.getElementById('btn-nav-main').style.display='flex';
+  document.getElementById('btn-gmaps').style.display='flex';
   const navTxt=lang==='en'?'Navigate':'Navighează';
   const gmapsTxt=lang==='en'?'Open in Google Maps':'Deschide în Google Maps';
-  const navEl=document.getElementById('nav-txt');
-  const gmEl=document.getElementById('gmaps-txt');
-  if(navEl)navEl.textContent=navTxt;
-  if(gmEl)gmEl.textContent=gmapsTxt;
+  document.getElementById('nav-txt').textContent=navTxt;
+  document.getElementById('gmaps-txt').textContent=gmapsTxt;
   document.getElementById('mstats').classList.add('hidden');
   document.getElementById('bcard').classList.add('open');
 }
 
-window.closeCard=function(){document.getElementById('bcard').classList.remove('open');document.getElementById('mstats').classList.remove('hidden');selLoc=null};
+window.closeCard=function(){
+  document.getElementById('bcard').classList.remove('open');
+  document.getElementById('mstats').classList.remove('hidden');
+  selLoc=null;
+};
 
 window.navigateTo=function(){
   if(!selLoc)return;
   const lat=selLoc.lat,lng=selLoc.lng;
-  const name=lang==='en'&&selLoc.nameEn?selLoc.nameEn:selLoc.name;
-  // Apple Maps deeplink — nativ pe iPhone, legal 100%
-  const appleUrl='maps://maps.apple.com/?daddr='+lat+','+lng+'&dirflg=w&t=m';
-  // Fallback web Apple Maps pentru iPad/desktop
-  const appleWebUrl='https://maps.apple.com/?daddr='+lat+','+lng+'&dirflg=w';
   const isIOS=/iPhone|iPad|iPod/i.test(navigator.userAgent);
   if(isIOS){
-    // Incearca Apple Maps nativ, fallback web
-    window.location.href=appleUrl;
-    setTimeout(()=>window.open(appleWebUrl,'_blank'),1500);
-  } else {
+    window.location.href='maps://maps.apple.com/?daddr='+lat+','+lng+'&dirflg=w&t=m';
+    setTimeout(()=>window.open('https://maps.apple.com/?daddr='+lat+','+lng+'&dirflg=w','_blank'),1500);
+  }else{
     window.open('https://www.openstreetmap.org/directions?to='+lat+'%2C'+lng+'&from=&type=foot','_blank');
   }
-  // Log in pulse
-  try{
-    import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js").then(({addDoc,collection,serverTimestamp})=>{
-      addDoc(collection(db,'pulse_events'),{type:'navigation',icon:'🧭',message:'Navigare pornită spre <b>'+name+'</b>',tagClass:'tag-nexus',tagText:'NAV',timestamp:serverTimestamp()});
-    });
-  }catch(e){}
 };
 
 window.openGMaps=function(){
   if(!selLoc)return;
-  const lat=selLoc.lat,lng=selLoc.lng;
-  const name=lang==='en'&&selLoc.nameEn?selLoc.nameEn:selLoc.name;
-  // Google Maps URL universal — legal, redirecteaza la app sau web
-  window.open('https://www.google.com/maps/dir/?api=1&destination='+lat+','+lng+'&travelmode=walking','_blank');
+  window.open('https://www.google.com/maps/dir/?api=1&destination='+selLoc.lat+','+selLoc.lng+'&travelmode=walking','_blank');
 };
 
 map.on('click',()=>{if(document.getElementById('bcard').classList.contains('open'))window.closeCard()});
@@ -421,6 +478,7 @@ window.locateMe=function(){
   );
 };
 
+// ── LISTEN LOCATII DIN FIREBASE ──────────────────────────────
 try{
   onSnapshot(collection(db,'locations'),snap=>{
     fbLocs=snap.docs.map(d=>({id:d.id,...d.data()}));
@@ -428,6 +486,46 @@ try{
   });
 }catch(e){renderMarkers();}
 
+// ── LISTEN INSIDERI ACTIVI DIN VV PULSE ─────────────────────
+// Citeste colectia vv_pulse si afiseaza insiderii cu pulse activ
+try{
+  const nowTs=Timestamp.now();
+  onSnapshot(
+    query(collection(db,'vv_pulse'),where('expiresAt','>',nowTs)),
+    snap=>{
+      // Marcheaza toti ca potential sterse
+      const activeUids=new Set();
+
+      snap.forEach(docSnap=>{
+        const d=docSnap.data();
+        const uid=docSnap.id;
+        activeUids.add(uid);
+
+        // Adauga sau actualizeaza marker
+        if(d.lat && d.lng){
+          mkInsiderMarker(uid, d.lat, d.lng, d.alias||'Insider');
+        }
+      });
+
+      // Sterge markerii insiderilor care nu mai sunt activi
+      Object.keys(insiderMarkers).forEach(uid=>{
+        if(!activeUids.has(uid)){
+          removeInsiderMarker(uid);
+        }
+      });
+
+      // Actualizeaza counter
+      const count=activeUids.size;
+      document.getElementById('si').textContent=count;
+      document.getElementById('act-count').textContent=
+        document.getElementById('st').textContent!=='—'
+          ? parseInt(document.getElementById('st').textContent||'0')+count
+          : count;
+    }
+  );
+}catch(e){console.warn('[VV Pulse live]',e);}
+
+// ── WELCOME ──────────────────────────────────────────────────
 if(!localStorage.getItem('vv_welcomed')){
   wLang(lang);
 }else{
@@ -438,38 +536,39 @@ applyLang();
 renderMarkers();
 
 // Fly-to daca vine din VV Search
-const urlParams = new URLSearchParams(window.location.search);
-const flyLat = parseFloat(urlParams.get('lat'));
-const flyLng = parseFloat(urlParams.get('lng'));
-const flyName = urlParams.get('name');
-if (flyLat && flyLng) {
-  setTimeout(() => {
-    map.flyTo([flyLat, flyLng], 16, {duration: 1.5});
-    // Gaseste locatia si deschide cardul
-    setTimeout(() => {
-      const loc = [...LOCS, ...fbLocs].find(l => 
-        Math.abs(l.lat - flyLat) < 0.001 && Math.abs(l.lng - flyLng) < 0.001
-      );
-      if (loc) { selLoc = loc; openCard(loc); }
-      else if (flyName) {
-        // Creeaza un card minimal cu datele din URL
-        document.getElementById('cn').textContent = decodeURIComponent(flyName);
-        document.getElementById('cv').textContent = 'VERIFICAT';
-        document.getElementById('ctm').textContent = 'acum';
-        document.getElementById('cvb').textContent = 'ACTIV';
-        document.getElementById('cvb').className = 'card-vibe vibe-warm';
-        document.getElementById('csc').textContent = '—';
-        document.getElementById('cfr').textContent = '🔥';
-        document.getElementById('cva').textContent = '—';
-        document.getElementById('cdesc').style.display = 'none';
+const urlParams=new URLSearchParams(window.location.search);
+const flyLat=parseFloat(urlParams.get('lat'));
+const flyLng=parseFloat(urlParams.get('lng'));
+const flyName=urlParams.get('name');
+if(flyLat&&flyLng){
+  setTimeout(()=>{
+    map.flyTo([flyLat,flyLng],16,{duration:1.5});
+    setTimeout(()=>{
+      const loc=[...LOCS,...fbLocs].find(l=>Math.abs(l.lat-flyLat)<0.001&&Math.abs(l.lng-flyLng)<0.001);
+      if(loc){selLoc=loc;openCard(loc);}
+      else if(flyName){
+        document.getElementById('cn').textContent=decodeURIComponent(flyName);
+        document.getElementById('cv').textContent='VERIFICAT';
+        document.getElementById('cv').className='verified-badge';
+        document.getElementById('ctm').textContent='acum';
+        document.getElementById('cvb').textContent='ACTIV';
+        document.getElementById('cvb').className='card-vibe vibe-warm';
+        document.getElementById('csc').textContent='—';
+        document.getElementById('cfr').textContent='🔥';
+        document.getElementById('cva').textContent='—';
+        document.getElementById('cdesc').style.display='none';
+        document.getElementById('btn-nav-main').style.display='flex';
+        document.getElementById('btn-gmaps').style.display='flex';
         document.getElementById('mstats').classList.add('hidden');
         document.getElementById('bcard').classList.add('open');
       }
-    }, 1600);
-  }, 500);
+    },1600);
+  },500);
 }
 
-try{await setDoc(doc(db,"stats","map_visits"),{total:increment(1),[new Date().toISOString().slice(0,10)]:increment(1)},{merge:true});}catch(e){}
+try{
+  await setDoc(doc(db,"stats","map_visits"),{total:increment(1),[new Date().toISOString().slice(0,10)]:increment(1)},{merge:true});
+}catch(e){}
 </script>
 </body>
 </html>
