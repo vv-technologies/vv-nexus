@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#000">
+<title>VV Content Studio · CEO</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --gold:#D4AF37;--gold2:rgba(212,175,55,.1);--gold-b:rgba(212,175,55,.2);
+  --w:#fff;--w70:rgba(255,255,255,.7);--w50:rgba(255,255,255,.5);
+  --w30:rgba(255,255,255,.3);--w15:rgba(255,255,255,.15);
+  --w08:rgba(255,255,255,.08);--w04:rgba(255,255,255,.04);
+  --border:rgba(255,255,255,.08);
+  --green:#34c759;--blue:#0A84FF;--red:#ff3b30;--orange:#FF9500;
+  --font:'Syne',sans-serif;--mono:'DM Mono',monospace;
+}
+html,body{min-height:100vh;background:#000;color:var(--w);font-family:var(--mono);-webkit-font-smoothing:antialiased;}
+
+/* Login */
+#login{position:fixed;inset:0;background:#000;z-index:999;display:flex;align-items:center;justify-content:center;}
+#login.hidden{display:none;}
+.login-box{width:100%;max-width:360px;padding:36px;background:var(--w04);border:1px solid var(--border);border-radius:20px;}
+.login-logo{font-family:var(--font);font-size:28px;font-weight:900;letter-spacing:6px;color:var(--gold);margin-bottom:4px;}
+.login-sub{font-size:9px;letter-spacing:3px;color:var(--w30);margin-bottom:28px;}
+
+/* Layout */
+.app{display:grid;grid-template-columns:220px 1fr;min-height:100vh;}
+
+/* Sidebar */
+.sidebar{background:rgba(255,255,255,.02);border-right:1px solid var(--border);padding:20px 0;display:flex;flex-direction:column;}
+.sb-brand{padding:0 18px 20px;border-bottom:1px solid var(--border);margin-bottom:12px;}
+.sb-logo{font-family:var(--font);font-weight:900;font-size:14px;letter-spacing:5px;color:var(--gold);}
+.sb-role{font-size:9px;letter-spacing:2px;color:var(--w30);margin-top:3px;}
+.sb-nav{flex:1;padding:0 8px;}
+.sb-item{display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:10px;cursor:pointer;font-size:12px;color:var(--w50);transition:all .15s;margin-bottom:2px;}
+.sb-item:hover{background:var(--w04);color:var(--w80);}
+.sb-item.active{background:var(--gold2);border:0.5px solid var(--gold-b);color:var(--gold);}
+.sb-section{font-size:8px;letter-spacing:3px;color:var(--w30);font-weight:700;padding:10px 10px 4px;}
+.sb-footer{padding:16px 18px;border-top:1px solid var(--border);}
+
+/* Main */
+.main{display:flex;flex-direction:column;overflow:hidden;}
+.topbar{padding:14px 28px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.topbar-title{font-family:var(--font);font-size:15px;font-weight:900;}
+.topbar-right{display:flex;align-items:center;gap:10px;}
+.live-chip{display:flex;align-items:center;gap:5px;padding:4px 10px;background:var(--w04);border:0.5px solid var(--border);border-radius:20px;font-size:10px;color:var(--w30);}
+.live-dot{width:5px;height:5px;border-radius:50%;background:var(--green);box-shadow:0 0 6px rgba(52,199,89,.8);animation:blink 2s ease-in-out infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+
+.content{flex:1;overflow-y:auto;padding:24px 28px;}
+.section{display:none;}
+.section.active{display:block;}
+
+/* Cards */
+.card{background:var(--w04);border:1px solid var(--border);border-radius:16px;padding:20px 22px;margin-bottom:14px;position:relative;overflow:hidden;}
+.card::before{content:'';position:absolute;top:0;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,var(--gold-b),transparent);}
+.card-title{font-family:var(--font);font-size:13px;font-weight:800;margin-bottom:4px;}
+.card-sub{font-size:11px;color:var(--w30);margin-bottom:16px;}
+
+/* Stats */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px;}
+.stat{background:var(--w04);border:1px solid var(--border);border-radius:12px;padding:14px 16px;}
+.stat-v{font-family:var(--font);font-size:24px;font-weight:900;}
+.stat-l{font-size:9px;letter-spacing:2px;color:var(--w30);font-weight:700;margin-top:3px;}
+.gold-v{color:var(--gold);}
+.green-v{color:var(--green);}
+.blue-v{color:var(--blue);}
+.orange-v{color:var(--orange);}
+
+/* Form */
+.field{margin-bottom:14px;}
+.fl{font-size:9px;letter-spacing:2px;color:var(--w30);font-weight:700;display:block;margin-bottom:6px;}
+.fi{width:100%;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:10px;padding:10px 14px;color:var(--w);font-family:var(--mono);font-size:13px;outline:none;transition:border-color .2s;-webkit-appearance:none;}
+.fi:focus{border-color:rgba(212,175,55,.35);}
+.fi::placeholder{color:var(--w30);}
+.select{width:100%;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:10px;padding:10px 14px;color:var(--w);font-family:var(--mono);font-size:13px;outline:none;cursor:pointer;}
+.select option{background:#111;}
+.textarea{width:100%;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:10px;padding:10px 14px;color:var(--w);font-family:var(--mono);font-size:13px;outline:none;resize:vertical;min-height:70px;line-height:1.6;transition:border-color .2s;}
+.textarea:focus{border-color:rgba(212,175,55,.35);}
+.textarea::placeholder{color:var(--w30);}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:10px;font-family:var(--mono);font-size:12px;font-weight:700;cursor:pointer;transition:all .15s;border:none;min-height:36px;letter-spacing:.3px;}
+.btn-gold{background:var(--gold);color:#000;}
+.btn-gold:hover{opacity:.88;}
+.btn-outline{background:var(--w04);border:0.5px solid var(--border);color:var(--w70);}
+.btn-outline:hover{background:var(--w08);}
+.btn-green{background:rgba(52,199,89,.1);border:0.5px solid rgba(52,199,89,.2);color:var(--green);}
+.btn-red{background:rgba(255,59,48,.08);border:0.5px solid rgba(255,59,48,.15);color:var(--red);}
+.btn-full{width:100%;min-height:42px;font-size:13px;justify-content:center;}
+.btn:disabled{opacity:.4;cursor:not-allowed;}
+
+/* Table */
+.vv-table{width:100%;border-collapse:collapse;}
+.vv-table th{font-size:9px;letter-spacing:2px;color:var(--w30);font-weight:700;padding:8px 12px;text-align:left;border-bottom:1px solid var(--border);text-transform:uppercase;}
+.vv-table td{padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.03);font-size:12px;color:var(--w70);vertical-align:middle;}
+.vv-table tr:hover td{background:var(--w04);}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:6px;font-size:9px;font-weight:700;letter-spacing:1px;}
+.b-green{background:rgba(52,199,89,.1);border:0.5px solid rgba(52,199,89,.2);color:var(--green);}
+.b-gold{background:var(--gold2);border:0.5px solid var(--gold-b);color:var(--gold);}
+.b-blue{background:rgba(10,132,255,.1);border:0.5px solid rgba(10,132,255,.2);color:var(--blue);}
+.b-orange{background:rgba(255,149,0,.1);border:0.5px solid rgba(255,149,0,.2);color:var(--orange);}
+.b-red{background:rgba(255,59,48,.08);border:0.5px solid rgba(255,59,48,.15);color:var(--red);}
+
+/* Type pills */
+.type-grid{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;}
+.type-pill{padding:6px 14px;background:var(--w04);border:0.5px solid var(--border);border-radius:100px;font-size:11px;color:var(--w30);cursor:pointer;transition:all .15s;}
+.type-pill.active{background:var(--gold2);border-color:var(--gold-b);color:var(--gold);}
+
+/* Pricing section */
+.price-toggle{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+.toggle{width:40px;height:22px;background:var(--w08);border-radius:100px;cursor:pointer;position:relative;transition:background .2s;}
+.toggle.on{background:var(--gold);}
+.toggle-knob{width:18px;height:18px;background:#fff;border-radius:50%;position:absolute;top:2px;left:2px;transition:transform .2s;}
+.toggle.on .toggle-knob{transform:translateX(18px);}
+.toggle-label{font-size:12px;color:var(--w50);}
+
+/* Loading */
+.loading{display:flex;align-items:center;gap:8px;padding:30px;color:var(--w30);font-size:12px;justify-content:center;}
+.spinner{width:14px;height:14px;border:1.5px solid var(--w08);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Toast */
+#toast{position:fixed;bottom:20px;right:20px;background:rgba(10,10,16,.97);border:0.5px solid var(--w08);border-radius:12px;padding:10px 18px;font-size:12px;font-weight:600;color:var(--w);opacity:0;transition:all .25s;pointer-events:none;z-index:9999;max-width:280px;}
+#toast.on{opacity:1;}
+
+/* Section header */
+.sec-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+.sec-title{font-family:var(--font);font-size:18px;font-weight:900;letter-spacing:-.3px;}
+.sec-sub{font-size:11px;color:var(--w30);margin-top:2px;}
+
+/* Empty state */
+.empty{text-align:center;padding:40px;color:var(--w30);font-size:12px;}
+
+/* Modal overlay */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:500;display:none;align-items:center;justify-content:center;padding:20px;}
+.modal-overlay.show{display:flex;}
+.modal{background:#0a0a0f;border:1px solid var(--border);border-radius:20px;padding:28px;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;position:relative;}
+.modal-close{position:absolute;top:16px;right:16px;width:28px;height:28px;background:var(--w04);border:none;border-radius:50%;color:var(--w50);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;}
+.modal-title{font-family:var(--font);font-size:16px;font-weight:900;margin-bottom:4px;}
+.modal-sub{font-size:11px;color:var(--w30);margin-bottom:20px;}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login">
+  <div class="login-box">
+    <div class="login-logo">VV</div>
+    <div class="login-sub">CONTENT STUDIO · CEO</div>
+    <div class="field" style="margin-bottom:10px">
+      <input class="fi" type="email" id="l-email" placeholder="Email CEO">
+    </div>
+    <div class="field">
+      <input class="fi" type="password" id="l-pass" placeholder="Parolă">
+    </div>
+    <button class="btn btn-gold btn-full" style="margin-top:10px" onclick="doLogin()">INTRĂ</button>
+    <div id="l-err" style="font-size:11px;color:var(--red);text-align:center;margin-top:8px;min-height:16px"></div>
+  </div>
+</div>
+
+<!-- APP -->
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-brand">
+      <div class="sb-logo">VV STUDIO</div>
+      <div class="sb-role">CEO · CONTENT</div>
+    </div>
+    <nav class="sb-nav">
+      <div class="sb-section">PRINCIPAL</div>
+      <div class="sb-item active" onclick="showSec('dashboard',this)">⬡ Dashboard</div>
+      <div class="sb-item" onclick="showSec('static',this)">📍 Date Statice</div>
+      <div class="sb-item" onclick="showSec('pages',this)">📄 Pagini VV NOW</div>
+      <div class="sb-item" onclick="showSec('pricing',this)">💰 Prețuri Servicii</div>
+      <div class="sb-section">ECOSISTEM</div>
+      <div class="sb-item" onclick="showSec('nodes',this)">🏢 Business Nodes</div>
+      <div class="sb-item" onclick="showSec('talents',this)">⬡ Talente</div>
+      <div class="sb-item" onclick="showSec('charter',this)">📜 Charter VV</div>
+    </nav>
+    <div class="sb-footer">
+      <button class="btn btn-outline" style="width:100%;font-size:11px" onclick="doLogout()">Deconectare</button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-title" id="topbar-title">⬡ Dashboard</div>
+      <div class="topbar-right">
+        <div class="live-chip"><div class="live-dot"></div>Beta Live</div>
+        <div class="live-chip" id="topbar-time">—</div>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- DASHBOARD -->
+      <div class="section active" id="sec-dashboard">
+        <div class="stats-grid" id="dash-stats">
+          <div class="stat"><div class="stat-v gold-v" id="ds-static">—</div><div class="stat-l">DATE STATICE</div></div>
+          <div class="stat"><div class="stat-v green-v" id="ds-nodes">—</div><div class="stat-l">NODURI BUSINESS</div></div>
+          <div class="stat"><div class="stat-v blue-v" id="ds-talents">—</div><div class="stat-l">TALENTE ACTIVE</div></div>
+          <div class="stat"><div class="stat-v orange-v" id="ds-pages">—</div><div class="stat-l">PAGINI VV NOW</div></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Acțiuni Rapide</div>
+          <div class="card-sub">CEO Studio — gestionezi tot ecosistemul fără cod</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <button class="btn btn-gold" onclick="showSec('static',document.querySelector('[onclick*=static]'))">+ Adaugă Locație Statică</button>
+            <button class="btn btn-outline" onclick="showSec('pages',document.querySelector('[onclick*=pages]'))">+ Pagină VV NOW</button>
+            <button class="btn btn-outline" onclick="showSec('pricing',document.querySelector('[onclick*=pricing]'))">💰 Setează Prețuri</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Feed Ecosistem</div>
+          <div id="dash-feed"><div class="loading"><div class="spinner"></div></div></div>
+        </div>
+      </div>
+
+      <!-- DATE STATICE -->
+      <div class="section" id="sec-static">
+        <div class="sec-header">
+          <div>
+            <div class="sec-title">Date Statice</div>
+            <div class="sec-sub">Spitale, urgențe, instituții — date verificate manual, nu pot fi falsificate</div>
+          </div>
+          <button class="btn btn-gold" onclick="openAddStatic()">+ Adaugă</button>
+        </div>
+
+        <!-- Categorii predefinite -->
+        <div class="card" style="margin-bottom:20px">
+          <div class="card-title">Import Rapid — Date Urgențe București</div>
+          <div class="card-sub">Adaugă automat datele esențiale verificate pentru București</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn btn-outline" onclick="importPreset('spitale_buc')">🏥 Spitale Urgențe BUC</button>
+            <button class="btn btn-outline" onclick="importPreset('politie_buc')">🚔 Poliție BUC</button>
+            <button class="btn btn-outline" onclick="importPreset('farmacii_noapte')">💊 Farmacii Noapte</button>
+            <button class="btn btn-outline" onclick="importPreset('metrou_buc')">🚇 Metrou BUC</button>
+            <button class="btn btn-outline" onclick="importPreset('urgente_nationale')">🆘 Numere Urgențe RO</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <table class="vv-table">
+            <thead>
+              <tr>
+                <th>Nume</th><th>Tip</th><th>Oraș</th><th>Vizibil</th><th>Acțiuni</th>
+              </tr>
+            </thead>
+            <tbody id="static-table"><tr><td colspan="5" class="loading"><div class="spinner"></div></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- PAGINI VV NOW -->
+      <div class="section" id="sec-pages">
+        <div class="sec-header">
+          <div>
+            <div class="sec-title">Pagini VV NOW</div>
+            <div class="sec-sub">Conținut hibrid legal — apare în VV NOW când cineva caută</div>
+          </div>
+          <button class="btn btn-gold" onclick="openAddPage()">+ Pagină Nouă</button>
+        </div>
+        <div class="card">
+          <div class="card-title">Ce e o Pagină VV NOW?</div>
+          <div style="font-size:12px;color:var(--w50);line-height:1.8">
+            O pagină VV NOW e un răspuns complet pe care Nexus îl afișează când cineva caută un subiect specific.
+            Exemple: "Ce să vizitezi în Slobozia", "Restaurante deschise noaptea în București", "Trasee montane ușoare lângă Sinaia".
+            <br><br>
+            <b style="color:var(--w70)">Cum faci bani:</b> Poți seta un preț per afișare pentru pagini sponsorizate. Localurile sau turoperatorii plătesc să apară primii. Totul marcat legal ca "Conținut Sponsorizat VV".
+          </div>
+        </div>
+        <div id="pages-list"><div class="loading"><div class="spinner"></div></div></div>
+      </div>
+
+      <!-- PREȚURI SERVICII -->
+      <div class="section" id="sec-pricing">
+        <div class="sec-header">
+          <div>
+            <div class="sec-title">Prețuri Servicii</div>
+            <div class="sec-sub">Setează prețurile pentru serviciile ecosistemului VV</div>
+          </div>
+          <button class="btn btn-gold" onclick="savePricing()">Salvează</button>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Business Node</div>
+          <div class="card-sub">Cât plătesc firmele să apară în VV NOW</div>
+          <div class="row3">
+            <div class="field">
+              <label class="fl">BETA (acum)</label>
+              <input class="fi" id="p-biz-beta" value="0" type="number"> <span style="font-size:10px;color:var(--w30)">€/lună</span>
+            </div>
+            <div class="field">
+              <label class="fl">STANDARD (VV 1.0)</label>
+              <input class="fi" id="p-biz-std" value="9" type="number"> <span style="font-size:10px;color:var(--w30)">€/lună</span>
+            </div>
+            <div class="field">
+              <label class="fl">PREMIUM (Nod Fondator)</label>
+              <input class="fi" id="p-biz-prem" value="29" type="number"> <span style="font-size:10px;color:var(--w30)">€/lună</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">VV Talent</div>
+          <div class="card-sub">Cât plătesc agențiile să caute talente</div>
+          <div class="row3">
+            <div class="field">
+              <label class="fl">LISTARE TALENT</label>
+              <input class="fi" id="p-tal-list" value="0" type="number"> <span style="font-size:10px;color:var(--w30)">€ (gratuit beta)</span>
+            </div>
+            <div class="field">
+              <label class="fl">ACCES AGENȚIE</label>
+              <input class="fi" id="p-tal-agency" value="49" type="number"> <span style="font-size:10px;color:var(--w30)">€/lună</span>
+            </div>
+            <div class="field">
+              <label class="fl">PER CONTACT TALENT</label>
+              <input class="fi" id="p-tal-contact" value="5" type="number"> <span style="font-size:10px;color:var(--w30)">€/contact</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">VV NOW Premium</div>
+          <div class="card-sub">Abonamentul userilor pentru funcții avansate</div>
+          <div class="row3">
+            <div class="field">
+              <label class="fl">STANDARD</label>
+              <input class="fi" id="p-now-std" value="0" type="number"> <span style="font-size:10px;color:var(--w30)">€/lună (gratuit)</span>
+            </div>
+            <div class="field">
+              <label class="fl">PREMIUM</label>
+              <input class="fi" id="p-now-prem" value="9" type="number"> <span style="font-size:10px;color:var(--w30)">€/lună</span>
+            </div>
+            <div class="field">
+              <label class="fl">ONYX (VV Coins)</label>
+              <input class="fi" id="p-now-onyx" value="500" type="number"> <span style="font-size:10px;color:var(--w30)">VV Coins</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">VERIFY Flash Mission</div>
+          <div class="card-sub">Costul per verificare fizică</div>
+          <div class="row2">
+            <div class="field">
+              <label class="fl">COST USER (plătit din VV)</label>
+              <input class="fi" id="p-verify-user" value="10" type="number"> <span style="font-size:10px;color:var(--w30)">VV Coins</span>
+            </div>
+            <div class="field">
+              <label class="fl">RECOMPENSĂ INSIDER</label>
+              <input class="fi" id="p-verify-insider" value="10" type="number"> <span style="font-size:10px;color:var(--w30)">VV Coins</span>
+            </div>
+          </div>
+          <div style="font-size:11px;color:var(--w30);margin-top:8px">
+            ℹ️ În Beta: userile nu plătesc VV Coins real — e o simulare. La VV 1.0 intră economia reală.
+          </div>
+        </div>
+
+        <div class="card" style="background:rgba(212,175,55,.04);border-color:var(--gold-b)">
+          <div class="card-title" style="color:var(--gold)">Proiecție Venituri Lunare</div>
+          <div style="font-size:12px;color:var(--w50);line-height:2">
+            <div>🏢 100 Business Nodes × 9€ = <b style="color:var(--w)">900€</b></div>
+            <div>👥 10 Agenții × 49€ = <b style="color:var(--w)">490€</b></div>
+            <div>⬡ 50 useri Premium × 9€ = <b style="color:var(--w)">450€</b></div>
+            <div style="border-top:1px solid var(--border);margin-top:8px;padding-top:8px">
+              Total estimat: <b style="color:var(--gold);font-size:14px">1.840€/lună</b> cu 160 clienți activi
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BUSINESS NODES -->
+      <div class="section" id="sec-nodes">
+        <div class="sec-header">
+          <div><div class="sec-title">Business Nodes</div><div class="sec-sub">Locații înregistrate în ecosistem</div></div>
+        </div>
+        <div class="card">
+          <table class="vv-table">
+            <thead><tr><th>Locație</th><th>Tip</th><th>Oraș</th><th>Status</th><th>Creat</th></tr></thead>
+            <tbody id="nodes-table"><tr><td colspan="5"><div class="loading"><div class="spinner"></div></div></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TALENTE -->
+      <div class="section" id="sec-talents">
+        <div class="sec-header">
+          <div><div class="sec-title">VV Talent</div><div class="sec-sub">Profiluri active în ecosistem</div></div>
+        </div>
+        <div class="card">
+          <table class="vv-table">
+            <thead><tr><th>Alias</th><th>Domeniu</th><th>Oraș</th><th>Nivel</th><th>Skills</th></tr></thead>
+            <tbody id="talents-table"><tr><td colspan="5"><div class="loading"><div class="spinner"></div></div></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- CHARTER -->
+      <div class="section" id="sec-charter">
+        <div class="sec-header">
+          <div><div class="sec-title">VV Charter</div><div class="sec-sub">Regulile legale ale ecosistemului</div></div>
+        </div>
+        <div class="card">
+          <div style="font-size:12px;color:var(--w50);line-height:2">
+            <div><b style="color:var(--gold)">ART-1</b> · Anonimat — Nicio dată de buletin stocată în sistem</div>
+            <div><b style="color:var(--gold)">ART-2</b> · Ton — Direct, profesional, fără manipulare</div>
+            <div><b style="color:var(--gold)">ART-3</b> · Filtru Etic — Conținut ilegal blocat automat</div>
+            <div><b style="color:var(--gold)">ART-4</b> · Anti-Scroll — Conținut orientat spre acțiune reală</div>
+            <div><b style="color:var(--gold)">ART-5</b> · Loialitate — Userii pot șterge datele oricând</div>
+            <div><b style="color:var(--gold)">ART-6</b> · VV Coins — Economie transparentă, trasabilă</div>
+            <div><b style="color:var(--gold)">ART-7</b> · Ierarhie — Level bazat pe acțiuni fizice reale</div>
+            <div><b style="color:var(--gold)">ART-8</b> · Maturitate — Conținut 18+ marcat explicit</div>
+            <div><b style="color:var(--gold)">ART-9</b> · Expirare — Date fără update șterse automat</div>
+            <div><b style="color:var(--gold)">ART-10</b> · GDPR — Conformitate legislație română și UE</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Sancțiuni Automate</div>
+          <div style="font-size:12px;color:var(--w50);line-height:2">
+            <div>Business Node cu date false → Neverificat 7 zile automat</div>
+            <div>Business Node fără update 30 zile → Marcat "Date posibil depășite"</div>
+            <div>Business Node fără update 120 zile → Șters automat</div>
+            <div>Talent cu informații false → Profil suspendat</div>
+            <div>Conținut care încalcă ART-3 → Blocat înainte de publicare</div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<!-- MODAL ADD STATIC -->
+<div class="modal-overlay" id="modal-static">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('modal-static')">✕</button>
+    <div class="modal-title">Adaugă Locație Statică</div>
+    <div class="modal-sub">Date verificate manual — apar în VV NOW, nu pot fi falsificate de useri</div>
+    <div class="field">
+      <label class="fl">TIP LOCAȚIE *</label>
+      <div class="type-grid">
+        <div class="type-pill" onclick="selectType(this,'spital')">🏥 Spital</div>
+        <div class="type-pill" onclick="selectType(this,'politie')">🚔 Poliție</div>
+        <div class="type-pill" onclick="selectType(this,'pompieri')">🚒 Pompieri</div>
+        <div class="type-pill" onclick="selectType(this,'smurd')">🚑 SMURD</div>
+        <div class="type-pill" onclick="selectType(this,'farmacie')">💊 Farmacie</div>
+        <div class="type-pill" onclick="selectType(this,'metrou')">🚇 Metrou</div>
+        <div class="type-pill" onclick="selectType(this,'primarie')">🏛️ Primărie</div>
+        <div class="type-pill" onclick="selectType(this,'urgenta_num')">📞 Număr Urgență</div>
+        <div class="type-pill" onclick="selectType(this,'obiectiv')">🏛️ Obiectiv</div>
+        <div class="type-pill" onclick="selectType(this,'altele')">⬡ Altele</div>
+      </div>
+      <input type="hidden" id="s-type">
+    </div>
+    <div class="row2">
+      <div class="field"><label class="fl">NUME *</label><input class="fi" id="s-name" placeholder="ex: Spitalul Floreasca"></div>
+      <div class="field"><label class="fl">ORAȘ *</label><input class="fi" id="s-city" placeholder="București"></div>
+    </div>
+    <div class="field"><label class="fl">ADRESĂ</label><input class="fi" id="s-addr" placeholder="Calea Floreasca 8"></div>
+    <div class="row2">
+      <div class="field"><label class="fl">TELEFON / URGENȚĂ</label><input class="fi" id="s-phone" placeholder="021 / 112..."></div>
+      <div class="field"><label class="fl">PROGRAM</label><input class="fi" id="s-hours" placeholder="24/7 sau L-V 08-20"></div>
+    </div>
+    <div class="field"><label class="fl">INFORMAȚII UTILE</label><textarea class="textarea" id="s-info" placeholder="Secție urgențe, specialități, acces transport..."></textarea></div>
+    <div class="field">
+      <label class="fl">CUVINTE CHEIE (cum să apară în VV NOW)</label>
+      <input class="fi" id="s-keywords" placeholder="ex: urgente, traumatologie, cardiologie...">
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+      <div class="toggle on" id="s-visible-toggle" onclick="toggleVisible()"><div class="toggle-knob"></div></div>
+      <div class="toggle-label">Vizibil în VV NOW</div>
+    </div>
+    <button class="btn btn-gold btn-full" onclick="saveStatic()">⬡ SALVEAZĂ LOCAȚIA</button>
+  </div>
+</div>
+
+<!-- MODAL ADD PAGE -->
+<div class="modal-overlay" id="modal-page">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('modal-page')">✕</button>
+    <div class="modal-title">Pagină VV NOW Nouă</div>
+    <div class="modal-sub">Conținut hibrid legal — apare când cineva caută subiectul</div>
+    <div class="field"><label class="fl">TITLU PAGINĂ *</label><input class="fi" id="pg-title" placeholder="ex: Restaurante deschise noaptea în București"></div>
+    <div class="field"><label class="fl">CUVINTE CHEIE (triggere căutare) *</label><input class="fi" id="pg-keywords" placeholder="ex: restaurant noapte, mancare noapte, deschis 24h..."></div>
+    <div class="field"><label class="fl">CONȚINUT *</label><textarea class="textarea" id="pg-content" style="min-height:120px" placeholder="Conținutul paginii — ce vede userul când caută..."></textarea></div>
+    <div class="row2">
+      <div class="field"><label class="fl">ORAȘ / ZONĂ</label><input class="fi" id="pg-city" placeholder="București, Slobozia, toată România..."></div>
+      <div class="field"><label class="fl">CATEGORIE</label>
+        <select class="select" id="pg-cat">
+          <option value="info">ℹ️ Informare</option>
+          <option value="urgenta">🆘 Urgență</option>
+          <option value="turism">🗺️ Turism</option>
+          <option value="business">🏢 Business</option>
+          <option value="sponsorizat">💛 Sponsorizat</option>
+        </select>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:16px">
+      <div class="price-toggle">
+        <div class="toggle" id="pg-paid-toggle" onclick="togglePaid()"><div class="toggle-knob"></div></div>
+        <div class="toggle-label">Pagină Sponsorizată (generează venit)</div>
+      </div>
+      <div id="pg-price-section" style="display:none">
+        <div class="row2">
+          <div class="field"><label class="fl">PREȚ PER LUNĂ (€)</label><input class="fi" id="pg-price" placeholder="ex: 29"></div>
+          <div class="field"><label class="fl">CLIENT / SPONSOR</label><input class="fi" id="pg-sponsor" placeholder="Numele clientului"></div>
+        </div>
+        <div style="font-size:11px;color:var(--orange)">⚠️ Pagina va fi marcată "Conținut Sponsorizat VV" conform legislației.</div>
+      </div>
+    </div>
+    <button class="btn btn-gold btn-full" onclick="savePage()">⬡ PUBLICĂ PAGINA</button>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<!-- FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script>
+firebase.initializeApp({
+  apiKey:"AIzaSyDGv4kEClO0RHCLvXVLOT-vyPHw6bsxYVc",
+  authDomain:"vv-ep-beta.firebaseapp.com",
+  projectId:"vv-ep-beta"
+});
+var db = firebase.firestore();
+var auth = firebase.auth();
+var CEO_UID = 'PthU3uVY5WSPNx8d4XrdXEgszEo1';
+var _staticVisible = true;
+var _pagePaid = false;
+var _selectedType = '';
+
+// ── AUTH ──────────────────────────────────────────────────────
+auth.onAuthStateChanged(function(user) {
+  if (user && user.uid === CEO_UID) {
+    document.getElementById('login').classList.add('hidden');
+    initApp();
+  } else if (user) {
+    auth.signOut();
+  }
+});
+
+function doLogin() {
+  var email = document.getElementById('l-email').value;
+  var pass = document.getElementById('l-pass').value;
+  var err = document.getElementById('l-err');
+  err.textContent = '';
+  auth.signInWithEmailAndPassword(email, pass).catch(function(e) {
+    err.textContent = 'Acces refuzat.';
+  });
+}
+function doLogout() { auth.signOut().then(function(){ location.reload(); }); }
+
+// ── CLOCK ─────────────────────────────────────────────────────
+setInterval(function() {
+  var now = new Date();
+  var t = document.getElementById('topbar-time');
+  if (t) t.textContent = now.toLocaleTimeString('ro-RO', {hour:'2-digit',minute:'2-digit'});
+}, 1000);
+
+// ── INIT ──────────────────────────────────────────────────────
+async function initApp() {
+  loadDashboard();
+}
+
+async function loadDashboard() {
+  try {
+    var [staticD, nodesD, talentsD, pagesD, feedD] = await Promise.all([
+      db.collection('vv_static_data').get(),
+      db.collection('verified_nodes').where('status','==','active').get(),
+      db.collection('vv_talents').where('status','==','active').get(),
+      db.collection('vv_now_pages').get(),
+      db.collection('vvhi_dataset').orderBy('timestamp','desc').limit(6).get()
+    ]);
+    document.getElementById('ds-static').textContent = staticD.size;
+    document.getElementById('ds-nodes').textContent = nodesD.size;
+    document.getElementById('ds-talents').textContent = talentsD.size;
+    document.getElementById('ds-pages').textContent = pagesD.size;
+
+    var acts = {'VV_NOW_SEARCH':'Căutare VV NOW','VERIFY_REQUESTED':'Flash Mission','BUSINESS_NODE_CREATED':'Nou Business Node','TALENT_REGISTERED':'Nou Talent','APPROVE_MISSION':'Misiune aprobată'};
+    var feedHtml = '';
+    feedD.forEach(function(doc) {
+      var d = doc.data();
+      var date = d.timestamp ? d.timestamp.toDate().toLocaleString('ro-RO',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}) : '—';
+      feedHtml += '<tr><td style="font-size:11px;font-weight:700;color:var(--gold)">'+(acts[d.action]||d.action)+'</td><td style="font-size:11px;color:var(--w30)">'+date+'</td></tr>';
+    });
+    document.getElementById('dash-feed').innerHTML = '<table class="vv-table"><tbody>'+feedHtml+'</tbody></table>';
+  } catch(e) { console.log(e); }
+}
+
+// ── NAVIGARE ─────────────────────────────────────────────────
+function showSec(name, el) {
+  document.querySelectorAll('.section').forEach(function(s){ s.classList.remove('active'); });
+  document.querySelectorAll('.sb-item').forEach(function(i){ i.classList.remove('active'); });
+  var sec = document.getElementById('sec-'+name);
+  if (sec) sec.classList.add('active');
+  if (el) el.classList.add('active');
+  var titles = {dashboard:'⬡ Dashboard',static:'📍 Date Statice',pages:'📄 Pagini VV NOW',pricing:'💰 Prețuri Servicii',nodes:'🏢 Business Nodes',talents:'⬡ Talente',charter:'📜 VV Charter'};
+  document.getElementById('topbar-title').textContent = titles[name] || name;
+  if (name === 'static') loadStaticTable();
+  if (name === 'nodes') loadNodesTable();
+  if (name === 'talents') loadTalentsTable();
+  if (name === 'pages') loadPages();
+}
+
+// ── DATE STATICE ──────────────────────────────────────────────
+var PRESETS = {
+  spitale_buc: [
+    {name:'Spitalul Floreasca',type:'spital',city:'București',addr:'Calea Floreasca 8',phone:'021 599 2300',hours:'24/7',info:'Urgențe, chirurgie, traumatologie',keywords:'floreasca,urgente,spital,traumatologie'},
+    {name:'Spitalul Elias',type:'spital',city:'București',addr:'Bulevardul Mărăști 17',phone:'021 316 1600',hours:'24/7',info:'Urgențe generale, cardiologie, neurologie',keywords:'elias,urgente,spital,marasti'},
+    {name:'Spitalul Bagdasar-Arseni',type:'spital',city:'București',addr:'Bulevardul Constantin Brâncoveanu 10',phone:'021 334 3007',hours:'24/7',info:'Neurochirurgie, urgențe neurologice',keywords:'bagdasar,neurochirurgie,urgente,spital'},
+    {name:'Spitalul de Urgență Grigore Alexandrescu',type:'spital',city:'București',addr:'Bulevardul Iancu de Hunedoara 30-32',phone:'021 316 9354',hours:'24/7',info:'Urgențe copii, pediatrie',keywords:'alexandrescu,copii,urgente,pediatrie,spital'}
+  ],
+  politie_buc: [
+    {name:'Poliția Municipiului București',type:'politie',city:'București',addr:'Calea Victoriei 17',phone:'021 311 2921',hours:'24/7',info:'Dispecerat general, sesizări',keywords:'politie,bucuresti,sesizare'},
+    {name:'Număr urgență Poliție',type:'urgenta_num',city:'România',addr:'—',phone:'112',hours:'24/7',info:'Numărul național de urgențe poliție',keywords:'politie,112,urgenta,ajutor'}
+  ],
+  farmacii_noapte: [
+    {name:'Sensiblu Nonstop Unirii',type:'farmacie',city:'București',addr:'Piața Unirii',phone:'—',hours:'24/7',info:'Farmacie nonstop cu livrare',keywords:'farmacie,noapte,nonstop,unirii,sensiblu'},
+    {name:'Dona Nonstop Victoriei',type:'farmacie',city:'București',addr:'Piața Victoriei',phone:'—',hours:'24/7',info:'Farmacie nonstop',keywords:'farmacie,noapte,nonstop,victoriei,dona'}
+  ],
+  metrou_buc: [
+    {name:'Metrou București — Info',type:'metrou',city:'București',addr:'—',phone:'021 335 4142',hours:'05:00-23:00',info:'Program general metrou. Linii M1 M2 M3 M4 M5',keywords:'metrou,bucuresti,transport,m1,m2,m3,m4,m5'}
+  ],
+  urgente_nationale: [
+    {name:'URGENȚE — 112',type:'urgenta_num',city:'România',addr:'—',phone:'112',hours:'24/7',info:'Numărul național de urgențe — Poliție, Ambulanță, Pompieri',keywords:'112,urgenta,ambulanta,politie,pompieri,ajutor'},
+    {name:'TELVERDE Sănătate — 0800 800 358',type:'urgenta_num',city:'România',addr:'—',phone:'0800 800 358',hours:'24/7',info:'Linie gratuită informații medicale',keywords:'sanatate,telverde,medical,sfat,informatii'},
+    {name:'Ambulanță — 112 / 021 961',type:'urgenta_num',city:'București',addr:'—',phone:'021 961',hours:'24/7',info:'Ambulanță București',keywords:'ambulanta,urgenta,112,bucuresti'}
+  ]
+};
+
+async function importPreset(key) {
+  var data = PRESETS[key];
+  if (!data) return;
+  var btn = event.target;
+  btn.disabled = true;
+  btn.textContent = 'Se importă...';
+  try {
+    var batch = db.batch();
+    data.forEach(function(item) {
+      var ref = db.collection('vv_static_data').doc();
+      batch.set(ref, {
+        ...item,
+        visible: true,
+        source: 'CEO_STUDIO',
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    });
+    await batch.commit();
+    showToast('✅ ' + data.length + ' locații importate!');
+    loadStaticTable();
+    loadDashboard();
+  } catch(e) {
+    showToast('Eroare: ' + e.message, true);
+  }
+  btn.disabled = false;
+  btn.textContent = btn.textContent.replace('Se importă...','');
+}
+
+async function loadStaticTable() {
+  var tbody = document.getElementById('static-table');
+  tbody.innerHTML = '<tr><td colspan="5"><div class="loading"><div class="spinner"></div></div></td></tr>';
+  try {
+    var snap = await db.collection('vv_static_data').orderBy('createdAt','desc').limit(50).get();
+    if (snap.empty) { tbody.innerHTML = '<tr><td colspan="5" class="empty">Nicio locație statică. Folosește Import Rapid sau Adaugă.</td></tr>'; return; }
+    var html = '';
+    snap.forEach(function(doc) {
+      var d = doc.data();
+      var typeIcons = {spital:'🏥',politie:'🚔',pompieri:'🚒',smurd:'🚑',farmacie:'💊',metrou:'🚇',primarie:'🏛️',urgenta_num:'📞',obiectiv:'🏛️'};
+      html += '<tr><td><b>'+d.name+'</b><br><span style="font-size:10px;color:var(--w30)">'+d.phone+'</span></td>' +
+        '<td><span class="badge b-gold">'+(typeIcons[d.type]||'⬡')+' '+d.type+'</span></td>' +
+        '<td>'+d.city+'</td>' +
+        '<td><span class="badge '+(d.visible?'b-green':'b-red')+'">'+(d.visible?'ACTIV':'ASCUNS')+'</span></td>' +
+        '<td><button class="btn btn-red" style="padding:4px 8px;font-size:10px" onclick="deleteStatic(\''+doc.id+'\')">✕</button></td></tr>';
+    });
+    tbody.innerHTML = html;
+  } catch(e) { tbody.innerHTML = '<tr><td colspan="5" style="color:var(--red)">Eroare: '+e.message+'</td></tr>'; }
+}
+
+function openAddStatic() { document.getElementById('modal-static').classList.add('show'); }
+function selectType(el, type) {
+  document.querySelectorAll('.type-pill').forEach(function(p){ p.classList.remove('active'); });
+  el.classList.add('active');
+  _selectedType = type;
+  document.getElementById('s-type').value = type;
+}
+function toggleVisible() {
+  _staticVisible = !_staticVisible;
+  document.getElementById('s-visible-toggle').classList.toggle('on', _staticVisible);
+}
+
+async function saveStatic() {
+  var name = document.getElementById('s-name').value.trim();
+  var city = document.getElementById('s-city').value.trim();
+  var type = document.getElementById('s-type').value || _selectedType;
+  if (!name || !city || !type) { showToast('Completează: Tip, Nume, Oraș'); return; }
+  try {
+    await db.collection('vv_static_data').add({
+      name, city, type,
+      addr: document.getElementById('s-addr').value.trim() || null,
+      phone: document.getElementById('s-phone').value.trim() || null,
+      hours: document.getElementById('s-hours').value.trim() || null,
+      info: document.getElementById('s-info').value.trim() || null,
+      keywords: document.getElementById('s-keywords').value.trim() || null,
+      visible: _staticVisible,
+      source: 'CEO_STUDIO',
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    closeModal('modal-static');
+    showToast('✅ Locație salvată!');
+    loadStaticTable();
+    loadDashboard();
+  } catch(e) { showToast('Eroare: ' + e.message, true); }
+}
+
+async function deleteStatic(id) {
+  if (!confirm('Ștergi această locație?')) return;
+  try {
+    await db.collection('vv_static_data').doc(id).delete();
+    showToast('Șters.');
+    loadStaticTable();
+  } catch(e) { showToast('Eroare: ' + e.message, true); }
+}
+
+// ── PAGINI VV NOW ─────────────────────────────────────────────
+async function loadPages() {
+  var el = document.getElementById('pages-list');
+  el.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+  try {
+    var snap = await db.collection('vv_now_pages').orderBy('createdAt','desc').get();
+    if (snap.empty) { el.innerHTML = '<div class="card"><div class="empty">Nicio pagină. Creează prima pagină VV NOW.</div></div>'; return; }
+    var html = '<div class="card"><table class="vv-table"><thead><tr><th>Titlu</th><th>Categorie</th><th>Oraș</th><th>Sponsorizat</th><th>Acțiuni</th></tr></thead><tbody>';
+    snap.forEach(function(doc) {
+      var d = doc.data();
+      html += '<tr><td><b>'+d.title+'</b><br><span style="font-size:10px;color:var(--w30)">'+d.keywords.substring(0,40)+'...</span></td>' +
+        '<td><span class="badge b-blue">'+d.category+'</span></td>' +
+        '<td>'+d.city+'</td>' +
+        '<td>'+(d.isPaid?'<span class="badge b-gold">'+d.price+'€/lună</span>':'<span class="badge" style="color:var(--w30)">Gratuit</span>')+'</td>' +
+        '<td><button class="btn btn-red" style="padding:4px 8px;font-size:10px" onclick="deletePage(\''+doc.id+'\')">✕</button></td></tr>';
+    });
+    html += '</tbody></table></div>';
+    el.innerHTML = html;
+  } catch(e) { el.innerHTML = '<div class="card" style="color:var(--red)">Eroare: '+e.message+'</div>'; }
+}
+
+function openAddPage() { document.getElementById('modal-page').classList.add('show'); }
+function togglePaid() {
+  _pagePaid = !_pagePaid;
+  document.getElementById('pg-paid-toggle').classList.toggle('on', _pagePaid);
+  document.getElementById('pg-price-section').style.display = _pagePaid ? 'block' : 'none';
+}
+
+async function savePage() {
+  var title = document.getElementById('pg-title').value.trim();
+  var keywords = document.getElementById('pg-keywords').value.trim();
+  var content = document.getElementById('pg-content').value.trim();
+  if (!title || !keywords || !content) { showToast('Completează: Titlu, Cuvinte cheie, Conținut'); return; }
+  try {
+    await db.collection('vv_now_pages').add({
+      title, keywords, content,
+      city: document.getElementById('pg-city').value.trim() || 'România',
+      category: document.getElementById('pg-cat').value,
+      isPaid: _pagePaid,
+      price: _pagePaid ? parseFloat(document.getElementById('pg-price').value) || 0 : 0,
+      sponsor: _pagePaid ? document.getElementById('pg-sponsor').value.trim() : null,
+      isSponsored: _pagePaid,
+      visible: true,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    closeModal('modal-page');
+    showToast('✅ Pagina publicată!');
+    loadPages();
+    loadDashboard();
+  } catch(e) { showToast('Eroare: ' + e.message, true); }
+}
+
+async function deletePage(id) {
+  if (!confirm('Ștergi această pagină?')) return;
+  try { await db.collection('vv_now_pages').doc(id).delete(); showToast('Ștersă.'); loadPages(); }
+  catch(e) { showToast('Eroare: ' + e.message, true); }
+}
+
+// ── NODES & TALENTS ───────────────────────────────────────────
+async function loadNodesTable() {
+  var tbody = document.getElementById('nodes-table');
+  try {
+    var snap = await db.collection('verified_nodes').orderBy('createdAt','desc').limit(30).get();
+    if (snap.empty) { tbody.innerHTML = '<tr><td colspan="5" class="empty">Niciun Business Node.</td></tr>'; return; }
+    var html = '';
+    snap.forEach(function(doc) {
+      var d = doc.data();
+      var date = d.createdAt ? d.createdAt.toDate().toLocaleDateString('ro') : '—';
+      html += '<tr><td><b>'+d.name+'</b>'+(d.isPioneer?'<span class="badge b-gold" style="margin-left:6px">PIONIER</span>':'')+
+        '</td><td>'+d.type+'</td><td>'+d.cityDisplay+'</td>' +
+        '<td><span class="badge '+(d.status==='active'?'b-green':'b-orange')+'">'+d.status.toUpperCase()+'</span></td>' +
+        '<td>'+date+'</td></tr>';
+    });
+    tbody.innerHTML = html;
+  } catch(e) { tbody.innerHTML = '<tr><td colspan="5" style="color:var(--red)">Eroare: '+e.message+'</td></tr>'; }
+}
+
+async function loadTalentsTable() {
+  var tbody = document.getElementById('talents-table');
+  try {
+    var snap = await db.collection('vv_talents').orderBy('createdAt','desc').limit(30).get();
+    if (snap.empty) { tbody.innerHTML = '<tr><td colspan="5" class="empty">Niciun talent.</td></tr>'; return; }
+    var html = '';
+    snap.forEach(function(doc) {
+      var d = doc.data();
+      var skills = (d.skills||[]).slice(0,3).join(', ');
+      html += '<tr><td>'+d.alias+'</td><td>'+d.domain+'</td><td>'+d.cityDisplay+'</td>' +
+        '<td><span class="badge b-blue">'+d.level+'</span></td><td>'+skills+'</td></tr>';
+    });
+    tbody.innerHTML = html;
+  } catch(e) { tbody.innerHTML = '<tr><td colspan="5" style="color:var(--red)">Eroare: '+e.message+'</td></tr>'; }
+}
+
+// ── PRICING ───────────────────────────────────────────────────
+async function savePricing() {
+  try {
+    await db.collection('config').doc('pricing').set({
+      business: { beta: parseFloat(document.getElementById('p-biz-beta').value)||0, standard: parseFloat(document.getElementById('p-biz-std').value)||9, premium: parseFloat(document.getElementById('p-biz-prem').value)||29 },
+      talent: { list: parseFloat(document.getElementById('p-tal-list').value)||0, agency: parseFloat(document.getElementById('p-tal-agency').value)||49, perContact: parseFloat(document.getElementById('p-tal-contact').value)||5 },
+      nowPremium: { standard: 0, premium: parseFloat(document.getElementById('p-now-prem').value)||9, onyxCoins: parseFloat(document.getElementById('p-now-onyx').value)||500 },
+      verify: { userCost: parseFloat(document.getElementById('p-verify-user').value)||10, insiderReward: parseFloat(document.getElementById('p-verify-insider').value)||10 },
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    showToast('✅ Prețuri salvate!');
+  } catch(e) { showToast('Eroare: ' + e.message, true); }
+}
+
+// ── UTILS ─────────────────────────────────────────────────────
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+function showToast(msg, isErr) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.borderColor = isErr ? 'rgba(255,59,48,.3)' : 'rgba(52,199,89,.25)';
+  t.classList.add('on');
+  clearTimeout(t._t); t._t = setTimeout(function(){ t.classList.remove('on'); }, 3500);
+}
+</script>
+</body>
+</html>
