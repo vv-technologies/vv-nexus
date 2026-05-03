@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#000">
+<title>VV Talent · Înregistrare Profil</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800;900&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --gold:#D4AF37;--gold2:rgba(212,175,55,.1);--gold-b:rgba(212,175,55,.2);
+  --w:#fff;--w70:rgba(255,255,255,.7);--w50:rgba(255,255,255,.5);
+  --w30:rgba(255,255,255,.3);--w15:rgba(255,255,255,.15);
+  --w08:rgba(255,255,255,.08);--w04:rgba(255,255,255,.04);
+  --border:rgba(255,255,255,.08);
+  --green:#34c759;--blue:#0A84FF;--red:#ff3b30;--orange:#FF9500;
+  --font:'Syne',sans-serif;--mono:'DM Mono',monospace;
+}
+html,body{min-height:100vh;background:#000;color:var(--w);
+  font-family:var(--mono);-webkit-font-smoothing:antialiased;}
+
+.hdr{padding:20px 28px;display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid var(--border);}
+.logo{font-family:var(--font);font-weight:900;font-size:16px;letter-spacing:6px;color:var(--gold);text-decoration:none;}
+.hdr-nav{display:flex;gap:8px;}
+.hdr-link{padding:5px 12px;background:var(--w04);border:0.5px solid var(--border);
+  border-radius:100px;font-size:11px;color:var(--w30);text-decoration:none;transition:all .15s;}
+.hdr-link:hover{color:var(--w70);}
+
+.main{max-width:680px;margin:0 auto;padding:48px 24px 80px;}
+
+.page-hero{text-align:center;margin-bottom:48px;}
+.page-eye{font-size:8px;letter-spacing:5px;color:rgba(10,132,255,.5);font-weight:700;margin-bottom:16px;}
+.page-title{font-family:var(--font);font-size:clamp(24px,4vw,40px);font-weight:900;letter-spacing:-1px;margin-bottom:12px;line-height:1.1;}
+.page-title .b{color:var(--blue);}
+.page-sub{font-size:13px;color:var(--w50);line-height:1.8;max-width:480px;margin:0 auto;}
+
+.stats-row{display:flex;gap:1px;margin-bottom:40px;overflow:hidden;border-radius:14px;border:1px solid var(--border);}
+.stat-item{flex:1;padding:16px;background:var(--w04);text-align:center;}
+.stat-val{font-family:var(--font);font-size:22px;font-weight:900;color:var(--blue);}
+.stat-lbl{font-size:9px;letter-spacing:2px;color:var(--w30);font-weight:700;margin-top:3px;}
+
+.form-card{background:var(--w04);border:1px solid var(--border);border-radius:20px;
+  padding:28px;margin-bottom:16px;position:relative;overflow:hidden;}
+.form-card::before{content:'';position:absolute;top:0;left:10%;right:10%;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(10,132,255,.2),transparent);}
+
+.section-label{font-size:8px;letter-spacing:4px;color:rgba(10,132,255,.5);font-weight:700;margin-bottom:20px;}
+
+.field{margin-bottom:16px;}
+.field-label{font-size:9px;letter-spacing:2px;color:var(--w30);font-weight:700;display:block;margin-bottom:6px;}
+.field-input{width:100%;background:rgba(255,255,255,.05);border:1px solid var(--border);
+  border-radius:10px;padding:11px 14px;color:var(--w);font-family:var(--mono);
+  font-size:13px;outline:none;transition:border-color .2s;-webkit-appearance:none;}
+.field-input:focus{border-color:rgba(10,132,255,.35);}
+.field-input::placeholder{color:var(--w30);}
+.field-select{width:100%;background:rgba(255,255,255,.05);border:1px solid var(--border);
+  border-radius:10px;padding:11px 14px;color:var(--w);font-family:var(--mono);font-size:13px;outline:none;cursor:pointer;}
+.field-select option{background:#111;}
+.field-textarea{width:100%;background:rgba(255,255,255,.05);border:1px solid var(--border);
+  border-radius:10px;padding:11px 14px;color:var(--w);font-family:var(--mono);
+  font-size:13px;outline:none;resize:vertical;min-height:80px;line-height:1.6;transition:border-color .2s;}
+.field-textarea:focus{border-color:rgba(10,132,255,.35);}
+.field-textarea::placeholder{color:var(--w30);}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+
+/* Skills pills */
+.skills-wrap{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;}
+.skill-pill{padding:6px 14px;background:rgba(10,132,255,.08);
+  border:0.5px solid rgba(10,132,255,.2);border-radius:100px;
+  font-size:11px;color:rgba(10,132,255,.8);cursor:pointer;transition:all .15s;
+  display:flex;align-items:center;gap:5px;}
+.skill-pill.active{background:rgba(10,132,255,.18);border-color:rgba(10,132,255,.4);color:var(--blue);}
+.skill-pill:hover{background:rgba(10,132,255,.14);}
+
+/* Availability */
+.avail-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px;}
+.avail-item{padding:10px;background:var(--w04);border:0.5px solid var(--border);
+  border-radius:10px;text-align:center;cursor:pointer;transition:all .15s;font-size:12px;color:var(--w50);}
+.avail-item.active{background:rgba(52,199,89,.08);border-color:rgba(52,199,89,.25);color:var(--green);}
+
+/* Charter */
+.charter-box{background:rgba(10,132,255,.04);border:1px solid rgba(10,132,255,.15);
+  border-radius:14px;padding:18px;margin-bottom:16px;}
+.charter-title{font-size:9px;letter-spacing:3px;color:rgba(10,132,255,.6);font-weight:700;margin-bottom:12px;}
+.charter-item{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;cursor:pointer;}
+.charter-item:last-child{margin-bottom:0;}
+.charter-check{width:18px;height:18px;border:1px solid var(--border);border-radius:4px;
+  background:var(--w04);display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;margin-top:1px;transition:all .15s;cursor:pointer;}
+.charter-check.checked{background:var(--blue);border-color:var(--blue);}
+.charter-check-icon{font-size:10px;display:none;}
+.charter-check.checked .charter-check-icon{display:block;color:#fff;font-weight:900;}
+.charter-text{font-size:12px;color:var(--w50);line-height:1.6;}
+.charter-text b{color:var(--w70);}
+
+.expiry-info{background:var(--w04);border:1px solid var(--border);border-radius:14px;padding:16px 18px;margin-bottom:16px;}
+.expiry-row{display:flex;align-items:center;justify-content:space-between;
+  padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:12px;}
+.expiry-row:last-child{border-bottom:none;}
+.exp-label{color:var(--w50);}
+.exp-green{color:var(--green);}
+.exp-orange{color:var(--orange);}
+.exp-red{color:var(--red);}
+
+.submit-btn{width:100%;padding:16px;background:var(--blue);color:#fff;
+  border:none;border-radius:12px;font-family:var(--font);font-size:14px;
+  font-weight:900;cursor:pointer;transition:opacity .15s;letter-spacing:.5px;}
+.submit-btn:hover{opacity:.88;}
+.submit-btn:disabled{opacity:.4;cursor:not-allowed;}
+
+.success-screen{display:none;text-align:center;padding:40px 20px;}
+.success-screen.show{display:block;}
+.success-hex{font-size:48px;margin-bottom:20px;animation:pop .4s cubic-bezier(.16,1,.3,1);}
+@keyframes pop{from{transform:scale(0)}to{transform:scale(1)}}
+.success-title{font-family:var(--font);font-size:24px;font-weight:900;color:var(--blue);margin-bottom:8px;}
+.success-sub{font-size:13px;color:var(--w50);line-height:1.8;margin-bottom:24px;}
+.talent-id{font-family:var(--mono);font-size:12px;color:var(--blue);
+  background:rgba(10,132,255,.08);border:1px solid rgba(10,132,255,.2);
+  border-radius:8px;padding:10px 16px;display:inline-block;margin-bottom:20px;letter-spacing:2px;}
+
+/* How it works */
+.how-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:32px;}
+.how-item{background:var(--w04);border:1px solid var(--border);border-radius:14px;padding:16px;}
+.how-num{font-family:var(--font);font-size:24px;font-weight:900;color:rgba(10,132,255,.3);margin-bottom:8px;}
+.how-title{font-size:11px;font-weight:700;color:var(--w70);margin-bottom:4px;font-family:var(--font);}
+.how-text{font-size:11px;color:var(--w30);line-height:1.6;}
+
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(6px);
+  background:rgba(8,8,14,.97);border:0.5px solid var(--w08);border-radius:100px;
+  padding:9px 20px;font-size:11px;color:var(--w70);opacity:0;transition:all .25s;
+  pointer-events:none;z-index:999;white-space:nowrap;}
+#toast.on{opacity:1;transform:translateX(-50%) translateY(0);}
+
+@media(max-width:580px){
+  .field-row{grid-template-columns:1fr;}
+  .how-grid{grid-template-columns:1fr;}
+  .avail-grid{grid-template-columns:1fr 1fr;}
+  .stats-row{flex-direction:column;}
+}
+</style>
+</head>
+<body>
+<div id="toast"></div>
+
+<header class="hdr">
+  <a href="https://vv-technologies.github.io/vv-nexus/" class="logo">VV</a>
+  <nav class="hdr-nav">
+    <a href="https://vv-technologies.github.io/vv-nexus/vv-now.html" class="hdr-link">VV NOW</a>
+    <a href="https://vv-technologies.github.io/vv-nexus/business-register.html" class="hdr-link">Business</a>
+    <a href="https://vv-technologies.github.io/ceo.html" class="hdr-link">VV Beta</a>
+  </nav>
+</header>
+
+<div class="main">
+
+  <div class="page-hero">
+    <div class="page-eye">VV TALENT · BETA</div>
+    <h1 class="page-title">Talentul tău.<br><span class="b">Găsit de cei care contează.</span></h1>
+    <p class="page-sub">Listează-te în ecosistemul VV. Agențiile și firmele locale te găsesc direct, fără intermediari, fără CV-uri trimise în gol. Anonim până decizi să răspunzi.</p>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-item">
+      <div class="stat-val" id="stat-talents">—</div>
+      <div class="stat-lbl">TALENTE ACTIVE</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-val" id="stat-firms">—</div>
+      <div class="stat-lbl">FIRME CĂUTĂTOARE</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-val">90</div>
+      <div class="stat-lbl">ZILE VALABILITATE</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-val">0€</div>
+      <div class="stat-lbl">COST BETA</div>
+    </div>
+  </div>
+
+  <div class="how-grid">
+    <div class="how-item"><div class="how-num">01</div><div class="how-title">Te listezi anonim</div><div class="how-text">Fără nume real. Firmele văd skillurile tale, nu identitatea.</div></div>
+    <div class="how-item"><div class="how-num">02</div><div class="how-title">Firmele te găsesc</div><div class="how-text">Agenții și angajatori caută în VV Talent după skill și disponibilitate.</div></div>
+    <div class="how-item"><div class="how-num">03</div><div class="how-title">Tu decizi dacă răspunzi</div><div class="how-text">Primești un cod VV. Dacă vrei să continui, tu îl trimiți firmei.</div></div>
+    <div class="how-item"><div class="how-num">04</div><div class="how-title">Profil activ 90 zile</div><div class="how-text">Actualizezi o dată la 3 luni sau profilul expiră automat.</div></div>
+  </div>
+
+  <div class="expiry-info">
+    <div class="expiry-row"><span class="exp-label">Profil activ</span><span class="exp-green">✓ Vizibil pentru angajatori</span></div>
+    <div class="expiry-row"><span class="exp-label">+30 zile fără update</span><span style="color:var(--w30)">Reminder automat trimis</span></div>
+    <div class="expiry-row"><span class="exp-label">+90 zile fără update</span><span style="color:var(--orange)">⏰ Marcat "Posibil indisponibil"</span></div>
+    <div class="expiry-row"><span class="exp-label">+120 zile</span><span style="color:var(--red)">✗ Șters automat din sistem</span></div>
+  </div>
+
+  <div id="form-section">
+
+    <div class="form-card">
+      <div class="section-label">PROFIL TALENT · ANONIM</div>
+
+      <div class="field">
+        <label class="field-label">ALIAS (pseudonim) *</label>
+        <input class="field-input" id="f-alias" type="text" placeholder="ex: Dev_Slobozia, Designer_X, Student_IT...">
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label class="field-label">DOMENIU PRINCIPAL *</label>
+          <select class="field-select" id="f-domain">
+            <option value="">Selectează...</option>
+            <option value="it-dev">💻 IT · Programare</option>
+            <option value="design">🎨 Design · UI/UX</option>
+            <option value="marketing">📣 Marketing · Social Media</option>
+            <option value="content">✍️ Content · Redactare</option>
+            <option value="foto-video">📸 Foto · Video</option>
+            <option value="finante">💰 Finanțe · Contabilitate</option>
+            <option value="juridic">⚖️ Juridic</option>
+            <option value="vanzari">🤝 Vânzări · Business Dev</option>
+            <option value="educatie">📚 Educație · Meditații</option>
+            <option value="sanatate">🏥 Sănătate</option>
+            <option value="meserii">🔧 Meserii · Tehnic</option>
+            <option value="altele">⬡ Altele</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="field-label">ORAȘ *</label>
+          <input class="field-input" id="f-city" type="text" placeholder="ex: Slobozia, București...">
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label">NIVEL EXPERIENȚĂ</label>
+        <select class="field-select" id="f-level">
+          <option value="student">🎓 Student / Începător</option>
+          <option value="junior">⬡ Junior (1-2 ani)</option>
+          <option value="mid">⬡⬡ Mid-Level (3-5 ani)</option>
+          <option value="senior">⬡⬡⬡ Senior (5+ ani)</option>
+          <option value="expert">💎 Expert / Specialist</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label class="field-label">SKILLS PRINCIPALE (selectează)</label>
+        <div class="skills-wrap" id="skills-wrap">
+          <div class="skill-pill" onclick="toggleSkill(this,'React')">React</div>
+          <div class="skill-pill" onclick="toggleSkill(this,'Node.js')">Node.js</div>
+          <div class="skill-pill" onclick="toggleSkill(this,'Python')">Python</div>
+          <div class="skill-pill" onclick="toggleSkill(this,'Figma')">Figma</div>
+          <div class="skill-pill" onclick="toggleSkill(this,'Photoshop')">Photoshop</div>
+          <div class="skill-pill" onclick="toggleSkill(this,'WordPress')">WordPress</div>
+          <div class="skill-pill" onclick="toggleSkill(this,'SEO')">SEO</div>
+          <div class="skill-pill" onclick="toggleSkill(this,'Instagram')">Instagram</div>
+          <div class="skill-pill" onclick="toggleSkill(this,'TikTok')">TikTok</div>
+          <div class="skill-pill" onclick="toggleSkill(this,'Excel')">Excel</div>
+          <div class="skill-pill" onclick="toggleSkill(this,'Contabilitate')">Contabilitate</div>
+          <div class="skill-pill" onclick="toggleSkill(this,'Drept civil')">Drept civil</div>
+          <div class="skill-pill" onclick="toggleSkill(this,'Foto')">Foto</div>
+          <div class="skill-pill" onclick="toggleSkill(this,'Video editing')">Video editing</div>
+          <div class="skill-pill" onclick="toggleSkill(this,'Firebase')">Firebase</div>
+          <div class="skill-pill" onclick="toggleSkill(this,'HTML/CSS')">HTML/CSS</div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label">ALTE SKILLS (liber)</label>
+        <input class="field-input" id="f-skills-custom" type="text" placeholder="ex: AutoCAD, Română nativă, Permis B...">
+      </div>
+
+      <div class="field">
+        <label class="field-label">CE POT FACE PENTRU TINE</label>
+        <textarea class="field-textarea" id="f-desc" placeholder="Descrie pe scurt ce poți oferi. Proiecte relevante, ce problemă rezolvi..."></textarea>
+      </div>
+
+      <div class="field">
+        <label class="field-label">DISPONIBILITATE</label>
+        <div class="avail-grid">
+          <div class="avail-item" onclick="toggleAvail(this,'full-time')" data-val="full-time">Full-time</div>
+          <div class="avail-item" onclick="toggleAvail(this,'part-time')" data-val="part-time">Part-time</div>
+          <div class="avail-item" onclick="toggleAvail(this,'freelance')" data-val="freelance">Freelance</div>
+          <div class="avail-item" onclick="toggleAvail(this,'remote')" data-val="remote">Remote</div>
+          <div class="avail-item" onclick="toggleAvail(this,'internship')" data-val="internship">Internship</div>
+          <div class="avail-item" onclick="toggleAvail(this,'proiecte')" data-val="proiecte">Proiecte</div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label">EXPECTANȚĂ SALARIALĂ (opțional)</label>
+        <input class="field-input" id="f-salary" type="text" placeholder="ex: 3000-5000 RON / negociabil...">
+      </div>
+    </div>
+
+    <div class="charter-box">
+      <div class="charter-title">VV CHARTER · TERMENI TALENT</div>
+
+      <div class="charter-item" onclick="toggleCheck('c1')">
+        <div class="charter-check" id="c1"><span class="charter-check-icon">✓</span></div>
+        <div class="charter-text"><b>Anonimat complet.</b> Nu îmi stochez date personale (CNP, buletin, adresă) în VV. Contactul se face prin codul VV Talent.</div>
+      </div>
+
+      <div class="charter-item" onclick="toggleCheck('c2')">
+        <div class="charter-check" id="c2"><span class="charter-check-icon">✓</span></div>
+        <div class="charter-text"><b>Informații corecte.</b> Skillurile și experiența declarate sunt reale. VV Charter ART-3 se aplică — informații false duc la suspendarea profilului.</div>
+      </div>
+
+      <div class="charter-item" onclick="toggleCheck('c3')">
+        <div class="charter-check" id="c3"><span class="charter-check-icon">✓</span></div>
+        <div class="charter-text"><b>Înțeleg expirarea.</b> Profilul se șterge automat după 120 zile fără actualizare.</div>
+      </div>
+    </div>
+
+    <button class="submit-btn" id="submit-btn" onclick="submitTalent()">⬡ ACTIVEAZĂ PROFILUL TALENT</button>
+  </div>
+
+  <div class="success-screen" id="success-screen">
+    <div class="success-hex">⬡</div>
+    <div class="success-title">Profil Activat</div>
+    <div class="success-sub">Profilul tău este acum în ecosistemul VV. Angajatorii și agențiile locale te pot găsi după skilluri.</div>
+    <div class="talent-id" id="talent-id-display">VV·TALENT·——</div>
+    <div class="success-sub" style="font-size:12px;margin-bottom:20px">Acesta e codul tău. Dacă un angajator te contactează prin VV, tu îi confirmi cu acest cod.</div>
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+      <button onclick="shareTalent()"
+        style="padding:12px 20px;background:var(--blue);color:#fff;border:none;border-radius:10px;font-family:var(--font);font-size:12px;font-weight:800;cursor:pointer;">
+        📲 Distribuie profilul
+      </button>
+      <a href="https://vv-technologies.github.io/vv-nexus/vv-now.html"
+        style="padding:12px 20px;background:var(--w04);border:0.5px solid var(--border);color:var(--w70);border-radius:10px;font-family:var(--mono);font-size:12px;text-decoration:none;display:flex;align-items:center;">
+        VV NOW →
+      </a>
+    </div>
+  </div>
+
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script>
+if (!firebase.apps.length) {
+  firebase.initializeApp({
+    apiKey:"AIzaSyDGv4kEClO0RHCLvXVLOT-vyPHw6bsxYVc",
+    authDomain:"vv-ep-beta.firebaseapp.com",
+    projectId:"vv-ep-beta"
+  });
+}
+var db = firebase.firestore();
+var _talentId = null;
+var _selectedSkills = [];
+var _selectedAvail = [];
+
+async function loadStats() {
+  try {
+    var [talents, firms] = await Promise.all([
+      db.collection('vv_talents').where('status','==','active').get(),
+      db.collection('verified_nodes').where('status','==','active').get()
+    ]);
+    document.getElementById('stat-talents').textContent = talents.size;
+    document.getElementById('stat-firms').textContent = firms.size;
+  } catch(e) {}
+}
+
+function toggleSkill(el, skill) {
+  el.classList.toggle('active');
+  if (el.classList.contains('active')) {
+    if (!_selectedSkills.includes(skill)) _selectedSkills.push(skill);
+  } else {
+    _selectedSkills = _selectedSkills.filter(function(s){ return s !== skill; });
+  }
+}
+
+function toggleAvail(el, val) {
+  el.classList.toggle('active');
+  if (el.classList.contains('active')) {
+    if (!_selectedAvail.includes(val)) _selectedAvail.push(val);
+  } else {
+    _selectedAvail = _selectedAvail.filter(function(v){ return v !== val; });
+  }
+}
+
+function toggleCheck(id) {
+  document.getElementById(id).classList.toggle('checked');
+}
+
+function allChecked() {
+  return ['c1','c2','c3'].every(function(id){
+    return document.getElementById(id).classList.contains('checked');
+  });
+}
+
+function genTalentId() {
+  var chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  var p = '';
+  for (var i=0;i<6;i++) p += chars[Math.floor(Math.random()*chars.length)];
+  return 'VV·TALENT·' + p;
+}
+
+async function submitTalent() {
+  var alias = document.getElementById('f-alias').value.trim();
+  var domain = document.getElementById('f-domain').value;
+  var city = document.getElementById('f-city').value.trim();
+  var level = document.getElementById('f-level').value;
+  var desc = document.getElementById('f-desc').value.trim();
+  var salary = document.getElementById('f-salary').value.trim();
+  var customSkills = document.getElementById('f-skills-custom').value.trim();
+
+  if (!alias || !domain || !city) {
+    showToast('Completează: Alias, Domeniu și Oraș'); return;
+  }
+  if (!allChecked()) {
+    showToast('Bifează toți termenii VV Charter'); return;
+  }
+
+  var allSkills = _selectedSkills.concat(
+    customSkills ? customSkills.split(',').map(function(s){return s.trim();}).filter(Boolean) : []
+  );
+
+  var btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.textContent = 'Se activează...';
+
+  try {
+    _talentId = genTalentId();
+    var now = firebase.firestore.FieldValue.serverTimestamp();
+
+    await db.collection('vv_talents').add({
+      talentId: _talentId,
+      alias, domain, city: city.toLowerCase(), cityDisplay: city,
+      level, description: desc || null,
+      skills: allSkills,
+      availability: _selectedAvail,
+      salaryExpectation: salary || null,
+      status: 'active',
+      charterAccepted: true,
+      createdAt: now,
+      lastUpdated: now,
+      warnAt: firebase.firestore.Timestamp.fromDate(new Date(Date.now()+30*24*60*60*1000)),
+      notifyAt: firebase.firestore.Timestamp.fromDate(new Date(Date.now()+90*24*60*60*1000)),
+      deleteAt: firebase.firestore.Timestamp.fromDate(new Date(Date.now()+120*24*60*60*1000))
+    });
+
+    await db.collection('inbox').add({
+      to: 'CEO', from: _talentId, type: 'new_talent',
+      message: '⬡ Nou Talent: ' + alias + ' · ' + domain + ' · ' + city,
+      talentId: _talentId, read: false, createdAt: now
+    });
+
+    db.collection('vvhi_dataset').add({
+      action: 'TALENT_REGISTERED',
+      context: { domain, city: city.toLowerCase(), level, skillsCount: allSkills.length },
+      timestamp: now
+    }).catch(function(){});
+
+    document.getElementById('form-section').style.display = 'none';
+    document.getElementById('success-screen').classList.add('show');
+    document.getElementById('talent-id-display').textContent = _talentId;
+    showToast('⬡ Profil activat!');
+
+  } catch(e) {
+    btn.disabled = false;
+    btn.textContent = '⬡ ACTIVEAZĂ PROFILUL TALENT';
+    showToast('Eroare: ' + e.message);
+  }
+}
+
+function shareTalent() {
+  var domain = document.getElementById('f-domain').value;
+  var city = document.getElementById('f-city').value;
+  var text = 'M-am listat pe VV Talent — platforma unde talentele din ' + city +
+    ' sunt găsite de angajatori fără CV-uri în gol. ' +
+    'Te înscrii și tu: vv-technologies.github.io/vv-nexus/talent-register.html';
+  if (navigator.share) {
+    navigator.share({ text });
+  } else {
+    window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
+  }
+}
+
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('on');
+  clearTimeout(t._t); t._t = setTimeout(function(){ t.classList.remove('on'); }, 3500);
+}
+
+loadStats();
+</script>
+</body>
+</html>
