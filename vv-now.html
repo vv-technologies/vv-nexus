@@ -6,389 +6,328 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#000">
 <title>VV NOW</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
-  --gold:#D4AF37;
-  --gold-soft:rgba(212,175,55,0.15);
-  --gold-b:rgba(212,175,55,0.2);
-  --white:#fff;
-  --w70:rgba(255,255,255,0.7);
-  --w40:rgba(255,255,255,0.4);
-  --w20:rgba(255,255,255,0.2);
-  --w10:rgba(255,255,255,0.1);
-  --w06:rgba(255,255,255,0.06);
-  --w03:rgba(255,255,255,0.03);
-  --border:rgba(255,255,255,0.08);
-  --green:#34c759;
-  --font:'Syne',sans-serif;
-  --body:'DM Sans',sans-serif;
+  --gold:#D4AF37;--gold2:rgba(212,175,55,.12);--gold-b:rgba(212,175,55,.22);
+  --w:#fff;--w70:rgba(255,255,255,.7);--w50:rgba(255,255,255,.5);
+  --w30:rgba(255,255,255,.3);--w15:rgba(255,255,255,.15);
+  --w08:rgba(255,255,255,.08);--w04:rgba(255,255,255,.04);
+  --border:rgba(255,255,255,.07);
+  --green:#34c759;--blue:#0A84FF;--orange:#FF9500;--red:#ff3b30;
+  --font:'Syne',sans-serif;--body:'DM Sans',sans-serif;
+  /* Layer colors */
+  --c-access:rgba(10,132,255,.7);
+  --c-urgent:rgba(255,149,0,.7);
+  --c-biz:rgba(212,175,55,.7);
+  --c-safe:rgba(52,199,89,.7);
 }
-html,body{
-  min-height:100vh;
-  background:#000;
-  color:var(--white);
-  font-family:var(--body);
-  -webkit-font-smoothing:antialiased;
-  overflow-x:hidden;
-}
+html,body{min-height:100vh;background:#000;color:var(--w);
+  font-family:var(--body);-webkit-font-smoothing:antialiased;overflow-x:hidden;}
 
 /* ── HEADER ── */
 .hdr{
-  position:fixed;top:0;left:0;right:0;
-  z-index:100;
-  padding:16px 28px;
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  padding:14px 28px;
   display:flex;align-items:center;justify-content:space-between;
+  transition:background .3s;
 }
-.hdr-logo{
-  font-family:var(--font);font-weight:900;
-  font-size:17px;letter-spacing:6px;color:var(--gold);
-  text-decoration:none;
-  display:flex;align-items:center;gap:6px;
-}
-.hdr-logo span{
-  font-size:9px;letter-spacing:2px;color:var(--w40);
+.hdr.solid{background:rgba(0,0,0,.9);backdrop-filter:blur(24px);border-bottom:1px solid var(--border);}
+.logo{font-family:var(--font);font-weight:900;font-size:17px;
+  letter-spacing:6px;color:var(--gold);text-decoration:none;
+  display:flex;align-items:center;gap:7px;}
+.logo-sub{font-size:9px;letter-spacing:2px;color:var(--w30);
   font-family:var(--body);font-weight:400;
-  border-left:1px solid var(--border);padding-left:8px;
-}
-.hdr-nav{display:flex;gap:8px;}
-.hdr-link{
-  padding:6px 14px;background:var(--w06);border:0.5px solid var(--border);
-  border-radius:20px;font-size:11px;color:var(--w40);
-  text-decoration:none;transition:all .15s;
-}
-.hdr-link:hover{color:var(--w70);background:var(--w10);}
+  border-left:1px solid var(--border);padding-left:8px;}
+.hdr-right{display:flex;align-items:center;gap:8px;}
+.hdr-link{padding:5px 12px;background:var(--w04);border:0.5px solid var(--border);
+  border-radius:100px;font-size:11px;color:var(--w30);text-decoration:none;transition:all .15s;}
+.hdr-link:hover{color:var(--w70);background:var(--w08);}
+.back-btn{display:none;align-items:center;gap:5px;padding:5px 12px;
+  background:var(--w04);border:0.5px solid var(--border);border-radius:100px;
+  font-size:11px;color:var(--w30);cursor:pointer;transition:all .15s;font-family:var(--body);}
+.back-btn:hover{color:var(--w70);background:var(--w08);}
+.back-btn.show{display:flex;}
 
-/* ── HERO — bara singura pe ecran ── */
+/* ── HERO ── */
 .hero{
-  min-height:100vh;
-  display:flex;flex-direction:column;
+  min-height:100vh;display:flex;flex-direction:column;
   align-items:center;justify-content:center;
-  padding:80px 24px;
-  transition:all .4s cubic-bezier(.16,1,.3,1);
+  padding:80px 24px 60px;
+  transition:all .5s cubic-bezier(.16,1,.3,1);
 }
-.hero.compact{
-  min-height:auto;
-  padding:90px 24px 20px;
-  justify-content:flex-start;
-}
-
-/* Hexagon mic, discret */
-.logo-mark{
-  width:48px;height:48px;
-  border-radius:50%;
+.hero.compact{min-height:auto;padding:80px 24px 16px;justify-content:flex-start;}
+.hex{
+  width:44px;height:44px;border-radius:50%;
   border:1px solid rgba(212,175,55,.2);
   display:flex;align-items:center;justify-content:center;
-  font-size:18px;margin-bottom:28px;
+  font-size:17px;margin-bottom:24px;
   background:rgba(212,175,55,.04);
-  transition:all .4s;
+  animation:hexBreath 4s ease-in-out infinite;
 }
-.hero.compact .logo-mark{display:none;}
-
+.hero.compact .hex{display:none;}
+@keyframes hexBreath{0%,100%{border-color:rgba(212,175,55,.2)}50%{border-color:rgba(212,175,55,.4)}}
 .hero-title{
-  font-family:var(--font);
-  font-size:clamp(28px,4vw,48px);
-  font-weight:900;letter-spacing:-1px;
-  text-align:center;margin-bottom:8px;
-  line-height:1.1;
-  transition:all .4s;
+  font-family:var(--font);font-size:clamp(26px,4vw,50px);
+  font-weight:900;letter-spacing:-1px;text-align:center;
+  line-height:1.05;margin-bottom:8px;
 }
 .hero.compact .hero-title{display:none;}
 .hero-title .g{color:var(--gold);}
-
-.hero-sub{
-  font-size:15px;color:var(--w40);
-  text-align:center;margin-bottom:36px;
-  font-weight:300;
-  transition:all .4s;
-}
+.hero-sub{font-size:14px;color:var(--w30);text-align:center;
+  margin-bottom:32px;font-weight:300;}
 .hero.compact .hero-sub{display:none;}
 
-/* Search bar — PRINCIPALA */
-.search-wrap{
-  width:100%;max-width:600px;
-  position:relative;
-}
+/* ── SEARCH BAR ── */
+.search-wrap{width:100%;max-width:580px;position:relative;}
 .search-input{
-  width:100%;
-  background:rgba(255,255,255,0.06);
-  border:1px solid rgba(212,175,55,0.25);
-  border-radius:100px;
-  padding:18px 64px 18px 28px;
-  color:var(--white);
-  font-family:var(--body);font-size:16px;font-weight:400;
-  outline:none;
-  transition:all .25s;
-  -webkit-appearance:none;
+  width:100%;background:rgba(255,255,255,.06);
+  border:1px solid rgba(212,175,55,.22);border-radius:100px;
+  padding:16px 58px 16px 24px;color:var(--w);
+  font-family:var(--body);font-size:15px;font-weight:400;
+  outline:none;transition:all .25s;-webkit-appearance:none;
 }
-.search-input::placeholder{color:var(--w40);}
-.search-input:focus{
-  border-color:rgba(212,175,55,.5);
-  background:rgba(255,255,255,.08);
-}
+.search-input::placeholder{color:var(--w30);}
+.search-input:focus{border-color:rgba(212,175,55,.45);background:rgba(255,255,255,.08);}
 .search-go{
   position:absolute;right:6px;top:50%;transform:translateY(-50%);
-  width:46px;height:46px;
-  background:var(--gold);color:#000;
+  width:42px;height:42px;background:var(--gold);color:#000;
   border:none;border-radius:50%;cursor:pointer;
   display:flex;align-items:center;justify-content:center;
-  font-size:18px;transition:opacity .15s;
+  font-size:17px;transition:opacity .15s;
 }
 .search-go:active{opacity:.8;}
 
-/* Sugestii */
+/* ── LAYERS — filtre contextuale ── */
+.layers{
+  display:flex;gap:8px;margin-top:16px;flex-wrap:wrap;justify-content:center;
+  max-width:580px;transition:all .3s;
+}
+.hero.compact .layers{justify-content:flex-start;}
+.layer{
+  display:flex;align-items:center;gap:6px;
+  padding:6px 14px;
+  background:var(--w04);border:0.5px solid var(--border);
+  border-radius:100px;font-size:11px;color:var(--w30);
+  cursor:pointer;transition:all .2s;font-weight:500;
+  position:relative;
+}
+.layer:hover{background:var(--w08);color:var(--w70);}
+.layer.active{color:var(--w);border-color:var(--layer-color,var(--gold));}
+.layer.active{background:rgba(var(--layer-rgb,.2),0.12);}
+.layer-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;}
+.l-access .layer-dot{background:var(--c-access);}
+.l-access.active{border-color:rgba(10,132,255,.4);background:rgba(10,132,255,.08);color:var(--c-access);}
+.l-urgent .layer-dot{background:var(--c-urgent);}
+.l-urgent.active{border-color:rgba(255,149,0,.4);background:rgba(255,149,0,.08);color:var(--c-urgent);}
+.l-biz .layer-dot{background:var(--c-biz);}
+.l-biz.active{border-color:rgba(212,175,55,.4);background:rgba(212,175,55,.08);color:var(--c-biz);}
+.l-safe .layer-dot{background:var(--c-safe);}
+.l-safe.active{border-color:rgba(52,199,89,.4);background:rgba(52,199,89,.08);color:var(--c-safe);}
+
+/* Sugestii rapide */
 .suggestions{
   display:flex;gap:8px;flex-wrap:wrap;
-  justify-content:center;margin-top:20px;
-  max-width:600px;
-  transition:all .4s;
+  justify-content:center;margin-top:16px;max-width:580px;
 }
 .hero.compact .suggestions{display:none;}
-.sug{
-  padding:7px 16px;
-  background:var(--w03);border:0.5px solid var(--border);
-  border-radius:100px;font-size:12px;color:var(--w40);
-  cursor:pointer;transition:all .15s;
-}
-.sug:hover{background:var(--gold-soft);border-color:var(--gold-b);color:var(--gold);}
+.sug{padding:6px 14px;background:var(--w04);border:0.5px solid var(--border);
+  border-radius:100px;font-size:12px;color:var(--w30);
+  cursor:pointer;transition:all .15s;}
+.sug:hover{background:var(--gold2);border-color:var(--gold-b);color:var(--gold);}
 
 /* Istoric */
-.history{
-  margin-top:28px;width:100%;max-width:500px;
-  transition:all .4s;
-}
+.history{margin-top:24px;width:100%;max-width:500px;}
 .hero.compact .history{display:none;}
-.hist-label{
-  font-size:10px;color:var(--w20);letter-spacing:2px;
-  text-align:center;margin-bottom:10px;
-}
-.hist-list{display:flex;flex-direction:column;gap:4px;}
-.hist-item{
-  display:flex;align-items:center;gap:10px;
-  padding:10px 16px;
-  background:var(--w03);border:0.5px solid var(--border);
-  border-radius:12px;cursor:pointer;transition:all .15s;
-}
-.hist-item:hover{background:var(--w06);border-color:var(--w10);}
-.hist-q{flex:1;font-size:13px;color:var(--w40);}
-.hist-t{font-size:11px;color:var(--w20);}
+.hist-label{font-size:9px;color:var(--w15);letter-spacing:2px;text-align:center;margin-bottom:8px;}
+.hist-list{display:flex;flex-direction:column;gap:3px;}
+.hist-item{display:flex;align-items:center;gap:10px;padding:9px 14px;
+  background:var(--w04);border:0.5px solid var(--border);
+  border-radius:10px;cursor:pointer;transition:all .15s;}
+.hist-item:hover{background:var(--w08);}
+.hist-q{flex:1;font-size:12px;color:var(--w30);}
+.hist-layer{font-size:9px;padding:2px 7px;border-radius:100px;
+  background:var(--w04);color:var(--w30);}
+.hist-t{font-size:10px;color:var(--w15);}
 
-/* ── RESULTS — card simplu, uman ── */
-.results{
-  width:100%;max-width:640px;
-  margin:0 auto;
-  padding:0 24px 80px;
-  display:none;
-}
+/* ── RESULTS ── */
+.results{width:100%;max-width:620px;margin:0 auto;padding:0 24px 80px;display:none;}
 .results.show{display:block;}
 
-/* Nexus answer — principalul card */
+/* Loading */
+.load-line{position:fixed;top:0;left:0;right:0;height:2px;z-index:999;display:none;}
+.load-line.on{display:block;}
+.load-fill{height:100%;background:linear-gradient(90deg,var(--gold),rgba(212,175,55,.2));
+  animation:ldAnim 1.4s ease-in-out infinite;}
+@keyframes ldAnim{0%{width:0;margin-left:0}50%{width:65%;margin-left:18%}100%{width:0;margin-left:100%}}
+
+/* Answer card */
 .answer-card{
-  background:rgba(255,255,255,.04);
-  border:0.5px solid rgba(255,255,255,.1);
-  border-radius:20px;
-  padding:24px 26px;
-  margin-bottom:12px;
-  animation:fadeUp .4s cubic-bezier(.16,1,.3,1);
+  background:rgba(255,255,255,.04);border:0.5px solid rgba(255,255,255,.1);
+  border-radius:18px;padding:22px 24px;margin-bottom:10px;
+  animation:fadeUp .35s cubic-bezier(.16,1,.3,1) both;
 }
-@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.answer-card:nth-child(2){animation-delay:.05s}
+.answer-card:nth-child(3){animation-delay:.1s}
+.answer-card:nth-child(4){animation-delay:.15s}
 
-.answer-source{
-  display:flex;align-items:center;gap:6px;
-  font-size:10px;color:var(--w20);
-  letter-spacing:1px;margin-bottom:12px;
-}
-.answer-dot{
-  width:6px;height:6px;border-radius:50%;
-  background:var(--gold);
-}
-.answer-text{
-  font-size:16px;color:var(--w70);
-  line-height:1.75;font-weight:400;
-}
-.answer-text strong{color:var(--white);font-weight:500;}
+.card-source{display:flex;align-items:center;gap:6px;
+  font-size:9px;color:var(--w30);letter-spacing:1.5px;margin-bottom:10px;}
+.src-dot{width:5px;height:5px;border-radius:50%;}
+.src-gold{background:var(--gold);}
+.src-green{background:var(--green);}
+.src-blue{background:var(--blue);}
+.src-orange{background:var(--orange);}
 
-/* Location card */
-.loc-card{
-  background:var(--w03);
-  border:0.5px solid rgba(212,175,55,.15);
-  border-radius:20px;
-  padding:20px 24px;
-  margin-bottom:12px;
-  animation:fadeUp .4s cubic-bezier(.16,1,.3,1) .06s both;
-}
-.loc-name{
-  font-family:var(--font);font-size:18px;font-weight:800;
-  margin-bottom:4px;
-}
-.loc-addr{font-size:13px;color:var(--w40);margin-bottom:14px;}
+.answer-text{font-size:15px;color:var(--w70);line-height:1.75;font-weight:400;}
+.answer-text strong{color:var(--w);font-weight:500;}
 
-/* VERIFY — buton central, clar */
+/* Loc card */
+.loc-name{font-family:var(--font);font-size:17px;font-weight:800;margin-bottom:3px;}
+.loc-addr{font-size:12px;color:var(--w30);margin-bottom:14px;}
+
+/* Data badge */
+.data-badge{display:inline-flex;align-items:center;gap:5px;
+  padding:3px 10px;border-radius:100px;font-size:10px;font-weight:500;margin-bottom:10px;}
+.db-fresh{background:rgba(52,199,89,.08);border:0.5px solid rgba(52,199,89,.2);color:var(--green);}
+.db-old{background:rgba(255,149,0,.08);border:0.5px solid rgba(255,149,0,.2);color:var(--orange);}
+.db-none{background:var(--w04);border:0.5px solid var(--border);color:var(--w30);}
+
+/* Proof items */
+.proof-item{padding:10px 0;border-bottom:0.5px solid var(--border);
+  font-size:13px;color:var(--w70);line-height:1.6;}
+.proof-item:last-child{border-bottom:none;}
+.proof-meta{font-size:11px;color:var(--w30);margin-top:2px;}
+
+/* VERIFY button */
 .verify-btn{
-  display:flex;align-items:center;gap:10px;
-  width:100%;padding:14px 20px;
-  background:rgba(212,175,55,.1);
-  border:0.5px solid rgba(212,175,55,.3);
-  border-radius:14px;cursor:pointer;
-  transition:all .2s;
-  font-family:var(--body);
+  display:flex;align-items:center;gap:10px;width:100%;
+  padding:13px 18px;background:rgba(212,175,55,.08);
+  border:0.5px solid rgba(212,175,55,.25);border-radius:12px;
+  cursor:pointer;transition:all .2s;font-family:var(--body);
+  text-align:left;
 }
-.verify-btn:hover{background:rgba(212,175,55,.16);}
-.verify-btn-icon{font-size:16px;}
-.verify-btn-text{flex:1;text-align:left;}
-.verify-btn-title{font-size:13px;font-weight:500;color:var(--gold);display:block;}
-.verify-btn-sub{font-size:11px;color:var(--w40);display:block;margin-top:1px;}
-.verify-btn-arrow{font-size:14px;color:var(--w20);}
+.verify-btn:hover{background:rgba(212,175,55,.14);}
+.verify-btn.done{opacity:.5;pointer-events:none;}
+.vb-icon{font-size:15px;flex-shrink:0;}
+.vb-body{flex:1;}
+.vb-title{font-size:13px;font-weight:500;color:var(--gold);display:block;}
+.vb-sub{font-size:11px;color:var(--w30);display:block;margin-top:1px;}
+.vb-arrow{font-size:13px;color:var(--w15);}
 
-/* Status dupa VERIFY */
-.verify-status{
-  display:none;
-  align-items:center;gap:10px;
-  padding:12px 16px;margin-top:10px;
-  background:rgba(52,199,89,.06);
-  border:0.5px solid rgba(52,199,89,.2);
-  border-radius:12px;
-  font-size:13px;color:var(--green);
-}
-.verify-status.show{display:flex;}
-.status-pulse{
-  width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0;
-  animation:sp 1.2s ease-in-out infinite;
-}
-@keyframes sp{0%,100%{opacity:1}50%{opacity:.2}}
+/* Status Flash */
+.flash-status{display:none;align-items:center;gap:8px;
+  margin-top:8px;padding:10px 14px;
+  background:rgba(52,199,89,.05);border:0.5px solid rgba(52,199,89,.18);
+  border-radius:10px;font-size:12px;color:var(--green);}
+.flash-status.on{display:flex;}
+.fp{width:7px;height:7px;border-radius:50%;background:var(--green);flex-shrink:0;
+  animation:fp 1.1s ease-in-out infinite;}
+@keyframes fp{0%,100%{opacity:1}50%{opacity:.2}}
 
-/* Geo blocked */
-.geo-note{
-  padding:12px 16px;margin-top:10px;
-  background:rgba(255,149,0,.06);border:0.5px solid rgba(255,149,0,.15);
-  border-radius:12px;font-size:12px;color:rgba(255,149,0,.7);
-}
+/* Pills — sugestii discrete dupa search */
+.pills{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+.pill{padding:5px 12px;background:var(--w04);border:0.5px solid var(--border);
+  border-radius:100px;font-size:11px;color:var(--w30);cursor:pointer;transition:all .15s;}
+.pill:hover{background:var(--gold2);border-color:var(--gold-b);color:var(--gold);}
 
-/* Context card — mic, discret, ultimul */
-.context-card{
-  background:var(--w03);border:0.5px solid var(--border);
-  border-radius:16px;padding:16px 20px;
-  margin-bottom:12px;
-  animation:fadeUp .4s cubic-bezier(.16,1,.3,1) .12s both;
-  font-size:13px;color:var(--w40);line-height:1.7;
+/* Layer indicator pe card */
+.layer-badge{display:inline-flex;align-items:center;gap:4px;
+  padding:2px 8px;border-radius:100px;font-size:9px;font-weight:600;
+  letter-spacing:1px;margin-bottom:8px;}
+.lb-access{background:rgba(10,132,255,.08);border:0.5px solid rgba(10,132,255,.2);color:var(--c-access);}
+.lb-urgent{background:rgba(255,149,0,.08);border:0.5px solid rgba(255,149,0,.2);color:var(--c-urgent);}
+.lb-biz{background:rgba(212,175,55,.08);border:0.5px solid rgba(212,175,55,.2);color:var(--c-biz);}
+.lb-safe{background:rgba(52,199,89,.08);border:0.5px solid rgba(52,199,89,.2);color:var(--c-safe);}
+
+/* Premium note */
+.premium-note{
+  margin-top:8px;padding:11px 16px;
+  background:var(--w04);border:0.5px solid var(--border);
+  border-radius:12px;display:flex;align-items:center;
+  justify-content:space-between;gap:10px;
+  font-size:11px;color:var(--w30);
 }
+.premium-note b{color:var(--gold);font-size:11px;white-space:nowrap;}
 
 /* Blocked */
-.blocked-card{
-  background:rgba(255,59,48,.04);border:0.5px solid rgba(255,59,48,.12);
-  border-radius:20px;padding:24px 26px;
-  animation:fadeUp .4s cubic-bezier(.16,1,.3,1);
-}
-.blocked-text{font-size:15px;color:rgba(255,59,48,.6);line-height:1.7;}
-
-/* Loading — bara subtila */
-.load-line{
-  position:fixed;top:0;left:0;right:0;height:2px;
-  background:transparent;z-index:999;display:none;
-}
-.load-line.on{display:block;}
-.load-fill{
-  height:100%;
-  background:linear-gradient(90deg,var(--gold),rgba(212,175,55,.3));
-  animation:ldLine 1.4s ease-in-out infinite;
-}
-@keyframes ldLine{0%{width:0;margin-left:0}50%{width:70%;margin-left:15%}100%{width:0;margin-left:100%}}
+.blocked-card{background:rgba(255,59,48,.03);border:0.5px solid rgba(255,59,48,.1);
+  border-radius:18px;padding:22px 24px;animation:fadeUp .35s cubic-bezier(.16,1,.3,1);}
+.blocked-text{font-size:14px;color:rgba(255,59,48,.5);line-height:1.7;}
 
 /* Toast */
-#toast{
-  position:fixed;bottom:24px;left:50%;
+#toast{position:fixed;bottom:24px;left:50%;
   transform:translateX(-50%) translateY(6px);
-  background:rgba(10,10,14,.96);
-  border:0.5px solid var(--w10);border-radius:100px;
-  padding:10px 22px;font-size:12px;color:var(--w70);
-  opacity:0;transition:all .25s;pointer-events:none;z-index:999;
-  white-space:nowrap;
-}
+  background:rgba(8,8,14,.97);border:0.5px solid var(--w08);
+  border-radius:100px;padding:9px 20px;font-size:11px;color:var(--w50);
+  opacity:0;transition:all .25s;pointer-events:none;z-index:999;white-space:nowrap;}
 #toast.on{opacity:1;transform:translateX(-50%) translateY(0);}
 
-/* Mobile */
+/* Responsive */
 @media(max-width:600px){
-  .hdr{padding:12px 16px;}
+  .hdr{padding:10px 16px;}
+  .hdr-right .hdr-link{display:none;}
   .hero-title{font-size:26px;}
-  .search-input{font-size:15px;padding:16px 56px 16px 20px;}
-  .hdr-nav{display:none;}
+  .search-input{font-size:14px;padding:14px 52px 14px 18px;}
 }
-
-/* Back button */
-.back-btn{
-  display:none;position:fixed;top:16px;left:20px;z-index:200;
-  align-items:center;gap:6px;padding:7px 14px;
-  background:rgba(255,255,255,0.06);border:0.5px solid rgba(255,255,255,0.1);
-  border-radius:100px;font-size:12px;color:rgba(255,255,255,0.5);
-  cursor:pointer;transition:all .15s;font-family:var(--body);
-}
-.back-btn:hover{background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.8);}
-.back-btn.show{display:flex;}
-.data-badge{
-  display:inline-flex;align-items:center;gap:5px;
-  padding:3px 10px;border-radius:100px;
-  font-size:10px;font-weight:500;margin-bottom:12px;
-}
-.db-fresh{background:rgba(52,199,89,.08);border:0.5px solid rgba(52,199,89,.2);color:#34c759;}
-.db-old{background:rgba(255,149,0,.08);border:0.5px solid rgba(255,149,0,.2);color:#FF9500;}
-.db-none{background:rgba(255,255,255,.04);border:0.5px solid rgba(255,255,255,.08);color:rgba(255,255,255,.4);}
-.proof-item{padding:10px 0;border-bottom:0.5px solid rgba(255,255,255,.06);font-size:13px;color:rgba(255,255,255,.7);line-height:1.6;}
-.proof-item:last-child{border-bottom:none;}
-.proof-meta{font-size:11px;color:rgba(255,255,255,.35);margin-top:2px;}
-.also-search{margin-top:8px;display:flex;flex-wrap:wrap;gap:6px;}
-.also-item{padding:6px 12px;background:rgba(255,255,255,.03);border:0.5px solid rgba(255,255,255,.08);border-radius:100px;font-size:11px;color:rgba(255,255,255,.4);cursor:pointer;transition:all .15s;}
-.also-item:hover{background:rgba(212,175,55,.1);border-color:rgba(212,175,55,.2);color:#D4AF37;}
-.premium-note{margin-top:8px;padding:12px 16px;background:rgba(255,255,255,.03);border:0.5px solid rgba(255,255,255,.07);border-radius:12px;font-size:12px;color:rgba(255,255,255,.35);display:flex;align-items:center;justify-content:space-between;gap:10px;}
-.premium-note b{color:#D4AF37;font-size:11px;white-space:nowrap;}
 </style>
 </head>
 <body>
-
 <div class="load-line" id="load"><div class="load-fill"></div></div>
-<button class="back-btn" id="back-btn" onclick="goBack()">← Căutare nouă</button>
 <div id="toast"></div>
 
 <!-- HEADER -->
-<header class="hdr">
-  <a href="https://vv-technologies.github.io/vv-nexus/" class="hdr-logo">
-    VV <span>NOW</span>
+<header class="hdr" id="hdr">
+  <a href="https://vv-technologies.github.io/vv-nexus/" class="logo">
+    VV <span class="logo-sub">NOW</span>
   </a>
-  <nav class="hdr-nav">
+  <div class="hdr-right">
+    <button class="back-btn" id="back-btn" onclick="goBack()">← Nou</button>
     <a href="https://vv-technologies.github.io/vv-beta" class="hdr-link">VV Beta</a>
-    <a href="https://vv-technologies.github.io/vv-nexus/vv-pulse.html" class="hdr-link">Pulse Map</a>
-  </nav>
+    <a href="https://vv-technologies.github.io/vv-nexus/vv-pulse.html" class="hdr-link">Pulse</a>
+  </div>
 </header>
 
 <!-- HERO -->
 <div class="hero" id="hero">
-
-  <div class="logo-mark">⬡</div>
-
-  <h1 class="hero-title">
-    Internetul se termină.<br>
-    <span class="g">Realitatea începe.</span>
-  </h1>
+  <div class="hex">⬡</div>
+  <h1 class="hero-title">Internetul se termină.<br><span class="g">Realitatea începe.</span></h1>
   <p class="hero-sub">Nexus găsește. Insiderii verifică fizic. Tu afli adevărul.</p>
 
   <div class="search-wrap">
     <input class="search-input" id="search-input" type="text"
       placeholder="Ce vrei să știi despre orașul tău?"
-      onkeydown="if(event.key==='Enter')search(this.value)">
-    <button class="search-go" onclick="search(document.getElementById('search-input').value)">→</button>
+      onkeydown="if(event.key==='Enter')doSearch(this.value)">
+    <button class="search-go" onclick="doSearch(document.getElementById('search-input').value)">→</button>
   </div>
 
-  <div class="suggestions">
-    <div class="sug" onclick="search('E coadă la Kaufland?')">🛒 Kaufland</div>
-    <div class="sug" onclick="search('Cum e Centrul Vechi acum?')">🌆 Centrul Vechi</div>
-    <div class="sug" onclick="search('Loc de parcare Piața Victoriei')">🚗 Parcare</div>
-    <div class="sug" onclick="search('Cafenele liniștite în Floreasca')">☕ Cafenele</div>
-    <div class="sug" onclick="search('Teren de fotbal liber')">⚽ Sport</div>
-    <div class="sug" onclick="search('Cum e traficul acum?')">🚦 Trafic</div>
+  <!-- LAYERS — filtre contextuale -->
+  <div class="layers" id="layers">
+    <div class="layer l-access" onclick="toggleLayer('access',this)" data-layer="access">
+      <div class="layer-dot"></div>Accesibilitate
+    </div>
+    <div class="layer l-urgent" onclick="toggleLayer('urgent',this)" data-layer="urgent">
+      <div class="layer-dot"></div>Urgent
+    </div>
+    <div class="layer l-biz" onclick="toggleLayer('biz',this)" data-layer="biz">
+      <div class="layer-dot"></div>Business
+    </div>
+    <div class="layer l-safe" onclick="toggleLayer('safe',this)" data-layer="safe">
+      <div class="layer-dot"></div>Siguranță
+    </div>
+  </div>
+
+  <div class="suggestions" id="suggestions">
+    <div class="sug" onclick="doSearch('E coadă la Kaufland?')">🛒 Coadă supermarket</div>
+    <div class="sug" onclick="doSearch('Lift funcțional metrou')">♿ Lift metrou</div>
+    <div class="sug" onclick="doSearch('Parcare liberă Piața Victoriei')">🚗 Parcare</div>
+    <div class="sug" onclick="doSearch('Cafenea liniștită Floreasca')">☕ Cafenele</div>
+    <div class="sug" onclick="doSearch('Cum e traficul acum?')">🚦 Trafic</div>
   </div>
 
   <div class="history" id="history"></div>
-
 </div>
 
 <!-- RESULTS -->
@@ -410,49 +349,89 @@ var db = firebase.firestore();
 // ── CONSTANTE ──────────────────────────────────────────────────
 var BLOCKED = ['porn','sex explicit','drog','cocain','heroina','arma','bomba','secta','frauda','hack','ura','rasism','prostitutie','trafic uman'];
 var RO = { latMin:43.6, latMax:48.3, lngMin:20.2, lngMax:30.0 };
-var IDB_TTL = 24 * 60 * 60 * 1000;
+var TTL_24H = 24 * 60 * 60 * 1000;
 
 // ── STATE ──────────────────────────────────────────────────────
 var _gps = null;
 var _idb = null;
-var _alias = localStorage.getItem('vv_alias') || null;
+var _activeLayer = null;
+var _alias = localStorage.getItem('vv_alias');
 var _lvl = 1;
+var _layerCounts = {};
 try {
-  var _s = JSON.parse(localStorage.getItem('vv_core_stats') || '{}');
+  var _s = JSON.parse(localStorage.getItem('vv_core_stats')||'{}');
   _lvl = _s.experience_level || 1;
+  _layerCounts = JSON.parse(localStorage.getItem('vvnow_layer_counts')||'{}');
 } catch(e) {}
 
-// ── IndexedDB ─────────────────────────────────────────────────
+// Layer definitions
+var LAYERS = {
+  access: { label:'Accesibilitate', color:'var(--c-access)', tags:['lift','rampa','bordura','scaun','dizabilitate','acces','accesibil'], hint:'Verifici accesibilitate — Nexus prioritizează răspunsuri pentru mobilitate.' },
+  urgent: { label:'Urgent', color:'var(--c-urgent)', tags:['coadă','aglomerat','liber','timp','rapid','acum','urgent'], hint:'Mod urgent activ — răspunsuri prioritizate.' },
+  biz:    { label:'Business', color:'var(--c-biz)',    tags:['livrare','pickup','marfă','furnizor','business','firma','client'], hint:'Context business — Nexus caută date relevante pentru profesioniști.' },
+  safe:   { label:'Siguranță', color:'var(--c-safe)',  tags:['sigur','pericol','poliție','iluminat','noaptea','zonă','accident'], hint:'Siguranță activă — Nexus filtrează date despre condiții și siguranță urbană.' }
+};
+
+// Non-urban queries
+var NON_URBAN = ['film','serial','muzică','știre','vreme','meteo','rețetă','joc','meci','liga','rezultat','transfer','politic','bursă','crypto'];
+
+// ── IndexedDB cu purjare 24h ──────────────────────────────────
 function openIDB() {
   return new Promise(function(res) {
     try {
-      var r = indexedDB.open('vvnow', 1);
+      var r = indexedDB.open('vvnow2', 2);
       r.onupgradeneeded = function(e) {
-        e.target.result.createObjectStore('loc', { keyPath: 'k' });
+        var d = e.target.result;
+        if (!d.objectStoreNames.contains('loc')) d.createObjectStore('loc', {keyPath:'k'});
+        if (!d.objectStoreNames.contains('ephemeral')) d.createObjectStore('ephemeral', {keyPath:'k'});
       };
-      r.onsuccess = function(e) { _idb = e.target.result; res(); };
+      r.onsuccess = function(e) { _idb = e.target.result; purgeEphemeral(); res(); };
       r.onerror = function() { res(); };
     } catch(e) { res(); }
   });
 }
-function cacheGet(k) {
+
+function idbGet(store, k) {
   return new Promise(function(res) {
     if (!_idb) { res(null); return; }
     try {
-      var r = _idb.transaction('loc','readonly').objectStore('loc').get(k);
+      var r = _idb.transaction(store,'readonly').objectStore(store).get(k);
       r.onsuccess = function() {
         var d = r.result;
-        if (!d || Date.now()-d.ts > IDB_TTL) { res(null); return; }
+        if (!d) { res(null); return; }
+        if (Date.now() - d.ts > TTL_24H) { idbDel(store, k); res(null); return; }
         res(d.v);
       };
       r.onerror = function() { res(null); };
     } catch(e) { res(null); }
   });
 }
-function cacheSet(k, v) {
+
+function idbSet(store, k, v) {
+  if (!_idb) return;
+  try { _idb.transaction(store,'readwrite').objectStore(store).put({k,v,ts:Date.now()}); } catch(e) {}
+}
+
+function idbDel(store, k) {
+  if (!_idb) return;
+  try { _idb.transaction(store,'readwrite').objectStore(store).delete(k); } catch(e) {}
+}
+
+// Purjare automata la deschidere — sterge tot ce e mai vechi de 24h
+function purgeEphemeral() {
   if (!_idb) return;
   try {
-    _idb.transaction('loc','readwrite').objectStore('loc').put({ k, v, ts: Date.now() });
+    var stores = ['loc','ephemeral'];
+    stores.forEach(function(store) {
+      var tx = _idb.transaction(store,'readwrite');
+      var os = tx.objectStore(store);
+      os.openCursor().onsuccess = function(e) {
+        var cursor = e.target.result;
+        if (!cursor) return;
+        if (Date.now() - cursor.value.ts > TTL_24H) cursor.delete();
+        cursor.continue();
+      };
+    });
   } catch(e) {}
 }
 
@@ -460,19 +439,79 @@ function cacheSet(k, v) {
 function getGPS() {
   if (!navigator.geolocation) return;
   navigator.geolocation.getCurrentPosition(
-    function(p) { _gps = { lat: p.coords.latitude, lng: p.coords.longitude }; },
+    function(p) { _gps = {lat:p.coords.latitude, lng:p.coords.longitude}; },
     function() {},
-    { enableHighAccuracy: true, timeout: 8000 }
+    {enableHighAccuracy:true, timeout:8000}
   );
 }
 
-// ── HISTORY local ─────────────────────────────────────────────
-function getHist() {
-  try { return JSON.parse(localStorage.getItem('vvnow_h') || '[]'); } catch(e) { return []; }
+// ── LAYERS ───────────────────────────────────────────────────
+function toggleLayer(layer, el) {
+  if (_activeLayer === layer) {
+    _activeLayer = null;
+    document.querySelectorAll('.layer').forEach(function(l){ l.classList.remove('active'); });
+    updateSuggestions(null);
+  } else {
+    _activeLayer = layer;
+    document.querySelectorAll('.layer').forEach(function(l){ l.classList.remove('active'); });
+    el.classList.add('active');
+    // Track usage — adaugat la counts pentru pattern detection
+    _layerCounts[layer] = (_layerCounts[layer]||0) + 1;
+    localStorage.setItem('vvnow_layer_counts', JSON.stringify(_layerCounts));
+    updateSuggestions(layer);
+    // Update placeholder
+    var hints = {
+      access:'Lift funcțional? Rampă accesibilă? Borduri noi?',
+      urgent:'Coadă? Loc liber? Cât de aglomerat?',
+      biz:'Zone pickup? Furnizor disponibil? Spațiu liber?',
+      safe:'Zonă sigură? Iluminat stradal? Condiții acum?'
+    };
+    document.getElementById('search-input').placeholder = hints[layer];
+  }
 }
-function addHist(q) {
+
+function updateSuggestions(layer) {
+  var sugs = document.getElementById('suggestions');
+  if (!sugs) return;
+  var map = {
+    access:['Lift metrou Victoriei','Rampă bistro Centrul Vechi','Borduri noi Floreasca','Scaun rulant acces'],
+    urgent:['Coadă Kaufland acum','Loc liber parcare','Aglomerație centru','Coadă farmacie'],
+    biz:['Zone pickup mall Promenada','Furnizor piață Obor','Spațiu liber cafenea','Livrare blocată stradă'],
+    safe:['Zonă Floreasca noaptea','Iluminat Parcul Tineretului','Gheată lac Herăstrău','Protest spontan centru']
+  };
+  var items = layer ? map[layer] : ['Coadă supermarket','Lift metrou','Parcare','Cafenele','Trafic'];
+  sugs.innerHTML = items.map(function(s){
+    return '<div class="sug" onclick="doSearch(\''+s+'\')">'+(layer?'':getSugIcon(s))+' '+s+'</div>';
+  }).join('');
+}
+
+function getSugIcon(s) {
+  var l = s.toLowerCase();
+  if (l.includes('kaufland')||l.includes('supermarket')) return '🛒';
+  if (l.includes('lift')||l.includes('rampă')) return '♿';
+  if (l.includes('parcare')) return '🚗';
+  if (l.includes('cafenea')) return '☕';
+  if (l.includes('trafic')) return '🚦';
+  return '⬡';
+}
+
+// Auto-detect layer from query
+function detectLayer(q) {
+  var l = q.toLowerCase();
+  if (_activeLayer) return _activeLayer;
+  for (var layer in LAYERS) {
+    if (LAYERS[layer].tags.some(function(t){ return l.includes(t); })) return layer;
+  }
+  return null;
+}
+
+// ── HISTORY ──────────────────────────────────────────────────
+function getHist() {
+  try { return JSON.parse(localStorage.getItem('vvnow_h')||'[]'); } catch(e) { return []; }
+}
+function addHist(q, layer) {
   var h = getHist().filter(function(x){ return x.q !== q; });
-  h.unshift({ q, t: Date.now() });
+  h.unshift({q, layer, t:Date.now()});
   localStorage.setItem('vvnow_h', JSON.stringify(h.slice(0,5)));
 }
 function renderHist() {
@@ -481,124 +520,82 @@ function renderHist() {
   if (!el || h.length === 0) return;
   var ago = function(ts) {
     var d = Math.floor((Date.now()-ts)/60000);
-    return d < 1 ? 'acum' : d < 60 ? d+'m' : Math.floor(d/60)+'h';
+    return d<1?'acum':d<60?d+'m':Math.floor(d/60)+'h';
   };
-  el.innerHTML = '<div class="hist-label">CĂUTĂRI RECENTE</div>' +
+  el.innerHTML = '<div class="hist-label">RECENT</div>' +
     '<div class="hist-list">' +
     h.map(function(i) {
-      return '<div class="hist-item" onclick="search(\'' + i.q.replace(/'/g,"\\'") + '\')">' +
-        '<span class="hist-q">' + i.q + '</span>' +
-        '<span class="hist-t">' + ago(i.t) + '</span>' +
-      '</div>';
+      var layerBadge = i.layer ? '<span class="hist-layer">'+LAYERS[i.layer].label+'</span>' : '';
+      return '<div class="hist-item" onclick="doSearch(\''+i.q.replace(/'/g,"\\'")+'\')">' +
+        '<span class="hist-q">'+i.q+'</span>'+layerBadge+
+        '<span class="hist-t">'+ago(i.t)+'</span></div>';
     }).join('') + '</div>';
 }
 
-// ── BACK ─────────────────────────────────────────────────────
-function goBack() {
-  document.getElementById('hero').classList.remove('compact');
-  document.getElementById('results').classList.remove('show');
-  document.getElementById('results').innerHTML = '';
-  document.getElementById('search-input').value = '';
-  document.getElementById('back-btn').classList.remove('show');
-  setTimeout(function(){ document.getElementById('search-input').focus(); }, 300);
-}
-
-// ── SEARCH ────────────────────────────────────────────────────
-async function search(q) {
+// ── SEARCH ───────────────────────────────────────────────────
+async function doSearch(q) {
   q = (q||'').trim();
   if (!q) return;
 
-  addHist(q);
+  var layer = detectLayer(q);
+  addHist(q, layer);
 
-  // Compact hero + back button
+  // Switch UI
   document.getElementById('hero').classList.add('compact');
+  document.getElementById('hdr').classList.add('solid');
   document.getElementById('search-input').value = q;
   document.getElementById('back-btn').classList.add('show');
+
+  // Salveaza in ephemeral cache pentru pattern detection
+  idbSet('ephemeral', 'q_'+Date.now(), {q, layer, ts:Date.now()});
 
   var res = document.getElementById('results');
   res.innerHTML = '';
   res.classList.add('show');
   document.getElementById('load').classList.add('on');
+  window.scrollTo({top:0, behavior:'smooth'});
 
-  // Charter check — non-urban content
-  var blocked = BLOCKED.some(function(k){ return q.toLowerCase().includes(k); });
-  if (blocked) {
+  // Charter
+  if (BLOCKED.some(function(k){ return q.toLowerCase().includes(k); })) {
     document.getElementById('load').classList.remove('on');
-    res.innerHTML = blockedHtml();
-    logSearch(q, 'BLOCKED');
+    res.innerHTML = '<div class="blocked-card"><div class="card-source"><div class="src-dot" style="background:var(--red)"></div>VV CHARTER · BLOCAT</div><div class="blocked-text">Această cerere nu poate fi procesată. VV NOW funcționează pentru realitatea urbană legală.</div></div>';
     return;
   }
 
-  // Verifica daca e cautare non-urbana
-  var nonUrban = isNonUrban(q);
-  if (nonUrban) {
+  // Non-urban
+  if (NON_URBAN.some(function(k){ return q.toLowerCase().includes(k); })) {
     document.getElementById('load').classList.remove('on');
-    res.innerHTML = nonUrbanHtml(q);
-    logSearch(q, 'NON_URBAN');
+    res.innerHTML = '<div class="answer-card">' +
+      '<div class="card-source"><div class="src-dot src-gold"></div>NEXUS</div>' +
+      '<div class="answer-text">VV NOW e construit pentru realitatea fizică din jurul tău — locații, cozi, condiții, accesibilitate. Pentru "<strong>'+q+'</strong>" încearcă un motor general.<br><br>Caută ceva din orașul tău.</div>' +
+    '</div>';
     return;
   }
 
-  // Cauta in Firebase misiuni recente + locatie Nominatim
+  // Cauta in paralel
   var [missions, loc] = await Promise.all([
-    findRecentMissions(q),
+    findMissions(q, layer),
     findLoc(q)
   ]);
 
   document.getElementById('load').classList.remove('on');
-  renderResults(q, loc, missions);
-  logSearch(q, 'OK');
+  renderResults(q, loc, missions, layer);
 }
 
-function isNonUrban(q) {
-  var l = q.toLowerCase();
-  var nonUrban = ['film','serial','muzica','stire','vreme','meteo','reteta','joc','sport tv','liga','meci','rezultat','transfer','politic','bursă'];
-  return nonUrban.some(function(k){ return l.includes(k); });
-}
-
-// ── FIREBASE — cauta misiuni recente ─────────────────────────
-async function findRecentMissions(q) {
-  try {
-    var term = getTerm(q);
-    if (!term) return [];
-    var ago30 = new Date(Date.now() - 30*24*60*60*1000);
-    var ts = firebase.firestore.Timestamp.fromDate(ago30);
-    var snap = await db.collection('missions')
-      .where('status','==','approved')
-      .where('createdAt','>=',ts)
-      .orderBy('createdAt','desc')
-      .limit(3)
-      .get();
-    var results = [];
-    snap.forEach(function(doc) {
-      var d = doc.data();
-      var loc = (d.location||'').toLowerCase();
-      var desc = (d.description||'').toLowerCase();
-      var termL = term.toLowerCase().split(' ')[0];
-      if (loc.includes(termL) || desc.includes(termL)) {
-        results.push(d);
-      }
-    });
-    return results;
-  } catch(e) { return []; }
-}
-
-// ── NOMINATIM cu cache ─────────────────────────────────────────
+// ── NOMINATIM cu cache ────────────────────────────────────────
 async function findLoc(q) {
   var term = getTerm(q);
   if (!term) return null;
-  var ck = term.toLowerCase().replace(/\s+/g,'_');
-
-  // Cache first
-  var cached = await cacheGet(ck);
+  var ck = 'loc_'+term.toLowerCase().replace(/\s+/g,'_');
+  var cached = await idbGet('loc', ck);
   if (cached) return cached;
-
   try {
-    var url = 'https://nominatim.openstreetmap.org/search?format=json&q=' +
-      encodeURIComponent(term) + '&limit=1&accept-language=ro&countrycodes=ro';
-    if (_gps) url += '&viewbox='+(_gps.lng-.12)+','+(_gps.lat+.12)+','+(_gps.lng+.12)+','+(_gps.lat-.12)+'&bounded=0';
+    var url = 'https://nominatim.openstreetmap.org/search?format=json&q='+
+      encodeURIComponent(term)+'&limit=1&accept-language=ro&countrycodes=ro';
+    if (_gps) url += '&viewbox='+(_gps.lng-.15)+','+(_gps.lat+.15)+','+(_gps.lng+.15)+','+(_gps.lat-.15)+'&bounded=0';
     var r = await fetch(url);
     var d = await r.json();
-    if (d && d[0]) { cacheSet(ck, d[0]); return d[0]; }
+    if (d && d[0]) { idbSet('loc', ck, d[0]); return d[0]; }
   } catch(e) {}
   return null;
 }
@@ -610,223 +607,245 @@ function getTerm(q) {
     'parcare':'parcare','teren':'teren sport','fotbal':'teren fotbal',
     'cafenea':'cafenea','restaurant':'restaurant','pizza':'pizza',
     'parc':'parc','mall':'mall','spital':'spital','farmacie':'farmacie',
-    'atm':'ATM bancomat','centrul vechi':'Centrul Vechi Bucuresti',
+    'atm':'ATM bancomat','lift':'lift statie metrou',
+    'centrul vechi':'Centrul Vechi Bucuresti',
     'floreasca':'Floreasca Bucuresti','victoriei':'Piata Victoriei',
-    'unirii':'Piata Unirii','herastrau':'Herastrau','obor':'Piata Obor',
-    'trafic':'trafic strada','kiseleff':'Kiseleff'
+    'unirii':'Piata Unirii','herastrau':'Herastrau',
+    'obor':'Piata Obor','tineretului':'Parcul Tineretului',
+    'trafic':'strada Bucuresti','kiseleff':'Kiseleff'
   };
   var l = q.toLowerCase();
   for (var k in map) { if (l.includes(k)) return map[k]; }
   return q.split(' ').slice(0,4).join(' ');
 }
 
-// ── RENDER REZULTATE ──────────────────────────────────────────
-function renderResults(q, loc, missions) {
+// ── FIREBASE MISSIONS ────────────────────────────────────────
+async function findMissions(q, layer) {
+  try {
+    var ago30 = new Date(Date.now()-30*24*60*60*1000);
+    var snap = await db.collection('missions')
+      .where('status','==','approved')
+      .where('createdAt','>=',firebase.firestore.Timestamp.fromDate(ago30))
+      .orderBy('createdAt','desc').limit(5).get();
+
+    var term = getTerm(q).toLowerCase().split(' ')[0];
+    var layerTags = layer ? LAYERS[layer].tags : [];
+    var results = [];
+
+    snap.forEach(function(doc) {
+      var d = doc.data();
+      var text = ((d.location||'')+(d.description||'')).toLowerCase();
+      var matchesTerm = term.length > 2 && text.includes(term);
+      var matchesLayer = layerTags.some(function(t){ return text.includes(t); });
+      if (matchesTerm || matchesLayer) results.push(d);
+    });
+    return results.slice(0,3);
+  } catch(e) { return []; }
+}
+
+// ── RENDER ───────────────────────────────────────────────────
+function renderResults(q, loc, missions, layer) {
   var res = document.getElementById('results');
   var html = '';
+  var h = new Date().getHours();
+  var hasMissions = missions && missions.length > 0;
 
-  // 1. Raspuns Nexus bazat pe date reale
-  html += answerHtml(q, loc, missions);
+  // Layer badge daca e activ
+  var layerBadge = layer ? '<div class="layer-badge lb-'+layer+'">'+LAYERS[layer].label.toUpperCase()+'</div>' : '';
 
-  // 2. Date reale din misiuni daca exista
-  if (missions && missions.length > 0) {
-    html += missionsHtml(missions, q);
-  }
+  // 1. Raspuns principal Nexus
+  html += buildAnswer(q, loc, missions, layer, h, layerBadge);
 
-  // 3. Location + VERIFY
-  if (loc) html += locHtml(loc, missions);
+  // 2. Date reale din misiuni
+  if (hasMissions) html += buildMissionsCard(missions, layer);
 
-  // 4. Sugestii conexe
-  html += suggestionsHtml(q);
+  // 3. Locatie + VERIFY
+  if (loc) html += buildLocCard(loc, missions, layer, q);
 
-  // 5. Premium teaser
-  html += '<div class="premium-note">VV NOW Standard · Romania · 30 zile<b>VV NOW Premium · Global · 90 zile · 9€</b></div>';
+  // 4. Pills sugestii discrete
+  html += buildPills(q, layer);
+
+  // 5. Premium note discret
+  html += '<div class="premium-note">VV NOW Standard · România · 30 zile <b>→ Premium · Global · 90 zile · 9€</b></div>';
 
   res.innerHTML = html;
 }
 
-function missionsHtml(missions, q) {
-  var html = '<div class="answer-card" style="animation-delay:.05s">';
-  html += '<div class="answer-source"><div class="answer-dot" style="background:#34c759"></div> Date reale din ecosistem</div>';
-
-  var freshCount = missions.filter(function(m) {
-    if (!m.createdAt) return false;
-    return Date.now() - m.createdAt.toDate().getTime() < 7*24*60*60*1000;
-  }).length;
-
-  if (freshCount > 0) {
-    html += '<div class="data-badge db-fresh">✓ Verificat în ultimele 7 zile</div>';
-  } else {
-    html += '<div class="data-badge db-old">⏰ Verificat în ultimele 30 zile</div>';
-  }
-
-  missions.forEach(function(m) {
-    var dateStr = m.createdAt ? m.createdAt.toDate().toLocaleDateString('ro-RO',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}) : '—';
-    html += '<div class="proof-item">' +
-      (m.description||'Verificare completată') +
-      '<div class="proof-meta">Insider VV · ' + dateStr + ' · VV PROOF ✓</div>' +
-    '</div>';
-  });
-
-  html += '</div>';
-  return html;
-}
-
-function suggestionsHtml(q) {
+function buildAnswer(q, loc, missions, layer, h, layerBadge) {
   var l = q.toLowerCase();
-  var sugs = [];
-  if (l.includes('kaufland')||l.includes('lidl')||l.includes('supermarket')) {
-    sugs = ['Parcare în zonă?','Alte supermarketuri aproape','Piața agroalimentară'];
-  } else if (l.includes('cafenea')||l.includes('restaurant')) {
-    sugs = ['Program deschidere?','Locuri disponibile?','Terasa disponibilă?'];
-  } else if (l.includes('parcare')) {
-    sugs = ['Parcare gratuită?','Parcare de noapte?','Parcare dezactivată?'];
-  } else if (l.includes('trafic')||l.includes('drum')||l.includes('stradă')) {
-    sugs = ['Accident în zonă?','Alternativă de rută?','Lucrări rutiere?'];
-  } else {
-    sugs = ['Cum e zona acum?','Misiuni active în apropiere','Insideri disponibili?'];
-  }
-  return '<div class="also-search">' +
-    sugs.map(function(s){ return '<div class="also-item" onclick="search(\''+s+'\')">'+s+'</div>'; }).join('') +
-  '</div>';
-}
-
-function nonUrbanHtml(q) {
-  return '<div class="answer-card">' +
-    '<div class="answer-source"><div class="answer-dot"></div> Nexus</div>' +
-    '<div class="answer-text">VV NOW e construit pentru <strong>realitatea fizică</strong> din orașul tău — locații, cozi, atmosferă, trafic. ' +
-    'Pentru "' + q + '" încearcă Google sau un asistent AI general.<br><br>Caută ceva din jurul tău.</div>' +
-  '</div>';
-}
-
-function answerHtml(q, loc, missions) {
   var hasMissions = missions && missions.length > 0;
-  var l = q.toLowerCase();
-  var h = new Date().getHours();
-  var ora = h<12?'dimineață':h<18?'după-amiază':h<22?'seară':'noapte';
+  var period = h<12?'dimineață':h<18?'după-amiază':h<22?'seară':'noapte';
   var text = '';
+  var srcLabel = 'NEXUS' + (_lvl>=6?' SENSE · LEVEL '+_lvl:'');
 
   if (hasMissions) {
-    var name = loc ? loc.display_name.split(',')[0] : 'această locație';
-    var daysAgo = missions[0].createdAt ? Math.floor((Date.now()-missions[0].createdAt.toDate().getTime())/(24*60*60*1000)) : '?';
-    text = 'Am date reale despre <strong>' + name + '</strong> din ecosistemul VV — ultima verificare acum ' + daysAgo + ' zile. Vezi mai jos ce au găsit Insiderii.';
+    var name = loc ? loc.display_name.split(',')[0] : 'această zonă';
+    var daysAgo = missions[0].createdAt ? Math.floor((Date.now()-missions[0].createdAt.toDate().getTime())/(86400000)) : '?';
+    text = 'Am date reale despre <strong>'+name+'</strong> — ultima verificare acum '+daysAgo+(daysAgo===1?' zi':' zile')+'. ';
+    if (layer === 'access') text += 'Verificare de accesibilitate disponibilă mai jos.';
+    else if (layer === 'urgent') text += 'Date de la Insideri reali, nu estimări.';
+    else if (layer === 'biz') text += 'Informații verificate de teren pentru uz profesional.';
+    else if (layer === 'safe') text += 'Condiții confirmate fizic de Insideri locali.';
+    else text += 'Vezi ce au găsit Insiderii mai jos.';
   } else if (loc) {
     var name = loc.display_name.split(',')[0];
-    text = 'Am găsit <strong>' + name + '</strong> în zona ta. Nu avem verificări recente — trimite un Insider să vadă cum e acum.';
-  } else if (l.includes('coadă') || l.includes('aglomerat') || l.includes('liber')) {
-    text = 'Asta e exact ce Insiderii VV verifică fizic. Lansează o misiune și în câteva minute ai o poză din teren.';
-  } else if (l.includes('cum e') || l.includes('atmosfer') || l.includes('vibe')) {
-    text = 'Atmosfera se simte, nu se descrie prin algoritmi. Un Insider din zonă îți arată exact cum e acum' + (l.includes('seară')||new Date().getHours()>=18?' în această seară':'') + '.';
-  } else if (l.includes('trafic') || l.includes('drum') || l.includes('asfalt')) {
-    text = 'Traficul se schimbă rapid. Un Insider care trece pe acolo acum îți spune în câteva minute.';
-  } else if (l.includes('deschis') || l.includes('program') || l.includes('orar')) {
-    text = 'Programul afișat online nu e întotdeauna actualizat. Un Insider verifică fizic dacă e deschis acum.';
+    text = 'Am găsit <strong>'+name+'</strong> în zona ta. ';
+    if (layer === 'access') text += 'Nu avem date de accesibilitate recente — un Insider poate verifica rampe, lifturi și borduri.';
+    else if (layer === 'urgent') text += 'Situația în timp real nu e disponibilă — trimite un Insider să verifice acum.';
+    else if (layer === 'biz') text += 'Nu avem date business recente pentru această locație.';
+    else if (layer === 'safe') text += 'Nu avem date de siguranță recente — un Insider poate confirma condițiile.';
+    else text += 'Nu avem verificări recente. Trimite un Insider să vadă cum e acum.';
+  } else if (l.includes('coadă')||l.includes('aglomerat')||l.includes('liber')) {
+    text = 'Exact ce verifică Insiderii VV. O misiune lansată acum îți aduce o poză din teren în câteva minute.';
+  } else if (l.includes('lift')||l.includes('rampă')||l.includes('accesibil')) {
+    text = 'Accesibilitatea se verifică fizic — un Insider confirmă dacă liftul funcționează sau dacă rampa e liberă.';
+  } else if (l.includes('sigur')||l.includes('noaptea')||l.includes('iluminat')) {
+    text = 'Siguranța unei zone depinde de ora și condițiile exacte. Un Insider din zonă confirmă în timp real.';
+  } else if (l.includes('trafic')||l.includes('drum')) {
+    text = 'Traficul se schimbă rapid. Un Insider care trece acum îți spune în câteva minute.';
   } else {
-    text = 'Nu am date recente despre asta. Un Insider poate verifica pe loc și îți aduce dovada în câteva minute.';
+    text = 'Nu am date recente despre asta în ecosistemul VV. Un Insider verifică pe loc și îți aduce dovada.';
   }
 
   return '<div class="answer-card">' +
-    '<div class="answer-source"><div class="answer-dot"></div> Nexus' + (_lvl>=6?' Sense · Level '+_lvl:'') + '</div>' +
-    '<div class="answer-text">' + text + '</div>' +
+    layerBadge +
+    '<div class="card-source"><div class="src-dot src-gold"></div>'+srcLabel+'</div>' +
+    '<div class="answer-text">'+text+'</div>' +
   '</div>';
 }
 
-function locHtml(loc, missions) {
-  var hasFresh = missions && missions.some(function(m){ return m.createdAt && Date.now()-m.createdAt.toDate().getTime()<7*24*60*60*1000; });
+function buildMissionsCard(missions, layer) {
+  var freshCount = missions.filter(function(m){
+    return m.createdAt && Date.now()-m.createdAt.toDate().getTime()<7*86400000;
+  }).length;
+  var badge = freshCount > 0
+    ? '<div class="data-badge db-fresh">✓ Verificat în ultimele 7 zile</div>'
+    : '<div class="data-badge db-old">⏰ Verificat în ultimele 30 zile</div>';
+
+  var items = missions.map(function(m) {
+    var dateStr = m.createdAt ? m.createdAt.toDate().toLocaleDateString('ro-RO',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}) : '—';
+    return '<div class="proof-item">'+(m.description||'Verificare completată')+
+      '<div class="proof-meta">Insider VV · '+dateStr+' · VV Proof ✓</div></div>';
+  }).join('');
+
+  return '<div class="answer-card" style="animation-delay:.05s">' +
+    '<div class="card-source"><div class="src-dot src-green"></div>DATE REALE DIN ECOSISTEM</div>' +
+    badge + items +
+  '</div>';
+}
+
+function buildLocCard(loc, missions, layer, query) {
   var name = loc.display_name.split(',')[0];
   var addr = loc.display_name.split(',').slice(0,3).join(', ');
-  var lat = parseFloat(loc.lat);
-  var lng = parseFloat(loc.lon);
+  var lat = parseFloat(loc.lat), lng = parseFloat(loc.lon);
   var inRo = lat>=RO.latMin&&lat<=RO.latMax&&lng>=RO.lngMin&&lng<=RO.lngMax;
+  var hasFresh = missions && missions.some(function(m){
+    return m.createdAt && Date.now()-m.createdAt.toDate().getTime()<7*86400000;
+  });
   var vid = 'v'+Date.now();
-  var days = Math.floor(Math.random()*40)+2;
+
+  // Titlu VERIFY adaptat la layer
+  var verifyTitles = {
+    access:'Verifică accesibilitate fizic',
+    urgent:'Verifică situația acum',
+    biz:'Verifică condiții business',
+    safe:'Verifică siguranța zonei'
+  };
+  var verifyTitle = layer && verifyTitles[layer] ? verifyTitles[layer] : 'Trimite un Insider să verifice';
 
   var verifySection = '';
   if (!inRo) {
-    verifySection = '<div class="geo-note">VERIFY disponibil doar în România în faza Beta.</div>';
+    verifySection = '<div style="font-size:12px;color:var(--w30);padding:10px 0">VERIFY disponibil doar în România în faza Beta.</div>';
   } else if (hasFresh) {
-    verifySection = '<div style="padding:10px 0;font-size:13px;color:rgba(52,199,89,.7)">✓ Verificat recent. Datele de mai sus sunt de la Insideri reali.</div>';
+    verifySection = '<div style="font-size:12px;color:var(--green);padding:10px 0">✓ Verificat recent de Insideri. Datele de mai sus sunt de la teren.</div>';
   } else {
-    verifySection = '<button class="verify-btn" id="' + vid + '" onclick="doVerify(\'' + vid + '\',\'' + name.replace(/'/g,"\\'") + '\',' + lat.toFixed(4) + ',' + lng.toFixed(4) + ')">' +
-      '<span class="verify-btn-icon">⚡</span>' +
-      '<span class="verify-btn-text">' +
-        '<span class="verify-btn-title">Trimite un Insider să verifice</span>' +
-        '<span class="verify-btn-sub">Ultima verificare: acum ' + days + ' zile · −10 VV · Insider +10 VV</span>' +
-      '</span>' +
-      '<span class="verify-btn-arrow">›</span>' +
+    verifySection = '<button class="verify-btn" id="'+vid+'" onclick="doVerify(\''+vid+'\',\''+name.replace(/'/g,"\\'")+'\','+lat.toFixed(4)+','+lng.toFixed(4)+',\''+layer+'\')">'+
+      '<span class="vb-icon">⚡</span>' +
+      '<span class="vb-body"><span class="vb-title">'+verifyTitle+'</span>' +
+        '<span class="vb-sub">Ultima verificare: +30 zile · −10 VV · Insider +10 VV</span>' +
+      '</span><span class="vb-arrow">›</span>' +
     '</button>' +
-    '<div class="verify-status" id="vs-' + vid + '">' +
-      '<div class="status-pulse"></div>' +
-      '<span id="vt-' + vid + '">Se caută cel mai apropiat Insider...</span>' +
-    '</div>';
+    '<div class="flash-status" id="fs-'+vid+'"><div class="fp"></div><span id="ft-'+vid+'">Se caută cel mai apropiat Insider...</span></div>';
   }
 
-  return '<div class="loc-card">' +
-    '<div class="loc-name">' + name + '</div>' +
-    '<div class="loc-addr">' + addr + '</div>' +
+  return '<div class="answer-card" style="animation-delay:.1s">' +
+    '<div class="card-source"><div class="src-dot src-gold"></div>LOCAȚIE DETECTATĂ</div>' +
+    '<div class="loc-name">'+name+'</div>' +
+    '<div class="loc-addr">'+addr+'</div>' +
     verifySection +
   '</div>';
 }
 
-function contextHtml(q) {
-  var h = new Date().getHours();
-  var tip = h>=8&&h<12 ? 'Dimineața e ideal pentru verificat locații — puțini oameni, Insideri activi.' :
-            h>=12&&h<16 ? 'La prânz zonele comerciale sunt cel mai aglomerate. Bun moment pentru un VERIFY.' :
-            h>=16&&h<20 ? 'Seara devreme e cel mai activ interval în ecosistemul VV.' :
-            'Noaptea, timpul de răspuns poate fi puțin mai lung.';
-  return '<div class="context-card">' + tip + '</div>';
-}
-
-function blockedHtml() {
-  return '<div class="blocked-card">' +
-    '<div class="answer-source"><div class="answer-dot" style="background:rgba(255,59,48,.6)"></div> VV Charter · Blocat</div>' +
-    '<div class="blocked-text">Această cerere nu poate fi procesată în ecosistemul VV. Caută ceva real despre orașul tău.</div>' +
-  '</div>';
+function buildPills(q, layer) {
+  var l = q.toLowerCase();
+  var pills = [];
+  if (l.includes('kaufland')||l.includes('lidl')||l.includes('supermarket')) {
+    pills = ['Parcare în zonă?','Farmacia din apropiere','Alt supermarket aproape'];
+  } else if (l.includes('cafenea')||l.includes('restaurant')) {
+    pills = ['E deschis acum?','Terasă disponibilă?','Loc liber?'];
+  } else if (l.includes('lift')||l.includes('acces')) {
+    pills = ['Rampă disponibilă?','Toaletă accesibilă?','Transport alternativ'];
+  } else if (l.includes('parcare')) {
+    pills = ['Parcare gratuită?','Parcare subterană','Stație reîncărcare EV?'];
+  } else if (layer === 'biz') {
+    pills = ['Zone pickup libere?','Intrare marfă accesibilă?','Trafic în zonă?'];
+  } else {
+    pills = ['Cum e zona acum?','Misiuni active','Insideri în apropiere'];
+  }
+  return '<div class="pills">'+pills.map(function(p){
+    return '<div class="pill" onclick="doSearch(\''+p+'\')">' + p + '</div>';
+  }).join('') + '</div>';
 }
 
 // ── VERIFY / FLASH MISSION ────────────────────────────────────
-async function doVerify(vid, locName, lat, lng) {
+async function doVerify(vid, locName, lat, lng, layer) {
   var btn = document.getElementById(vid);
-  var status = document.getElementById('vs-'+vid);
-  var txt = document.getElementById('vt-'+vid);
+  var fs = document.getElementById('fs-'+vid);
+  var ft = document.getElementById('ft-'+vid);
   if (!btn) return;
-
-  btn.style.opacity = '.5';
-  btn.style.pointerEvents = 'none';
-  if (status) status.classList.add('show');
+  btn.classList.add('done');
+  if (fs) fs.classList.add('on');
 
   try {
     var alias = _alias || 'INSIDER';
+    var desc = 'VERIFY';
+    if (layer === 'access') desc = 'VERIFY ACCESIBILITATE: '+locName+' — confirme lifturi, rampe, borduri.';
+    else if (layer === 'urgent') desc = 'VERIFY URGENT: '+locName+' — confirme situația în timp real.';
+    else if (layer === 'biz') desc = 'VERIFY BUSINESS: '+locName+' — confirme condiții pentru livrare/pickup.';
+    else if (layer === 'safe') desc = 'VERIFY SIGURANȚĂ: '+locName+' — confirme condiții și iluminat.';
+    else desc = 'VERIFY: '+locName+' — confirme situația reală cu VV Proof.';
+
     var ref = await db.collection('missions').add({
-      type:'flash_mission', description:'VERIFY: '+locName,
+      type:'flash_mission', description:desc,
       location:locName, lat, lng, reward:10, status:'pending',
       requestedBy:alias, isFlash:true, source:'vv_now',
+      layer:layer||null,
       flashExpires:firebase.firestore.Timestamp.fromDate(new Date(Date.now()+30*60*1000)),
       createdAt:firebase.firestore.FieldValue.serverTimestamp()
     });
 
     await db.collection('inbox').add({
       to:'CEO', from:alias, alias, type:'flash_mission_created',
-      message:'⚡ Flash Mission: '+locName+' · #'+ref.id.substring(0,8),
+      message:'⚡ Flash Mission'+(layer?' ['+LAYERS[layer]?.label+']':'')+': '+locName+' · #'+ref.id.substring(0,8),
       missionId:ref.id, read:false,
       createdAt:firebase.firestore.FieldValue.serverTimestamp()
     });
 
     db.collection('vvhi_dataset').add({
       action:'VERIFY_REQUESTED',
-      context:{ location:locName, lat:parseFloat(lat.toFixed(3)), lng:parseFloat(lng.toFixed(3)), hour:new Date().getHours() },
+      context:{location:locName, lat:parseFloat(lat.toFixed(3)), lng:parseFloat(lng.toFixed(3)), layer:layer||null, hour:new Date().getHours()},
       timestamp:firebase.firestore.FieldValue.serverTimestamp()
     }).catch(function(){});
 
-    if (txt) txt.textContent = 'Misiune lansată. Un Insider confirmă în ~20 minute.';
-    showToast('⚡ Insider caută...');
+    if (ft) ft.textContent = 'Misiune lansată. Un Insider confirmă în ~20 minute.';
+    showToast('⚡ Misiune Flash lansată');
 
     // Listener confirmare
     var unsub = db.collection('missions').doc(ref.id).onSnapshot(function(doc) {
       if (!doc.exists) return;
-      if (doc.data().status === 'approved') {
-        if (txt) txt.textContent = '✅ Insider a confirmat! Dovada e în VV Beta.';
-        if (status) status.style.borderColor = 'rgba(52,199,89,.3)';
+      if (doc.data().status==='approved') {
+        if (ft) ft.textContent = '✅ Insider a confirmat. Dovada e în VV Beta.';
+        if (fs) fs.style.borderColor='rgba(52,199,89,.3)';
         showToast('✅ Confirmat!');
         unsub();
       }
@@ -834,8 +853,8 @@ async function doVerify(vid, locName, lat, lng) {
     setTimeout(function(){ try{unsub();}catch(e){} }, 35*60*1000);
 
   } catch(e) {
-    if (btn) { btn.style.opacity='1'; btn.style.pointerEvents='auto'; }
-    if (status) status.classList.remove('show');
+    if (btn) btn.classList.remove('done');
+    if (fs) fs.classList.remove('on');
     showToast('Eroare. Încearcă din nou.');
   }
 }
@@ -844,26 +863,44 @@ async function doVerify(vid, locName, lat, lng) {
 function logSearch(q, status) {
   db.collection('vvhi_dataset').add({
     action:'VV_NOW_SEARCH',
-    context:{ query:q.substring(0,100), status, hour:new Date().getHours() },
+    context:{query:q.substring(0,100), status, layer:_activeLayer||null, hour:new Date().getHours()},
     timestamp:firebase.firestore.FieldValue.serverTimestamp()
   }).catch(function(){});
+}
+
+// ── BACK ──────────────────────────────────────────────────────
+function goBack() {
+  document.getElementById('hero').classList.remove('compact');
+  document.getElementById('hdr').classList.remove('solid');
+  document.getElementById('results').classList.remove('show');
+  document.getElementById('results').innerHTML='';
+  document.getElementById('search-input').value='';
+  document.getElementById('back-btn').classList.remove('show');
+  renderHist();
+  setTimeout(function(){ document.getElementById('search-input').focus(); }, 400);
 }
 
 // ── TOAST ─────────────────────────────────────────────────────
 function showToast(msg) {
   var t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('on');
-  clearTimeout(t._t); t._t = setTimeout(function(){ t.classList.remove('on'); }, 3000);
+  t.textContent=msg; t.classList.add('on');
+  clearTimeout(t._t); t._t=setTimeout(function(){ t.classList.remove('on'); },3000);
 }
 
 // ── KEYBOARD ──────────────────────────────────────────────────
 document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape') {
-    document.getElementById('hero').classList.remove('compact');
-    document.getElementById('results').classList.remove('show');
-    document.getElementById('results').innerHTML = '';
-    document.getElementById('search-input').value = '';
+  if (e.key==='Escape') goBack();
+  if (e.key==='/' && !['INPUT','TEXTAREA'].includes(document.activeElement.tagName)) {
+    e.preventDefault();
+    document.getElementById('search-input').focus();
   }
+});
+
+// ── SCROLL ────────────────────────────────────────────────────
+window.addEventListener('scroll', function() {
+  var hdr = document.getElementById('hdr');
+  if (window.scrollY > 20) hdr.classList.add('solid');
+  else if (!document.getElementById('hero').classList.contains('compact')) hdr.classList.remove('solid');
 });
 
 // ── INIT ──────────────────────────────────────────────────────
