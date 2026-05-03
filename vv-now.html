@@ -580,6 +580,48 @@ async function nexusWebSearch(q,layer){
   }catch(e){return null;}
 }
 
+
+// ── DATE STATICE + PAGINI VV NOW ─────────────────────────────
+async function findStaticData(q) {
+  if(!_isOnline) return null;
+  try {
+    var l = q.toLowerCase();
+    var snap = await db.collection('vv_static_data')
+      .where('visible','==',true).get();
+    var results = [];
+    snap.forEach(function(doc) {
+      var d = doc.data();
+      var kw = (d.keywords||'').toLowerCase();
+      var name = (d.name||'').toLowerCase();
+      var type = (d.type||'').toLowerCase();
+      if (kw.split(',').some(function(k){ return l.includes(k.trim()) && k.trim().length > 2; }) ||
+          name.split(' ').some(function(w){ return l.includes(w) && w.length > 3; }) ||
+          l.includes(type)) {
+        results.push(d);
+      }
+    });
+    return results.slice(0, 2);
+  } catch(e) { return null; }
+}
+
+async function findVVNowPage(q) {
+  if(!_isOnline) return null;
+  try {
+    var l = q.toLowerCase();
+    var snap = await db.collection('vv_now_pages')
+      .where('visible','==',true).get();
+    var match = null;
+    snap.forEach(function(doc) {
+      var d = doc.data();
+      var kw = (d.keywords||'').toLowerCase().split(',');
+      if (kw.some(function(k){ return l.includes(k.trim()) && k.trim().length > 2; })) {
+        match = d;
+      }
+    });
+    return match;
+  } catch(e) { return null; }
+}
+
 // ── MAIN SEARCH ───────────────────────────────────────────────
 async function doSearch(q){
   q=(q||'').trim();
@@ -621,14 +663,16 @@ async function doSearch(q){
   }
 
   // Cauta in paralel: date VV + locatie + web search
-  var [missions,loc,webAnswer]=await Promise.all([
+  var [missions,loc,webAnswer,staticData,vvPage]=await Promise.all([
     findMissions(q,layer),
     findLoc(q),
-    nexusWebSearch(q,layer)
+    nexusWebSearch(q,layer),
+    findStaticData(q),
+    findVVNowPage(q)
   ]);
 
   document.getElementById('load').classList.remove('on');
-  renderResults(q,loc,missions,webAnswer,layer);
+  renderResults(q,loc,missions,webAnswer,layer,staticData,vvPage);
 
   // Log
   db.collection('vvhi_dataset').add({
@@ -639,7 +683,7 @@ async function doSearch(q){
 }
 
 // ── RENDER ────────────────────────────────────────────────────
-function renderResults(q,loc,missions,webAnswer,layer){
+function renderResults(q,loc,missions,webAnswer,layer,staticData,vvPage){
   var res=document.getElementById('results');
   var html='';
   var hasMissions=missions&&missions.length>0;
@@ -677,6 +721,33 @@ function renderResults(q,loc,missions,webAnswer,layer){
         return '<div class="proof-item">'+(m.description||'Verificare completată')+
           '<div class="proof-meta">Insider VV · '+dateStr+'</div></div>';
       }).join('')+
+    '</div>';
+  }
+
+  // ── 2.5 DATE STATICE CEO (prioritate maxima) ──
+  if(staticData && staticData.length > 0) {
+    staticData.forEach(function(s) {
+      var typeIcons = {spital:'🏥',politie:'🚔',pompieri:'🚒',smurd:'🚑',farmacie:'💊',metrou:'🚇',primarie:'🏛️',urgenta_num:'📞',obiectiv:'🏛️'};
+      html += '<div class="vv-card" style="border-color:rgba(52,199,89,.2);animation-delay:.04s">' +
+        '<div class="card-src"><div class="src-dot dot-green"></div>DATE VERIFICATE · VV STATIC</div>' +
+        '<div style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:100px;font-size:9px;font-weight:700;background:rgba(52,199,89,.08);border:0.5px solid rgba(52,199,89,.2);color:var(--green);margin-bottom:10px">✓ Verificat de CEO · Nu poate fi falsificat</div>' +
+        '<div style="font-family:var(--font);font-size:16px;font-weight:800;margin-bottom:4px">'+(typeIcons[s.type]||'⬡')+' '+s.name+'</div>' +
+        (s.addr ? '<div style="font-size:12px;color:var(--w30);margin-bottom:8px">'+s.addr+'</div>' : '') +
+        '<div style="display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--w50)">' +
+        (s.phone ? '<span>📞 '+s.phone+'</span>' : '') +
+        (s.hours ? '<span>🕐 '+s.hours+'</span>' : '') +
+        '</div>' +
+        (s.info ? '<div style="font-size:12px;color:var(--w50);margin-top:8px;line-height:1.6">'+s.info+'</div>' : '') +
+      '</div>';
+    });
+  }
+
+  // ── 2.6 PAGINA VV NOW (continut CEO) ──
+  if(vvPage) {
+    html += '<div class="answer-card" style="border-color:rgba(212,175,55,.15);animation-delay:.07s">' +
+      '<div class="card-src"><div class="src-dot dot-gold"></div>PAGINA VV NOW' + (vvPage.isSponsored?' · CONȚINUT SPONSORIZAT':'') + '</div>' +
+      '<div style="font-family:var(--font);font-size:15px;font-weight:800;margin-bottom:8px">'+vvPage.title+'</div>' +
+      '<div class="answer-text">'+vvPage.content+'</div>' +
     '</div>';
   }
 
