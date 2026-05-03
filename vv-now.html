@@ -431,8 +431,19 @@ function purge(){
 function getGPS(){
   if(!navigator.geolocation)return;
   navigator.geolocation.getCurrentPosition(
-    function(p){_gps={lat:p.coords.latitude,lng:p.coords.longitude};},
-    function(){},
+    function(p){
+      _gps={lat:p.coords.latitude,lng:p.coords.longitude};
+      initCityContext();
+    },
+    function(){
+      // Fallback - foloseste orasul salvat
+      var saved = localStorage.getItem('vvme_home_city');
+      if(saved){
+        _currentCity = saved;
+        var inp = document.getElementById('search-input');
+        if(inp) inp.placeholder = 'Ce vrei să știi despre '+saved+'?';
+      }
+    },
     {enableHighAccuracy:true,timeout:8000}
   );
 }
@@ -480,6 +491,90 @@ function renderHist(){
     }).join('')+'</div>';
 }
 
+
+// ── VV ME · CITY INTELLIGENCE ────────────────────────────────
+var _homeCity = localStorage.getItem('vvme_home_city') || null;
+var _currentCity = localStorage.getItem('vvme_current_city') || null;
+var _cityLat = null;
+var _cityLng = null;
+
+async function detectCityFromGPS(lat, lng) {
+  try {
+    var url = 'https://nominatim.openstreetmap.org/reverse?format=json&lat='+lat+'&lon='+lng+'&accept-language=ro';
+    var r = await fetch(url);
+    var d = await r.json();
+    var city = d.address ? (d.address.city || d.address.town || d.address.village || d.address.county || 'România') : 'România';
+    return city;
+  } catch(e) { return null; }
+}
+
+async function initCityContext() {
+  if (!_gps) return;
+  
+  var detectedCity = await detectCityFromGPS(_gps.lat, _gps.lng);
+  if (!detectedCity) return;
+  
+  _currentCity = detectedCity;
+  
+  // Prima vizita — seteaza orasul de acasa
+  if (!_homeCity) {
+    _homeCity = detectedCity;
+    localStorage.setItem('vvme_home_city', _homeCity);
+  }
+  
+  localStorage.setItem('vvme_current_city', _currentCity);
+  
+  // Update placeholder cu orasul detectat
+  var inp = document.getElementById('search-input');
+  if (inp && detectedCity) {
+    inp.placeholder = 'Ce vrei să știi despre ' + detectedCity + '?';
+  }
+  
+  // Daca e alt oras decat acasa — context switch silent
+  if (_homeCity && _currentCity && _homeCity.toLowerCase() !== _currentCity.toLowerCase()) {
+    showCitySwitch(_currentCity);
+  }
+}
+
+function showCitySwitch(city) {
+  // Notificare discreta ca VV Me a schimbat contextul
+  var banner = document.createElement('div');
+  banner.style.cssText = 'position:fixed;top:58px;left:50%;transform:translateX(-50%);background:rgba(10,132,255,.12);border:0.5px solid rgba(10,132,255,.25);border-radius:100px;padding:6px 16px;font-size:11px;color:rgba(10,132,255,.9);z-index:100;animation:fadeUp .3s ease;pointer-events:none;';
+  banner.textContent = '📍 VV Me: context schimbat → ' + city;
+  document.body.appendChild(banner);
+  setTimeout(function(){ banner.remove(); }, 3000);
+}
+
+// Purjare inteligenta la schimb de oras
+function purgeIfCityChanged() {
+  var lastCity = localStorage.getItem('vvme_last_search_city');
+  if (lastCity && _currentCity && lastCity.toLowerCase() !== _currentCity.toLowerCase()) {
+    // Oras diferit — purjeaza cache-ul de cautari (nu si locatiile statice)
+    localStorage.removeItem('vvnow_h');
+    if (_idb) {
+      try {
+        var tx = _idb.transaction('cache','readwrite');
+        tx.objectStore('cache').clear();
+      } catch(e) {}
+    }
+  }
+  if (_currentCity) localStorage.setItem('vvme_last_search_city', _currentCity);
+}
+
+// Injecteaza orasul in cautare daca userul nu l-a specificat
+function enrichQueryWithCity(q) {
+  var city = _currentCity || _homeCity;
+  if (!city) return q;
+  var l = q.toLowerCase();
+  // Daca query-ul nu contine deja un oras, adauga contextul
+  var cityWords = city.toLowerCase().split(' ');
+  var hasCity = cityWords.some(function(w){ return l.includes(w) && w.length > 3; });
+  if (!hasCity && city !== 'România') {
+    return q; // returnam query original, dar folosim city in Nominatim
+  }
+  return q;
+}
+
 // ── NOMINATIM cu cache ─────────────────────────────────────────
 async function findLoc(q){
   var term=getTerm(q);
@@ -489,8 +584,13 @@ async function findLoc(q){
   if(cached)return cached;
   if(!_isOnline)return null;
   try{
-    var url='https://nominatim.openstreetmap.org/search?format=json&q='+
-      encodeURIComponent(term)+'&limit=1&accept-language=ro&countrycodes=ro';
+    // Adauga orasul curent ca context daca nu e deja in query
+  var searchTerm = term;
+  if(_currentCity && !term.toLowerCase().includes(_currentCity.toLowerCase().split(' ')[0])) {
+    searchTerm = term + ' ' + _currentCity;
+  }
+  var url='https://nominatim.openstreetmap.org/search?format=json&q='+
+      encodeURIComponent(searchTerm)+'&limit=1&accept-language=ro&countrycodes=ro';
     if(_gps)url+='&viewbox='+(_gps.lng-.15)+','+(_gps.lat+.15)+','+(_gps.lng+.15)+','+(_gps.lat-.15)+'&bounded=0';
     var r=await fetch(url);
     var d=await r.json();
@@ -539,7 +639,7 @@ async function findMissions(q,layer){
   }catch(e){return[];}
 }
 
-// ── NEXUS WEB SEARCH (60% hibrid) ────────────────────────────
+// ── VV ME · WEB SEARCH (60% hibrid) ────────────────────────────
 async function nexusWebSearch(q,layer){
   if(!_isOnline)return null;
 
@@ -629,6 +729,7 @@ async function doSearch(q){
 
   var layer=detectLayer(q);
   addHist(q,layer);
+  purgeIfCityChanged();
 
   document.getElementById('hero').classList.add('compact');
   document.getElementById('hdr').classList.add('solid');
@@ -637,21 +738,30 @@ async function doSearch(q){
   window.scrollTo({top:0,behavior:'smooth'});
 
   var res=document.getElementById('results');
-  res.innerHTML='<div style="padding:20px 0;font-size:12px;color:rgba(212,175,55,.4);text-align:center;letter-spacing:1px">Nexus scanează...</div>';
+  res.innerHTML='<div style="padding:20px 0;font-size:12px;color:rgba(212,175,55,.4);text-align:center;letter-spacing:1px">VV Me scanează...</div>';
   res.classList.add('show');
   document.getElementById('load').classList.add('on');
 
   // Charter
-  if(BLOCKED.some(function(k){return q.toLowerCase().includes(k);})){
+  // Verificare Charter — cuvinte intregi, nu substring (ex: 'ura' nu blocheaza 'restaurant')
+  var qWords = q.toLowerCase().split(/[\s,;.!?]+/);
+  var isBlocked = BLOCKED.some(function(k){
+    if(k.includes(' ')) return q.toLowerCase().includes(k); // fraze intregi
+    return qWords.some(function(w){ return w === k; }); // cuvinte exacte
+  });
+  if(isBlocked){
     document.getElementById('load').classList.remove('on');
     res.innerHTML='<div class="blocked-card"><div class="card-src"><div class="src-dot" style="background:var(--red)"></div>BLOCAT · VV CHARTER</div><div style="font-size:14px;color:rgba(255,59,48,.5);line-height:1.7">Această cerere nu poate fi procesată. VV NOW funcționează pentru realitatea urbană legală.</div></div>';
     return;
   }
 
   // Non-urban
-  if(NON_URBAN.some(function(k){return q.toLowerCase().includes(k);})){
+  var isNonUrban = NON_URBAN.some(function(k){
+    return qWords.some(function(w){ return w === k; });
+  });
+  if(isNonUrban){
     document.getElementById('load').classList.remove('on');
-    res.innerHTML='<div class="answer-card"><div class="card-src"><div class="src-dot dot-gold"></div>NEXUS</div><div class="answer-text">VV NOW e construit pentru realitatea fizică din jurul tău — locații, cozi, accesibilitate, trafic. Pentru "<strong>'+q+'</strong>" încearcă un motor general.</div></div>';
+    res.innerHTML='<div class="answer-card"><div class="card-src"><div class="src-dot dot-gold"></div>VV ME</div><div class="answer-text">VV NOW e construit pentru realitatea fizică din jurul tău — locații, cozi, accesibilitate, trafic. Pentru "<strong>'+q+'</strong>" încearcă un motor general.</div></div>';
     return;
   }
 
@@ -691,7 +801,7 @@ function renderResults(q,loc,missions,webAnswer,layer,staticData,vvPage){
   var layerBadge=layer?'<div class="layer-badge lb-'+layer+'">'+LAYERS[layer].label.toUpperCase()+'</div>':'';
 
   // ── 1. RASPUNS PRINCIPAL NEXUS ──
-  var srcLabel='NEXUS'+(_lvl>=6?' SENSE · LVL '+_lvl:'');
+  var srcLabel='VV ME'+(_lvl>=6?' SENSE · LVL '+_lvl:'');
   var mainText='';
   if(hasMissions){
     var name=loc?loc.display_name.split(',')[0]:'această zonă';
@@ -754,7 +864,7 @@ function renderResults(q,loc,missions,webAnswer,layer,staticData,vvPage){
   // ── 3. DATE WEB HIBRID (60%) ──
   if(webAnswer){
     html+='<div class="web-card">'+
-      '<div class="card-src"><div class="src-dot dot-web"></div>DATE PUBLICE · INTERNET</div>'+
+      '<div class="card-src"><div class="src-dot dot-web"></div>DATE PUBLICE · VV ME WEB</div>'+
       '<div class="web-label">⚠ Nevalidat fizic</div>'+
       '<div class="web-text">'+webAnswer+'</div>'+
       '<div class="web-note">Sursă: internet public. Poate fi depășit. VERIFY = certitudine 100%.</div>'+
@@ -943,6 +1053,14 @@ openIDB().then(function(){
   getGPS();
   renderHist();
   if(_isOnline)loadPulse();
+  // Prima vizita
+  if(!localStorage.getItem('vvme_home_city') && !localStorage.getItem('vvme_welcomed')) {
+    localStorage.setItem('vvme_welcomed','1');
+    setTimeout(function(){
+      var inp = document.getElementById('search-input');
+      if(inp) inp.placeholder = 'Bună! Ce oraș explorezi azi?';
+    }, 800);
+  }
 });
 </script>
 </body>
