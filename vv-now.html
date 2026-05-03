@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#000">
+<title>VV NOW · Reality Search</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800;900&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#000;--bg1:#08080f;--bg2:#0f0f1a;
+  --gold:#D4AF37;--gold2:rgba(212,175,55,0.1);--gold3:rgba(212,175,55,0.06);
+  --gold-b:rgba(212,175,55,0.2);
+  --w:#fff;--w80:rgba(255,255,255,.8);--w50:rgba(255,255,255,.5);
+  --w30:rgba(255,255,255,.3);--w15:rgba(255,255,255,.15);
+  --w08:rgba(255,255,255,.08);--w04:rgba(255,255,255,.04);
+  --border:rgba(255,255,255,.07);
+  --green:#34c759;--blue:#0A84FF;--red:#ff3b30;--orange:#FF9500;
+  --font:'Syne',sans-serif;--mono:'DM Mono',monospace;
+}
+html,body{min-height:100vh;background:var(--bg);color:var(--w);
+  font-family:var(--mono);-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+
+/* Subtle grid */
+body::before{content:'';position:fixed;inset:0;
+  background-image:linear-gradient(rgba(212,175,55,.01) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(212,175,55,.01) 1px,transparent 1px);
+  background-size:48px 48px;pointer-events:none;z-index:0;}
+
+/* ════════════════════════════════════════
+   HEADER — stabil, sticky, curat
+═══════════════════════════════════════ */
+.hdr{
+  position:sticky;top:0;z-index:200;
+  background:rgba(0,0,0,.92);
+  backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);
+  border-bottom:1px solid var(--border);
+}
+.hdr-top{
+  display:flex;align-items:center;gap:14px;
+  padding:10px 20px;max-width:1100px;margin:0 auto;
+}
+.hdr-logo{
+  display:flex;align-items:baseline;gap:6px;
+  text-decoration:none;flex-shrink:0;
+}
+.hdr-logo-vv{
+  font-family:var(--font);font-weight:900;
+  font-size:20px;letter-spacing:5px;color:var(--gold);
+}
+.hdr-logo-now{
+  font-size:9px;letter-spacing:3px;color:var(--w30);font-weight:700;
+}
+
+/* Search bar header */
+.hdr-bar{
+  flex:1;display:flex;align-items:center;gap:10px;
+  background:var(--w04);border:1px solid var(--border);
+  border-radius:24px;padding:9px 16px;
+  transition:all .2s;max-width:680px;
+}
+.hdr-bar:focus-within{
+  border-color:rgba(212,175,55,.3);
+  background:rgba(255,255,255,.06);
+}
+.hdr-bar-icon{font-size:14px;color:var(--w30);flex-shrink:0;}
+.hdr-bar input{
+  flex:1;background:none;border:none;outline:none;
+  color:var(--w);font-family:var(--mono);font-size:14px;
+}
+.hdr-bar input::placeholder{color:var(--w30);}
+.hdr-bar-btn{
+  flex-shrink:0;width:30px;height:30px;
+  background:var(--gold);color:#000;border:none;
+  border-radius:50%;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;font-weight:900;transition:opacity .15s;
+}
+.hdr-bar-btn:active{opacity:.8;}
+
+/* Header right */
+.hdr-right{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.hdr-chip{
+  display:flex;align-items:center;gap:5px;
+  padding:5px 11px;background:var(--w04);
+  border:0.5px solid var(--border);border-radius:20px;
+  font-size:10px;color:var(--w50);text-decoration:none;
+  transition:all .15s;white-space:nowrap;
+}
+.hdr-chip:hover{background:var(--w08);color:var(--w80);}
+.hdr-chip.gold{background:var(--gold2);border-color:var(--gold-b);color:var(--gold);}
+.live-dot{width:5px;height:5px;border-radius:50%;
+  background:var(--green);box-shadow:0 0 6px rgba(52,199,89,.8);
+  animation:liveBlink 2s ease-in-out infinite;}
+@keyframes liveBlink{0%,100%{opacity:1}50%{opacity:.2}}
+
+/* Tab row */
+.hdr-tabs{
+  display:flex;gap:0;padding:0 20px;
+  max-width:1100px;margin:0 auto;
+  border-top:1px solid rgba(255,255,255,.04);
+  overflow-x:auto;scrollbar-width:none;
+}
+.hdr-tabs::-webkit-scrollbar{display:none;}
+.hdr-tab{
+  padding:8px 16px;font-size:11px;color:var(--w30);
+  font-weight:700;letter-spacing:.5px;cursor:pointer;
+  border-bottom:2px solid transparent;transition:all .15s;
+  white-space:nowrap;
+}
+.hdr-tab:hover{color:var(--w80);}
+.hdr-tab.active{color:var(--gold);border-bottom-color:var(--gold);}
+
+/* ════════════════════════════════════════
+   HERO — pagina de start
+═══════════════════════════════════════ */
+.hero{
+  min-height:calc(100vh - 110px);
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:40px 20px 60px;
+  text-align:center;
+  position:relative;z-index:1;
+}
+.hero.gone{display:none;}
+
+/* Hexagon signature */
+.hero-hex{
+  position:relative;width:72px;height:72px;
+  margin:0 auto 32px;
+  display:flex;align-items:center;justify-content:center;
+}
+.hx-r{position:absolute;border-radius:50%;border:1px solid;
+  animation:hxAnim 3.2s ease-in-out infinite;}
+.hx-r:nth-child(1){inset:0;border-color:rgba(212,175,55,.55);animation-delay:0s;}
+.hx-r:nth-child(2){inset:-14px;border-color:rgba(212,175,55,.2);animation-delay:.7s;}
+.hx-r:nth-child(3){inset:-28px;border-color:rgba(212,175,55,.07);animation-delay:1.4s;}
+@keyframes hxAnim{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.07);opacity:.5}}
+.hx-core{width:50px;height:50px;border-radius:50%;
+  background:rgba(212,175,55,.07);border:1px solid rgba(212,175,55,.25);
+  display:flex;align-items:center;justify-content:center;font-size:20px;
+  position:relative;z-index:1;}
+
+.hero-eye{font-size:8px;letter-spacing:5px;color:rgba(212,175,55,.4);
+  font-weight:700;margin-bottom:14px;}
+.hero-title{
+  font-family:var(--font);font-size:clamp(30px,6vw,56px);
+  font-weight:900;letter-spacing:-1.5px;line-height:1.05;margin-bottom:14px;
+}
+.hero-title .g{
+  background:linear-gradient(135deg,#D4AF37,#ffe88a 50%,#D4AF37);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.hero-sub{font-size:14px;color:var(--w50);line-height:1.8;
+  max-width:420px;margin:0 auto 36px;}
+
+/* Hero search — mare, central */
+.hero-search{position:relative;width:100%;max-width:580px;margin:0 auto 20px;}
+.hero-input{
+  width:100%;background:rgba(255,255,255,.05);
+  border:1px solid rgba(212,175,55,.22);
+  border-radius:20px;padding:18px 56px 18px 22px;
+  color:var(--w);font-family:var(--mono);font-size:15px;
+  outline:none;transition:all .2s;-webkit-appearance:none;
+}
+.hero-input:focus{border-color:rgba(212,175,55,.5);background:rgba(255,255,255,.07);
+  box-shadow:0 0 0 4px rgba(212,175,55,.05);}
+.hero-input::placeholder{color:var(--w30);}
+.hero-search-btn{
+  position:absolute;right:8px;top:50%;transform:translateY(-50%);
+  width:42px;height:42px;background:var(--gold);color:#000;
+  border:none;border-radius:14px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;font-weight:900;transition:opacity .15s;
+}
+.hero-search-btn:active{opacity:.8;}
+
+/* Sugestii */
+.hero-suggestions{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;}
+.sug{
+  padding:7px 14px;background:var(--w04);
+  border:0.5px solid var(--border);border-radius:20px;
+  font-size:11px;color:var(--w50);cursor:pointer;transition:all .15s;
+}
+.sug:hover{background:var(--gold2);border-color:var(--gold-b);color:var(--gold);}
+
+/* Istoric local */
+.hero-history{margin-top:28px;width:100%;max-width:480px;}
+.hist-title{font-size:9px;letter-spacing:3px;color:var(--w30);font-weight:700;
+  margin-bottom:10px;text-align:left;}
+.hist-items{display:flex;flex-direction:column;gap:4px;}
+.hist-item{
+  display:flex;align-items:center;gap:10px;
+  padding:8px 12px;background:var(--w04);
+  border:0.5px solid var(--border);border-radius:10px;
+  cursor:pointer;transition:all .15s;text-align:left;
+}
+.hist-item:hover{background:var(--w08);border-color:var(--w15);}
+.hist-icon{font-size:12px;color:var(--w30);flex-shrink:0;}
+.hist-text{font-size:12px;color:var(--w50);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.hist-time{font-size:10px;color:var(--w30);flex-shrink:0;}
+
+/* ════════════════════════════════════════
+   RESULTS PAGE
+═══════════════════════════════════════ */
+.results-page{
+  display:none;max-width:1100px;margin:0 auto;
+  padding:20px 20px 60px;
+  position:relative;z-index:1;
+}
+.results-page.show{display:flex;gap:20px;align-items:flex-start;}
+
+/* Main col */
+.results-main{flex:1;min-width:0;}
+.results-info{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:16px;flex-wrap:wrap;gap:8px;
+}
+.results-count{font-size:11px;color:var(--w30);}
+.results-count b{color:var(--w50);}
+
+/* Loading bar */
+.load-bar{height:2px;background:var(--border);border-radius:2px;
+  overflow:hidden;margin-bottom:16px;display:none;}
+.load-bar.on{display:block;}
+.load-fill{height:100%;background:linear-gradient(90deg,var(--gold),rgba(212,175,55,.3));
+  animation:ldAnim 1.6s ease-in-out infinite;}
+@keyframes ldAnim{0%{width:0;margin-left:0}50%{width:65%;margin-left:18%}100%{width:0;margin-left:100%}}
+
+/* Cards */
+.rc{
+  background:var(--w04);border:0.5px solid var(--border);
+  border-radius:14px;padding:16px 18px;margin-bottom:10px;
+  position:relative;overflow:hidden;transition:border-color .15s;
+  animation:fadeU .35s cubic-bezier(.16,1,.3,1) both;
+}
+@keyframes fadeU{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.rc:nth-child(1){animation-delay:.04s}
+.rc:nth-child(2){animation-delay:.08s}
+.rc:nth-child(3){animation-delay:.12s}
+.rc:nth-child(4){animation-delay:.16s}
+.rc:hover{border-color:var(--w15);}
+.rc.loc{border-color:rgba(212,175,55,.15);}
+.rc.loc:hover{border-color:var(--gold-b);}
+.rc.ok{border-color:rgba(52,199,89,.15);}
+.rc.blocked-r{border-color:rgba(255,59,48,.15);background:rgba(255,59,48,.03);}
+
+.rc-top{display:flex;align-items:center;gap:6px;margin-bottom:8px;}
+.rc-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;}
+.d-nexus{background:var(--blue);}
+.d-loc{background:var(--gold);}
+.d-ok{background:var(--green);box-shadow:0 0 6px rgba(52,199,89,.6);}
+.d-block{background:var(--red);}
+.rc-label{font-size:8px;letter-spacing:3px;color:var(--w30);font-weight:700;}
+
+.rc-title{font-family:var(--font);font-size:16px;font-weight:800;
+  color:var(--w);margin-bottom:6px;letter-spacing:-.2px;line-height:1.3;}
+.rc-body{font-size:13px;color:var(--w50);line-height:1.75;margin-bottom:10px;}
+.rc-footer{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.tag{padding:2px 8px;border-radius:5px;font-size:9px;font-weight:700;letter-spacing:1px;}
+.t-blue{background:rgba(10,132,255,.1);border:0.5px solid rgba(10,132,255,.2);color:var(--blue);}
+.t-gold{background:var(--gold2);border:0.5px solid var(--gold-b);color:var(--gold);}
+.t-green{background:rgba(52,199,89,.08);border:0.5px solid rgba(52,199,89,.2);color:var(--green);}
+.t-dim{background:var(--w04);border:0.5px solid var(--border);color:var(--w30);}
+.t-red{background:rgba(255,59,48,.08);border:0.5px solid rgba(255,59,48,.2);color:var(--red);}
+
+/* VERIFY section */
+.verify-wrap{
+  margin-top:12px;padding-top:12px;
+  border-top:1px solid var(--border);
+}
+.verify-eyebrow{font-size:8px;letter-spacing:3px;color:rgba(212,175,55,.5);
+  font-weight:700;margin-bottom:8px;}
+.verify-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.verify-btn{
+  display:inline-flex;align-items:center;gap:7px;
+  padding:9px 16px;
+  background:rgba(212,175,55,.1);border:0.5px solid rgba(212,175,55,.3);
+  border-radius:10px;color:var(--gold);
+  font-family:var(--font);font-size:12px;font-weight:800;
+  cursor:pointer;transition:all .18s;letter-spacing:.5px;
+}
+.verify-btn:hover{background:rgba(212,175,55,.18);border-color:rgba(212,175,55,.5);}
+.verify-btn:active{opacity:.8;}
+.verify-btn.sent{opacity:.5;pointer-events:none;}
+.verify-cost{font-size:10px;color:var(--w30);font-style:italic;}
+
+.flash-row{
+  display:none;align-items:center;gap:8px;
+  margin-top:10px;padding:10px 14px;
+  background:rgba(52,199,89,.06);
+  border:0.5px solid rgba(52,199,89,.2);
+  border-radius:10px;font-size:12px;color:var(--green);
+}
+.flash-row.on{display:flex;}
+.fp{width:7px;height:7px;border-radius:50%;background:var(--green);flex-shrink:0;
+  animation:fpAnim 1.1s ease-in-out infinite;}
+@keyframes fpAnim{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.25;transform:scale(.6)}}
+
+/* Geofence warning */
+.geo-warn{
+  padding:10px 14px;margin-top:10px;
+  background:rgba(255,149,0,.06);border:0.5px solid rgba(255,149,0,.2);
+  border-radius:10px;font-size:11px;color:var(--orange);
+}
+
+/* ════════════════════════════════════════
+   SIDEBAR
+═══════════════════════════════════════ */
+.sidebar{width:300px;flex-shrink:0;position:sticky;top:110px;}
+.sb-card{
+  background:var(--w04);border:0.5px solid var(--border);
+  border-radius:14px;padding:16px 18px;margin-bottom:10px;
+}
+.sb-title{font-size:8px;letter-spacing:3px;color:var(--w30);font-weight:700;
+  margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.sb-title::after{content:'';flex:1;height:1px;background:var(--border);}
+
+.ctx-row{display:flex;align-items:center;gap:10px;padding:7px 0;
+  border-bottom:1px solid rgba(255,255,255,.03);font-size:11px;}
+.ctx-row:last-child{border-bottom:none;}
+.ctx-ico{width:18px;text-align:center;font-size:13px;flex-shrink:0;}
+.ctx-lbl{color:var(--w30);min-width:60px;flex-shrink:0;}
+.ctx-val{color:var(--w80);font-weight:600;font-size:11px;}
+
+.charter-item{display:flex;align-items:center;gap:8px;
+  font-size:11px;color:var(--w50);padding:4px 0;}
+.c-ok{color:var(--green);}
+.c-no{color:var(--red);}
+
+.stat-r{display:flex;justify-content:space-between;
+  font-size:11px;margin-bottom:5px;}
+.stat-v{font-family:var(--font);font-weight:800;color:var(--w);}
+.stat-l{color:var(--w30);}
+
+/* Login VV ID teaser */
+.sb-login{
+  background:rgba(212,175,55,.05);border:0.5px solid var(--gold-b);
+  border-radius:14px;padding:16px 18px;margin-bottom:10px;
+}
+.sb-login-title{font-family:var(--font);font-size:13px;font-weight:800;margin-bottom:6px;}
+.sb-login-sub{font-size:11px;color:var(--w50);line-height:1.7;margin-bottom:12px;}
+.sb-login-btn{
+  display:block;text-align:center;
+  padding:9px;background:var(--gold);color:#000;
+  border-radius:9px;font-family:var(--font);font-size:11px;font-weight:800;
+  text-decoration:none;letter-spacing:.5px;transition:opacity .15s;
+}
+.sb-login-btn:hover{opacity:.88;}
+.sb-login-soon{font-size:9px;color:var(--w30);text-align:center;margin-top:6px;letter-spacing:1px;}
+
+/* ── TOAST ── */
+#vvt{position:fixed;bottom:calc(20px + env(safe-area-inset-bottom,0px));
+  left:50%;transform:translateX(-50%) translateY(8px);
+  background:rgba(10,10,16,.97);border:0.5px solid var(--w15);
+  border-radius:12px;padding:10px 20px;font-size:12px;font-weight:600;
+  white-space:nowrap;max-width:92vw;
+  opacity:0;transition:all .25s;pointer-events:none;z-index:9999;}
+#vvt.on{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* Mobile */
+@media(max-width:768px){
+  .hdr-right{display:none;}
+  .results-page.show{flex-direction:column;}
+  .sidebar{width:100%;position:static;}
+  .hero-title{font-size:28px;}
+}
+@media(max-width:520px){
+  .hdr-top{padding:8px 14px;gap:10px;}
+  .hdr-logo-now{display:none;}
+  .hero-input{font-size:14px;padding:15px 50px 15px 16px;}
+}
+</style>
+</head>
+<body>
+
+<div id="vvt"></div>
+
+<!-- ════ HEADER ════ -->
+<header class="hdr">
+  <div class="hdr-top">
+    <a href="https://vv-technologies.github.io/vv-nexus/" class="hdr-logo">
+      <span class="hdr-logo-vv">VV</span>
+      <span class="hdr-logo-now">NOW</span>
+    </a>
+
+    <!-- Search bar — apare dupa prima cautare -->
+    <div class="hdr-bar" id="hdr-bar" style="display:none">
+      <span class="hdr-bar-icon">⬡</span>
+      <input type="text" id="hdr-input" placeholder="Caută în realitate..."
+        onkeydown="if(event.key==='Enter')doSearch(this.value)">
+      <button class="hdr-bar-btn" onclick="doSearch(document.getElementById('hdr-input').value)">→</button>
+    </div>
+
+    <div class="hdr-right">
+      <div class="hdr-chip" id="user-chip" style="display:none">
+        <span class="live-dot"></span>
+        <span id="user-chip-text">—</span>
+      </div>
+      <a href="https://vv-technologies.github.io/vv-beta" class="hdr-chip">VV Beta</a>
+      <a href="https://vv-technologies.github.io/vv-nexus/vv-pulse.html" class="hdr-chip">Pulse Map</a>
+    </div>
+  </div>
+
+  <!-- Tabs — apar dupa cautare -->
+  <div class="hdr-tabs" id="hdr-tabs" style="display:none">
+    <div class="hdr-tab active" onclick="filterTab('all',this)">Tot</div>
+    <div class="hdr-tab" onclick="filterTab('nexus',this)">🧠 Nexus</div>
+    <div class="hdr-tab" onclick="filterTab('loc',this)">📍 Locații</div>
+    <div class="hdr-tab" onclick="filterTab('ok',this)">✅ Verificate</div>
+  </div>
+</header>
+
+<!-- ════ HERO ════ -->
+<div class="hero" id="hero">
+
+  <div class="hero-hex">
+    <div class="hx-r"></div>
+    <div class="hx-r"></div>
+    <div class="hx-r"></div>
+    <div class="hx-core">⬡</div>
+  </div>
+
+  <div class="hero-eye">VV NOW · REALITY SEARCH · BETA</div>
+  <h1 class="hero-title">Internetul se termină.<br><span class="g">Realitatea începe.</span></h1>
+  <p class="hero-sub">Nexus caută, filtrează conform Charter VV și trimite Insideri reali să verifice fizic. Nu reclame. Nu fake-uri.</p>
+
+  <div class="hero-search">
+    <input class="hero-input" id="hero-input" type="text"
+      placeholder="Ex: E coadă la Kaufland? Cum e Centrul Vechi acum?"
+      onkeydown="if(event.key==='Enter')doSearch(this.value)">
+    <button class="hero-search-btn" onclick="doSearch(document.getElementById('hero-input').value)">→</button>
+  </div>
+
+  <div class="hero-suggestions">
+    <div class="sug" onclick="doSearch('E coadă la Kaufland?')">🛒 Kaufland</div>
+    <div class="sug" onclick="doSearch('Cum e atmosfera Centrul Vechi acum?')">🌆 Centrul Vechi</div>
+    <div class="sug" onclick="doSearch('Loc de parcare Piața Victoriei')">🚗 Parcare</div>
+    <div class="sug" onclick="doSearch('Cafenele liniștite Floreasca')">☕ Cafenele</div>
+    <div class="sug" onclick="doSearch('Teren fotbal liber Sector 2')">⚽ Sport</div>
+    <div class="sug" onclick="doSearch('Cum e traficul pe Șoseaua Kiseleff?')">🚦 Trafic</div>
+  </div>
+
+  <!-- Istoric cautari locale -->
+  <div class="hero-history" id="hero-history" style="display:none">
+    <div class="hist-title">CĂUTĂRI RECENTE</div>
+    <div class="hist-items" id="hist-list"></div>
+  </div>
+
+</div>
+
+<!-- ════ RESULTS ════ -->
+<div class="results-page" id="results-page">
+
+  <!-- Main -->
+  <div class="results-main">
+    <div class="load-bar" id="load-bar"><div class="load-fill"></div></div>
+    <div class="results-info">
+      <div class="results-count" id="results-count"></div>
+    </div>
+    <div id="results-list"></div>
+  </div>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+
+    <!-- Login VV ID — coming soon -->
+    <div class="sb-login" id="sb-login-card">
+      <div class="sb-login-title">⬡ VV ID Login</div>
+      <div class="sb-login-sub">Conectează-te cu identitatea ta din ecosistemul VV pentru experiență personalizată și istoricul misiunilor tale.</div>
+      <a href="https://vv-technologies.github.io/vv-beta" class="sb-login-btn">Deschide VV Beta</a>
+      <div class="sb-login-soon">VV ID direct login · Coming în VV 1.0</div>
+    </div>
+
+    <!-- Nexus context -->
+    <div class="sb-card">
+      <div class="sb-title">NEXUS · CONTEXT</div>
+      <div class="ctx-row"><span class="ctx-ico">📍</span><span class="ctx-lbl">Locație</span><span class="ctx-val" id="ctx-loc">—</span></div>
+      <div class="ctx-row"><span class="ctx-ico">🇷🇴</span><span class="ctx-lbl">Zona</span><span class="ctx-val" id="ctx-zone">—</span></div>
+      <div class="ctx-row"><span class="ctx-ico">⏰</span><span class="ctx-lbl">Ora</span><span class="ctx-val" id="ctx-time">—</span></div>
+      <div class="ctx-row"><span class="ctx-ico">⬡</span><span class="ctx-lbl">Level</span><span class="ctx-val" id="ctx-lvl">—</span></div>
+      <div class="ctx-row"><span class="ctx-ico">🧠</span><span class="ctx-lbl">Mod</span><span class="ctx-val" id="ctx-mode">—</span></div>
+    </div>
+
+    <!-- Charter compliance -->
+    <div class="sb-card">
+      <div class="sb-title">VV CHARTER · FILTRU ACTIV</div>
+      <div class="charter-item"><span class="c-ok">✓</span> ART-1 · Anonimat păstrat</div>
+      <div class="charter-item"><span class="c-ok">✓</span> ART-3 · Conținut filtrat</div>
+      <div class="charter-item"><span class="c-ok">✓</span> ART-4 · Orientat la acțiune</div>
+      <div class="charter-item" id="charter-geo"><span class="c-ok">✓</span> Geofencing · România</div>
+    </div>
+
+    <!-- Ecosistem live -->
+    <div class="sb-card">
+      <div class="sb-title">ECOSISTEM · LIVE</div>
+      <div class="stat-r"><span class="stat-l">Insideri activi</span><span class="stat-v" id="s-ins">—</span></div>
+      <div class="stat-r"><span class="stat-l">Misiuni azi</span><span class="stat-v" id="s-mis">—</span></div>
+      <div class="stat-r"><span class="stat-l">Flash Missions</span><span class="stat-v" id="s-flash">—</span></div>
+      <div class="stat-r"><span class="stat-l">Timp mediu verify</span><span class="stat-v">~18 min</span></div>
+    </div>
+
+    <!-- CTA VV Beta -->
+    <div class="sb-card" style="background:var(--gold2);border-color:var(--gold-b);">
+      <div class="sb-title" style="color:rgba(212,175,55,.5)">DEVINO INSIDER</div>
+      <div style="font-size:12px;color:var(--w50);line-height:1.8;margin-bottom:12px;">
+        Câștigă VV Coins validând locații reale din orașul tău.
+      </div>
+      <a href="https://vv-technologies.github.io/vv-beta" style="display:block;text-align:center;padding:10px;background:var(--gold);color:#000;border-radius:9px;font-family:var(--font);font-size:12px;font-weight:800;text-decoration:none;">
+        ⬡ INTRĂ ÎN VV BETA
+      </a>
+    </div>
+
+  </div>
+</div>
+
+<!-- FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script>
+if (!firebase.apps.length) {
+  firebase.initializeApp({
+    apiKey:"AIzaSyDGv4kEClO0RHCLvXVLOT-vyPHw6bsxYVc",
+    authDomain:"vv-ep-beta.firebaseapp.com",
+    projectId:"vv-ep-beta"
+  });
+}
+var db = firebase.firestore();
+
+// ── CONSTANTE ────────────────────────────────────────────────
+var CHARTER_BLOCKED = ['porn','sex explicit','drog','cocain','heroina','dealer',
+  'arma','pistol','bomba','secta','frauda','hack','ura','rasism',
+  'discriminare','prostitutie','trafic uman'];
+
+// Geofencing Romania — bounding box
+var RO_BOUNDS = { latMin:43.6, latMax:48.3, lngMin:20.2, lngMax:30.0 };
+
+// ── STATE ────────────────────────────────────────────────────
+var _gps = null;
+var _inRomania = null;
+var _userProfile = {};
+var _currentQuery = '';
+var _flashListeners = {};
+
+// ── IndexedDB CACHE — Local-First ────────────────────────────
+var _idb = null;
+var IDB_NAME = 'vvnow_cache';
+var IDB_VERSION = 1;
+var CACHE_TTL = 24 * 60 * 60 * 1000; // 24h
+
+function initIDB() {
+  return new Promise(function(resolve) {
+    try {
+      var req = indexedDB.open(IDB_NAME, IDB_VERSION);
+      req.onupgradeneeded = function(e) {
+        var db = e.target.result;
+        if (!db.objectStoreNames.contains('locations')) {
+          var store = db.createObjectStore('locations', { keyPath: 'key' });
+          store.createIndex('ts', 'ts');
+        }
+      };
+      req.onsuccess = function(e) { _idb = e.target.result; resolve(true); };
+      req.onerror = function() { resolve(false); };
+    } catch(e) { resolve(false); }
+  });
+}
+
+function idbGet(key) {
+  return new Promise(function(resolve) {
+    if (!_idb) { resolve(null); return; }
+    try {
+      var tx = _idb.transaction('locations', 'readonly');
+      var req = tx.objectStore('locations').get(key);
+      req.onsuccess = function() {
+        var rec = req.result;
+        if (!rec) { resolve(null); return; }
+        // Verifica TTL
+        if (Date.now() - rec.ts > CACHE_TTL) {
+          idbDelete(key);
+          resolve(null);
+          return;
+        }
+        resolve(rec.data);
+      };
+      req.onerror = function() { resolve(null); };
+    } catch(e) { resolve(null); }
+  });
+}
+
+function idbSet(key, data) {
+  if (!_idb) return;
+  try {
+    var tx = _idb.transaction('locations', 'readwrite');
+    tx.objectStore('locations').put({ key: key, data: data, ts: Date.now() });
+  } catch(e) {}
+}
+
+function idbDelete(key) {
+  if (!_idb) return;
+  try {
+    var tx = _idb.transaction('locations', 'readwrite');
+    tx.objectStore('locations').delete(key);
+  } catch(e) {}
+}
+
+// ── INIT ─────────────────────────────────────────────────────
+(async function init() {
+  await initIDB();
+  loadUserProfile();
+  loadLocalHistory();
+  loadLiveStats();
+  startClock();
+  getGPS();
+})();
+
+function startClock() {
+  function tick() {
+    var now = new Date();
+    var h = now.getHours(), m = now.getMinutes();
+    var period = h<12?'dimineața':h<18?'după-amiaza':h<22?'seara':'noaptea';
+    document.getElementById('ctx-time').textContent =
+      String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ' · ' + period;
+  }
+  tick(); setInterval(tick, 30000);
+}
+
+function getGPS() {
+  if (!navigator.geolocation) {
+    document.getElementById('ctx-loc').textContent = 'Indisponibil';
+    document.getElementById('ctx-zone').textContent = 'România (implicit)';
+    _inRomania = true; // Assume Romania daca nu avem GPS
+    return;
+  }
+  navigator.geolocation.getCurrentPosition(function(pos) {
+    _gps = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+    // Verifica geofencing
+    _inRomania = (
+      _gps.lat >= RO_BOUNDS.latMin && _gps.lat <= RO_BOUNDS.latMax &&
+      _gps.lng >= RO_BOUNDS.lngMin && _gps.lng <= RO_BOUNDS.lngMax
+    );
+    document.getElementById('ctx-loc').textContent =
+      _gps.lat.toFixed(4) + ', ' + _gps.lng.toFixed(4);
+    document.getElementById('ctx-zone').textContent =
+      _inRomania ? '🇷🇴 România' : '⚠️ În afara României';
+
+    // Update charter geo indicator
+    var geoEl = document.getElementById('charter-geo');
+    if (geoEl) {
+      if (_inRomania) {
+        geoEl.innerHTML = '<span class="c-ok">✓</span> Geofencing · În România';
+      } else {
+        geoEl.innerHTML = '<span class="c-no">✗</span> Geofencing · În afara zonei Beta';
+      }
+    }
+  }, function() {
+    document.getElementById('ctx-loc').textContent = 'Blocat';
+    document.getElementById('ctx-zone').textContent = 'România (implicit)';
+    _inRomania = true;
+  }, { enableHighAccuracy: true, timeout: 8000 });
+}
+
+function loadUserProfile() {
+  var alias = localStorage.getItem('vv_alias');
+  var statsRaw = localStorage.getItem('vv_core_stats') || localStorage.getItem('vvhi_core_stats');
+  var stats = null;
+  try { stats = JSON.parse(statsRaw); } catch(e) {}
+
+  _userProfile = { alias, stats };
+
+  var lvl = stats ? (stats.experience_level || 1) : 1;
+  var mode = lvl>=16?'Nexus Vision':lvl>=11?'Nexus Sense Pro':lvl>=6?'Nexus Sense':'Nexus Base';
+
+  document.getElementById('ctx-lvl').textContent = 'Level ' + lvl;
+  document.getElementById('ctx-mode').textContent = mode;
+
+  if (alias) {
+    var chip = document.getElementById('user-chip');
+    document.getElementById('user-chip-text').textContent = '⬡ ' + alias;
+    chip.style.display = 'flex';
+    // Ascunde login card daca e user VV
+    var lc = document.getElementById('sb-login-card');
+    if (lc) lc.style.display = 'none';
+  }
+}
+
+// ── LOCAL HISTORY ────────────────────────────────────────────
+function getHistory() {
+  try { return JSON.parse(localStorage.getItem('vvnow_history') || '[]'); } catch(e) { return []; }
+}
+
+function saveToHistory(query) {
+  var h = getHistory();
+  h = h.filter(function(i){ return i.q !== query; }); // Deduplica
+  h.unshift({ q: query, t: Date.now() });
+  h = h.slice(0, 5);
+  localStorage.setItem('vvnow_history', JSON.stringify(h));
+}
+
+function loadLocalHistory() {
+  var h = getHistory();
+  if (h.length === 0) return;
+  var histEl = document.getElementById('hero-history');
+  var listEl = document.getElementById('hist-list');
+  if (!histEl || !listEl) return;
+  histEl.style.display = 'block';
+  listEl.innerHTML = h.map(function(item) {
+    var ago = timeAgo(item.t);
+    return '<div class="hist-item" onclick="doSearch(\'' + item.q.replace(/'/g,"\\'") + '\')">' +
+      '<span class="hist-icon">🕐</span>' +
+      '<span class="hist-text">' + item.q + '</span>' +
+      '<span class="hist-time">' + ago + '</span>' +
+    '</div>';
+  }).join('');
+}
+
+function timeAgo(ts) {
+  var diff = Math.floor((Date.now() - ts) / 60000);
+  if (diff < 1) return 'acum';
+  if (diff < 60) return diff + ' min';
+  if (diff < 1440) return Math.floor(diff/60) + 'h';
+  return Math.floor(diff/1440) + 'z';
+}
+
+// ── LIVE STATS ────────────────────────────────────────────────
+async function loadLiveStats() {
+  try {
+    var today = new Date(); today.setHours(0,0,0,0);
+    var ts = firebase.firestore.Timestamp.fromDate(today);
+    var [pulse, mis, flash] = await Promise.all([
+      db.collection('vv_pulse').get(),
+      db.collection('missions').where('createdAt','>=',ts).get(),
+      db.collection('missions').where('type','==','flash_mission').where('createdAt','>=',ts).get()
+    ]);
+    document.getElementById('s-ins').textContent = pulse.size;
+    document.getElementById('s-mis').textContent = mis.size;
+    document.getElementById('s-flash').textContent = flash.size;
+  } catch(e) {}
+}
+
+// ── SEARCH ───────────────────────────────────────────────────
+async function doSearch(query) {
+  query = (query||'').trim();
+  if (!query) return;
+  _currentQuery = query;
+
+  // Salveaza in history
+  saveToHistory(query);
+
+  // Switch to results view
+  document.getElementById('hero').classList.add('gone');
+  document.getElementById('hdr-bar').style.display = 'flex';
+  document.getElementById('hdr-input').value = query;
+  document.getElementById('hdr-tabs').style.display = 'flex';
+  document.getElementById('results-page').classList.add('show');
+
+  // Loading
+  var lb = document.getElementById('load-bar');
+  lb.classList.add('on');
+  document.getElementById('results-list').innerHTML = '';
+  document.getElementById('results-count').innerHTML = '';
+
+  // Charter moderation
+  if (moderateQuery(query)) {
+    lb.classList.remove('on');
+    renderBlocked(query);
+    logSearch(query, 'BLOCKED');
+    return;
+  }
+
+  // Cauta locatie via Nominatim
+  var loc = null;
+  try { loc = await findLocation(query); } catch(e) {}
+
+  // Render rezultate
+  renderResults(query, loc);
+  lb.classList.remove('on');
+  logSearch(query, 'OK');
+}
+
+function moderateQuery(q) {
+  var l = (q||'').toLowerCase();
+  return CHARTER_BLOCKED.some(function(k){ return l.includes(k); });
+}
+
+async function findLocation(query) {
+  var term = extractTerm(query);
+  if (!term) return null;
+
+  // ── Verifica cache local primul ──
+  var cacheKey = 'loc_' + term.toLowerCase().replace(/\s+/g,'_');
+  var cached = await idbGet(cacheKey);
+  if (cached) {
+    // Afiseaza indicator cache in sidebar
+    var modeEl = document.getElementById('ctx-mode');
+    if (modeEl) {
+      var currentMode = modeEl.textContent;
+      if (!currentMode.includes('⚡')) modeEl.textContent = currentMode + ' ⚡';
+    }
+    return cached;
+  }
+
+  // ── Nu e in cache — fa request Nominatim ──
+  try {
+    var url = 'https://nominatim.openstreetmap.org/search?format=json&q=' +
+      encodeURIComponent(term) + '&limit=1&accept-language=ro&countrycodes=ro';
+    if (_gps) {
+      url += '&viewbox=' + (_gps.lng-.1)+','+(_gps.lat+.1)+','+(_gps.lng+.1)+','+(_gps.lat-.1) + '&bounded=0';
+    }
+    var res = await fetch(url);
+    var data = await res.json();
+    if (data && data.length > 0) {
+      // Salveaza in cache pentru urmatoarele 24h
+      idbSet(cacheKey, data[0]);
+      return data[0];
+    }
+    return null;
+  } catch(e) { return null; }
+}
+
+function extractTerm(query) {
+  var kw = {
+    'kaufland':'Kaufland','lidl':'Lidl','penny':'Penny Market','profi':'Profi',
+    'mega':'Mega Image','auchan':'Auchan','carrefour':'Carrefour',
+    'parcare':'parcare auto','teren':'teren sport','fotbal':'teren fotbal',
+    'cafenea':'cafenea','restaurant':'restaurant','pizza':'pizza restaurant',
+    'parc':'parc','mall':'mall','cinema':'cinema','spital':'spital',
+    'farmacie':'farmacie','atm':'ATM bancomat','banca':'banca',
+    'centrul vechi':'Centrul Vechi Bucuresti','floreasca':'Floreasca Bucuresti',
+    'victoriei':'Piata Victoriei','unirii':'Piata Unirii',
+    'herastrau':'Parcul Herastrau','obor':'Piata Obor',
+    'drumul taberei':'Drumul Taberei','militari':'Militari Bucuresti',
+    'trafic':'strada trafic','kiseleff':'Soseaua Kiseleff'
+  };
+  var l = query.toLowerCase();
+  for (var k in kw) { if (l.includes(k)) return kw[k]; }
+  return query.split(' ').slice(0,4).join(' ');
+}
+
+// ── RENDER ───────────────────────────────────────────────────
+function renderResults(query, locData) {
+  var list = document.getElementById('results-list');
+  var count = 0;
+  list.innerHTML = '';
+
+  // 1. Nexus answer
+  list.appendChild(buildNexusCard(query, locData));
+  count++;
+
+  // 2. Location card daca a gasit
+  if (locData) {
+    list.appendChild(buildLocCard(query, locData));
+    count++;
+  }
+
+  // 3. Context temporal
+  list.appendChild(buildTemporalCard(query));
+  count++;
+
+  document.getElementById('results-count').innerHTML =
+    '<b>' + count + '</b> rezultate · ' +
+    (loc ? '<span style="color:var(--green)">⚡ Cache local</span> · ' : '') +
+    'Filtrat de Nexus · Charter v1.3';
+}
+
+function buildNexusCard(query, locData) {
+  var div = document.createElement('div');
+  div.className = 'rc'; div.dataset.type = 'nexus';
+  var lvl = _userProfile.stats ? (_userProfile.stats.experience_level||1) : 1;
+  var prefix = lvl>=6 ? '⬡ Nexus Sense · Level ' + lvl : '⬡ Nexus';
+  var body = getNexusBody(query, locData, lvl);
+  div.innerHTML =
+    '<div class="rc-top"><div class="rc-dot d-nexus"></div><div class="rc-label">' + prefix + '</div></div>' +
+    '<div class="rc-title">Răspuns Nexus</div>' +
+    '<div class="rc-body">' + body + '</div>' +
+    '<div class="rc-footer"><span class="tag t-blue">NEXUS</span><span class="tag t-dim">CHARTER v1.3</span>' +
+    '<span style="font-size:10px;color:var(--w30)">VV Hybrid Univers</span></div>';
+  return div;
+}
+
+function getNexusBody(query, locData, lvl) {
+  var l = query.toLowerCase();
+  var h = new Date().getHours();
+  var period = h<12?'dimineața':h<18?'după-amiaza':h<22?'seara':'noaptea';
+
+  if (locData) {
+    var name = locData.display_name.split(',')[0];
+    var plus = lvl>=11 ? ' La această oră (' + period + ') aglomerația variază — un Insider confirmă exact.' : '';
+    return 'Am identificat <strong style="color:#fff">' + name + '</strong> în zona ta.' + plus + ' Lansează VERIFY pentru dovadă fizică.';
+  }
+  if (l.includes('coadă')||l.includes('aglomerat')||l.includes('liber')) {
+    return 'Situația în timp real nu poate fi confirmată digital. Un Insider din rețea verifică fizic și trimite VV PROOF în câteva minute.';
+  }
+  if (l.includes('cum e')||l.includes('atmosfer')||l.includes('vibe')||l.includes('trafic')) {
+    return 'Atmosfera și traficul se validează prin prezență fizică.' + (lvl>=6?' Nexus Sense detectează că ești activ ' + period + '.':'') + ' Un Insider confirmă cu VV PROOF.';
+  }
+  return 'Am procesat cererea ta. Informațiile online pot fi depășite. Un Insider verifică situația reală prin dovadă fizică.';
+}
+
+function buildLocCard(query, locData) {
+  var div = document.createElement('div');
+  div.className = 'rc loc'; div.dataset.type = 'loc';
+  var name = locData.display_name.split(',')[0];
+  var addr = locData.display_name.split(',').slice(0,3).join(', ');
+  var lat = parseFloat(locData.lat);
+  var lng = parseFloat(locData.lon);
+
+  // Verifica geofencing pentru VERIFY
+  var locInRo = lat >= RO_BOUNDS.latMin && lat <= RO_BOUNDS.latMax &&
+                lng >= RO_BOUNDS.lngMin && lng <= RO_BOUNDS.lngMax;
+
+  var daysSince = Math.floor(Math.random()*40)+2;
+  var needsVerify = daysSince > 7;
+  var vid = 'v' + Date.now();
+
+  var verifyHtml = '';
+  if (!locInRo) {
+    verifyHtml = '<div class="geo-warn">⚠️ VERIFY disponibil doar în România în faza Beta.</div>';
+  } else if (needsVerify) {
+    verifyHtml =
+      '<div class="verify-wrap">' +
+        '<div class="verify-eyebrow">VERIFY REALITY?</div>' +
+        '<div class="verify-row">' +
+          '<button class="verify-btn" id="' + vid + '" onclick="triggerVerify(\'' + vid + '\',\'' + name.replace(/'/g,"\\'") + '\',' + lat.toFixed(4) + ',' + lng.toFixed(4) + ')">' +
+            '⚡ VERIFY — Trimite un Insider' +
+          '</button>' +
+          '<span class="verify-cost">−10 VV · Insider +10 VV</span>' +
+        '</div>' +
+        '<div class="flash-row" id="fr-' + vid + '">' +
+          '<div class="fp"></div>' +
+          '<span id="ft-' + vid + '">Se caută cel mai apropiat Insider...</span>' +
+        '</div>' +
+      '</div>';
+  } else {
+    verifyHtml = '<div style="margin-top:10px;font-size:11px;color:var(--green)">✅ Verificat recent de Insideri VV</div>';
+  }
+
+  div.innerHTML =
+    '<div class="rc-top"><div class="rc-dot d-loc"></div><div class="rc-label">LOCAȚIE DETECTATĂ</div></div>' +
+    '<div class="rc-title">' + name + '</div>' +
+    '<div class="rc-body">' + addr + '<br>' +
+      '<span style="font-size:10px;color:var(--w30);font-family:var(--mono)">' + lat.toFixed(4) + ', ' + lng.toFixed(4) + '</span>' +
+    '</div>' +
+    '<div class="rc-footer">' +
+      '<span class="tag t-gold">📍 LOCAȚIE</span>' +
+      '<span style="font-size:10px;color:var(--w30)">Ultima verificare: <span style="color:' + (daysSince>7?'var(--orange)':'var(--green)') + '">' + daysSince + ' zile</span></span>' +
+    '</div>' +
+    verifyHtml;
+  return div;
+}
+
+function buildTemporalCard(query) {
+  var div = document.createElement('div');
+  div.className = 'rc'; div.dataset.type = 'nexus';
+  var h = new Date().getHours();
+  var tip = h>=8&&h<12 ? 'Dimineața e ideal pentru verificat locații comerciale — trafic redus, Insideri activi.' :
+            h>=12&&h<16 ? 'Prânzul e ora de vârf. Restaurantele și cafenelele sunt cel mai probabil aglomerate.' :
+            h>=16&&h<20 ? 'Seara devreme — cel mai activ interval pentru Insideri în ecosistemul VV.' :
+            h>=20&&h<23 ? 'Seara — bun pentru verificat atmosfera zonelor de entertainment.' :
+            'Noaptea târziu — ecosistemul e mai liniștit. Timp de răspuns mai lung.';
+  div.innerHTML =
+    '<div class="rc-top"><div class="rc-dot d-nexus"></div><div class="rc-label">NEXUS · CONTEXT TEMPORAL</div></div>' +
+    '<div class="rc-body">' + tip + '</div>' +
+    '<div class="rc-footer"><span class="tag t-dim">ART-4 Anti-Scroll</span>' +
+      '<span style="font-size:10px;color:var(--w30)">Ieși în oraș. Nexus te ajută să găsești.</span></div>';
+  return div;
+}
+
+function renderBlocked(query) {
+  var list = document.getElementById('results-list');
+  var div = document.createElement('div');
+  div.className = 'rc blocked-r';
+  div.innerHTML =
+    '<div class="rc-top"><div class="rc-dot d-block"></div><div class="rc-label">VV CHARTER · BLOCAT</div></div>' +
+    '<div class="rc-title" style="color:var(--red)">🚫 Această cerere nu este permisă</div>' +
+    '<div class="rc-body">Conținutul solicitat încalcă VV Charter ART-3 · Filtrul Etic Automat. VV NOW funcționează conform legislației române și europene.</div>' +
+    '<div class="rc-footer"><span class="tag t-red">CHARTER ART-3</span><span class="tag t-dim">GDPR · DSA</span></div>';
+  list.appendChild(div);
+  document.getElementById('results-count').textContent = 'Cerere blocată de Charter VV';
+}
+
+// ── VERIFY / FLASH MISSION ────────────────────────────────────
+async function triggerVerify(vid, locName, lat, lng) {
+  var btn = document.getElementById(vid);
+  var flashRow = document.getElementById('fr-' + vid);
+  var flashText = document.getElementById('ft-' + vid);
+  if (!btn) return;
+
+  btn.classList.add('sent');
+  btn.textContent = '⚡ Se trimite...';
+  if (flashRow) flashRow.classList.add('on');
+
+  try {
+    var alias = localStorage.getItem('vv_alias') || 'INSIDER';
+
+    // Creeaza Flash Mission
+    var ref = await db.collection('missions').add({
+      type: 'flash_mission',
+      description: 'VERIFY: ' + locName + ' — confirmă situația reală cu VV PROOF.',
+      location: locName,
+      lat: lat, lng: lng,
+      reward: 10,
+      status: 'pending',
+      requestedBy: alias,
+      isFlash: true,
+      source: 'vv_now',
+      flashExpires: firebase.firestore.Timestamp.fromDate(new Date(Date.now()+30*60*1000)),
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    var missionId = ref.id;
+
+    // Notifica CEO
+    await db.collection('inbox').add({
+      to: 'CEO', from: alias, alias: alias,
+      type: 'flash_mission_created',
+      message: '⚡ Flash Mission: ' + locName + ' · #' + missionId.substring(0,8),
+      missionId: missionId, read: false,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    // Log VVhi
+    db.collection('vvhi_dataset').add({
+      action: 'VERIFY_REQUESTED',
+      context: {
+        location: locName,
+        lat: parseFloat(lat.toFixed(3)), lng: parseFloat(lng.toFixed(3)),
+        query: _currentQuery.substring(0,80),
+        hour: new Date().getHours()
+      },
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    }).catch(function(){});
+
+    if (flashText) flashText.textContent = '✅ Misiune Flash lansată! Un Insider confirmă în ~20 minute.';
+    if (flashRow) flashRow.style.background = 'rgba(52,199,89,.06)';
+    btn.textContent = '✅ VERIFY lansat';
+
+    // Listener Firebase — asteapta confirmarea
+    listenForCompletion(missionId, flashText, flashRow);
+
+    showToast('⚡ Flash Mission #' + missionId.substring(0,8) + ' lansată!');
+
+    // Update stats
+    var sc = document.getElementById('s-flash');
+    if (sc) sc.textContent = (parseInt(sc.textContent||'0') + 1) + '';
+
+  } catch(e) {
+    btn.classList.remove('sent');
+    btn.textContent = '⚡ VERIFY — Trimite un Insider';
+    if (flashRow) flashRow.classList.remove('on');
+    showToast('Eroare: ' + e.message, true);
+  }
+}
+
+// Listener Firebase — update automat cand misiunea e completata
+function listenForCompletion(missionId, textEl, rowEl) {
+  var unsub = db.collection('missions').doc(missionId)
+    .onSnapshot(function(doc) {
+      if (!doc.exists) return;
+      var d = doc.data();
+      if (d.status === 'approved' || d.status === 'completed') {
+        if (textEl) textEl.innerHTML = '🎯 <strong>Insider a confirmat!</strong> VV PROOF disponibil în VV Beta.';
+        if (rowEl) {
+          rowEl.style.background = 'rgba(52,199,89,.08)';
+          rowEl.style.borderColor = 'rgba(52,199,89,.3)';
+        }
+        showToast('✅ Insider a validat locația!');
+        unsub(); // Stop listening
+      }
+    }, function() { /* silent fail */ });
+
+  // Stop listening dupa 35 minute
+  setTimeout(function() { try { unsub(); } catch(e) {} }, 35*60*1000);
+}
+
+// ── FILTER TABS ───────────────────────────────────────────────
+function filterTab(type, el) {
+  document.querySelectorAll('.hdr-tab').forEach(function(t){ t.classList.remove('active'); });
+  el.classList.add('active');
+  document.querySelectorAll('.rc').forEach(function(card) {
+    card.style.display = (type==='all' || card.dataset.type===type) ? 'block' : 'none';
+  });
+}
+
+// ── LOG SEARCH ────────────────────────────────────────────────
+function logSearch(query, status) {
+  db.collection('vvhi_dataset').add({
+    action: 'VV_NOW_SEARCH',
+    context: {
+      query: query.substring(0,100), status: status,
+      hour: new Date().getHours(), hasGPS: !!_gps,
+      inRomania: _inRomania
+    },
+    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+  }).catch(function(){});
+}
+
+// ── TOAST ────────────────────────────────────────────────────
+function showToast(msg, isErr) {
+  var t = document.getElementById('vvt');
+  t.textContent = msg;
+  t.style.borderColor = isErr ? 'rgba(255,59,48,.3)' : 'rgba(52,199,89,.25)';
+  t.classList.add('on');
+  clearTimeout(t._t);
+  t._t = setTimeout(function(){ t.classList.remove('on'); }, 3200);
+}
+
+// ── KEYBOARD SHORTCUTS ────────────────────────────────────────
+document.addEventListener('keydown', function(e) {
+  if (e.key==='/' && !['INPUT','TEXTAREA'].includes(document.activeElement.tagName)) {
+    e.preventDefault();
+    var inp = document.getElementById('hero').classList.contains('gone')
+      ? document.getElementById('hdr-input')
+      : document.getElementById('hero-input');
+    if (inp) inp.focus();
+  }
+  if (e.key==='Escape') {
+    document.getElementById('hero').classList.remove('gone');
+    document.getElementById('results-page').classList.remove('show');
+    document.getElementById('hdr-bar').style.display = 'none';
+    document.getElementById('hdr-tabs').style.display = 'none';
+    loadLocalHistory();
+  }
+});
+</script>
+</body>
+</html>
