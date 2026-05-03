@@ -314,11 +314,39 @@ html,body{
   .search-input{font-size:15px;padding:16px 56px 16px 20px;}
   .hdr-nav{display:none;}
 }
+
+/* Back button */
+.back-btn{
+  display:none;position:fixed;top:16px;left:20px;z-index:200;
+  align-items:center;gap:6px;padding:7px 14px;
+  background:rgba(255,255,255,0.06);border:0.5px solid rgba(255,255,255,0.1);
+  border-radius:100px;font-size:12px;color:rgba(255,255,255,0.5);
+  cursor:pointer;transition:all .15s;font-family:var(--body);
+}
+.back-btn:hover{background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.8);}
+.back-btn.show{display:flex;}
+.data-badge{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:3px 10px;border-radius:100px;
+  font-size:10px;font-weight:500;margin-bottom:12px;
+}
+.db-fresh{background:rgba(52,199,89,.08);border:0.5px solid rgba(52,199,89,.2);color:#34c759;}
+.db-old{background:rgba(255,149,0,.08);border:0.5px solid rgba(255,149,0,.2);color:#FF9500;}
+.db-none{background:rgba(255,255,255,.04);border:0.5px solid rgba(255,255,255,.08);color:rgba(255,255,255,.4);}
+.proof-item{padding:10px 0;border-bottom:0.5px solid rgba(255,255,255,.06);font-size:13px;color:rgba(255,255,255,.7);line-height:1.6;}
+.proof-item:last-child{border-bottom:none;}
+.proof-meta{font-size:11px;color:rgba(255,255,255,.35);margin-top:2px;}
+.also-search{margin-top:8px;display:flex;flex-wrap:wrap;gap:6px;}
+.also-item{padding:6px 12px;background:rgba(255,255,255,.03);border:0.5px solid rgba(255,255,255,.08);border-radius:100px;font-size:11px;color:rgba(255,255,255,.4);cursor:pointer;transition:all .15s;}
+.also-item:hover{background:rgba(212,175,55,.1);border-color:rgba(212,175,55,.2);color:#D4AF37;}
+.premium-note{margin-top:8px;padding:12px 16px;background:rgba(255,255,255,.03);border:0.5px solid rgba(255,255,255,.07);border-radius:12px;font-size:12px;color:rgba(255,255,255,.35);display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.premium-note b{color:#D4AF37;font-size:11px;white-space:nowrap;}
 </style>
 </head>
 <body>
 
 <div class="load-line" id="load"><div class="load-fill"></div></div>
+<button class="back-btn" id="back-btn" onclick="goBack()">← Căutare nouă</button>
 <div id="toast"></div>
 
 <!-- HEADER -->
@@ -465,6 +493,16 @@ function renderHist() {
     }).join('') + '</div>';
 }
 
+// ── BACK ─────────────────────────────────────────────────────
+function goBack() {
+  document.getElementById('hero').classList.remove('compact');
+  document.getElementById('results').classList.remove('show');
+  document.getElementById('results').innerHTML = '';
+  document.getElementById('search-input').value = '';
+  document.getElementById('back-btn').classList.remove('show');
+  setTimeout(function(){ document.getElementById('search-input').focus(); }, 300);
+}
+
 // ── SEARCH ────────────────────────────────────────────────────
 async function search(q) {
   q = (q||'').trim();
@@ -472,19 +510,17 @@ async function search(q) {
 
   addHist(q);
 
-  // Compact hero
+  // Compact hero + back button
   document.getElementById('hero').classList.add('compact');
   document.getElementById('search-input').value = q;
+  document.getElementById('back-btn').classList.add('show');
 
-  // Show results area
   var res = document.getElementById('results');
   res.innerHTML = '';
   res.classList.add('show');
-
-  // Loading
   document.getElementById('load').classList.add('on');
 
-  // Charter check
+  // Charter check — non-urban content
   var blocked = BLOCKED.some(function(k){ return q.toLowerCase().includes(k); });
   if (blocked) {
     document.getElementById('load').classList.remove('on');
@@ -493,13 +529,57 @@ async function search(q) {
     return;
   }
 
-  // Cauta locatie
-  var loc = await findLoc(q);
+  // Verifica daca e cautare non-urbana
+  var nonUrban = isNonUrban(q);
+  if (nonUrban) {
+    document.getElementById('load').classList.remove('on');
+    res.innerHTML = nonUrbanHtml(q);
+    logSearch(q, 'NON_URBAN');
+    return;
+  }
 
-  // Render
+  // Cauta in Firebase misiuni recente + locatie Nominatim
+  var [missions, loc] = await Promise.all([
+    findRecentMissions(q),
+    findLoc(q)
+  ]);
+
   document.getElementById('load').classList.remove('on');
-  renderResults(q, loc);
+  renderResults(q, loc, missions);
   logSearch(q, 'OK');
+}
+
+function isNonUrban(q) {
+  var l = q.toLowerCase();
+  var nonUrban = ['film','serial','muzica','stire','vreme','meteo','reteta','joc','sport tv','liga','meci','rezultat','transfer','politic','bursă'];
+  return nonUrban.some(function(k){ return l.includes(k); });
+}
+
+// ── FIREBASE — cauta misiuni recente ─────────────────────────
+async function findRecentMissions(q) {
+  try {
+    var term = getTerm(q);
+    if (!term) return [];
+    var ago30 = new Date(Date.now() - 30*24*60*60*1000);
+    var ts = firebase.firestore.Timestamp.fromDate(ago30);
+    var snap = await db.collection('missions')
+      .where('status','==','approved')
+      .where('createdAt','>=',ts)
+      .orderBy('createdAt','desc')
+      .limit(3)
+      .get();
+    var results = [];
+    snap.forEach(function(doc) {
+      var d = doc.data();
+      var loc = (d.location||'').toLowerCase();
+      var desc = (d.description||'').toLowerCase();
+      var termL = term.toLowerCase().split(' ')[0];
+      if (loc.includes(termL) || desc.includes(termL)) {
+        results.push(d);
+      }
+    });
+    return results;
+  } catch(e) { return []; }
 }
 
 // ── NOMINATIM cu cache ─────────────────────────────────────────
@@ -541,41 +621,108 @@ function getTerm(q) {
 }
 
 // ── RENDER REZULTATE ──────────────────────────────────────────
-function renderResults(q, loc) {
+function renderResults(q, loc, missions) {
   var res = document.getElementById('results');
   var html = '';
 
-  // 1. Raspuns uman Nexus
-  html += answerHtml(q, loc);
+  // 1. Raspuns Nexus bazat pe date reale
+  html += answerHtml(q, loc, missions);
 
-  // 2. Location + VERIFY
-  if (loc) html += locHtml(loc);
+  // 2. Date reale din misiuni daca exista
+  if (missions && missions.length > 0) {
+    html += missionsHtml(missions, q);
+  }
 
-  // 3. Context discret
-  html += contextHtml(q);
+  // 3. Location + VERIFY
+  if (loc) html += locHtml(loc, missions);
+
+  // 4. Sugestii conexe
+  html += suggestionsHtml(q);
+
+  // 5. Premium teaser
+  html += '<div class="premium-note">VV NOW Standard · Romania · 30 zile<b>VV NOW Premium · Global · 90 zile · 9€</b></div>';
 
   res.innerHTML = html;
 }
 
-function answerHtml(q, loc) {
+function missionsHtml(missions, q) {
+  var html = '<div class="answer-card" style="animation-delay:.05s">';
+  html += '<div class="answer-source"><div class="answer-dot" style="background:#34c759"></div> Date reale din ecosistem</div>';
+
+  var freshCount = missions.filter(function(m) {
+    if (!m.createdAt) return false;
+    return Date.now() - m.createdAt.toDate().getTime() < 7*24*60*60*1000;
+  }).length;
+
+  if (freshCount > 0) {
+    html += '<div class="data-badge db-fresh">✓ Verificat în ultimele 7 zile</div>';
+  } else {
+    html += '<div class="data-badge db-old">⏰ Verificat în ultimele 30 zile</div>';
+  }
+
+  missions.forEach(function(m) {
+    var dateStr = m.createdAt ? m.createdAt.toDate().toLocaleDateString('ro-RO',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}) : '—';
+    html += '<div class="proof-item">' +
+      (m.description||'Verificare completată') +
+      '<div class="proof-meta">Insider VV · ' + dateStr + ' · VV PROOF ✓</div>' +
+    '</div>';
+  });
+
+  html += '</div>';
+  return html;
+}
+
+function suggestionsHtml(q) {
+  var l = q.toLowerCase();
+  var sugs = [];
+  if (l.includes('kaufland')||l.includes('lidl')||l.includes('supermarket')) {
+    sugs = ['Parcare în zonă?','Alte supermarketuri aproape','Piața agroalimentară'];
+  } else if (l.includes('cafenea')||l.includes('restaurant')) {
+    sugs = ['Program deschidere?','Locuri disponibile?','Terasa disponibilă?'];
+  } else if (l.includes('parcare')) {
+    sugs = ['Parcare gratuită?','Parcare de noapte?','Parcare dezactivată?'];
+  } else if (l.includes('trafic')||l.includes('drum')||l.includes('stradă')) {
+    sugs = ['Accident în zonă?','Alternativă de rută?','Lucrări rutiere?'];
+  } else {
+    sugs = ['Cum e zona acum?','Misiuni active în apropiere','Insideri disponibili?'];
+  }
+  return '<div class="also-search">' +
+    sugs.map(function(s){ return '<div class="also-item" onclick="search(\''+s+'\')">'+s+'</div>'; }).join('') +
+  '</div>';
+}
+
+function nonUrbanHtml(q) {
+  return '<div class="answer-card">' +
+    '<div class="answer-source"><div class="answer-dot"></div> Nexus</div>' +
+    '<div class="answer-text">VV NOW e construit pentru <strong>realitatea fizică</strong> din orașul tău — locații, cozi, atmosferă, trafic. ' +
+    'Pentru "' + q + '" încearcă Google sau un asistent AI general.<br><br>Caută ceva din jurul tău.</div>' +
+  '</div>';
+}
+
+function answerHtml(q, loc, missions) {
+  var hasMissions = missions && missions.length > 0;
   var l = q.toLowerCase();
   var h = new Date().getHours();
   var ora = h<12?'dimineață':h<18?'după-amiază':h<22?'seară':'noapte';
   var text = '';
 
-  if (loc) {
+  if (hasMissions) {
+    var name = loc ? loc.display_name.split(',')[0] : 'această locație';
+    var daysAgo = missions[0].createdAt ? Math.floor((Date.now()-missions[0].createdAt.toDate().getTime())/(24*60*60*1000)) : '?';
+    text = 'Am date reale despre <strong>' + name + '</strong> din ecosistemul VV — ultima verificare acum ' + daysAgo + ' zile. Vezi mai jos ce au găsit Insiderii.';
+  } else if (loc) {
     var name = loc.display_name.split(',')[0];
-    text = 'Am găsit <strong>' + name + '</strong> în zona ta. ';
-    if (_lvl >= 6) text += 'La această ' + ora + ', situația poate varia. ';
-    text += 'Cel mai sigur mod de a afla realitatea e să trimiți un Insider să verifice.';
+    text = 'Am găsit <strong>' + name + '</strong> în zona ta. Nu avem verificări recente — trimite un Insider să vadă cum e acum.';
   } else if (l.includes('coadă') || l.includes('aglomerat') || l.includes('liber')) {
-    text = 'Asta e exact ce Insiderii VV pot verifica în timp real. Lansează o misiune și în câteva minute primești o poză din teren.';
+    text = 'Asta e exact ce Insiderii VV verifică fizic. Lansează o misiune și în câteva minute ai o poză din teren.';
   } else if (l.includes('cum e') || l.includes('atmosfer') || l.includes('vibe')) {
-    text = 'Atmosfera nu se poate descrie prin algoritmi. ' + (_lvl>=6?'Nexus Sense detectează că ești activ '+ora+'. ':'') + 'Un Insider din zonă îți poate arăta exact cum e acum.';
-  } else if (l.includes('trafic')) {
-    text = 'Traficul se schimbă rapid. Un Insider care trece pe acolo acum îți poate spune în câteva minute cum e situația reală.';
+    text = 'Atmosfera se simte, nu se descrie prin algoritmi. Un Insider din zonă îți arată exact cum e acum' + (l.includes('seară')||new Date().getHours()>=18?' în această seară':'') + '.';
+  } else if (l.includes('trafic') || l.includes('drum') || l.includes('asfalt')) {
+    text = 'Traficul se schimbă rapid. Un Insider care trece pe acolo acum îți spune în câteva minute.';
+  } else if (l.includes('deschis') || l.includes('program') || l.includes('orar')) {
+    text = 'Programul afișat online nu e întotdeauna actualizat. Un Insider verifică fizic dacă e deschis acum.';
   } else {
-    text = 'Nexus a procesat cererea ta. Informațiile online îmbătrânesc rapid — un Insider verifică pe loc și îți aduce dovada fizică.';
+    text = 'Nu am date recente despre asta. Un Insider poate verifica pe loc și îți aduce dovada în câteva minute.';
   }
 
   return '<div class="answer-card">' +
@@ -584,7 +731,8 @@ function answerHtml(q, loc) {
   '</div>';
 }
 
-function locHtml(loc) {
+function locHtml(loc, missions) {
+  var hasFresh = missions && missions.some(function(m){ return m.createdAt && Date.now()-m.createdAt.toDate().getTime()<7*24*60*60*1000; });
   var name = loc.display_name.split(',')[0];
   var addr = loc.display_name.split(',').slice(0,3).join(', ');
   var lat = parseFloat(loc.lat);
@@ -596,6 +744,8 @@ function locHtml(loc) {
   var verifySection = '';
   if (!inRo) {
     verifySection = '<div class="geo-note">VERIFY disponibil doar în România în faza Beta.</div>';
+  } else if (hasFresh) {
+    verifySection = '<div style="padding:10px 0;font-size:13px;color:rgba(52,199,89,.7)">✓ Verificat recent. Datele de mai sus sunt de la Insideri reali.</div>';
   } else {
     verifySection = '<button class="verify-btn" id="' + vid + '" onclick="doVerify(\'' + vid + '\',\'' + name.replace(/'/g,"\\'") + '\',' + lat.toFixed(4) + ',' + lng.toFixed(4) + ')">' +
       '<span class="verify-btn-icon">⚡</span>' +
