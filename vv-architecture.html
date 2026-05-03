@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VV Hybrid Univers · Arhitectură & Viziune</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800;900&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --gold:#D4AF37;--gold2:rgba(212,175,55,.08);--gold-b:rgba(212,175,55,.18);
+  --w:#fff;--w70:rgba(255,255,255,.7);--w50:rgba(255,255,255,.5);
+  --w30:rgba(255,255,255,.3);--w15:rgba(255,255,255,.12);
+  --border:rgba(255,255,255,.08);
+  --green:#34c759;--blue:#0A84FF;--red:#ff3b30;--orange:#FF9500;
+  --font:'Syne',sans-serif;--mono:'DM Mono',monospace;
+}
+html,body{background:#000;color:var(--w);font-family:var(--mono);-webkit-font-smoothing:antialiased;}
+
+/* NAV */
+.nav{position:sticky;top:0;z-index:100;background:rgba(0,0,0,.92);backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);padding:12px 40px;
+  display:flex;align-items:center;justify-content:space-between;}
+.nav-logo{font-family:var(--font);font-weight:900;font-size:15px;letter-spacing:5px;color:var(--gold);}
+.nav-links{display:flex;gap:6px;}
+.nav-link{padding:5px 12px;background:rgba(255,255,255,.04);border:0.5px solid var(--border);
+  border-radius:100px;font-size:10px;color:var(--w30);text-decoration:none;transition:all .15s;}
+.nav-link:hover{color:var(--w70);}
+
+/* HERO */
+.hero{max-width:860px;margin:0 auto;padding:80px 40px 60px;text-align:center;}
+.hero-eye{font-size:8px;letter-spacing:5px;color:rgba(212,175,55,.4);font-weight:700;margin-bottom:20px;}
+.hero-title{font-family:var(--font);font-size:clamp(32px,5vw,60px);font-weight:900;
+  letter-spacing:-2px;line-height:1.05;margin-bottom:16px;}
+.hero-title .g{color:var(--gold);}
+.hero-sub{font-size:15px;color:var(--w50);line-height:1.8;max-width:560px;margin:0 auto 40px;}
+.hero-version{display:inline-flex;align-items:center;gap:8px;padding:6px 16px;
+  background:var(--gold2);border:0.5px solid var(--gold-b);border-radius:100px;
+  font-size:10px;color:var(--gold);letter-spacing:2px;font-weight:700;}
+
+/* SECTION */
+.section{max-width:860px;margin:0 auto;padding:0 40px 60px;}
+.section-label{font-size:8px;letter-spacing:5px;color:rgba(212,175,55,.4);font-weight:700;margin-bottom:20px;}
+.section-title{font-family:var(--font);font-size:clamp(22px,3vw,36px);font-weight:900;
+  letter-spacing:-1px;margin-bottom:12px;line-height:1.1;}
+.section-sub{font-size:13px;color:var(--w50);line-height:1.8;margin-bottom:32px;}
+
+/* DIVIDER */
+.divider{max-width:860px;margin:0 auto 60px;padding:0 40px;}
+.div-line{height:1px;background:linear-gradient(90deg,transparent,var(--gold-b),transparent);}
+
+/* COMPONENTS GRID */
+.comp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:32px;}
+.comp-card{background:rgba(255,255,255,.03);border:0.5px solid var(--border);
+  border-radius:16px;padding:20px;position:relative;overflow:hidden;transition:border-color .2s;}
+.comp-card:hover{border-color:rgba(212,175,55,.2);}
+.comp-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--gold-b),transparent);}
+.comp-icon{font-size:22px;margin-bottom:10px;}
+.comp-name{font-family:var(--font);font-size:13px;font-weight:800;margin-bottom:4px;}
+.comp-desc{font-size:11px;color:var(--w30);line-height:1.6;}
+.comp-badge{display:inline-block;padding:2px 8px;border-radius:100px;font-size:9px;
+  font-weight:700;letter-spacing:1px;margin-top:8px;}
+.cb-live{background:rgba(52,199,89,.08);border:0.5px solid rgba(52,199,89,.2);color:var(--green);}
+.cb-soon{background:rgba(255,149,0,.08);border:0.5px solid rgba(255,149,0,.2);color:var(--orange);}
+.cb-future{background:rgba(255,255,255,.04);border:0.5px solid var(--border);color:var(--w30);}
+
+/* FLOW */
+.flow{display:flex;flex-direction:column;gap:0;margin-bottom:32px;}
+.flow-step{display:flex;align-items:flex-start;gap:20px;padding:20px 0;
+  border-bottom:1px solid rgba(255,255,255,.04);}
+.flow-step:last-child{border-bottom:none;}
+.flow-num{font-family:var(--font);font-size:32px;font-weight:900;color:rgba(212,175,55,.2);
+  flex-shrink:0;width:50px;line-height:1;}
+.flow-content{}
+.flow-title{font-family:var(--font);font-size:14px;font-weight:800;margin-bottom:4px;}
+.flow-desc{font-size:12px;color:var(--w50);line-height:1.7;}
+.flow-tag{display:inline-block;padding:1px 7px;border-radius:100px;font-size:9px;font-weight:700;
+  letter-spacing:1px;margin-top:6px;}
+.ft-vvme{background:rgba(212,175,55,.08);border:0.5px solid rgba(212,175,55,.2);color:var(--gold);}
+.ft-nexus{background:rgba(10,132,255,.08);border:0.5px solid rgba(10,132,255,.2);color:var(--blue);}
+.ft-insider{background:rgba(52,199,89,.08);border:0.5px solid rgba(52,199,89,.2);color:var(--green);}
+.ft-firebase{background:rgba(255,149,0,.08);border:0.5px solid rgba(255,149,0,.2);color:var(--orange);}
+
+/* LEGAL */
+.legal-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:32px;}
+.legal-card{background:rgba(255,255,255,.03);border:0.5px solid var(--border);
+  border-radius:14px;padding:18px;}
+.legal-title{font-size:11px;font-weight:700;color:var(--w70);margin-bottom:8px;font-family:var(--font);}
+.legal-text{font-size:11px;color:var(--w30);line-height:1.7;}
+
+/* REVENUE */
+.rev-table{width:100%;border-collapse:collapse;margin-bottom:20px;}
+.rev-table th{font-size:9px;letter-spacing:2px;color:var(--w30);font-weight:700;
+  padding:8px 12px;text-align:left;border-bottom:1px solid var(--border);text-transform:uppercase;}
+.rev-table td{padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.03);
+  font-size:12px;color:var(--w70);}
+.rev-table tr:last-child td{border-bottom:none;font-weight:700;color:var(--gold);}
+.rev-total{font-family:var(--font);font-size:18px;font-weight:900;color:var(--gold);}
+
+/* QUOTE */
+.quote{text-align:center;padding:40px 0;margin-bottom:40px;}
+.quote-text{font-family:var(--font);font-size:clamp(18px,3vw,28px);font-weight:800;
+  color:var(--gold);letter-spacing:-.5px;line-height:1.3;margin-bottom:12px;}
+.quote-by{font-size:11px;color:var(--w30);letter-spacing:2px;}
+
+/* TECH STACK */
+.tech-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;}
+.tech-pill{padding:6px 14px;background:rgba(255,255,255,.04);border:0.5px solid var(--border);
+  border-radius:100px;font-size:11px;color:var(--w50);}
+
+/* FOOTER */
+footer{text-align:center;padding:40px;border-top:1px solid var(--border);
+  font-size:11px;color:var(--w30);line-height:2;}
+
+/* PRINT */
+@media print{
+  body{background:#fff;color:#000;}
+  .nav{display:none;}
+}
+
+@media(max-width:700px){
+  .comp-grid{grid-template-columns:1fr 1fr;}
+  .legal-grid{grid-template-columns:1fr;}
+  .hero{padding:60px 20px 40px;}
+  .section{padding:0 20px 40px;}
+  .divider{padding:0 20px;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-logo">VV</div>
+  <div class="nav-links">
+    <a href="https://vv-technologies.github.io/vv-nexus/vv-now.html" class="nav-link">VV NOW</a>
+    <a href="https://vv-technologies.github.io/vv-nexus/" class="nav-link">Hub</a>
+    <a href="https://vv-technologies.github.io/vv-nexus/vv-studio.html" class="nav-link">Studio</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-eye">VV HYBRID UNIVERS · DOCUMENT DE ARHITECTURĂ</div>
+  <h1 class="hero-title">Realitatea Digitală<br><span class="g">Verificată Fizic.</span></h1>
+  <p class="hero-sub">VV Hybrid Univers este primul ecosistem care combină căutare AI hibridă cu validare umană fizică, economie internă anonimă și infrastructură Local-First. Construit pentru oameni care au nevoie de certitudine, nu de informații.</p>
+  <div class="hero-version">Beta · v1.3 · Mai 2026 · România</div>
+</div>
+
+<div class="divider"><div class="div-line"></div></div>
+
+<!-- VIZIUNE -->
+<div class="section">
+  <div class="section-label">01 · VIZIUNE</div>
+  <h2 class="section-title">Google arhivează.<br>VV verifică.</h2>
+  <p class="section-sub">Internetul actual e plin de informații expirate, recenzii false și reclame. VV NOW nu indexează internetul — trimite oameni reali să verifice fizic și returnează certitudine, nu link-uri.</p>
+
+  <div class="comp-grid">
+    <div class="comp-card">
+      <div class="comp-icon">🌐</div>
+      <div class="comp-name">Google Maps</div>
+      <div class="comp-desc">Poze de acum 3 ani. Recenzii cumpărate. Nu știe dacă e coadă acum.</div>
+    </div>
+    <div class="comp-card">
+      <div class="comp-icon">🤖</div>
+      <div class="comp-name">ChatGPT / Gemini</div>
+      <div class="comp-desc">Cunoaștere generală. Nu vede strada ta acum. Nu poate confirma fizic.</div>
+    </div>
+    <div class="comp-card" style="border-color:rgba(212,175,55,.2);background:rgba(212,175,55,.03)">
+      <div class="comp-icon">⬡</div>
+      <div class="comp-name">VV NOW</div>
+      <div class="comp-desc">Date publice + VV Proof fizic. Verificare spontană prin Insideri reali. Certitudine 100%.</div>
+      <span class="comp-badge cb-live">UNIC ÎN LUME</span>
+    </div>
+  </div>
+
+  <div class="quote">
+    <div class="quote-text">"Adevărul se validează pe stradă,<br>nu pe ecran."</div>
+    <div class="quote-by">VV CHARTER · ART-4</div>
+  </div>
+</div>
+
+<div class="divider"><div class="div-line"></div></div>
+
+<!-- COMPONENTE -->
+<div class="section">
+  <div class="section-label">02 · ECOSISTEM</div>
+  <h2 class="section-title">6 componente.<br>Un singur univers.</h2>
+  <p class="section-sub">Fiecare componentă comunică cu celelalte prin Firebase Firestore. Niciuna nu poate funcționa fără celelalte — asta e puterea ecosistemului.</p>
+
+  <div class="comp-grid">
+    <div class="comp-card">
+      <div class="comp-icon">🔍</div>
+      <div class="comp-name">VV NOW</div>
+      <div class="comp-desc">Motor de căutare hibrid. 60% date publice web + 40% VV Proof din teren. VV Me — asistentul personal care știe orașul tău.</div>
+      <span class="comp-badge cb-live">LIVE</span>
+    </div>
+    <div class="comp-card">
+      <div class="comp-icon">⬡</div>
+      <div class="comp-name">VV Beta</div>
+      <div class="comp-desc">Aplicația de misiuni. Insiderii primesc Flash Missions, merg fizic, trimit VV Proof. XP, Level, VV Coins.</div>
+      <span class="comp-badge cb-live">LIVE</span>
+    </div>
+    <div class="comp-card">
+      <div class="comp-icon">🏢</div>
+      <div class="comp-name">VV Business Node</div>
+      <div class="comp-desc">Locații înregistrate în ecosistem. Apar în VV NOW. Verificate spontan de Insideri. Expiră automat dacă nu sunt actualizate.</div>
+      <span class="comp-badge cb-live">LIVE</span>
+    </div>
+    <div class="comp-card">
+      <div class="comp-icon">⬡</div>
+      <div class="comp-name">VV Talent</div>
+      <div class="comp-desc">Studenți și freelanceri listați anonim. Agențiile caută după skill. Contact prin cod VV — fără CV-uri în gol.</div>
+      <span class="comp-badge cb-live">LIVE</span>
+    </div>
+    <div class="comp-card">
+      <div class="comp-icon">🧠</div>
+      <div class="comp-name">VVhi Shadow</div>
+      <div class="comp-desc">AI intern care învață din fiecare acțiune a Insiderilor. Îmbunătățește răspunsurile VV Me fără să stocheze date personale.</div>
+      <span class="comp-badge cb-live">LIVE</span>
+    </div>
+    <div class="comp-card">
+      <div class="comp-icon">👁</div>
+      <div class="comp-name">Inner Circle</div>
+      <div class="comp-desc">Primii 100 Fondatori. Acces prioritar, VV·CORE·ID unic, statut permanent în ecosistem.</div>
+      <span class="comp-badge cb-live">LIVE · 2/100</span>
+    </div>
+  </div>
+</div>
+
+<div class="divider"><div class="div-line"></div></div>
+
+<!-- FLUX DATE -->
+<div class="section">
+  <div class="section-label">03 · CUM FUNCȚIONEAZĂ</div>
+  <h2 class="section-title">De la întrebare<br>la certitudine fizică.</h2>
+  <p class="section-sub">Fluxul complet al unei căutări în VV NOW — ce vede userul vs ce se întâmplă în spate.</p>
+
+  <div class="flow">
+    <div class="flow-step">
+      <div class="flow-num">01</div>
+      <div class="flow-content">
+        <div class="flow-title">Userul scrie o întrebare</div>
+        <div class="flow-desc">"E coadă la Kaufland?" — VV Me detectează automat contextul (oraș din GPS, ora din zi, layer relevant: Urgent). Nu cere confirmare. Deduce singur.</div>
+        <span class="flow-tag ft-vvme">VV ME · LOCAL</span>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-num">02</div>
+      <div class="flow-content">
+        <div class="flow-title">Nexus caută în paralel — 3 surse simultan</div>
+        <div class="flow-desc">
+          <b style="color:rgba(212,175,55,.8)">Sursă 1:</b> Date statice CEO (spitale, urgențe, numere — verificate manual, nu pot fi falsificate)<br>
+          <b style="color:rgba(52,199,89,.8)">Sursă 2:</b> VV Proof din ultimele 30 zile (misiuni aprobate de Insideri reali)<br>
+          <b style="color:rgba(255,255,255,.4)">Sursă 3:</b> Web search hibrid via Anthropic API (date publice, marcate "Nevalidat fizic")
+        </div>
+        <span class="flow-tag ft-nexus">NEXUS · FIREBASE + WEB</span>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-num">03</div>
+      <div class="flow-content">
+        <div class="flow-title">VV Me construiește răspunsul contextual</div>
+        <div class="flow-desc">Dacă există date VV Proof → afișează cu badge verde "Verificat fizic". Dacă nu → afișează date web marcate clar "Date publice · Nevalidat". Dacă există date statice CEO → prioritate maximă, badge "✓ CEO Verified".</div>
+        <span class="flow-tag ft-vvme">VV ME · RĂSPUNS HIBRID</span>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-num">04</div>
+      <div class="flow-content">
+        <div class="flow-title">Userul apasă VERIFY — dacă vrea certitudine 100%</div>
+        <div class="flow-desc">Se creează o Flash Mission în Firebase. Cel mai apropiat Insider disponibil primește notificarea în VV Beta. Merge fizic, face poza VV Proof. Userul primește confirmarea automat — fără refresh.</div>
+        <span class="flow-tag ft-insider">INSIDER · VV BETA · FIZIC</span>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-num">05</div>
+      <div class="flow-content">
+        <div class="flow-title">VVhi Shadow învață</div>
+        <div class="flow-desc">Fiecare acțiune — căutare, VERIFY, misiune completată — se salvează anonim în vvhi_dataset. VVhi construiește pattern-uri ale orașului fără să știe cine a făcut ce. Datele brute se purjează la 24h.</div>
+        <span class="flow-tag ft-firebase">VVHI · SHADOW MODE</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"><div class="div-line"></div></div>
+
+<!-- VV ME -->
+<div class="section">
+  <div class="section-label">04 · VV ME</div>
+  <h2 class="section-title">Asistentul care<br>știe unde ești.</h2>
+  <p class="section-sub">VV Me nu e un chatbot. E un motor de context care se adaptează la fiecare user fără să stocheze date personale.</p>
+
+  <div class="flow">
+    <div class="flow-step">
+      <div class="flow-num">⬡</div>
+      <div class="flow-content">
+        <div class="flow-title">City Intelligence — detectare oraș din GPS</div>
+        <div class="flow-desc">La prima deschidere detectează orașul din GPS și setează contextul. Căutările sunt automat filtrate pentru acel oraș. Dacă călătorești, VV Me schimbă contextul silent — "Context nou: Cluj-Napoca" — și purjează cache-ul de căutări din alt oraș.</div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-num">⬡</div>
+      <div class="flow-content">
+        <div class="flow-title">Layer Intelligence — detectare intenție</div>
+        <div class="flow-desc">VV Me detectează automat dacă întrebarea e despre Accesibilitate, Urgență, Business sau Siguranță — fără să întrebe userul. Răspunsul și titlul VERIFY se adaptează contextului detectat.</div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-num">⬡</div>
+      <div class="flow-content">
+        <div class="flow-title">Ephemeral Memory — fără urmă digitală</div>
+        <div class="flow-desc">IndexedDB cu purjare automată la 24h. Istoricul de căutări rămâne local pe device-ul userului. VV nu vede ce caută nimeni. Dacă userul șterge browser-ul, totul dispare — conform VV Charter ART-1.</div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-num">⬡</div>
+      <div class="flow-content">
+        <div class="flow-title">Offline Intelligence — funcționează fără internet</div>
+        <div class="flow-desc">Service Worker cachează pagina la prima vizită. Fără net, VV Me răspunde din cache local cu banner discret "Mod offline". Când revine conexiunea, sincronizează automat.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"><div class="div-line"></div></div>
+
+<!-- LEGAL -->
+<div class="section">
+  <div class="section-label">05 · CADRUL LEGAL</div>
+  <h2 class="section-title">Construit legal<br>din prima linie de cod.</h2>
+  <p class="section-sub">VV Hybrid Univers respectă legislația română și europeană în vigoare — GDPR, DSA, legislația muncii. Fiecare funcție a fost gândită cu cadrul legal în minte.</p>
+
+  <div class="legal-grid">
+    <div class="legal-card">
+      <div class="legal-title">GDPR · Regulamentul European</div>
+      <div class="legal-text">Zero date de identificare personală stocate pe serverele VV. Totul rămâne local pe device-ul userului. Datele brute se purjează la 24h automat. Userul poate șterge totul cu un click.</div>
+    </div>
+    <div class="legal-card">
+      <div class="legal-title">DSA · Digital Services Act</div>
+      <div class="legal-text">Conținut sponsorizat marcat explicit "Conținut Sponsorizat VV". Charter ART-3 blochează automat conținut ilegal înainte de publicare. Sistem de raportare integrat.</div>
+    </div>
+    <div class="legal-card">
+      <div class="legal-title">Legislația Muncii RO</div>
+      <div class="legal-text">Insiderii nu sunt angajați — sunt colaboratori autonomi. VV Coins nu sunt salarii — sunt puncte de ecosistem fără valoare monetară directă în Beta. La VV 1.0 se reglementează prin PFA/SRL.</div>
+    </div>
+    <div class="legal-card">
+      <div class="legal-title">VV Charter · Legea Internă</div>
+      <div class="legal-text">14 articole care guvernează comportamentul în ecosistem. ART-1 Anonimat, ART-3 Filtru Etic, ART-8 Maturitate 18+, ART-9 Expirare automată, ART-10 GDPR. Aplicate automat de sistem.</div>
+    </div>
+    <div class="legal-card">
+      <div class="legal-title">Conținut Web Hibrid</div>
+      <div class="legal-text">Datele publice din web search sunt marcate "Date publice · Nevalidat fizic". Nu se prezintă ca date VV. Distincția e clară vizual și în cod. Sursele sunt procesate de Anthropic API.</div>
+    </div>
+    <div class="legal-card">
+      <div class="legal-title">Business Nodes · Contract Digital</div>
+      <div class="legal-text">Firmele bifează 4 termeni obligatorii înainte de înregistrare. Acceptă verificarea spontană și sistemul de sancțiuni automate. Echivalent juridic cu un contract de utilizare.</div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"><div class="div-line"></div></div>
+
+<!-- MONETIZARE -->
+<div class="section">
+  <div class="section-label">06 · MONETIZARE</div>
+  <h2 class="section-title">4 surse de venit.<br>Zero costuri fixe mari.</h2>
+  <p class="section-sub">Modelul financiar e construit pe infrastructură gratuită în Beta (Firebase Spark, GitHub Pages) și scalează cu veniturile.</p>
+
+  <table class="rev-table">
+    <thead>
+      <tr><th>Sursă</th><th>Preț</th><th>Target Beta</th><th>Venit Lunar</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><b>VV Business Node</b><br><span style="font-size:10px;color:var(--w30)">Locații în VV NOW</span></td>
+        <td>0€ Beta → 9€/lună</td>
+        <td>100 locații</td>
+        <td>900€</td>
+      </tr>
+      <tr>
+        <td><b>VV Talent · Acces Agenție</b><br><span style="font-size:10px;color:var(--w30)">Caută talente după skill</span></td>
+        <td>49€/lună per agenție</td>
+        <td>10 agenții</td>
+        <td>490€</td>
+      </tr>
+      <tr>
+        <td><b>VV NOW Premium</b><br><span style="font-size:10px;color:var(--w30)">Căutare globală, 90 zile</span></td>
+        <td>9€/lună per user</td>
+        <td>50 useri</td>
+        <td>450€</td>
+      </tr>
+      <tr>
+        <td><b>Pagini Sponsorizate VV NOW</b><br><span style="font-size:10px;color:var(--w30)">Conținut business în rezultate</span></td>
+        <td>29€/lună per pagină</td>
+        <td>10 pagini</td>
+        <td>290€</td>
+      </tr>
+      <tr>
+        <td><b>TOTAL ESTIMAT</b></td>
+        <td>—</td>
+        <td>170 clienți activi</td>
+        <td class="rev-total">2.130€/lună</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div style="font-size:11px;color:var(--w30);line-height:1.8">
+    <div>💡 Costuri fixe actuale: 0€ (Firebase Spark gratuit, GitHub Pages gratuit, Anthropic API pay-per-use)</div>
+    <div>💡 Primul euro real apare când primul Business Node trece de la Beta gratuit la 9€/lună</div>
+    <div>💡 Break-even: ~10 Business Nodes plătitoare = primele costuri API acoperite</div>
+  </div>
+</div>
+
+<div class="divider"><div class="div-line"></div></div>
+
+<!-- TECH STACK -->
+<div class="section">
+  <div class="section-label">07 · INFRASTRUCTURĂ TEHNICĂ</div>
+  <h2 class="section-title">Local-First.<br>Cloud-Backed.</h2>
+  <p class="section-sub">Arhitectura e gândită pentru scalare fără costuri mari. Datele utilizatorului rămân pe device-ul lui. Infrastructura VV e pe cloud gratuit în Beta.</p>
+
+  <div style="margin-bottom:20px">
+    <div style="font-size:9px;letter-spacing:3px;color:var(--w30);font-weight:700;margin-bottom:12px">FRONTEND</div>
+    <div class="tech-row">
+      <div class="tech-pill">HTML5 · CSS3 · Vanilla JS</div>
+      <div class="tech-pill">IndexedDB · Local-First</div>
+      <div class="tech-pill">Service Worker · Offline</div>
+      <div class="tech-pill">GitHub Pages · CDN gratuit</div>
+      <div class="tech-pill">PWA · Instalabil Android/iOS</div>
+    </div>
+  </div>
+
+  <div style="margin-bottom:20px">
+    <div style="font-size:9px;letter-spacing:3px;color:var(--w30);font-weight:700;margin-bottom:12px">BACKEND</div>
+    <div class="tech-row">
+      <div class="tech-pill">Firebase Firestore · 15 colecții</div>
+      <div class="tech-pill">Firebase Auth · CEO Panel</div>
+      <div class="tech-pill">Nominatim · Geocoding gratuit</div>
+      <div class="tech-pill">Anthropic API · Web Search Hibrid</div>
+    </div>
+  </div>
+
+  <div style="margin-bottom:20px">
+    <div style="font-size:9px;letter-spacing:3px;color:var(--w30);font-weight:700;margin-bottom:12px">COLECȚII FIREBASE ACTIVE</div>
+    <div class="tech-row">
+      <div class="tech-pill">missions · flash_missions</div>
+      <div class="tech-pill">users · contributors</div>
+      <div class="tech-pill">vvhi_dataset · audit_log</div>
+      <div class="tech-pill">verified_nodes · vv_talents</div>
+      <div class="tech-pill">vv_static_data · vv_now_pages</div>
+      <div class="tech-pill">inbox · transactions · config</div>
+      <div class="tech-pill">vv_pulse · access_keys</div>
+    </div>
+  </div>
+
+  <div>
+    <div style="font-size:9px;letter-spacing:3px;color:var(--w30);font-weight:700;margin-bottom:12px">SECURITATE</div>
+    <div class="tech-row">
+      <div class="tech-pill">Auth UID verificat per request</div>
+      <div class="tech-pill">Charter ART-3 · filtru automat</div>
+      <div class="tech-pill">Geofencing România · Beta</div>
+      <div class="tech-pill">Expirare automată 120 zile</div>
+      <div class="tech-pill">Zero date personale pe server</div>
+      <div class="tech-pill">Purjare 24h · GDPR compliant</div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"><div class="div-line"></div></div>
+
+<!-- ROADMAP -->
+<div class="section">
+  <div class="section-label">08 · ROADMAP</div>
+  <h2 class="section-title">De la Beta<br>la imperiu.</h2>
+
+  <div class="flow">
+    <div class="flow-step">
+      <div class="flow-num" style="color:rgba(52,199,89,.4)">✓</div>
+      <div class="flow-content">
+        <div class="flow-title" style="color:var(--green)">VV Beta · Acum</div>
+        <div class="flow-desc">VV NOW hibrid live, VV Beta misiuni, CEO Panel, VV Studio, Business Node, Talent Register, Inner Circle 100 Fondatori, VV Me city intelligence, Service Worker offline.</div>
+        <span class="flow-tag ft-insider">LIVE · Mai 2026</span>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-num" style="color:rgba(212,175,55,.3)">→</div>
+      <div class="flow-content">
+        <div class="flow-title">VV 1.0 · Următoarele 6 luni</div>
+        <div class="flow-desc">VV ID Login direct, plăți Stripe integrate, VV NOW Premium 9€ activ, VV Family GPS anonim, amenzi financiare automate, extindere 5 orașe România.</div>
+        <span class="flow-tag ft-vvme">TARGET · Noiembrie 2026</span>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-num" style="color:rgba(255,255,255,.1)">→</div>
+      <div class="flow-content">
+        <div class="flow-title">VV 2.0 · Expansiune</div>
+        <div class="flow-desc">Aplicație React Native nativă, VV Bridge mesh P2P, VV Creator platformă conținut verificat, expansiune internațională cu VV NOW Global.</div>
+        <span class="flow-tag ft-nexus">VIZIUNE · 2027</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"><div class="div-line"></div></div>
+
+<!-- QUOTE FINAL -->
+<div class="section">
+  <div class="quote" style="padding:60px 0">
+    <div class="quote-text">"Google e o arhivă.<br>ChatGPT e un creier fără ochi.<br>VV NOW e ochi vii pe asfalt<br>cu creier AI."</div>
+    <div class="quote-by">VV HYBRID UNIVERS · VIZIUNE FONDATOR</div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div style="font-family:var(--font);font-size:18px;font-weight:900;letter-spacing:5px;color:var(--gold);margin-bottom:12px">VV</div>
+  <div>VV Hybrid Univers · Beta · România · 2026</div>
+  <div style="margin-top:8px">
+    <a href="https://vv-technologies.github.io/vv-nexus/vv-now.html" style="color:var(--w30);text-decoration:none;margin:0 12px">VV NOW</a>
+    <a href="https://vv-technologies.github.io/vv-nexus/business-register.html" style="color:var(--w30);text-decoration:none;margin:0 12px">Business</a>
+    <a href="https://vv-technologies.github.io/vv-nexus/talent-register.html" style="color:var(--w30);text-decoration:none;margin:0 12px">Talent</a>
+    <a href="https://vv-technologies.github.io/vv-nexus/vv-studio.html" style="color:var(--w30);text-decoration:none;margin:0 12px">Studio CEO</a>
+  </div>
+  <div style="margin-top:16px;font-size:10px">Toate drepturile rezervate · VV Technologies · GDPR Compliant · VV Charter v1.3</div>
+</footer>
+
+</body>
+</html>
