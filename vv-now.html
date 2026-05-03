@@ -180,6 +180,7 @@ html,body{min-height:100vh;background:#000;color:var(--w);
 .src-green{background:var(--green);}
 .src-blue{background:var(--blue);}
 .src-orange{background:var(--orange);}
+.src-blue{background:var(--blue);}
 
 .answer-text{font-size:15px;color:var(--w70);line-height:1.75;font-weight:400;}
 .answer-text strong{color:var(--w);font-weight:500;}
@@ -912,23 +913,7 @@ async function doVerify(vid, locName, lat, lng, layer) {
 }
 
 // ── LIVE PULSE FEED ──────────────────────────────────────────
-async function loadPulseFeed() {
-  try {
-    var snap = await db.collection('vvhi_dataset')
-      .where('action','==','VERIFY_REQUESTED')
-      .orderBy('timestamp','desc').limit(1).get();
-    if (snap.empty) return;
-    var d = snap.docs[0].data();
-    var loc = d.context && d.context.location ? d.context.location : 'o locație';
-    var ago = d.timestamp ? Math.floor((Date.now()-d.timestamp.toDate().getTime())/60000) : '?';
-    var feed = document.getElementById('results');
-    if (!feed) return;
-    var pulse = document.createElement('div');
-    pulse.style.cssText = 'margin-top:8px;padding:10px 14px;background:rgba(52,199,89,.04);border:0.5px solid rgba(52,199,89,.1);border-radius:10px;font-size:11px;color:rgba(255,255,255,.3);display:flex;align-items:center;gap:8px;';
-    pulse.innerHTML = '<div style="width:5px;height:5px;border-radius:50%;background:#34c759;box-shadow:0 0 6px rgba(52,199,89,.6);flex-shrink:0;animation:fp 1.5s ease-in-out infinite"></div>Ultima verificare: <span style="color:rgba(255,255,255,.5)">' + loc + '</span> · acum ' + ago + ' min';
-    feed.appendChild(pulse);
-  } catch(e) {}
-}
+
 
 // ── LOG ───────────────────────────────────────────────────────
 function logSearch(q, status) {
@@ -1006,6 +991,52 @@ async function loadPulseFeed() {
     if (pfRight) pfRight.textContent = 'VV NOW Beta · Live';
   } catch(e) {}
 }
+// ── NEXUS HIBRID — web search cand nu exista date VV ─────────
+async function nexusWebSearch(query, layer) {
+  try {
+    var systemPrompt = 'Esti Nexus, asistentul VV Hybrid Univers pentru realitate urbana din Romania. ' +
+      'Raspunzi SCURT (max 2 propozitii) la intrebari despre locatii fizice, cozi, accesibilitate, trafic, siguranta. ' +
+      'Mentionezi ca datele sunt publice si pot fi neactualizate. Nu inventezi date specifice. Limba: romana.';
+
+    var response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 150,
+        system: systemPrompt,
+        tools: [{ type: 'web_search_20250305', name: 'web_search' }],
+        messages: [{ role: 'user', content: query }]
+      })
+    });
+    if (!response.ok) return null;
+    var data = await response.json();
+    var text = '';
+    if (data.content) {
+      data.content.forEach(function(block) {
+        if (block.type === 'text' && block.text) text += block.text;
+      });
+    }
+    return text.trim() || null;
+  } catch(e) { return null; }
+}
+
+async function loadHybridAnswer(q, layer) {
+  var webText = await nexusWebSearch(q, layer);
+  if (!webText) return;
+  var firstCard = document.querySelector('.answer-card');
+  if (!firstCard) return;
+  var card = document.createElement('div');
+  card.className = 'answer-card';
+  card.style.borderColor = 'rgba(10,132,255,.15)';
+  card.innerHTML =
+    '<div class="card-source"><div class="src-dot" style="background:var(--blue)"></div>DATE PUBLICE · NEXUS WEB</div>' +
+    '<div style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:100px;font-size:9px;font-weight:700;letter-spacing:1px;background:rgba(10,132,255,.08);border:0.5px solid rgba(10,132,255,.2);color:var(--blue);margin-bottom:10px">⚠ Nevalidat fizic · Date publice</div>' +
+    '<div class="answer-text">' + webText + '</div>' +
+    '<div style="margin-top:8px;font-size:11px;color:rgba(255,255,255,.25)">Informații publice — pot fi depășite. Apasă VERIFY pentru certitudine din teren.</div>';
+  firstCard.parentNode.insertBefore(card, firstCard.nextSibling);
+}
+
 </script>
 
 <!-- LIVE PULSE FEED -->
