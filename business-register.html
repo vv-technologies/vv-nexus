@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#000">
+<title>VV Business Node · Înregistrare Locație</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800;900&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --gold:#D4AF37;--gold2:rgba(212,175,55,.1);--gold-b:rgba(212,175,55,.2);
+  --w:#fff;--w70:rgba(255,255,255,.7);--w50:rgba(255,255,255,.5);
+  --w30:rgba(255,255,255,.3);--w15:rgba(255,255,255,.15);
+  --w08:rgba(255,255,255,.08);--w04:rgba(255,255,255,.04);
+  --border:rgba(255,255,255,.08);
+  --green:#34c759;--blue:#0A84FF;--red:#ff3b30;--orange:#FF9500;
+  --font:'Syne',sans-serif;--mono:'DM Mono',monospace;
+}
+html,body{min-height:100vh;background:#000;color:var(--w);
+  font-family:var(--mono);-webkit-font-smoothing:antialiased;}
+
+/* Header */
+.hdr{padding:20px 28px;display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid var(--border);}
+.logo{font-family:var(--font);font-weight:900;font-size:16px;
+  letter-spacing:6px;color:var(--gold);text-decoration:none;}
+.hdr-nav{display:flex;gap:8px;}
+.hdr-link{padding:5px 12px;background:var(--w04);border:0.5px solid var(--border);
+  border-radius:100px;font-size:11px;color:var(--w30);text-decoration:none;transition:all .15s;}
+.hdr-link:hover{color:var(--w70);}
+
+/* Main */
+.main{max-width:680px;margin:0 auto;padding:48px 24px 80px;}
+
+/* Hero section */
+.page-hero{text-align:center;margin-bottom:48px;}
+.page-eye{font-size:8px;letter-spacing:5px;color:rgba(212,175,55,.4);
+  font-weight:700;margin-bottom:16px;}
+.page-title{font-family:var(--font);font-size:clamp(24px,4vw,40px);
+  font-weight:900;letter-spacing:-1px;margin-bottom:12px;line-height:1.1;}
+.page-title .g{color:var(--gold);}
+.page-sub{font-size:13px;color:var(--w50);line-height:1.8;max-width:480px;margin:0 auto;}
+
+/* Stats row */
+.stats-row{display:flex;gap:1px;margin-bottom:40px;overflow:hidden;border-radius:14px;border:1px solid var(--border);}
+.stat-item{flex:1;padding:16px;background:var(--w04);text-align:center;}
+.stat-val{font-family:var(--font);font-size:22px;font-weight:900;color:var(--gold);}
+.stat-lbl{font-size:9px;letter-spacing:2px;color:var(--w30);font-weight:700;margin-top:3px;}
+
+/* Form */
+.form-card{background:var(--w04);border:1px solid var(--border);border-radius:20px;
+  padding:28px;margin-bottom:16px;position:relative;overflow:hidden;}
+.form-card::before{content:'';position:absolute;top:0;left:10%;right:10%;height:1px;
+  background:linear-gradient(90deg,transparent,var(--gold-b),transparent);}
+
+.section-label{font-size:8px;letter-spacing:4px;color:rgba(212,175,55,.5);
+  font-weight:700;margin-bottom:20px;}
+
+.field{margin-bottom:16px;}
+.field-label{font-size:9px;letter-spacing:2px;color:var(--w30);font-weight:700;
+  display:block;margin-bottom:6px;}
+.field-input{width:100%;background:rgba(255,255,255,.05);border:1px solid var(--border);
+  border-radius:10px;padding:11px 14px;color:var(--w);font-family:var(--mono);
+  font-size:13px;outline:none;transition:border-color .2s;-webkit-appearance:none;}
+.field-input:focus{border-color:rgba(212,175,55,.35);}
+.field-input::placeholder{color:var(--w30);}
+.field-select{width:100%;background:rgba(255,255,255,.05);border:1px solid var(--border);
+  border-radius:10px;padding:11px 14px;color:var(--w);font-family:var(--mono);
+  font-size:13px;outline:none;cursor:pointer;}
+.field-select option{background:#111;}
+.field-textarea{width:100%;background:rgba(255,255,255,.05);border:1px solid var(--border);
+  border-radius:10px;padding:11px 14px;color:var(--w);font-family:var(--mono);
+  font-size:13px;outline:none;resize:vertical;min-height:80px;line-height:1.6;transition:border-color .2s;}
+.field-textarea:focus{border-color:rgba(212,175,55,.35);}
+.field-textarea::placeholder{color:var(--w30);}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+
+/* Charter acceptance */
+.charter-box{background:rgba(212,175,55,.04);border:1px solid rgba(212,175,55,.15);
+  border-radius:14px;padding:18px;margin-bottom:16px;}
+.charter-title{font-size:9px;letter-spacing:3px;color:rgba(212,175,55,.6);
+  font-weight:700;margin-bottom:12px;}
+.charter-item{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;cursor:pointer;}
+.charter-item:last-child{margin-bottom:0;}
+.charter-check{width:18px;height:18px;border:1px solid var(--border);border-radius:4px;
+  background:var(--w04);display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;margin-top:1px;transition:all .15s;cursor:pointer;}
+.charter-check.checked{background:var(--gold);border-color:var(--gold);}
+.charter-check-icon{font-size:10px;display:none;}
+.charter-check.checked .charter-check-icon{display:block;color:#000;font-weight:900;}
+.charter-text{font-size:12px;color:var(--w50);line-height:1.6;}
+.charter-text b{color:var(--w70);}
+
+/* Pioneer badge */
+.pioneer-badge{display:flex;align-items:center;gap:12px;padding:14px 18px;
+  background:rgba(212,175,55,.06);border:1px solid rgba(212,175,55,.2);
+  border-radius:12px;margin-bottom:20px;}
+.pb-icon{font-size:20px;flex-shrink:0;}
+.pb-title{font-size:12px;font-weight:700;color:var(--gold);font-family:var(--font);}
+.pb-sub{font-size:11px;color:var(--w30);margin-top:2px;}
+.pb-count{font-family:var(--font);font-size:20px;font-weight:900;color:var(--gold);
+  flex-shrink:0;margin-left:auto;}
+
+/* Submit */
+.submit-btn{width:100%;padding:16px;background:var(--gold);color:#000;
+  border:none;border-radius:12px;font-family:var(--font);font-size:14px;
+  font-weight:900;cursor:pointer;transition:opacity .15s;letter-spacing:.5px;}
+.submit-btn:hover{opacity:.88;}
+.submit-btn:disabled{opacity:.4;cursor:not-allowed;}
+
+/* Success */
+.success-screen{display:none;text-align:center;padding:40px 20px;}
+.success-screen.show{display:block;}
+.success-hex{font-size:48px;margin-bottom:20px;animation:successPop .4s cubic-bezier(.16,1,.3,1);}
+@keyframes successPop{from{transform:scale(0)}to{transform:scale(1)}}
+.success-title{font-family:var(--font);font-size:24px;font-weight:900;
+  color:var(--gold);margin-bottom:8px;}
+.success-sub{font-size:13px;color:var(--w50);line-height:1.8;margin-bottom:24px;}
+.node-id{font-family:var(--mono);font-size:12px;color:var(--gold);
+  background:var(--gold2);border:1px solid var(--gold-b);
+  border-radius:8px;padding:10px 16px;display:inline-block;margin-bottom:20px;
+  letter-spacing:2px;}
+
+/* Info boxes */
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:32px;}
+.info-box{background:var(--w04);border:1px solid var(--border);border-radius:14px;padding:16px;}
+.info-box-icon{font-size:18px;margin-bottom:8px;}
+.info-box-title{font-size:11px;font-weight:700;color:var(--w70);margin-bottom:4px;font-family:var(--font);}
+.info-box-text{font-size:11px;color:var(--w30);line-height:1.6;}
+
+/* Expiry info */
+.expiry-info{background:var(--w04);border:1px solid var(--border);border-radius:14px;
+  padding:16px 18px;margin-bottom:16px;}
+.expiry-row{display:flex;align-items:center;justify-content:space-between;
+  padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:12px;}
+.expiry-row:last-child{border-bottom:none;}
+.exp-label{color:var(--w50);}
+.exp-val{font-weight:700;}
+.exp-green{color:var(--green);}
+.exp-orange{color:var(--orange);}
+.exp-red{color:var(--red);}
+
+/* Toast */
+#toast{position:fixed;bottom:24px;left:50%;
+  transform:translateX(-50%) translateY(6px);
+  background:rgba(8,8,14,.97);border:0.5px solid var(--w08);
+  border-radius:100px;padding:9px 20px;font-size:11px;color:var(--w70);
+  opacity:0;transition:all .25s;pointer-events:none;z-index:999;white-space:nowrap;}
+#toast.on{opacity:1;transform:translateX(-50%) translateY(0);}
+
+@media(max-width:580px){
+  .field-row{grid-template-columns:1fr;}
+  .info-grid{grid-template-columns:1fr;}
+  .stats-row{flex-direction:column;}
+}
+</style>
+</head>
+<body>
+<div id="toast"></div>
+
+<!-- HEADER -->
+<header class="hdr">
+  <a href="https://vv-technologies.github.io/vv-nexus/" class="logo">VV</a>
+  <nav class="hdr-nav">
+    <a href="https://vv-technologies.github.io/vv-nexus/vv-now.html" class="hdr-link">VV NOW</a>
+    <a href="https://vv-technologies.github.io/vv-nexus/talent-register.html" class="hdr-link">Talent</a>
+    <a href="https://vv-technologies.github.io/ceo.html" class="hdr-link">VV Beta</a>
+  </nav>
+</header>
+
+<div class="main">
+
+  <!-- HERO -->
+  <div class="page-hero">
+    <div class="page-eye">VV BUSINESS NODE · BETA</div>
+    <h1 class="page-title">Locația ta.<br><span class="g">Adevărul tău.</span></h1>
+    <p class="page-sub">Înregistrează-ți locația în ecosistemul VV. Clienții te găsesc prin VV NOW. Datele tale sunt verificate spontan de Insideri reali — zero reclame, zero fake-uri.</p>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-row" id="stats-row">
+    <div class="stat-item">
+      <div class="stat-val" id="stat-nodes">—</div>
+      <div class="stat-lbl">NODURI ACTIVE</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-val" id="stat-pioneer">—</div>
+      <div class="stat-lbl">PIONIERI RĂMAȘI</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-val">30</div>
+      <div class="stat-lbl">ZILE VALABILITATE</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-val">0€</div>
+      <div class="stat-lbl">COST BETA</div>
+    </div>
+  </div>
+
+  <!-- INFO GRID -->
+  <div class="info-grid">
+    <div class="info-box">
+      <div class="info-box-icon">🔍</div>
+      <div class="info-box-title">Apari în VV NOW</div>
+      <div class="info-box-text">Când cineva caută tipul tău de locație, apari în rezultate cu badge "Nod VV Verificat".</div>
+    </div>
+    <div class="info-box">
+      <div class="info-box-icon">⚡</div>
+      <div class="info-box-title">Verificare spontană</div>
+      <div class="info-box-text">Insiderii VV pot verifica fizic oricând. Dacă datele tale sunt corecte, câștigă credibilitate.</div>
+    </div>
+    <div class="info-box">
+      <div class="info-box-icon">🛡️</div>
+      <div class="info-box-title">Anonimat complet</div>
+      <div class="info-box-text">Datele tale de contact rămân pe device-ul tău. Noi vedem doar informațiile publice ale locației.</div>
+    </div>
+    <div class="info-box">
+      <div class="info-box-icon">📋</div>
+      <div class="info-box-title">Lege VV Charter</div>
+      <div class="info-box-text">Dacă un Insider contrazice datele tale cu VV Proof, Nodul tău devine "Neverificat" timp de 7 zile.</div>
+    </div>
+  </div>
+
+  <!-- EXPIRY SYSTEM -->
+  <div class="expiry-info">
+    <div class="expiry-row">
+      <span class="exp-label">Actualizare date</span>
+      <span class="exp-val exp-green">✓ Nod activ · Apare în VV NOW</span>
+    </div>
+    <div class="expiry-row">
+      <span class="exp-label">+30 zile fără update</span>
+      <span class="exp-val exp-orange">⏰ Marcat ca "Date posibil depășite"</span>
+    </div>
+    <div class="expiry-row">
+      <span class="exp-label">+90 zile fără update</span>
+      <span class="exp-val" style="color:var(--w30)">📧 Notificare de reactivare trimisă</span>
+    </div>
+    <div class="expiry-row">
+      <span class="exp-label">+120 zile fără update</span>
+      <span class="exp-val exp-red">✗ Nod șters automat din sistem</span>
+    </div>
+  </div>
+
+  <!-- FORM -->
+  <div id="form-section">
+
+    <!-- Pioneer badge -->
+    <div class="pioneer-badge" id="pioneer-badge">
+      <div class="pb-icon">⬡</div>
+      <div>
+        <div class="pb-title">Statut Pionier disponibil</div>
+        <div class="pb-sub">Primele 10 locații din fiecare oraș primesc badge "Nod Fondator"</div>
+      </div>
+      <div class="pb-count" id="pioneer-count">—</div>
+    </div>
+
+    <!-- Date locatie -->
+    <div class="form-card">
+      <div class="section-label">DATE LOCAȚIE</div>
+
+      <div class="field">
+        <label class="field-label">NUME LOCAȚIE *</label>
+        <input class="field-input" id="f-name" type="text" placeholder="ex: Cafeneaua Florilor, Salon Maria...">
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label class="field-label">TIP LOCAȚIE *</label>
+          <select class="field-select" id="f-type">
+            <option value="">Selectează...</option>
+            <option value="cafenea">☕ Cafenea</option>
+            <option value="restaurant">🍽️ Restaurant</option>
+            <option value="salon">💈 Salon / Frizerie</option>
+            <option value="farmacie">💊 Farmacie</option>
+            <option value="magazin">🛒 Magazin / Supermarket</option>
+            <option value="birouri">🏢 Birouri / Coworking</option>
+            <option value="sport">⚽ Sport / Fitness</option>
+            <option value="cultura">🎨 Cultură / Artă</option>
+            <option value="servicii">🔧 Servicii</option>
+            <option value="altele">⬡ Altele</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="field-label">ORAȘ *</label>
+          <input class="field-input" id="f-city" type="text" placeholder="ex: Slobozia, București...">
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label">ADRESĂ (opțional)</label>
+        <input class="field-input" id="f-address" type="text" placeholder="Strada, număr...">
+      </div>
+
+      <div class="field">
+        <label class="field-label">DESCRIERE SCURTĂ</label>
+        <textarea class="field-textarea" id="f-desc" placeholder="Ce oferă locația ta? Program, specialități, ce o face unică..."></textarea>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label class="field-label">PROGRAM (opțional)</label>
+          <input class="field-input" id="f-hours" type="text" placeholder="ex: L-V 08:00-22:00">
+        </div>
+        <div class="field">
+          <label class="field-label">CONTACT PUBLIC (opțional)</label>
+          <input class="field-input" id="f-contact" type="text" placeholder="Tel / Instagram / Web">
+        </div>
+      </div>
+    </div>
+
+    <!-- Charter -->
+    <div class="charter-box">
+      <div class="charter-title">VV CHARTER · TERMENI OBLIGATORII</div>
+
+      <div class="charter-item" onclick="toggleCheck('c1')">
+        <div class="charter-check" id="c1"><span class="charter-check-icon">✓</span></div>
+        <div class="charter-text"><b>Accept verificarea spontană.</b> Înțeleg că Insiderii VV pot verifica fizic locația mea oricând, fără preaviz.</div>
+      </div>
+
+      <div class="charter-item" onclick="toggleCheck('c2')">
+        <div class="charter-check" id="c2"><span class="charter-check-icon">✓</span></div>
+        <div class="charter-text"><b>Datele mele sunt corecte.</b> Dacă un VV Proof contrazice informațiile mele, accept ca Nodul să fie marcat "Neverificat" timp de 7 zile automat.</div>
+      </div>
+
+      <div class="charter-item" onclick="toggleCheck('c3')">
+        <div class="charter-check" id="c3"><span class="charter-check-icon">✓</span></div>
+        <div class="charter-text"><b>Înțeleg sistemul de expirare.</b> Mă angajez să actualizez datele cel puțin o dată la 90 de zile sau accept ștergerea automată din sistem.</div>
+      </div>
+
+      <div class="charter-item" onclick="toggleCheck('c4')">
+        <div class="charter-check" id="c4"><span class="charter-check-icon">✓</span></div>
+        <div class="charter-text"><b>Nu există date de identificare personală.</b> VV nu stochează date de buletin, CNP sau informații private. Totul rămâne local pe device-ul meu.</div>
+      </div>
+    </div>
+
+    <button class="submit-btn" id="submit-btn" onclick="submitNode()">⬡ ÎNREGISTREAZĂ NODUL</button>
+  </div>
+
+  <!-- SUCCESS -->
+  <div class="success-screen" id="success-screen">
+    <div class="success-hex">⬡</div>
+    <div class="success-title">Nod Activat</div>
+    <div class="success-sub">Locația ta este acum în ecosistemul VV. Apare în VV NOW când cineva caută în zona ta.</div>
+    <div class="node-id" id="node-id-display">VV·NODE·——</div>
+    <div class="success-sub" style="font-size:12px;margin-bottom:16px">Salvează acest cod — e identitatea nodului tău în ecosistem.</div>
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+      <a href="https://vv-technologies.github.io/vv-nexus/vv-now.html"
+        style="padding:12px 20px;background:var(--gold);color:#000;border-radius:10px;font-family:var(--font);font-size:12px;font-weight:800;text-decoration:none;">
+        Caută-te în VV NOW →
+      </a>
+      <button onclick="shareNode()"
+        style="padding:12px 20px;background:var(--w04);border:0.5px solid var(--border);color:var(--w70);border-radius:10px;font-family:var(--mono);font-size:12px;cursor:pointer;">
+        📲 Distribuie
+      </button>
+    </div>
+  </div>
+
+</div>
+
+<!-- FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script>
+if (!firebase.apps.length) {
+  firebase.initializeApp({
+    apiKey:"AIzaSyDGv4kEClO0RHCLvXVLOT-vyPHw6bsxYVc",
+    authDomain:"vv-ep-beta.firebaseapp.com",
+    projectId:"vv-ep-beta"
+  });
+}
+var db = firebase.firestore();
+var _nodeId = null;
+
+// ── LOAD STATS ────────────────────────────────────────────────
+async function loadStats() {
+  try {
+    var snap = await db.collection('verified_nodes')
+      .where('status', '==', 'active').get();
+    document.getElementById('stat-nodes').textContent = snap.size;
+
+    // Pioneer slots — primele 10 per oras
+    var pioneer = Math.max(0, 10 - snap.size);
+    document.getElementById('stat-pioneer').textContent = pioneer > 0 ? pioneer + ' locuri' : 'Epuizat';
+    document.getElementById('pioneer-count').textContent = pioneer > 0 ? pioneer : '✗';
+  } catch(e) {}
+}
+
+// ── CHARTER CHECKS ────────────────────────────────────────────
+function toggleCheck(id) {
+  var el = document.getElementById(id);
+  el.classList.toggle('checked');
+}
+
+function allChecked() {
+  return ['c1','c2','c3','c4'].every(function(id) {
+    return document.getElementById(id).classList.contains('checked');
+  });
+}
+
+// ── GENERATE NODE ID ──────────────────────────────────────────
+function genNodeId() {
+  var chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  var p1 = '', p2 = '';
+  for (var i=0;i<4;i++) p1 += chars[Math.floor(Math.random()*chars.length)];
+  for (var i=0;i<4;i++) p2 += chars[Math.floor(Math.random()*chars.length)];
+  return 'VV·NODE·' + p1 + '-' + p2;
+}
+
+// ── SUBMIT ────────────────────────────────────────────────────
+async function submitNode() {
+  var name = document.getElementById('f-name').value.trim();
+  var type = document.getElementById('f-type').value;
+  var city = document.getElementById('f-city').value.trim();
+  var address = document.getElementById('f-address').value.trim();
+  var desc = document.getElementById('f-desc').value.trim();
+  var hours = document.getElementById('f-hours').value.trim();
+  var contact = document.getElementById('f-contact').value.trim();
+
+  if (!name || !type || !city) {
+    showToast('Completează: Nume, Tip și Oraș'); return;
+  }
+  if (!allChecked()) {
+    showToast('Bifează toți termenii VV Charter'); return;
+  }
+
+  var btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.textContent = 'Se activează...';
+
+  try {
+    _nodeId = genNodeId();
+    var now = firebase.firestore.FieldValue.serverTimestamp();
+    var expireAt30 = new Date(Date.now() + 30*24*60*60*1000);
+    var expireAt90 = new Date(Date.now() + 90*24*60*60*1000);
+    var expireAt120 = new Date(Date.now() + 120*24*60*60*1000);
+
+    // Verifica daca e pioneer
+    var existingSnap = await db.collection('verified_nodes')
+      .where('city', '==', city.toLowerCase()).get();
+    var isPioneer = existingSnap.size < 10;
+
+    await db.collection('verified_nodes').add({
+      nodeId: _nodeId,
+      name, type, city: city.toLowerCase(), cityDisplay: city,
+      address: address || null,
+      description: desc || null,
+      hours: hours || null,
+      contact: contact || null,
+      status: 'active',
+      isPioneer,
+      charterAccepted: true,
+      verificationScore: 100,
+      lastUpdated: now,
+      createdAt: now,
+      // Expiry timestamps
+      warnAt: firebase.firestore.Timestamp.fromDate(expireAt30),
+      notifyAt: firebase.firestore.Timestamp.fromDate(expireAt90),
+      deleteAt: firebase.firestore.Timestamp.fromDate(expireAt120)
+    });
+
+    // Notifica CEO
+    await db.collection('inbox').add({
+      to: 'CEO', from: _nodeId, type: 'new_business_node',
+      message: '⬡ Nou Nod Business: ' + name + ' · ' + city + (isPioneer?' · 🏆 PIONEER':''),
+      nodeId: _nodeId, read: false, createdAt: now
+    });
+
+    // Log VVhi
+    db.collection('vvhi_dataset').add({
+      action: 'BUSINESS_NODE_CREATED',
+      context: { nodeId: _nodeId, type, city: city.toLowerCase(), isPioneer },
+      timestamp: now
+    }).catch(function(){});
+
+    // Success UI
+    document.getElementById('form-section').style.display = 'none';
+    document.getElementById('success-screen').classList.add('show');
+    document.getElementById('node-id-display').textContent = _nodeId;
+
+    showToast(isPioneer ? '🏆 Nod Pionier activat!' : '⬡ Nod activat!');
+
+  } catch(e) {
+    btn.disabled = false;
+    btn.textContent = '⬡ ÎNREGISTREAZĂ NODUL';
+    showToast('Eroare: ' + e.message);
+  }
+}
+
+// ── SHARE ─────────────────────────────────────────────────────
+function shareNode() {
+  var name = document.getElementById('f-name')?.value || 'Locația mea';
+  var text = 'Am înregistrat "' + name + '" în ecosistemul VV! Acum mă găsiți și pe VV NOW. ' +
+    'vv-technologies.github.io/vv-nexus/vv-now.html · Cod: ' + _nodeId;
+  if (navigator.share) {
+    navigator.share({ text });
+  } else {
+    var wa = 'https://wa.me/?text=' + encodeURIComponent(text);
+    window.open(wa, '_blank');
+  }
+}
+
+// ── TOAST ─────────────────────────────────────────────────────
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('on');
+  clearTimeout(t._t); t._t = setTimeout(function(){ t.classList.remove('on'); }, 3500);
+}
+
+loadStats();
+</script>
+</body>
+</html>
