@@ -54,7 +54,7 @@ html,body{min-height:100vh;background:#000;color:var(--w);
 .hero{
   min-height:100vh;display:flex;flex-direction:column;
   align-items:center;justify-content:center;
-  padding:80px 24px 60px;
+  padding:110px 24px 60px;
   transition:all .5s cubic-bezier(.16,1,.3,1);
 }
 .hero.compact{min-height:auto;padding:80px 24px 16px;justify-content:flex-start;}
@@ -69,7 +69,7 @@ html,body{min-height:100vh;background:#000;color:var(--w);
 .hero.compact .hex{display:none;}
 @keyframes hexBreath{0%,100%{border-color:rgba(212,175,55,.2)}50%{border-color:rgba(212,175,55,.4)}}
 .hero-title{
-  font-family:var(--font);font-size:clamp(26px,4vw,50px);
+  font-family:var(--font);font-size:clamp(22px,3.2vw,42px);
   font-weight:900;letter-spacing:-1px;text-align:center;
   line-height:1.05;margin-bottom:8px;
 }
@@ -158,7 +158,7 @@ html,body{min-height:100vh;background:#000;color:var(--w);
 /* Loading */
 .load-line{position:fixed;top:0;left:0;right:0;height:2px;z-index:999;display:none;}
 .load-line.on{display:block;}
-.load-fill{height:100%;background:linear-gradient(90deg,var(--gold),rgba(212,175,55,.2));
+.load-fill{height:100%;background:linear-gradient(90deg,transparent,var(--gold),rgba(212,175,55,.6),var(--gold),transparent);
   animation:ldAnim 1.4s ease-in-out infinite;}
 @keyframes ldAnim{0%{width:0;margin-left:0}50%{width:65%;margin-left:18%}100%{width:0;margin-left:100%}}
 
@@ -264,6 +264,45 @@ html,body{min-height:100vh;background:#000;color:var(--w);
   border-radius:100px;padding:9px 20px;font-size:11px;color:var(--w50);
   opacity:0;transition:all .25s;pointer-events:none;z-index:999;white-space:nowrap;}
 #toast.on{opacity:1;transform:translateX(-50%) translateY(0);}
+
+
+/* Live Pulse Feed */
+.pulse-feed{
+  position:fixed;bottom:0;left:0;right:0;
+  background:rgba(0,0,0,.85);
+  backdrop-filter:blur(12px);
+  border-top:0.5px solid rgba(255,255,255,.06);
+  padding:8px 24px;
+  display:flex;align-items:center;justify-content:space-between;
+  z-index:50;
+  font-size:11px;color:rgba(255,255,255,.3);
+}
+.pf-left{display:flex;align-items:center;gap:8px;}
+.pf-dot{width:5px;height:5px;border-radius:50%;background:var(--green);
+  box-shadow:0 0 6px rgba(52,199,89,.8);animation:fp 2s ease-in-out infinite;}
+.pf-right{font-size:10px;color:rgba(255,255,255,.2);}
+
+/* Scanning state */
+.scanning-text{
+  display:none;font-size:12px;color:rgba(212,175,55,.5);
+  text-align:center;padding:8px 0;letter-spacing:1px;
+}
+.scanning-text.on{display:block;}
+
+/* Become Insider CTA */
+.insider-cta{
+  margin-top:8px;padding:12px 16px;
+  background:rgba(52,199,89,.05);
+  border:0.5px solid rgba(52,199,89,.15);
+  border-radius:12px;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  cursor:pointer;transition:all .15s;
+}
+.insider-cta:hover{background:rgba(52,199,89,.1);}
+.ict-text{font-size:13px;color:rgba(52,199,89,.8);}
+.ict-sub{font-size:11px;color:rgba(255,255,255,.3);margin-top:2px;}
+.ict-btn{padding:6px 14px;background:rgba(52,199,89,.1);border:0.5px solid rgba(52,199,89,.3);
+  border-radius:100px;font-size:11px;color:var(--green);white-space:nowrap;font-weight:600;}
 
 /* Responsive */
 @media(max-width:600px){
@@ -553,6 +592,7 @@ async function doSearch(q) {
   res.innerHTML = '';
   res.classList.add('show');
   document.getElementById('load').classList.add('on');
+  res.innerHTML = '<div class="scanning-text on">Nexus scanează...</div>';
   window.scrollTo({top:0, behavior:'smooth'});
 
   // Charter
@@ -662,13 +702,25 @@ function renderResults(q, loc, missions, layer) {
   // 3. Locatie + VERIFY
   if (loc) html += buildLocCard(loc, missions, layer, q);
 
+  // 4. Insider CTA daca nu sunt date si nu e locatie detectata
+  if (!hasMissions && !loc) {
+    html += '<div class="answer-card" style="animation-delay:.08s;border-color:rgba(212,175,55,.15)">' +
+      '<div class="card-source"><div class="src-dot src-gold"></div>DEVINO INSIDER</div>' +
+      '<div class="answer-text">Ești în zonă acum? <strong>Tu poți fi primul care verifică</strong> și câștigă 10 VV Coins. Deschide VV Beta și lansează misiunea.</div>' +
+      '<a href="https://vv-technologies.github.io/vv-beta" style="display:inline-flex;align-items:center;gap:6px;margin-top:12px;padding:10px 18px;background:rgba(212,175,55,.1);border:0.5px solid rgba(212,175,55,.25);border-radius:100px;font-size:12px;color:#D4AF37;text-decoration:none;font-weight:500;">⚡ Deschide VV Beta →</a>' +
+    '</div>';
+  }
+
   // 4. Pills sugestii discrete
   html += buildPills(q, layer);
 
   // 5. Premium note discret
-  html += '<div class="premium-note">VV NOW Standard · România · 30 zile <b>→ Premium · Global · 90 zile · 9€</b></div>';
+  html += '<div class="premium-note">Date din ultima lună · România <b>→ Upgrade · Mondial · 90 zile · 9€</b></div>';
 
   res.innerHTML = html;
+
+  // Load live pulse feed
+  loadPulseFeed();
 }
 
 function buildAnswer(q, loc, missions, layer, h, layerBadge) {
@@ -704,7 +756,7 @@ function buildAnswer(q, loc, missions, layer, h, layerBadge) {
   } else if (l.includes('trafic')||l.includes('drum')) {
     text = 'Traficul se schimbă rapid. Un Insider care trece acum îți spune în câteva minute.';
   } else {
-    text = 'Nu am date recente despre asta în ecosistemul VV. Un Insider verifică pe loc și îți aduce dovada.';
+    text = 'Nu am date recente despre <strong>'+q+'</strong> în rețeaua VV. Lansează o misiune și primul Insider disponibil verifică pe loc și îți aduce dovada foto.';
   }
 
   return '<div class="answer-card">' +
@@ -859,6 +911,25 @@ async function doVerify(vid, locName, lat, lng, layer) {
   }
 }
 
+// ── LIVE PULSE FEED ──────────────────────────────────────────
+async function loadPulseFeed() {
+  try {
+    var snap = await db.collection('vvhi_dataset')
+      .where('action','==','VERIFY_REQUESTED')
+      .orderBy('timestamp','desc').limit(1).get();
+    if (snap.empty) return;
+    var d = snap.docs[0].data();
+    var loc = d.context && d.context.location ? d.context.location : 'o locație';
+    var ago = d.timestamp ? Math.floor((Date.now()-d.timestamp.toDate().getTime())/60000) : '?';
+    var feed = document.getElementById('results');
+    if (!feed) return;
+    var pulse = document.createElement('div');
+    pulse.style.cssText = 'margin-top:8px;padding:10px 14px;background:rgba(52,199,89,.04);border:0.5px solid rgba(52,199,89,.1);border-radius:10px;font-size:11px;color:rgba(255,255,255,.3);display:flex;align-items:center;gap:8px;';
+    pulse.innerHTML = '<div style="width:5px;height:5px;border-radius:50%;background:#34c759;box-shadow:0 0 6px rgba(52,199,89,.6);flex-shrink:0;animation:fp 1.5s ease-in-out infinite"></div>Ultima verificare: <span style="color:rgba(255,255,255,.5)">' + loc + '</span> · acum ' + ago + ' min';
+    feed.appendChild(pulse);
+  } catch(e) {}
+}
+
 // ── LOG ───────────────────────────────────────────────────────
 function logSearch(q, status) {
   db.collection('vvhi_dataset').add({
@@ -907,7 +978,44 @@ window.addEventListener('scroll', function() {
 openIDB().then(function() {
   getGPS();
   renderHist();
+  loadPulseFeed();
 });
+
+async function loadPulseFeed() {
+  try {
+    var snap = await db.collection('vvhi_dataset')
+      .orderBy('timestamp','desc').limit(1).get();
+    if (snap.empty) return;
+    var d = snap.docs[0].data();
+    var ago = '';
+    if (d.timestamp) {
+      var diff = Math.floor((Date.now()-d.timestamp.toDate().getTime())/60000);
+      ago = diff<1?'acum':diff<60?diff+' min ago':Math.floor(diff/60)+'h ago';
+    }
+    var actions = {
+      'VV_NOW_SEARCH':'Cineva a căutat în VV NOW',
+      'VV_PULSE_CONNECT':'Pulse confirmat',
+      'VERIFY_REQUESTED':'Misiune Flash lansată',
+      'APPROVE_MISSION':'Verificare completată',
+      'CIRCLE_DEPLOY':'Nou Fondator activat'
+    };
+    var txt = actions[d.action] || 'Activitate în ecosistem';
+    var pfText = document.getElementById('pf-text');
+    var pfRight = document.getElementById('pf-right');
+    if (pfText) pfText.textContent = txt + ' · ' + ago;
+    if (pfRight) pfRight.textContent = 'VV NOW Beta · Live';
+  } catch(e) {}
+}
 </script>
+
+<!-- LIVE PULSE FEED -->
+<div class="pulse-feed" id="pulse-feed">
+  <div class="pf-left">
+    <div class="pf-dot"></div>
+    <span id="pf-text">Ecosistem activ</span>
+  </div>
+  <div class="pf-right" id="pf-right">VV NOW Beta</div>
+</div>
+
 </body>
 </html>
