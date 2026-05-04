@@ -2,530 +2,1066 @@
 <html lang="ro">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>VV Hybrid Univers · Arhitectură & Viziune</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800;900&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#000">
+<title>VV NOW</title>
+<link rel="manifest" href="manifest.json">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
-  --gold:#D4AF37;--gold2:rgba(212,175,55,.08);--gold-b:rgba(212,175,55,.18);
+  --gold:#D4AF37;--gold2:rgba(212,175,55,.1);--gold-b:rgba(212,175,55,.2);
   --w:#fff;--w70:rgba(255,255,255,.7);--w50:rgba(255,255,255,.5);
-  --w30:rgba(255,255,255,.3);--w15:rgba(255,255,255,.12);
-  --border:rgba(255,255,255,.08);
-  --green:#34c759;--blue:#0A84FF;--red:#ff3b30;--orange:#FF9500;
-  --font:'Syne',sans-serif;--mono:'DM Mono',monospace;
+  --w30:rgba(255,255,255,.3);--w15:rgba(255,255,255,.15);
+  --w08:rgba(255,255,255,.08);--w04:rgba(255,255,255,.04);
+  --border:rgba(255,255,255,.07);
+  --green:#34c759;--blue:#0A84FF;--orange:#FF9500;--red:#ff3b30;
+  --font:'Syne',sans-serif;--body:'DM Sans',sans-serif;
 }
-html,body{background:#000;color:var(--w);font-family:var(--mono);-webkit-font-smoothing:antialiased;}
+html,body{min-height:100vh;background:#000;color:var(--w);
+  font-family:var(--body);-webkit-font-smoothing:antialiased;overflow-x:hidden;}
 
-/* NAV */
-.nav{position:sticky;top:0;z-index:100;background:rgba(0,0,0,.92);backdrop-filter:blur(20px);
-  border-bottom:1px solid var(--border);padding:12px 40px;
-  display:flex;align-items:center;justify-content:space-between;}
-.nav-logo{font-family:var(--font);font-weight:900;font-size:15px;letter-spacing:5px;color:var(--gold);}
-.nav-links{display:flex;gap:6px;}
-.nav-link{padding:5px 12px;background:rgba(255,255,255,.04);border:0.5px solid var(--border);
-  border-radius:100px;font-size:10px;color:var(--w30);text-decoration:none;transition:all .15s;}
-.nav-link:hover{color:var(--w70);}
+/* ── HEADER ── */
+.hdr{position:fixed;top:0;left:0;right:0;z-index:200;
+  padding:14px 28px;display:flex;align-items:center;justify-content:space-between;
+  transition:background .3s;}
+.hdr.solid{background:rgba(0,0,0,.92);backdrop-filter:blur(24px);
+  border-bottom:1px solid var(--border);}
+.logo{font-family:var(--font);font-weight:900;font-size:16px;
+  letter-spacing:6px;color:var(--gold);text-decoration:none;
+  display:flex;align-items:center;gap:7px;}
+.logo-sub{font-size:9px;letter-spacing:2px;color:var(--w30);
+  font-family:var(--body);font-weight:400;
+  border-left:1px solid var(--border);padding-left:8px;}
+.hdr-right{display:flex;align-items:center;gap:8px;}
+.hdr-link{padding:5px 12px;background:var(--w04);border:0.5px solid var(--border);
+  border-radius:100px;font-size:11px;color:var(--w30);text-decoration:none;transition:all .15s;}
+.hdr-link:hover{color:var(--w70);background:var(--w08);}
+.back-btn{display:none;align-items:center;gap:5px;padding:5px 12px;
+  background:var(--w04);border:0.5px solid var(--border);border-radius:100px;
+  font-size:11px;color:var(--w30);cursor:pointer;transition:all .15s;font-family:var(--body);}
+.back-btn:hover{color:var(--w70);}
+.back-btn.show{display:flex;}
 
-/* HERO */
-.hero{max-width:860px;margin:0 auto;padding:80px 40px 60px;text-align:center;}
-.hero-eye{font-size:8px;letter-spacing:5px;color:rgba(212,175,55,.4);font-weight:700;margin-bottom:20px;}
-.hero-title{font-family:var(--font);font-size:clamp(32px,5vw,60px);font-weight:900;
-  letter-spacing:-2px;line-height:1.05;margin-bottom:16px;}
+/* ── OFFLINE BANNER ── */
+.offline-banner{
+  display:none;position:fixed;top:0;left:0;right:0;z-index:300;
+  background:rgba(255,149,0,.12);border-bottom:0.5px solid rgba(255,149,0,.3);
+  padding:8px 20px;font-size:11px;color:var(--orange);
+  text-align:center;
+}
+.offline-banner.show{display:block;}
+
+/* ── HERO ── */
+.hero{min-height:100vh;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:80px 24px 60px;transition:all .5s cubic-bezier(.16,1,.3,1);}
+.hero.compact{min-height:auto;padding:78px 24px 16px;justify-content:flex-start;}
+.hex{width:42px;height:42px;border-radius:50%;
+  border:1px solid rgba(212,175,55,.2);background:rgba(212,175,55,.04);
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;margin-bottom:22px;}
+.hero.compact .hex{display:none;}
+.hero-title{font-family:var(--font);font-size:clamp(20px,2.8vw,38px);
+  font-weight:900;letter-spacing:-1px;text-align:center;
+  line-height:1.08;margin-bottom:8px;}
+.hero.compact .hero-title{display:none;}
 .hero-title .g{color:var(--gold);}
-.hero-sub{font-size:15px;color:var(--w50);line-height:1.8;max-width:560px;margin:0 auto 40px;}
-.hero-version{display:inline-flex;align-items:center;gap:8px;padding:6px 16px;
-  background:var(--gold2);border:0.5px solid var(--gold-b);border-radius:100px;
-  font-size:10px;color:var(--gold);letter-spacing:2px;font-weight:700;}
+.hero-sub{font-size:14px;color:var(--w30);text-align:center;
+  margin-bottom:28px;font-weight:300;max-width:380px;}
+.hero.compact .hero-sub{display:none;}
 
-/* SECTION */
-.section{max-width:860px;margin:0 auto;padding:0 40px 60px;}
-.section-label{font-size:8px;letter-spacing:5px;color:rgba(212,175,55,.4);font-weight:700;margin-bottom:20px;}
-.section-title{font-family:var(--font);font-size:clamp(22px,3vw,36px);font-weight:900;
-  letter-spacing:-1px;margin-bottom:12px;line-height:1.1;}
-.section-sub{font-size:13px;color:var(--w50);line-height:1.8;margin-bottom:32px;}
+/* ── SEARCH ── */
+.search-wrap{width:100%;max-width:580px;position:relative;}
+.search-input{width:100%;background:rgba(255,255,255,.06);
+  border:1px solid rgba(212,175,55,.22);border-radius:100px;
+  padding:16px 58px 16px 24px;color:var(--w);
+  font-family:var(--body);font-size:15px;outline:none;
+  transition:all .25s;-webkit-appearance:none;}
+.search-input::placeholder{color:var(--w30);}
+.search-input:focus{border-color:rgba(212,175,55,.45);background:rgba(255,255,255,.08);}
+.search-go{position:absolute;right:6px;top:50%;transform:translateY(-50%);
+  width:42px;height:42px;background:var(--gold);color:#000;
+  border:none;border-radius:50%;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-size:17px;transition:opacity .15s;}
+.search-go:active{opacity:.8;}
 
-/* DIVIDER */
-.divider{max-width:860px;margin:0 auto 60px;padding:0 40px;}
-.div-line{height:1px;background:linear-gradient(90deg,transparent,var(--gold-b),transparent);}
+/* ── LAYERS ── */
+.layers{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;
+  justify-content:center;max-width:580px;}
+.hero.compact .layers{justify-content:flex-start;}
+.layer{display:flex;align-items:center;gap:5px;padding:6px 13px;
+  background:var(--w04);border:0.5px solid var(--border);
+  border-radius:100px;font-size:11px;color:var(--w30);
+  cursor:pointer;transition:all .2s;font-weight:500;}
+.layer-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;}
+.l-access .layer-dot{background:rgba(10,132,255,.8);}
+.l-access.active{border-color:rgba(10,132,255,.4);background:rgba(10,132,255,.08);color:rgba(10,132,255,.9);}
+.l-urgent .layer-dot{background:rgba(255,149,0,.8);}
+.l-urgent.active{border-color:rgba(255,149,0,.4);background:rgba(255,149,0,.08);color:rgba(255,149,0,.9);}
+.l-biz .layer-dot{background:rgba(212,175,55,.8);}
+.l-biz.active{border-color:rgba(212,175,55,.4);background:rgba(212,175,55,.08);color:rgba(212,175,55,.9);}
+.l-safe .layer-dot{background:rgba(52,199,89,.8);}
+.l-safe.active{border-color:rgba(52,199,89,.4);background:rgba(52,199,89,.08);color:rgba(52,199,89,.9);}
 
-/* COMPONENTS GRID */
-.comp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:32px;}
-.comp-card{background:rgba(255,255,255,.03);border:0.5px solid var(--border);
-  border-radius:16px;padding:20px;position:relative;overflow:hidden;transition:border-color .2s;}
-.comp-card:hover{border-color:rgba(212,175,55,.2);}
-.comp-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;
-  background:linear-gradient(90deg,transparent,var(--gold-b),transparent);}
-.comp-icon{font-size:22px;margin-bottom:10px;}
-.comp-name{font-family:var(--font);font-size:13px;font-weight:800;margin-bottom:4px;}
-.comp-desc{font-size:11px;color:var(--w30);line-height:1.6;}
-.comp-badge{display:inline-block;padding:2px 8px;border-radius:100px;font-size:9px;
-  font-weight:700;letter-spacing:1px;margin-top:8px;}
-.cb-live{background:rgba(52,199,89,.08);border:0.5px solid rgba(52,199,89,.2);color:var(--green);}
-.cb-soon{background:rgba(255,149,0,.08);border:0.5px solid rgba(255,149,0,.2);color:var(--orange);}
-.cb-future{background:rgba(255,255,255,.04);border:0.5px solid var(--border);color:var(--w30);}
+/* Sugestii */
+.suggestions{display:flex;gap:8px;flex-wrap:wrap;
+  justify-content:center;margin-top:14px;max-width:580px;}
+.hero.compact .suggestions{display:none;}
+.sug{padding:6px 14px;background:var(--w04);border:0.5px solid var(--border);
+  border-radius:100px;font-size:12px;color:var(--w30);cursor:pointer;transition:all .15s;}
+.sug:hover{background:var(--gold2);border-color:var(--gold-b);color:var(--gold);}
 
-/* FLOW */
-.flow{display:flex;flex-direction:column;gap:0;margin-bottom:32px;}
-.flow-step{display:flex;align-items:flex-start;gap:20px;padding:20px 0;
-  border-bottom:1px solid rgba(255,255,255,.04);}
-.flow-step:last-child{border-bottom:none;}
-.flow-num{font-family:var(--font);font-size:32px;font-weight:900;color:rgba(212,175,55,.2);
-  flex-shrink:0;width:50px;line-height:1;}
-.flow-content{}
-.flow-title{font-family:var(--font);font-size:14px;font-weight:800;margin-bottom:4px;}
-.flow-desc{font-size:12px;color:var(--w50);line-height:1.7;}
-.flow-tag{display:inline-block;padding:1px 7px;border-radius:100px;font-size:9px;font-weight:700;
-  letter-spacing:1px;margin-top:6px;}
-.ft-vvme{background:rgba(212,175,55,.08);border:0.5px solid rgba(212,175,55,.2);color:var(--gold);}
-.ft-nexus{background:rgba(10,132,255,.08);border:0.5px solid rgba(10,132,255,.2);color:var(--blue);}
-.ft-insider{background:rgba(52,199,89,.08);border:0.5px solid rgba(52,199,89,.2);color:var(--green);}
-.ft-firebase{background:rgba(255,149,0,.08);border:0.5px solid rgba(255,149,0,.2);color:var(--orange);}
+/* Istoric */
+.history{margin-top:22px;width:100%;max-width:500px;}
+.hero.compact .history{display:none;}
+.hist-label{font-size:9px;color:var(--w15);letter-spacing:2px;text-align:center;margin-bottom:8px;}
+.hist-list{display:flex;flex-direction:column;gap:3px;}
+.hist-item{display:flex;align-items:center;gap:10px;padding:9px 14px;
+  background:var(--w04);border:0.5px solid var(--border);
+  border-radius:10px;cursor:pointer;transition:all .15s;}
+.hist-item:hover{background:var(--w08);}
+.hist-q{flex:1;font-size:12px;color:var(--w30);}
+.hist-layer{font-size:9px;padding:2px 7px;border-radius:100px;
+  background:var(--w04);color:var(--w30);}
+.hist-t{font-size:10px;color:var(--w15);}
 
-/* LEGAL */
-.legal-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:32px;}
-.legal-card{background:rgba(255,255,255,.03);border:0.5px solid var(--border);
-  border-radius:14px;padding:18px;}
-.legal-title{font-size:11px;font-weight:700;color:var(--w70);margin-bottom:8px;font-family:var(--font);}
-.legal-text{font-size:11px;color:var(--w30);line-height:1.7;}
+/* ── RESULTS ── */
+.results{width:100%;max-width:620px;margin:0 auto;padding:0 24px 80px;display:none;}
+.results.show{display:block;}
 
-/* REVENUE */
-.rev-table{width:100%;border-collapse:collapse;margin-bottom:20px;}
-.rev-table th{font-size:9px;letter-spacing:2px;color:var(--w30);font-weight:700;
-  padding:8px 12px;text-align:left;border-bottom:1px solid var(--border);text-transform:uppercase;}
-.rev-table td{padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.03);
-  font-size:12px;color:var(--w70);}
-.rev-table tr:last-child td{border-bottom:none;font-weight:700;color:var(--gold);}
-.rev-total{font-family:var(--font);font-size:18px;font-weight:900;color:var(--gold);}
+/* Loading */
+.load-line{position:fixed;top:0;left:0;right:0;height:2px;z-index:999;display:none;}
+.load-line.on{display:block;}
+.load-fill{height:100%;
+  background:linear-gradient(90deg,transparent,var(--gold),rgba(212,175,55,.5),var(--gold),transparent);
+  animation:ldAnim 1.6s ease-in-out infinite;}
+@keyframes ldAnim{0%{width:0;margin-left:0}50%{width:70%;margin-left:15%}100%{width:0;margin-left:100%}}
 
-/* QUOTE */
-.quote{text-align:center;padding:40px 0;margin-bottom:40px;}
-.quote-text{font-family:var(--font);font-size:clamp(18px,3vw,28px);font-weight:800;
-  color:var(--gold);letter-spacing:-.5px;line-height:1.3;margin-bottom:12px;}
-.quote-by{font-size:11px;color:var(--w30);letter-spacing:2px;}
+/* Cards */
+.answer-card{background:rgba(255,255,255,.04);border:0.5px solid rgba(255,255,255,.1);
+  border-radius:18px;padding:20px 22px;margin-bottom:10px;
+  animation:fadeUp .35s cubic-bezier(.16,1,.3,1) both;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.answer-card:nth-child(1){animation-delay:.0s}
+.answer-card:nth-child(2){animation-delay:.06s}
+.answer-card:nth-child(3){animation-delay:.12s}
+.answer-card:nth-child(4){animation-delay:.18s}
 
-/* TECH STACK */
-.tech-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;}
-.tech-pill{padding:6px 14px;background:rgba(255,255,255,.04);border:0.5px solid var(--border);
-  border-radius:100px;font-size:11px;color:var(--w50);}
+.card-src{display:flex;align-items:center;gap:6px;
+  font-size:9px;color:var(--w30);letter-spacing:1.5px;margin-bottom:10px;}
+.src-dot{width:5px;height:5px;border-radius:50%;}
+.dot-gold{background:var(--gold);}
+.dot-green{background:var(--green);}
+.dot-web{background:rgba(255,255,255,.3);}
+.dot-blue{background:var(--blue);}
 
-/* FOOTER */
-footer{text-align:center;padding:40px;border-top:1px solid var(--border);
-  font-size:11px;color:var(--w30);line-height:2;}
+.answer-text{font-size:15px;color:var(--w70);line-height:1.75;}
+.answer-text strong{color:var(--w);font-weight:500;}
 
-/* PRINT */
-@media print{
-  body{background:#fff;color:#000;}
-  .nav{display:none;}
-}
+/* Layer badge */
+.layer-badge{display:inline-flex;align-items:center;gap:4px;
+  padding:2px 8px;border-radius:100px;font-size:9px;font-weight:700;
+  letter-spacing:1px;margin-bottom:8px;}
+.lb-access{background:rgba(10,132,255,.08);border:0.5px solid rgba(10,132,255,.2);color:rgba(10,132,255,.9);}
+.lb-urgent{background:rgba(255,149,0,.08);border:0.5px solid rgba(255,149,0,.2);color:rgba(255,149,0,.9);}
+.lb-biz{background:rgba(212,175,55,.08);border:0.5px solid rgba(212,175,55,.2);color:rgba(212,175,55,.9);}
+.lb-safe{background:rgba(52,199,89,.08);border:0.5px solid rgba(52,199,89,.2);color:rgba(52,199,89,.9);}
 
-@media(max-width:700px){
-  .comp-grid{grid-template-columns:1fr 1fr;}
-  .legal-grid{grid-template-columns:1fr;}
-  .hero{padding:60px 20px 40px;}
-  .section{padding:0 20px 40px;}
-  .divider{padding:0 20px;}
+/* Web data card — discret */
+.web-card{background:rgba(255,255,255,.03);border:0.5px solid rgba(255,255,255,.07);
+  border-radius:18px;padding:18px 22px;margin-bottom:10px;
+  animation:fadeUp .35s cubic-bezier(.16,1,.3,1) .1s both;}
+.web-label{display:inline-flex;align-items:center;gap:5px;
+  padding:2px 9px;border-radius:100px;font-size:9px;font-weight:600;
+  background:rgba(255,255,255,.05);border:0.5px solid rgba(255,255,255,.1);
+  color:rgba(255,255,255,.4);margin-bottom:10px;letter-spacing:1px;}
+.web-text{font-size:13px;color:var(--w50);line-height:1.7;}
+.web-note{font-size:11px;color:var(--w30);margin-top:8px;font-style:italic;}
+
+/* VV Data card */
+.vv-card{background:rgba(212,175,55,.04);border:0.5px solid rgba(212,175,55,.15);
+  border-radius:18px;padding:20px 22px;margin-bottom:10px;
+  animation:fadeUp .35s cubic-bezier(.16,1,.3,1) .06s both;}
+.data-badge{display:inline-flex;align-items:center;gap:5px;
+  padding:3px 10px;border-radius:100px;font-size:10px;font-weight:500;margin-bottom:10px;}
+.db-fresh{background:rgba(52,199,89,.08);border:0.5px solid rgba(52,199,89,.2);color:var(--green);}
+.db-old{background:rgba(255,149,0,.08);border:0.5px solid rgba(255,149,0,.2);color:var(--orange);}
+.proof-item{padding:9px 0;border-bottom:0.5px solid rgba(255,255,255,.05);
+  font-size:13px;color:var(--w70);line-height:1.6;}
+.proof-item:last-child{border-bottom:none;}
+.proof-meta{font-size:11px;color:var(--w30);margin-top:2px;}
+
+/* VERIFY — podul spre VV Pulse */
+.verify-wrap{margin-top:14px;padding-top:14px;border-top:0.5px solid var(--border);}
+.verify-label{font-size:9px;color:rgba(212,175,55,.5);letter-spacing:2px;
+  font-weight:700;margin-bottom:8px;}
+.verify-btn{display:flex;align-items:center;gap:10px;width:100%;
+  padding:13px 18px;background:rgba(212,175,55,.08);
+  border:0.5px solid rgba(212,175,55,.25);border-radius:12px;
+  cursor:pointer;transition:all .2s;font-family:var(--body);}
+.verify-btn:hover{background:rgba(212,175,55,.14);}
+.verify-btn.done{opacity:.5;pointer-events:none;}
+.vb-icon{font-size:15px;flex-shrink:0;}
+.vb-body{flex:1;text-align:left;}
+.vb-title{font-size:13px;font-weight:500;color:var(--gold);display:block;}
+.vb-sub{font-size:11px;color:var(--w30);display:block;margin-top:1px;}
+.flash-status{display:none;align-items:center;gap:8px;margin-top:8px;
+  padding:10px 14px;background:rgba(52,199,89,.05);
+  border:0.5px solid rgba(52,199,89,.18);border-radius:10px;
+  font-size:12px;color:var(--green);}
+.flash-status.on{display:flex;}
+.fp{width:7px;height:7px;border-radius:50%;background:var(--green);flex-shrink:0;
+  animation:fp 1.2s ease-in-out infinite;}
+@keyframes fp{0%,100%{opacity:1}50%{opacity:.2}}
+
+/* Share WhatsApp */
+.share-row{display:flex;align-items:center;gap:8px;margin-top:10px;}
+.share-btn{display:inline-flex;align-items:center;gap:6px;
+  padding:7px 14px;background:rgba(37,211,102,.08);
+  border:0.5px solid rgba(37,211,102,.2);border-radius:100px;
+  font-size:11px;color:rgba(37,211,102,.8);cursor:pointer;
+  transition:all .15s;font-family:var(--body);}
+.share-btn:hover{background:rgba(37,211,102,.14);}
+.copy-btn{display:inline-flex;align-items:center;gap:6px;
+  padding:7px 14px;background:var(--w04);border:0.5px solid var(--border);
+  border-radius:100px;font-size:11px;color:var(--w30);cursor:pointer;
+  transition:all .15s;font-family:var(--body);}
+.copy-btn:hover{background:var(--w08);color:var(--w70);}
+
+/* Pills */
+.pills{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+.pill{padding:5px 12px;background:var(--w04);border:0.5px solid var(--border);
+  border-radius:100px;font-size:11px;color:var(--w30);cursor:pointer;transition:all .15s;}
+.pill:hover{background:var(--gold2);border-color:var(--gold-b);color:var(--gold);}
+
+/* Offline cached */
+.offline-card{background:rgba(255,149,0,.04);border:0.5px solid rgba(255,149,0,.15);
+  border-radius:18px;padding:18px 22px;margin-bottom:10px;}
+
+/* Blocked */
+.blocked-card{background:rgba(255,59,48,.03);border:0.5px solid rgba(255,59,48,.1);
+  border-radius:18px;padding:20px 22px;
+  animation:fadeUp .35s cubic-bezier(.16,1,.3,1);}
+
+/* Premium note */
+.premium-note{padding:10px 16px;background:var(--w04);border:0.5px solid var(--border);
+  border-radius:12px;display:flex;align-items:center;justify-content:space-between;
+  gap:10px;font-size:11px;color:var(--w30);margin-top:8px;}
+.premium-note b{color:var(--gold);font-size:11px;white-space:nowrap;}
+
+/* Pulse Feed */
+.pulse-feed{position:fixed;bottom:0;left:0;right:0;
+  background:rgba(0,0,0,.88);backdrop-filter:blur(12px);
+  border-top:0.5px solid rgba(255,255,255,.05);
+  padding:6px 24px;display:flex;align-items:center;justify-content:space-between;
+  z-index:50;font-size:11px;color:rgba(255,255,255,.25);}
+.pf-left{display:flex;align-items:center;gap:8px;}
+.pf-dot{width:5px;height:5px;border-radius:50%;background:var(--green);
+  box-shadow:0 0 6px rgba(52,199,89,.8);animation:fp 2s ease-in-out infinite;}
+
+/* Toast */
+#toast{position:fixed;bottom:40px;left:50%;
+  transform:translateX(-50%) translateY(6px);
+  background:rgba(8,8,14,.97);border:0.5px solid var(--w08);
+  border-radius:100px;padding:9px 20px;font-size:11px;color:var(--w70);
+  opacity:0;transition:all .25s;pointer-events:none;z-index:999;white-space:nowrap;}
+#toast.on{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* Responsive */
+@media(max-width:600px){
+  .hdr{padding:10px 16px;}
+  .hdr-right .hdr-link{display:none;}
+  .search-input{font-size:14px;padding:14px 52px 14px 18px;}
 }
 </style>
 </head>
 <body>
+<div class="load-line" id="load"><div class="load-fill"></div></div>
+<div class="offline-banner" id="offline-banner">📡 Mod offline — răspunsuri din cache local</div>
+<div id="toast"></div>
 
-<!-- NAV -->
-<nav class="nav">
-  <div class="nav-logo">VV</div>
-  <div class="nav-links">
-    <a href="https://vv-technologies.github.io/vv-nexus/vv-now.html" class="nav-link">VV NOW</a>
-    <a href="https://vv-technologies.github.io/vv-nexus/" class="nav-link">Hub</a>
-    <a href="https://vv-technologies.github.io/vv-nexus/vv-studio.html" class="nav-link">Studio</a>
+<!-- HEADER -->
+<header class="hdr" id="hdr">
+  <a href="https://vv-technologies.github.io/vv-nexus/" class="logo">
+    VV <span class="logo-sub">NOW</span>
+  </a>
+  <div class="hdr-right">
+    <button class="back-btn" id="back-btn" onclick="goBack()">← Nou</button>
+    <a href="https://vv-technologies.github.io/ceo.html" class="hdr-link">VV Pulse</a>
+    <a href="https://vv-technologies.github.io/vv-nexus/vv-pulse.html" class="hdr-link">Pulse</a>
   </div>
-</nav>
+</header>
 
 <!-- HERO -->
-<div class="hero">
-  <div class="hero-eye">VV HYBRID UNIVERS · DOCUMENT DE ARHITECTURĂ</div>
-  <h1 class="hero-title">Realitatea Digitală<br><span class="g">Verificată Fizic.</span></h1>
-  <p class="hero-sub">VV Hybrid Univers este primul ecosistem care combină căutare AI hibridă cu validare umană fizică, economie internă anonimă și infrastructură Local-First. Construit pentru oameni care au nevoie de certitudine, nu de informații.</p>
-  <div class="hero-version">Beta · v1.3 · Mai 2026 · România</div>
+<div class="hero" id="hero">
+  <div class="hex">⬡</div>
+  <h1 class="hero-title">Internetul se termină.<br><span class="g">Realitatea începe.</span></h1>
+  <p class="hero-sub">Nexus caută peste tot. Insiderii confirmă fizic.</p>
+
+  <div class="search-wrap">
+    <input class="search-input" id="search-input" type="text"
+      placeholder="Ce vrei să știi despre orașul tău?"
+      onkeydown="if(event.key==='Enter')doSearch(this.value)">
+    <button class="search-go" onclick="doSearch(document.getElementById('search-input').value)">→</button>
+  </div>
+
+  <div class="layers" id="layers">
+    <div class="layer l-access" onclick="toggleLayer('access',this)"><div class="layer-dot"></div>Accesibilitate</div>
+    <div class="layer l-urgent" onclick="toggleLayer('urgent',this)"><div class="layer-dot"></div>Urgent</div>
+    <div class="layer l-biz" onclick="toggleLayer('biz',this)"><div class="layer-dot"></div>Business</div>
+    <div class="layer l-safe" onclick="toggleLayer('safe',this)"><div class="layer-dot"></div>Siguranță</div>
+  </div>
+
+  <div class="suggestions" id="suggestions">
+    <div class="sug" onclick="doSearch('E coadă la Kaufland?')">🛒 Coadă</div>
+    <div class="sug" onclick="doSearch('Lift funcțional metrou Victoriei')">♿ Lift metrou</div>
+    <div class="sug" onclick="doSearch('Parcare liberă Piața Unirii')">🚗 Parcare</div>
+    <div class="sug" onclick="doSearch('Cafenea liniștită Floreasca')">☕ Cafenele</div>
+    <div class="sug" onclick="doSearch('Trafic Șoseaua Kiseleff acum')">🚦 Trafic</div>
+  </div>
+
+  <div class="history" id="history"></div>
 </div>
 
-<div class="divider"><div class="div-line"></div></div>
+<!-- RESULTS -->
+<div class="results" id="results"></div>
 
-<!-- VIZIUNE -->
-<div class="section">
-  <div class="section-label">01 · VIZIUNE</div>
-  <h2 class="section-title">Google arhivează.<br>VV verifică.</h2>
-  <p class="section-sub">Internetul actual e plin de informații expirate, recenzii false și reclame. VV NOW nu indexează internetul — trimite oameni reali să verifice fizic și returnează certitudine, nu link-uri.</p>
-
-  <div class="comp-grid">
-    <div class="comp-card">
-      <div class="comp-icon">🌐</div>
-      <div class="comp-name">Google Maps</div>
-      <div class="comp-desc">Poze de acum 3 ani. Recenzii cumpărate. Nu știe dacă e coadă acum.</div>
-    </div>
-    <div class="comp-card">
-      <div class="comp-icon">🤖</div>
-      <div class="comp-name">ChatGPT / Gemini</div>
-      <div class="comp-desc">Cunoaștere generală. Nu vede strada ta acum. Nu poate confirma fizic.</div>
-    </div>
-    <div class="comp-card" style="border-color:rgba(212,175,55,.2);background:rgba(212,175,55,.03)">
-      <div class="comp-icon">⬡</div>
-      <div class="comp-name">VV NOW</div>
-      <div class="comp-desc">Date publice + VV Proof fizic. Verificare spontană prin Insideri reali. Certitudine 100%.</div>
-      <span class="comp-badge cb-live">UNIC ÎN LUME</span>
-    </div>
+<!-- PULSE FEED -->
+<div class="pulse-feed">
+  <div class="pf-left">
+    <div class="pf-dot"></div>
+    <span id="pf-text">Ecosistem activ</span>
   </div>
-
-  <div class="quote">
-    <div class="quote-text">"Adevărul se validează pe stradă,<br>nu pe ecran."</div>
-    <div class="quote-by">VV CHARTER · ART-4</div>
-  </div>
+  <span id="pf-right" style="font-size:10px;color:rgba(255,255,255,.15)">VV NOW Beta</span>
 </div>
 
-<div class="divider"><div class="div-line"></div></div>
+<!-- FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script>
+if (!firebase.apps.length) {
+  firebase.initializeApp({
+    apiKey:"AIzaSyDGv4kEClO0RHCLvXVLOT-vyPHw6bsxYVc",
+    authDomain:"vv-ep-beta.firebaseapp.com",
+    projectId:"vv-ep-beta"
+  });
+}
+var db = firebase.firestore();
 
-<!-- COMPONENTE -->
-<div class="section">
-  <div class="section-label">02 · ECOSISTEM</div>
-  <h2 class="section-title">6 componente.<br>Un singur univers.</h2>
-  <p class="section-sub">Fiecare componentă comunică cu celelalte prin Firebase Firestore. Niciuna nu poate funcționa fără celelalte — asta e puterea ecosistemului.</p>
+// ── CONSTANTE ──────────────────────────────────────────────────
+var BLOCKED = ['porn','sex explicit','drog','cocain','heroina','arma','bomba','secta','frauda','ura','rasism','prostitutie','trafic uman'];
+var NON_URBAN = ['film','serial','muzică','știre','meteo','rețetă','joc','meci','liga','rezultat','politic','bursă','crypto','horoscop'];
+var RO = {latMin:43.6,latMax:48.3,lngMin:20.2,lngMax:30.0};
+var TTL = 24*60*60*1000;
+var LAYERS = {
+  access:{label:'Accesibilitate',tags:['lift','rampă','bordură','scaun','acces','dizabilitate']},
+  urgent:{label:'Urgent',tags:['coadă','aglomerat','liber','acum','rapid','ocupat']},
+  biz:{label:'Business',tags:['livrare','pickup','marfă','furnizor','spațiu','birou']},
+  safe:{label:'Siguranță',tags:['sigur','pericol','iluminat','noaptea','accident','poliție']}
+};
 
-  <div class="comp-grid">
-    <div class="comp-card">
-      <div class="comp-icon">🔍</div>
-      <div class="comp-name">VV NOW</div>
-      <div class="comp-desc">Motor de căutare hibrid. 60% date publice web + 40% VV Proof din teren. VV Me — asistentul personal care știe orașul tău.</div>
-      <span class="comp-badge cb-live">LIVE</span>
-    </div>
-    <div class="comp-card">
-      <div class="comp-icon">⬡</div>
-      <div class="comp-name">VV Beta</div>
-      <div class="comp-desc">Aplicația de misiuni. Insiderii primesc Flash Missions, merg fizic, trimit VV Proof. XP, Level, VV Coins.</div>
-      <span class="comp-badge cb-live">LIVE</span>
-    </div>
-    <div class="comp-card">
-      <div class="comp-icon">🏢</div>
-      <div class="comp-name">VV Business Node</div>
-      <div class="comp-desc">Locații înregistrate în ecosistem. Apar în VV NOW. Verificate spontan de Insideri. Expiră automat dacă nu sunt actualizate.</div>
-      <span class="comp-badge cb-live">LIVE</span>
-    </div>
-    <div class="comp-card">
-      <div class="comp-icon">⬡</div>
-      <div class="comp-name">VV Talent</div>
-      <div class="comp-desc">Studenți și freelanceri listați anonim. Agențiile caută după skill. Contact prin cod VV — fără CV-uri în gol.</div>
-      <span class="comp-badge cb-live">LIVE</span>
-    </div>
-    <div class="comp-card">
-      <div class="comp-icon">🧠</div>
-      <div class="comp-name">VVhi Shadow</div>
-      <div class="comp-desc">AI intern care învață din fiecare acțiune a Insiderilor. Îmbunătățește răspunsurile VV Me fără să stocheze date personale.</div>
-      <span class="comp-badge cb-live">LIVE</span>
-    </div>
-    <div class="comp-card">
-      <div class="comp-icon">👁</div>
-      <div class="comp-name">Inner Circle</div>
-      <div class="comp-desc">Primii 100 Fondatori. Acces prioritar, VV·CORE·ID unic, statut permanent în ecosistem.</div>
-      <span class="comp-badge cb-live">LIVE · 2/100</span>
-    </div>
-  </div>
-</div>
+// ── STATE ──────────────────────────────────────────────────────
+var _gps=null, _idb=null, _activeLayer=null, _isOnline=navigator.onLine;
+var _alias=localStorage.getItem('vv_alias');
+var _lvl=1;
+try{var _s=JSON.parse(localStorage.getItem('vv_core_stats')||'{}');_lvl=_s.experience_level||1;}catch(e){}
 
-<div class="divider"><div class="div-line"></div></div>
+// ── OFFLINE DETECTION ─────────────────────────────────────────
+window.addEventListener('online', function(){ _isOnline=true; document.getElementById('offline-banner').classList.remove('show'); });
+window.addEventListener('offline', function(){ _isOnline=false; document.getElementById('offline-banner').classList.add('show'); });
+if (!_isOnline) document.getElementById('offline-banner').classList.add('show');
 
-<!-- FLUX DATE -->
-<div class="section">
-  <div class="section-label">03 · CUM FUNCȚIONEAZĂ</div>
-  <h2 class="section-title">De la întrebare<br>la certitudine fizică.</h2>
-  <p class="section-sub">Fluxul complet al unei căutări în VV NOW — ce vede userul vs ce se întâmplă în spate.</p>
+// ── SERVICE WORKER ────────────────────────────────────────────
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(function(){});
+}
 
-  <div class="flow">
-    <div class="flow-step">
-      <div class="flow-num">01</div>
-      <div class="flow-content">
-        <div class="flow-title">Userul scrie o întrebare</div>
-        <div class="flow-desc">"E coadă la Kaufland?" — VV Me detectează automat contextul (oraș din GPS, ora din zi, layer relevant: Urgent). Nu cere confirmare. Deduce singur.</div>
-        <span class="flow-tag ft-vvme">VV ME · LOCAL</span>
-      </div>
-    </div>
-    <div class="flow-step">
-      <div class="flow-num">02</div>
-      <div class="flow-content">
-        <div class="flow-title">Nexus caută în paralel — 3 surse simultan</div>
-        <div class="flow-desc">
-          <b style="color:rgba(212,175,55,.8)">Sursă 1:</b> Date statice CEO (spitale, urgențe, numere — verificate manual, nu pot fi falsificate)<br>
-          <b style="color:rgba(52,199,89,.8)">Sursă 2:</b> VV Proof din ultimele 30 zile (misiuni aprobate de Insideri reali)<br>
-          <b style="color:rgba(255,255,255,.4)">Sursă 3:</b> Web search hibrid via Anthropic API (date publice, marcate "Nevalidat fizic")
-        </div>
-        <span class="flow-tag ft-nexus">NEXUS · FIREBASE + WEB</span>
-      </div>
-    </div>
-    <div class="flow-step">
-      <div class="flow-num">03</div>
-      <div class="flow-content">
-        <div class="flow-title">VV Me construiește răspunsul contextual</div>
-        <div class="flow-desc">Dacă există date VV Proof → afișează cu badge verde "Verificat fizic". Dacă nu → afișează date web marcate clar "Date publice · Nevalidat". Dacă există date statice CEO → prioritate maximă, badge "✓ CEO Verified".</div>
-        <span class="flow-tag ft-vvme">VV ME · RĂSPUNS HIBRID</span>
-      </div>
-    </div>
-    <div class="flow-step">
-      <div class="flow-num">04</div>
-      <div class="flow-content">
-        <div class="flow-title">Userul apasă VERIFY — dacă vrea certitudine 100%</div>
-        <div class="flow-desc">Se creează o Flash Mission în Firebase. Cel mai apropiat Insider disponibil primește notificarea în VV Beta. Merge fizic, face poza VV Proof. Userul primește confirmarea automat — fără refresh.</div>
-        <span class="flow-tag ft-insider">INSIDER · VV BETA · FIZIC</span>
-      </div>
-    </div>
-    <div class="flow-step">
-      <div class="flow-num">05</div>
-      <div class="flow-content">
-        <div class="flow-title">VVhi Shadow învață</div>
-        <div class="flow-desc">Fiecare acțiune — căutare, VERIFY, misiune completată — se salvează anonim în vvhi_dataset. VVhi construiește pattern-uri ale orașului fără să știe cine a făcut ce. Datele brute se purjează la 24h.</div>
-        <span class="flow-tag ft-firebase">VVHI · SHADOW MODE</span>
-      </div>
-    </div>
-  </div>
-</div>
+// ── IndexedDB 24h ─────────────────────────────────────────────
+function openIDB() {
+  return new Promise(function(res) {
+    try {
+      var r = indexedDB.open('vvnow3',1);
+      r.onupgradeneeded = function(e) {
+        var d = e.target.result;
+        if (!d.objectStoreNames.contains('loc')) d.createObjectStore('loc',{keyPath:'k'});
+        if (!d.objectStoreNames.contains('cache')) d.createObjectStore('cache',{keyPath:'k'});
+      };
+      r.onsuccess = function(e){ _idb=e.target.result; purge(); res(); };
+      r.onerror = function(){ res(); };
+    } catch(e){ res(); }
+  });
+}
+function idbGet(store,k){
+  return new Promise(function(res){
+    if(!_idb){res(null);return;}
+    try{
+      var r=_idb.transaction(store,'readonly').objectStore(store).get(k);
+      r.onsuccess=function(){
+        var d=r.result;
+        if(!d||Date.now()-d.ts>TTL){res(null);return;}
+        res(d.v);
+      };
+      r.onerror=function(){res(null);};
+    }catch(e){res(null);}
+  });
+}
+function idbSet(store,k,v){
+  if(!_idb)return;
+  try{_idb.transaction(store,'readwrite').objectStore(store).put({k,v,ts:Date.now()});}catch(e){}
+}
+function purge(){
+  if(!_idb)return;
+  ['loc','cache'].forEach(function(store){
+    try{
+      var tx=_idb.transaction(store,'readwrite');
+      tx.objectStore(store).openCursor().onsuccess=function(e){
+        var cur=e.target.result;
+        if(!cur)return;
+        if(Date.now()-cur.value.ts>TTL)cur.delete();
+        cur.continue();
+      };
+    }catch(e){}
+  });
+}
 
-<div class="divider"><div class="div-line"></div></div>
+// ── GPS ────────────────────────────────────────────────────────
+function getGPS(){
+  if(!navigator.geolocation)return;
+  navigator.geolocation.getCurrentPosition(
+    function(p){
+      _gps={lat:p.coords.latitude,lng:p.coords.longitude};
+      initCityContext();
+    },
+    function(){
+      // Fallback - foloseste orasul salvat
+      var saved = localStorage.getItem('vvme_home_city');
+      if(saved){
+        _currentCity = saved;
+        var inp = document.getElementById('search-input');
+        if(inp) inp.placeholder = 'Ce vrei să știi despre '+saved+'?';
+      }
+    },
+    {enableHighAccuracy:true,timeout:8000}
+  );
+}
 
-<!-- VV ME -->
-<div class="section">
-  <div class="section-label">04 · VV ME</div>
-  <h2 class="section-title">Asistentul care<br>știe unde ești.</h2>
-  <p class="section-sub">VV Me nu e un chatbot. E un motor de context care se adaptează la fiecare user fără să stocheze date personale.</p>
+// ── LAYERS ────────────────────────────────────────────────────
+function toggleLayer(layer,el){
+  if(_activeLayer===layer){
+    _activeLayer=null;
+    document.querySelectorAll('.layer').forEach(function(l){l.classList.remove('active');});
+    document.getElementById('search-input').placeholder='Ce vrei să știi despre orașul tău?';
+  } else {
+    _activeLayer=layer;
+    document.querySelectorAll('.layer').forEach(function(l){l.classList.remove('active');});
+    el.classList.add('active');
+    var hints={access:'Lift funcțional? Rampă accesibilă?',urgent:'Coadă? Loc liber? Cât timp?',biz:'Pickup liber? Furnizor disponibil?',safe:'Zonă sigură? Iluminat stradal?'};
+    document.getElementById('search-input').placeholder=hints[layer];
+  }
+}
+function detectLayer(q){
+  if(_activeLayer)return _activeLayer;
+  var l=q.toLowerCase();
+  for(var layer in LAYERS){
+    if(LAYERS[layer].tags.some(function(t){return l.includes(t);}))return layer;
+  }
+  return null;
+}
 
-  <div class="flow">
-    <div class="flow-step">
-      <div class="flow-num">⬡</div>
-      <div class="flow-content">
-        <div class="flow-title">City Intelligence — detectare oraș din GPS</div>
-        <div class="flow-desc">La prima deschidere detectează orașul din GPS și setează contextul. Căutările sunt automat filtrate pentru acel oraș. Dacă călătorești, VV Me schimbă contextul silent — "Context nou: Cluj-Napoca" — și purjează cache-ul de căutări din alt oraș.</div>
-      </div>
-    </div>
-    <div class="flow-step">
-      <div class="flow-num">⬡</div>
-      <div class="flow-content">
-        <div class="flow-title">Layer Intelligence — detectare intenție</div>
-        <div class="flow-desc">VV Me detectează automat dacă întrebarea e despre Accesibilitate, Urgență, Business sau Siguranță — fără să întrebe userul. Răspunsul și titlul VERIFY se adaptează contextului detectat.</div>
-      </div>
-    </div>
-    <div class="flow-step">
-      <div class="flow-num">⬡</div>
-      <div class="flow-content">
-        <div class="flow-title">Ephemeral Memory — fără urmă digitală</div>
-        <div class="flow-desc">IndexedDB cu purjare automată la 24h. Istoricul de căutări rămâne local pe device-ul userului. VV nu vede ce caută nimeni. Dacă userul șterge browser-ul, totul dispare — conform VV Charter ART-1.</div>
-      </div>
-    </div>
-    <div class="flow-step">
-      <div class="flow-num">⬡</div>
-      <div class="flow-content">
-        <div class="flow-title">Offline Intelligence — funcționează fără internet</div>
-        <div class="flow-desc">Service Worker cachează pagina la prima vizită. Fără net, VV Me răspunde din cache local cu banner discret "Mod offline". Când revine conexiunea, sincronizează automat.</div>
-      </div>
-    </div>
-  </div>
-</div>
+// ── HISTORY ──────────────────────────────────────────────────
+function getHist(){try{return JSON.parse(localStorage.getItem('vvnow_h')||'[]');}catch(e){return[];}}
+function addHist(q,layer){
+  var h=getHist().filter(function(x){return x.q!==q;});
+  h.unshift({q,layer,t:Date.now()});
+  localStorage.setItem('vvnow_h',JSON.stringify(h.slice(0,5)));
+}
+function renderHist(){
+  var h=getHist();
+  var el=document.getElementById('history');
+  if(!el||h.length===0)return;
+  var ago=function(ts){var d=Math.floor((Date.now()-ts)/60000);return d<1?'acum':d<60?d+'m':Math.floor(d/60)+'h';};
+  el.innerHTML='<div class="hist-label">RECENT</div><div class="hist-list">'+
+    h.map(function(i){
+      var lb=i.layer?'<span class="hist-layer">'+LAYERS[i.layer].label+'</span>':'';
+      return '<div class="hist-item" onclick="doSearch(\''+i.q.replace(/'/g,"\\'")+'\')">'+
+        '<span class="hist-q">'+i.q+'</span>'+lb+'<span class="hist-t">'+ago(i.t)+'</span></div>';
+    }).join('')+'</div>';
+}
 
-<div class="divider"><div class="div-line"></div></div>
 
-<!-- LEGAL -->
-<div class="section">
-  <div class="section-label">05 · CADRUL LEGAL</div>
-  <h2 class="section-title">Construit legal<br>din prima linie de cod.</h2>
-  <p class="section-sub">VV Hybrid Univers respectă legislația română și europeană în vigoare — GDPR, DSA, legislația muncii. Fiecare funcție a fost gândită cu cadrul legal în minte.</p>
+// ── VV LEA · CITY INTELLIGENCE ────────────────────────────────
+var _homeCity = localStorage.getItem('vvme_home_city') || null;
+var _currentCity = localStorage.getItem('vvme_current_city') || null;
+var _cityLat = null;
+var _cityLng = null;
 
-  <div class="legal-grid">
-    <div class="legal-card">
-      <div class="legal-title">GDPR · Regulamentul European</div>
-      <div class="legal-text">Zero date de identificare personală stocate pe serverele VV. Totul rămâne local pe device-ul userului. Datele brute se purjează la 24h automat. Userul poate șterge totul cu un click.</div>
-    </div>
-    <div class="legal-card">
-      <div class="legal-title">DSA · Digital Services Act</div>
-      <div class="legal-text">Conținut sponsorizat marcat explicit "Conținut Sponsorizat VV". Charter ART-3 blochează automat conținut ilegal înainte de publicare. Sistem de raportare integrat.</div>
-    </div>
-    <div class="legal-card">
-      <div class="legal-title">Legislația Muncii RO</div>
-      <div class="legal-text">Insiderii nu sunt angajați — sunt colaboratori autonomi. VV Coins nu sunt salarii — sunt puncte de ecosistem fără valoare monetară directă în Beta. La VV 1.0 se reglementează prin PFA/SRL.</div>
-    </div>
-    <div class="legal-card">
-      <div class="legal-title">VV Charter · Legea Internă</div>
-      <div class="legal-text">14 articole care guvernează comportamentul în ecosistem. ART-1 Anonimat, ART-3 Filtru Etic, ART-8 Maturitate 18+, ART-9 Expirare automată, ART-10 GDPR. Aplicate automat de sistem.</div>
-    </div>
-    <div class="legal-card">
-      <div class="legal-title">Conținut Web Hibrid</div>
-      <div class="legal-text">Datele publice din web search sunt marcate "Date publice · Nevalidat fizic". Nu se prezintă ca date VV. Distincția e clară vizual și în cod. Sursele sunt procesate de Anthropic API.</div>
-    </div>
-    <div class="legal-card">
-      <div class="legal-title">Business Nodes · Contract Digital</div>
-      <div class="legal-text">Firmele bifează 4 termeni obligatorii înainte de înregistrare. Acceptă verificarea spontană și sistemul de sancțiuni automate. Echivalent juridic cu un contract de utilizare.</div>
-    </div>
-  </div>
-</div>
+async function detectCityFromGPS(lat, lng) {
+  try {
+    var url = 'https://nominatim.openstreetmap.org/reverse?format=json&lat='+lat+'&lon='+lng+'&accept-language=ro';
+    var r = await fetch(url);
+    var d = await r.json();
+    var city = d.address ? (d.address.city || d.address.town || d.address.village || d.address.county || 'România') : 'România';
+    return city;
+  } catch(e) { return null; }
+}
 
-<div class="divider"><div class="div-line"></div></div>
+async function initCityContext() {
+  if (!_gps) return;
+  
+  var detectedCity = await detectCityFromGPS(_gps.lat, _gps.lng);
+  if (!detectedCity) return;
+  
+  _currentCity = detectedCity;
+  
+  // Prima vizita — seteaza orasul de acasa
+  if (!_homeCity) {
+    _homeCity = detectedCity;
+    localStorage.setItem('vvme_home_city', _homeCity);
+  }
+  
+  localStorage.setItem('vvme_current_city', _currentCity);
+  
+  // Update placeholder cu orasul detectat
+  var inp = document.getElementById('search-input');
+  if (inp && detectedCity) {
+    inp.placeholder = 'Ce vrei să știi despre ' + detectedCity + '?';
+  }
+  
+  // Daca e alt oras decat acasa — context switch silent
+  if (_homeCity && _currentCity && _homeCity.toLowerCase() !== _currentCity.toLowerCase()) {
+    showCitySwitch(_currentCity);
+  }
+}
 
-<!-- MONETIZARE -->
-<div class="section">
-  <div class="section-label">06 · MONETIZARE</div>
-  <h2 class="section-title">4 surse de venit.<br>Zero costuri fixe mari.</h2>
-  <p class="section-sub">Modelul financiar e construit pe infrastructură gratuită în Beta (Firebase Spark, GitHub Pages) și scalează cu veniturile.</p>
+function showCitySwitch(city) {
+  // Notificare discreta ca VV Lea a schimbat contextul
+  var banner = document.createElement('div');
+  banner.style.cssText = 'position:fixed;top:58px;left:50%;transform:translateX(-50%);background:rgba(10,132,255,.12);border:0.5px solid rgba(10,132,255,.25);border-radius:100px;padding:6px 16px;font-size:11px;color:rgba(10,132,255,.9);z-index:100;animation:fadeUp .3s ease;pointer-events:none;';
+  banner.textContent = '📍 VV Lea: context schimbat → ' + city;
+  document.body.appendChild(banner);
+  setTimeout(function(){ banner.remove(); }, 3000);
+}
 
-  <table class="rev-table">
-    <thead>
-      <tr><th>Sursă</th><th>Preț</th><th>Target Beta</th><th>Venit Lunar</th></tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><b>VV Business Node</b><br><span style="font-size:10px;color:var(--w30)">Locații în VV NOW</span></td>
-        <td>0€ Beta → 9€/lună</td>
-        <td>100 locații</td>
-        <td>900€</td>
-      </tr>
-      <tr>
-        <td><b>VV Talent · Acces Agenție</b><br><span style="font-size:10px;color:var(--w30)">Caută talente după skill</span></td>
-        <td>49€/lună per agenție</td>
-        <td>10 agenții</td>
-        <td>490€</td>
-      </tr>
-      <tr>
-        <td><b>VV NOW Premium</b><br><span style="font-size:10px;color:var(--w30)">Căutare globală, 90 zile</span></td>
-        <td>9€/lună per user</td>
-        <td>50 useri</td>
-        <td>450€</td>
-      </tr>
-      <tr>
-        <td><b>Pagini Sponsorizate VV NOW</b><br><span style="font-size:10px;color:var(--w30)">Conținut business în rezultate</span></td>
-        <td>29€/lună per pagină</td>
-        <td>10 pagini</td>
-        <td>290€</td>
-      </tr>
-      <tr>
-        <td><b>TOTAL ESTIMAT</b></td>
-        <td>—</td>
-        <td>170 clienți activi</td>
-        <td class="rev-total">2.130€/lună</td>
-      </tr>
-    </tbody>
-  </table>
+// Purjare inteligenta la schimb de oras
+function purgeIfCityChanged() {
+  var lastCity = localStorage.getItem('vvme_last_search_city');
+  if (lastCity && _currentCity && lastCity.toLowerCase() !== _currentCity.toLowerCase()) {
+    // Oras diferit — purjeaza cache-ul de cautari (nu si locatiile statice)
+    localStorage.removeItem('vvnow_h');
+    if (_idb) {
+      try {
+        var tx = _idb.transaction('cache','readwrite');
+        tx.objectStore('cache').clear();
+      } catch(e) {}
+    }
+  }
+  if (_currentCity) localStorage.setItem('vvme_last_search_city', _currentCity);
+}
 
-  <div style="font-size:11px;color:var(--w30);line-height:1.8">
-    <div>💡 Costuri fixe actuale: 0€ (Firebase Spark gratuit, GitHub Pages gratuit, Anthropic API pay-per-use)</div>
-    <div>💡 Primul euro real apare când primul Business Node trece de la Beta gratuit la 9€/lună</div>
-    <div>💡 Break-even: ~10 Business Nodes plătitoare = primele costuri API acoperite</div>
-  </div>
-</div>
+// Injecteaza orasul in cautare daca userul nu l-a specificat
+function enrichQueryWithCity(q) {
+  var city = _currentCity || _homeCity;
+  if (!city) return q;
+  var l = q.toLowerCase();
+  // Daca query-ul nu contine deja un oras, adauga contextul
+  var cityWords = city.toLowerCase().split(' ');
+  var hasCity = cityWords.some(function(w){ return l.includes(w) && w.length > 3; });
+  if (!hasCity && city !== 'România') {
+    return q; // returnam query original, dar folosim city in Nominatim
+  }
+  return q;
+}
 
-<div class="divider"><div class="div-line"></div></div>
+// ── NOMINATIM cu cache ─────────────────────────────────────────
+async function findLoc(q){
+  var term=getTerm(q);
+  if(!term)return null;
+  var ck='loc_'+term.toLowerCase().replace(/\s+/g,'_');
+  var cached=await idbGet('loc',ck);
+  if(cached)return cached;
+  if(!_isOnline)return null;
+  try{
+    // Adauga orasul curent ca context daca nu e deja in query
+  var searchTerm = term;
+  if(_currentCity && !term.toLowerCase().includes(_currentCity.toLowerCase().split(' ')[0])) {
+    searchTerm = term + ' ' + _currentCity;
+  }
+  var url='https://nominatim.openstreetmap.org/search?format=json&q='+
+      encodeURIComponent(searchTerm)+'&limit=1&accept-language=ro&countrycodes=ro';
+    if(_gps)url+='&viewbox='+(_gps.lng-.15)+','+(_gps.lat+.15)+','+(_gps.lng+.15)+','+(_gps.lat-.15)+'&bounded=0';
+    var r=await fetch(url);
+    var d=await r.json();
+    if(d&&d[0]){idbSet('loc',ck,d[0]);return d[0];}
+  }catch(e){}
+  return null;
+}
 
-<!-- TECH STACK -->
-<div class="section">
-  <div class="section-label">07 · INFRASTRUCTURĂ TEHNICĂ</div>
-  <h2 class="section-title">Local-First.<br>Cloud-Backed.</h2>
-  <p class="section-sub">Arhitectura e gândită pentru scalare fără costuri mari. Datele utilizatorului rămân pe device-ul lui. Infrastructura VV e pe cloud gratuit în Beta.</p>
+function getTerm(q){
+  var map={
+    'kaufland':'Kaufland','lidl':'Lidl','penny':'Penny Market','profi':'Profi',
+    'mega':'Mega Image','auchan':'Auchan','carrefour':'Carrefour',
+    'parcare':'parcare','fotbal':'teren fotbal','cafenea':'cafenea',
+    'restaurant':'restaurant','pizza':'pizza','parc':'parc','mall':'mall',
+    'spital':'spital','farmacie':'farmacie','atm':'ATM bancomat',
+    'lift':'lift statie metrou','centrul vechi':'Centrul Vechi Bucuresti',
+    'floreasca':'Floreasca Bucuresti','victoriei':'Piata Victoriei',
+    'unirii':'Piata Unirii','herastrau':'Herastrau','obor':'Piata Obor',
+    'tineretului':'Parcul Tineretului','kiseleff':'Kiseleff','militari':'Militari'
+  };
+  var l=q.toLowerCase();
+  for(var k in map){if(l.includes(k))return map[k];}
+  return q.split(' ').slice(0,4).join(' ');
+}
 
-  <div style="margin-bottom:20px">
-    <div style="font-size:9px;letter-spacing:3px;color:var(--w30);font-weight:700;margin-bottom:12px">FRONTEND</div>
-    <div class="tech-row">
-      <div class="tech-pill">HTML5 · CSS3 · Vanilla JS</div>
-      <div class="tech-pill">IndexedDB · Local-First</div>
-      <div class="tech-pill">Service Worker · Offline</div>
-      <div class="tech-pill">GitHub Pages · CDN gratuit</div>
-      <div class="tech-pill">PWA · Instalabil Android/iOS</div>
-    </div>
-  </div>
+// ── FIREBASE MISSIONS (date VV — 40%) ────────────────────────
+async function findMissions(q,layer){
+  if(!_isOnline)return[];
+  try{
+    var ago30=new Date(Date.now()-30*24*60*60*1000);
+    var snap=await db.collection('missions')
+      .where('status','==','approved')
+      .where('createdAt','>=',firebase.firestore.Timestamp.fromDate(ago30))
+      .orderBy('createdAt','desc').limit(5).get();
+    var term=getTerm(q).toLowerCase().split(' ')[0];
+    var layerTags=layer?LAYERS[layer].tags:[];
+    var results=[];
+    snap.forEach(function(doc){
+      var d=doc.data();
+      var text=((d.location||'')+(d.description||'')).toLowerCase();
+      if((term.length>2&&text.includes(term))||layerTags.some(function(t){return text.includes(t);})){
+        results.push(d);
+      }
+    });
+    return results.slice(0,3);
+  }catch(e){return[];}
+}
 
-  <div style="margin-bottom:20px">
-    <div style="font-size:9px;letter-spacing:3px;color:var(--w30);font-weight:700;margin-bottom:12px">BACKEND</div>
-    <div class="tech-row">
-      <div class="tech-pill">Firebase Firestore · 15 colecții</div>
-      <div class="tech-pill">Firebase Auth · CEO Panel</div>
-      <div class="tech-pill">Nominatim · Geocoding gratuit</div>
-      <div class="tech-pill">Anthropic API · Web Search Hibrid</div>
-    </div>
-  </div>
+// ── VV LEA · WEB SEARCH (60% hibrid) ────────────────────────────
+async function nexusWebSearch(q,layer){
+  if(!_isOnline)return null;
 
-  <div style="margin-bottom:20px">
-    <div style="font-size:9px;letter-spacing:3px;color:var(--w30);font-weight:700;margin-bottom:12px">COLECȚII FIREBASE ACTIVE</div>
-    <div class="tech-row">
-      <div class="tech-pill">missions · flash_missions</div>
-      <div class="tech-pill">users · contributors</div>
-      <div class="tech-pill">vvhi_dataset · audit_log</div>
-      <div class="tech-pill">verified_nodes · vv_talents</div>
-      <div class="tech-pill">vv_static_data · vv_now_pages</div>
-      <div class="tech-pill">inbox · transactions · config</div>
-      <div class="tech-pill">vv_pulse · access_keys</div>
-    </div>
-  </div>
+  // Verifica cache
+  var ck='web_'+q.toLowerCase().replace(/\s+/g,'_').substring(0,50);
+  var cached=await idbGet('cache',ck);
+  if(cached)return cached;
 
-  <div>
-    <div style="font-size:9px;letter-spacing:3px;color:var(--w30);font-weight:700;margin-bottom:12px">SECURITATE</div>
-    <div class="tech-row">
-      <div class="tech-pill">Auth UID verificat per request</div>
-      <div class="tech-pill">Charter ART-3 · filtru automat</div>
-      <div class="tech-pill">Geofencing România · Beta</div>
-      <div class="tech-pill">Expirare automată 120 zile</div>
-      <div class="tech-pill">Zero date personale pe server</div>
-      <div class="tech-pill">Purjare 24h · GDPR compliant</div>
-    </div>
-  </div>
-</div>
+  try{
+    var system='Ești Nexus, motorul de căutare al VV Hybrid Univers pentru realitate urbană din România. '+
+      'Răspunzi SCURT și UMAN (max 2-3 propoziții) la întrebări despre locații fizice, cozi, program, accesibilitate, trafic, siguranță urbană. '+
+      'Limbaj: român, direct, fără jargon tehnic. '+
+      'IMPORTANT: Menționezi mereu că datele publice pot fi depășite și că VERIFY din VV dă certitudine 100%.'+
+      (layer?' Context: '+LAYERS[layer].label+'.':'');
 
-<div class="divider"><div class="div-line"></div></div>
+    var r=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:200,
+        system:system,
+        tools:[{type:'web_search_20250305',name:'web_search'}],
+        messages:[{role:'user',content:q}]
+      })
+    });
+    if(!r.ok)return null;
+    var data=await r.json();
+    var text='';
+    if(data.content){
+      data.content.forEach(function(block){
+        if(block.type==='text'&&block.text)text+=block.text;
+      });
+    }
+    var result=text.trim()||null;
+    if(result)idbSet('cache',ck,result);
+    return result;
+  }catch(e){return null;}
+}
 
-<!-- ROADMAP -->
-<div class="section">
-  <div class="section-label">08 · ROADMAP</div>
-  <h2 class="section-title">De la Beta<br>la imperiu.</h2>
 
-  <div class="flow">
-    <div class="flow-step">
-      <div class="flow-num" style="color:rgba(52,199,89,.4)">✓</div>
-      <div class="flow-content">
-        <div class="flow-title" style="color:var(--green)">VV Beta · Acum</div>
-        <div class="flow-desc">VV NOW hibrid live, VV Beta misiuni, CEO Panel, VV Studio, Business Node, Talent Register, Inner Circle 100 Fondatori, VV Me city intelligence, Service Worker offline.</div>
-        <span class="flow-tag ft-insider">LIVE · Mai 2026</span>
-      </div>
-    </div>
-    <div class="flow-step">
-      <div class="flow-num" style="color:rgba(212,175,55,.3)">→</div>
-      <div class="flow-content">
-        <div class="flow-title">VV 1.0 · Următoarele 6 luni</div>
-        <div class="flow-desc">VV ID Login direct, plăți Stripe integrate, VV NOW Premium 9€ activ, VV Family GPS anonim, amenzi financiare automate, extindere 5 orașe România.</div>
-        <span class="flow-tag ft-vvme">TARGET · Noiembrie 2026</span>
-      </div>
-    </div>
-    <div class="flow-step">
-      <div class="flow-num" style="color:rgba(255,255,255,.1)">→</div>
-      <div class="flow-content">
-        <div class="flow-title">VV 2.0 · Expansiune</div>
-        <div class="flow-desc">Aplicație React Native nativă, VV Bridge mesh P2P, VV Creator platformă conținut verificat, expansiune internațională cu VV NOW Global.</div>
-        <span class="flow-tag ft-nexus">VIZIUNE · 2027</span>
-      </div>
-    </div>
-  </div>
-</div>
+// ── DATE STATICE + PAGINI VV NOW ─────────────────────────────
+async function findStaticData(q) {
+  if(!_isOnline) return null;
+  try {
+    var l = q.toLowerCase();
+    var snap = await db.collection('vv_static_data')
+      .where('visible','==',true).get();
+    var results = [];
+    snap.forEach(function(doc) {
+      var d = doc.data();
+      var kw = (d.keywords||'').toLowerCase();
+      var name = (d.name||'').toLowerCase();
+      var type = (d.type||'').toLowerCase();
+      if (kw.split(',').some(function(k){ return l.includes(k.trim()) && k.trim().length > 2; }) ||
+          name.split(' ').some(function(w){ return l.includes(w) && w.length > 3; }) ||
+          l.includes(type)) {
+        results.push(d);
+      }
+    });
+    return results.slice(0, 2);
+  } catch(e) { return null; }
+}
 
-<div class="divider"><div class="div-line"></div></div>
+async function findVVNowPage(q) {
+  if(!_isOnline) return null;
+  try {
+    var l = q.toLowerCase();
+    var snap = await db.collection('vv_now_pages')
+      .where('visible','==',true).get();
+    var match = null;
+    snap.forEach(function(doc) {
+      var d = doc.data();
+      var kw = (d.keywords||'').toLowerCase().split(',');
+      if (kw.some(function(k){ return l.includes(k.trim()) && k.trim().length > 2; })) {
+        match = d;
+      }
+    });
+    return match;
+  } catch(e) { return null; }
+}
 
-<!-- QUOTE FINAL -->
-<div class="section">
-  <div class="quote" style="padding:60px 0">
-    <div class="quote-text">"Google e o arhivă.<br>ChatGPT e un creier fără ochi.<br>VV NOW e ochi vii pe asfalt<br>cu creier AI."</div>
-    <div class="quote-by">VV HYBRID UNIVERS · VIZIUNE FONDATOR</div>
-  </div>
-</div>
+// ── MAIN SEARCH ───────────────────────────────────────────────
+async function doSearch(q){
+  q=(q||'').trim();
+  if(!q)return;
 
-<!-- FOOTER -->
-<footer>
-  <div style="font-family:var(--font);font-size:18px;font-weight:900;letter-spacing:5px;color:var(--gold);margin-bottom:12px">VV</div>
-  <div>VV Hybrid Univers · Beta · România · 2026</div>
-  <div style="margin-top:8px">
-    <a href="https://vv-technologies.github.io/vv-nexus/vv-now.html" style="color:var(--w30);text-decoration:none;margin:0 12px">VV NOW</a>
-    <a href="https://vv-technologies.github.io/vv-nexus/business-register.html" style="color:var(--w30);text-decoration:none;margin:0 12px">Business</a>
-    <a href="https://vv-technologies.github.io/vv-nexus/talent-register.html" style="color:var(--w30);text-decoration:none;margin:0 12px">Talent</a>
-    <a href="https://vv-technologies.github.io/vv-nexus/vv-studio.html" style="color:var(--w30);text-decoration:none;margin:0 12px">Studio CEO</a>
-  </div>
-  <div style="margin-top:16px;font-size:10px">Toate drepturile rezervate · VV Technologies · GDPR Compliant · VV Charter v1.3</div>
-</footer>
+  var layer=detectLayer(q);
+  addHist(q,layer);
+  purgeIfCityChanged();
 
+  document.getElementById('hero').classList.add('compact');
+  document.getElementById('hdr').classList.add('solid');
+  document.getElementById('search-input').value=q;
+  document.getElementById('back-btn').classList.add('show');
+  window.scrollTo({top:0,behavior:'smooth'});
+
+  var res=document.getElementById('results');
+  res.innerHTML='<div style="padding:20px 0;font-size:12px;color:rgba(212,175,55,.4);text-align:center;letter-spacing:1px">VV Lea scanează...</div>';
+  res.classList.add('show');
+  document.getElementById('load').classList.add('on');
+
+  // Charter
+  // Verificare Charter — cuvinte intregi, nu substring (ex: 'ura' nu blocheaza 'restaurant')
+  var qWords = q.toLowerCase().split(/[\s,;.!?]+/);
+  var isBlocked = BLOCKED.some(function(k){
+    if(k.includes(' ')) return q.toLowerCase().includes(k); // fraze intregi
+    return qWords.some(function(w){ return w === k; }); // cuvinte exacte
+  });
+  if(isBlocked){
+    document.getElementById('load').classList.remove('on');
+    res.innerHTML='<div class="blocked-card"><div class="card-src"><div class="src-dot" style="background:var(--red)"></div>BLOCAT · VV CHARTER</div><div style="font-size:14px;color:rgba(255,59,48,.5);line-height:1.7">Această cerere nu poate fi procesată. VV NOW funcționează pentru realitatea urbană legală.</div></div>';
+    return;
+  }
+
+  // Non-urban
+  var isNonUrban = NON_URBAN.some(function(k){
+    return qWords.some(function(w){ return w === k; });
+  });
+  if(isNonUrban){
+    document.getElementById('load').classList.remove('on');
+    res.innerHTML='<div class="answer-card"><div class="card-src"><div class="src-dot dot-gold"></div>VV LEA</div><div class="answer-text">VV NOW e construit pentru realitatea fizică din jurul tău — locații, cozi, accesibilitate, trafic. Pentru "<strong>'+q+'</strong>" încearcă un motor general.</div></div>';
+    return;
+  }
+
+  // Offline — raspunde din cache
+  if(!_isOnline){
+    document.getElementById('load').classList.remove('on');
+    renderOffline(q,layer);
+    return;
+  }
+
+  // Cauta in paralel: date VV + locatie + web search
+  var [missions,loc,webAnswer,staticData,vvPage]=await Promise.all([
+    findMissions(q,layer),
+    findLoc(q),
+    nexusWebSearch(q,layer),
+    findStaticData(q),
+    findVVNowPage(q)
+  ]);
+
+  document.getElementById('load').classList.remove('on');
+  renderResults(q,loc,missions,webAnswer,layer,staticData,vvPage);
+
+  // Log
+  db.collection('vvhi_dataset').add({
+    action:'VV_NOW_SEARCH',
+    context:{query:q.substring(0,80),layer:layer||null,hasMissions:missions.length>0,hasWeb:!!webAnswer,hour:new Date().getHours()},
+    timestamp:firebase.firestore.FieldValue.serverTimestamp()
+  }).catch(function(){});
+}
+
+// ── RENDER ────────────────────────────────────────────────────
+function renderResults(q,loc,missions,webAnswer,layer,staticData,vvPage){
+  var res=document.getElementById('results');
+  var html='';
+  var hasMissions=missions&&missions.length>0;
+  var h=new Date().getHours();
+  var layerBadge=layer?'<div class="layer-badge lb-'+layer+'">'+LAYERS[layer].label.toUpperCase()+'</div>':'';
+
+  // ── 1. RASPUNS PRINCIPAL NEXUS ──
+  var srcLabel='VV LEA'+(_lvl>=6?' SENSE · LVL '+_lvl:'');
+  var mainText='';
+  if(hasMissions){
+    var name=loc?loc.display_name.split(',')[0]:'această zonă';
+    var days=Math.floor((Date.now()-missions[0].createdAt.toDate().getTime())/86400000);
+    mainText='Date reale din ecosistemul VV pentru <strong>'+name+'</strong> — verificate acum '+days+(days===1?' zi':' zile')+(layer&&layer==='access'?' de accesibilitate':layer==='safe'?' de siguranță':'')+'.';
+  } else if(webAnswer){
+    mainText='Am combinat datele publice disponibile cu rețeaua VV. '+(loc?'Am găsit <strong>'+loc.display_name.split(',')[0]+'</strong> în zona ta. ':'')+'Apasă VERIFY pentru certitudine 100% din teren.';
+  } else if(loc){
+    mainText='Am găsit <strong>'+loc.display_name.split(',')[0]+'</strong> în zona ta. Nu avem verificări recente în rețeaua VV.';
+  } else {
+    mainText='Nu am date recente în rețeaua VV pentru asta. '+(webAnswer?'Am căutat în surse publice mai jos.':'Apasă VERIFY și un Insider din zonă verifică fizic.');
+  }
+
+  html+='<div class="answer-card">'+layerBadge+
+    '<div class="card-src"><div class="src-dot dot-gold"></div>'+srcLabel+'</div>'+
+    '<div class="answer-text">'+mainText+'</div>'+
+    buildShareRow(q,mainText)+
+  '</div>';
+
+  // ── 2. DATE VV REALE (40%) ──
+  if(hasMissions){
+    var freshCount=missions.filter(function(m){return m.createdAt&&Date.now()-m.createdAt.toDate().getTime()<7*86400000;}).length;
+    var badge=freshCount>0?'<div class="data-badge db-fresh">✓ Verificat în ultimele 7 zile · VV Proof</div>':'<div class="data-badge db-old">⏰ Verificat în ultimele 30 zile · VV Proof</div>';
+    html+='<div class="vv-card"><div class="card-src"><div class="src-dot dot-green"></div>DATE VV · VERIFICATE FIZIC</div>'+badge+
+      missions.map(function(m){
+        var dateStr=m.createdAt?m.createdAt.toDate().toLocaleDateString('ro-RO',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}):'—';
+        return '<div class="proof-item">'+(m.description||'Verificare completată')+
+          '<div class="proof-meta">Insider VV · '+dateStr+'</div></div>';
+      }).join('')+
+    '</div>';
+  }
+
+  // ── 2.5 DATE STATICE CEO (prioritate maxima) ──
+  if(staticData && staticData.length > 0) {
+    staticData.forEach(function(s) {
+      var typeIcons = {spital:'🏥',politie:'🚔',pompieri:'🚒',smurd:'🚑',farmacie:'💊',metrou:'🚇',primarie:'🏛️',urgenta_num:'📞',obiectiv:'🏛️'};
+      html += '<div class="vv-card" style="border-color:rgba(52,199,89,.2);animation-delay:.04s">' +
+        '<div class="card-src"><div class="src-dot dot-green"></div>DATE VERIFICATE · VV STATIC</div>' +
+        '<div style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:100px;font-size:9px;font-weight:700;background:rgba(52,199,89,.08);border:0.5px solid rgba(52,199,89,.2);color:var(--green);margin-bottom:10px">✓ Verificat de CEO · Nu poate fi falsificat</div>' +
+        '<div style="font-family:var(--font);font-size:16px;font-weight:800;margin-bottom:4px">'+(typeIcons[s.type]||'⬡')+' '+s.name+'</div>' +
+        (s.addr ? '<div style="font-size:12px;color:var(--w30);margin-bottom:8px">'+s.addr+'</div>' : '') +
+        '<div style="display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--w50)">' +
+        (s.phone ? '<span>📞 '+s.phone+'</span>' : '') +
+        (s.hours ? '<span>🕐 '+s.hours+'</span>' : '') +
+        '</div>' +
+        (s.info ? '<div style="font-size:12px;color:var(--w50);margin-top:8px;line-height:1.6">'+s.info+'</div>' : '') +
+      '</div>';
+    });
+  }
+
+  // ── 2.6 PAGINA VV NOW (continut CEO) ──
+  if(vvPage) {
+    html += '<div class="answer-card" style="border-color:rgba(212,175,55,.15);animation-delay:.07s">' +
+      '<div class="card-src"><div class="src-dot dot-gold"></div>PAGINA VV NOW' + (vvPage.isSponsored?' · CONȚINUT SPONSORIZAT':'') + '</div>' +
+      '<div style="font-family:var(--font);font-size:15px;font-weight:800;margin-bottom:8px">'+vvPage.title+'</div>' +
+      '<div class="answer-text">'+vvPage.content+'</div>' +
+    '</div>';
+  }
+
+  // ── 3. DATE WEB HIBRID (60%) ──
+  if(webAnswer){
+    html+='<div class="web-card">'+
+      '<div class="card-src"><div class="src-dot dot-web"></div>DATE PUBLICE · VV LEA WEB</div>'+
+      '<div class="web-label">⚠ Nevalidat fizic</div>'+
+      '<div class="web-text">'+webAnswer+'</div>'+
+      '<div class="web-note">Sursă: internet public. Poate fi depășit. VERIFY = certitudine 100%.</div>'+
+    '</div>';
+  }
+
+  // ── 4. VERIFY — podul spre VV Pulse ──
+  if(loc){
+    var lat=parseFloat(loc.lat),lng=parseFloat(loc.lon);
+    var inRo=lat>=RO.latMin&&lat<=RO.latMax&&lng>=RO.lngMin&&lng<=RO.lngMax;
+    var hasFresh=hasMissions&&missions.some(function(m){return m.createdAt&&Date.now()-m.createdAt.toDate().getTime()<7*86400000;});
+    var name=loc.display_name.split(',')[0];
+    var vid='v'+Date.now();
+    var verifyTitles={access:'Verifică accesibilitate fizic',urgent:'Verifică situația acum',biz:'Verifică condiții business',safe:'Verifică siguranța zonei'};
+    var vtitle=layer&&verifyTitles[layer]?verifyTitles[layer]:'Trimite un Insider să verifice';
+
+    if(inRo&&!hasFresh){
+      html+='<div class="answer-card">'+
+        '<div class="verify-wrap">'+
+          '<div class="verify-label">VERIFY REALITY — CERTITUDINE 100%</div>'+
+          '<button class="verify-btn" id="'+vid+'" onclick="doVerify(\''+vid+'\',\''+name.replace(/'/g,"\\'")+'\','+lat.toFixed(4)+','+lng.toFixed(4)+',\''+layer+'\')">'+
+            '<span class="vb-icon">⚡</span>'+
+            '<span class="vb-body"><span class="vb-title">'+vtitle+'</span>'+
+              '<span class="vb-sub">Insider merge fizic · VV Proof foto · −10 VV · Insider +10 VV</span>'+
+            '</span>'+
+          '</button>'+
+          '<div class="flash-status" id="fs-'+vid+'"><div class="fp"></div><span id="ft-'+vid+'">Se caută cel mai apropiat Insider...</span></div>'+
+        '</div>'+
+      '</div>';
+    } else if(hasFresh){
+      html+='<div class="answer-card" style="border-color:rgba(52,199,89,.12)">'+
+        '<div class="card-src"><div class="src-dot dot-green"></div>VV PROOF · RECENT</div>'+
+        '<div class="answer-text" style="font-size:13px">✓ Verificat recent de Insideri. Datele de mai sus sunt din teren.</div>'+
+      '</div>';
+    }
+  }
+
+  // ── 5. PILLS ──
+  html+=buildPills(q,layer);
+
+  // ── 6. PREMIUM NOTE ──
+  html+='<div class="premium-note">Acces Standard · România · 30 zile <b>→ Premium · Global · 90 zile · 9€</b></div>';
+
+  res.innerHTML=html;
+}
+
+function renderOffline(q,layer){
+  var res=document.getElementById('results');
+  var cached=getHist();
+  var html='<div class="offline-card">'+
+    '<div class="card-src"><div class="src-dot" style="background:var(--orange)"></div>MOD OFFLINE · CACHE LOCAL</div>'+
+    '<div class="answer-text">Fără conexiune internet. Răspund din datele salvate local pe device-ul tău.</div>'+
+  '</div>';
+  if(cached.length>0){
+    html+='<div class="answer-card"><div class="card-src"><div class="src-dot dot-gold"></div>CĂUTĂRI SALVATE</div>'+
+      cached.map(function(i){return '<div class="proof-item">'+i.q+'</div>';}).join('')+
+    '</div>';
+  }
+  res.innerHTML=html;
+}
+
+// ── SHARE ─────────────────────────────────────────────────────
+function buildShareRow(q,text){
+  var shareText='Am verificat pe VV NOW: "'+q+'" → '+text.replace(/<[^>]*>/g,'').substring(0,100)+'... Verifică și tu: vv-technologies.github.io/vv-nexus/vv-now.html';
+  var waUrl='https://wa.me/?text='+encodeURIComponent(shareText);
+  return '<div class="share-row">'+
+    '<a class="share-btn" href="'+waUrl+'" target="_blank">📲 Trimite pe WhatsApp</a>'+
+    '<button class="copy-btn" onclick="copyLink()">🔗 Copiază link</button>'+
+  '</div>';
+}
+
+function copyLink(){
+  navigator.clipboard.writeText('https://vv-technologies.github.io/vv-nexus/vv-now.html')
+    .then(function(){showToast('Link copiat!');})
+    .catch(function(){showToast('vv-technologies.github.io/vv-nexus/vv-now.html');});
+}
+
+// ── PILLS ─────────────────────────────────────────────────────
+function buildPills(q,layer){
+  var l=q.toLowerCase();
+  var pills=[];
+  if(l.includes('kaufland')||l.includes('lidl')||l.includes('supermarket'))pills=['Parcare în zonă?','Farmacie aproape','Alt supermarket'];
+  else if(l.includes('cafenea')||l.includes('restaurant'))pills=['E deschis acum?','Terasă liberă?','Loc disponibil?'];
+  else if(l.includes('lift')||l.includes('acces')||l.includes('rampă'))pills=['Toaletă accesibilă?','Transport alternativ','Rampa liberă?'];
+  else if(l.includes('parcare'))pills=['Parcare gratuită?','Stație EV?','Parcare subterană'];
+  else if(layer==='biz')pills=['Intrare marfă liberă?','Trafic în zonă?','Zona de încărcare'];
+  else pills=['Cum e zona acum?','Coadă în zonă?','Misiuni active'];
+  return '<div class="pills">'+pills.map(function(p){
+    return '<div class="pill" onclick="doSearch(\''+p+'\')">' +p+'</div>';
+  }).join('')+'</div>';
+}
+
+// ── VERIFY / FLASH MISSION ────────────────────────────────────
+async function doVerify(vid,locName,lat,lng,layer){
+  var btn=document.getElementById(vid);
+  var fs=document.getElementById('fs-'+vid);
+  var ft=document.getElementById('ft-'+vid);
+  if(!btn)return;
+  btn.classList.add('done');
+  if(fs)fs.classList.add('on');
+  try{
+    var alias=_alias||'INSIDER';
+    var descs={access:'VERIFY ACCESIBILITATE: '+locName+' — lifturi, rampe, borduri.',urgent:'VERIFY URGENT: '+locName+' — situație în timp real.',biz:'VERIFY BUSINESS: '+locName+' — condiții livrare/pickup.',safe:'VERIFY SIGURANȚĂ: '+locName+' — condiții și iluminat.'};
+    var desc=layer&&descs[layer]?descs[layer]:'VERIFY: '+locName+' — situație reală cu VV Proof.';
+    var ref=await db.collection('missions').add({
+      type:'flash_mission',description:desc,
+      location:locName,lat,lng,reward:10,status:'pending',
+      requestedBy:alias,isFlash:true,source:'vv_now',layer:layer||null,
+      flashExpires:firebase.firestore.Timestamp.fromDate(new Date(Date.now()+30*60*1000)),
+      createdAt:firebase.firestore.FieldValue.serverTimestamp()
+    });
+    await db.collection('inbox').add({
+      to:'CEO',from:alias,alias,type:'flash_mission_created',
+      message:'⚡ Flash Mission'+(layer?' ['+LAYERS[layer].label+']':'')+': '+locName+' · #'+ref.id.substring(0,8),
+      missionId:ref.id,read:false,
+      createdAt:firebase.firestore.FieldValue.serverTimestamp()
+    });
+    db.collection('vvhi_dataset').add({
+      action:'VERIFY_REQUESTED',
+      context:{location:locName,lat:parseFloat(lat.toFixed(3)),lng:parseFloat(lng.toFixed(3)),layer:layer||null,hour:new Date().getHours()},
+      timestamp:firebase.firestore.FieldValue.serverTimestamp()
+    }).catch(function(){});
+    if(ft)ft.textContent='Misiune lansată. Insider confirmă în ~20 minute.';
+    showToast('⚡ Misiune Flash lansată');
+    var unsub=db.collection('missions').doc(ref.id).onSnapshot(function(doc){
+      if(!doc.exists)return;
+      if(doc.data().status==='approved'){
+        if(ft)ft.textContent='✅ Insider a confirmat! Dovada e în VV Pulse.';
+        if(fs)fs.style.borderColor='rgba(52,199,89,.3)';
+        showToast('✅ Confirmat!');
+        unsub();
+      }
+    });
+    setTimeout(function(){try{unsub();}catch(e){}},35*60*1000);
+  }catch(e){
+    if(btn)btn.classList.remove('done');
+    if(fs)fs.classList.remove('on');
+    showToast('Eroare. Încearcă din nou.');
+  }
+}
+
+// ── PULSE FEED ────────────────────────────────────────────────
+async function loadPulse(){
+  try{
+    var snap=await db.collection('vvhi_dataset').orderBy('timestamp','desc').limit(1).get();
+    if(snap.empty)return;
+    var d=snap.docs[0].data();
+    var ago='';
+    if(d.timestamp){var diff=Math.floor((Date.now()-d.timestamp.toDate().getTime())/60000);ago=diff<1?'acum':diff<60?diff+'m':Math.floor(diff/60)+'h';}
+    var acts={'VV_NOW_SEARCH':'Căutare în VV NOW','VV_PULSE_CONNECT':'Pulse confirmat','VERIFY_REQUESTED':'Misiune Flash lansată','APPROVE_MISSION':'Verificare completată'};
+    var txt=acts[d.action]||'Activitate în ecosistem';
+    var el=document.getElementById('pf-text');
+    if(el)el.textContent=txt+' · '+ago;
+  }catch(e){}
+}
+
+// ── UTILS ─────────────────────────────────────────────────────
+function goBack(){
+  document.getElementById('hero').classList.remove('compact');
+  document.getElementById('hdr').classList.remove('solid');
+  document.getElementById('results').classList.remove('show');
+  document.getElementById('results').innerHTML='';
+  document.getElementById('search-input').value='';
+  document.getElementById('back-btn').classList.remove('show');
+  renderHist();
+  setTimeout(function(){document.getElementById('search-input').focus();},400);
+}
+function showToast(msg){
+  var t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('on');
+  clearTimeout(t._t);t._t=setTimeout(function(){t.classList.remove('on');},3000);
+}
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape')goBack();
+  if(e.key==='/'&&!['INPUT','TEXTAREA'].includes(document.activeElement.tagName)){
+    e.preventDefault();document.getElementById('search-input').focus();
+  }
+});
+window.addEventListener('scroll',function(){
+  if(window.scrollY>20)document.getElementById('hdr').classList.add('solid');
+  else if(!document.getElementById('hero').classList.contains('compact'))document.getElementById('hdr').classList.remove('solid');
+});
+
+// ── INIT ──────────────────────────────────────────────────────
+openIDB().then(function(){
+  getGPS();
+  renderHist();
+  if(_isOnline)loadPulse();
+  // Prima vizita
+  if(!localStorage.getItem('vvme_home_city') && !localStorage.getItem('vvme_welcomed')) {
+    localStorage.setItem('vvme_welcomed','1');
+    setTimeout(function(){
+      var inp = document.getElementById('search-input');
+      if(inp) inp.placeholder = 'Bună! Ce oraș explorezi azi?';
+    }, 800);
+  }
+});
+</script>
 </body>
 </html>
