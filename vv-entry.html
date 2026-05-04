@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="theme-color" content="#000">
+<meta name="description" content="VV — Realitatea verificată fizic. Caută, descoperă, validează.">
+<title>VV</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Geist+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+:root{
+  --gold:#C8A96E;
+  --gold2:rgba(200,169,110,.1);
+  --gold-b:rgba(200,169,110,.2);
+  --gold-glow:rgba(200,169,110,.06);
+  --w:#F5F0E8;
+  --w70:rgba(245,240,232,.7);
+  --w40:rgba(245,240,232,.4);
+  --w20:rgba(245,240,232,.2);
+  --w10:rgba(245,240,232,.1);
+  --w05:rgba(245,240,232,.05);
+  --border:rgba(245,240,232,.08);
+  --green:#2DB87A;
+  --red:#E54D4D;
+  --bg:#080806;
+  --serif:'Cormorant Garamond',Georgia,serif;
+  --mono:'Geist Mono',monospace;
+}
+
+html,body{
+  min-height:100vh;
+  background:var(--bg);
+  color:var(--w);
+  font-family:var(--mono);
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+
+/* ── GRAIN TEXTURE ── */
+body::before{
+  content:'';
+  position:fixed;inset:0;z-index:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events:none;opacity:.4;
+}
+
+/* ── AMBIENT GLOW ── */
+.ambient{
+  position:fixed;
+  width:600px;height:600px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(200,169,110,.04) 0%,transparent 70%);
+  top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  pointer-events:none;z-index:0;
+  animation:ambientPulse 8s ease-in-out infinite;
+}
+@keyframes ambientPulse{
+  0%,100%{opacity:.5;transform:translate(-50%,-50%) scale(1);}
+  50%{opacity:1;transform:translate(-50%,-50%) scale(1.1);}
+}
+
+/* ── SCREENS ── */
+.screen{
+  position:fixed;inset:0;z-index:10;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom) 0;
+  opacity:0;pointer-events:none;
+  transition:opacity .6s cubic-bezier(.16,1,.3,1);
+}
+.screen.active{opacity:1;pointer-events:all;}
+.screen.exit{opacity:0;pointer-events:none;}
+
+/* ── SCREEN 0: SPLASH ── */
+#s0{background:var(--bg);}
+.splash-logo{
+  font-family:var(--serif);
+  font-size:120px;font-weight:300;
+  letter-spacing:20px;
+  color:var(--gold);
+  animation:logoReveal 1.5s cubic-bezier(.16,1,.3,1) forwards;
+  opacity:0;
+}
+@keyframes logoReveal{
+  0%{opacity:0;transform:translateY(20px);}
+  100%{opacity:1;transform:translateY(0);}
+}
+
+/* ── SCREEN 1: ONBOARDING SLIDES ── */
+#s1{padding:0 32px;}
+.slide{
+  display:none;flex-direction:column;
+  align-items:center;justify-content:center;
+  text-align:center;max-width:480px;width:100%;
+}
+.slide.show{display:flex;}
+.slide-eye{
+  font-size:9px;letter-spacing:4px;color:var(--w20);
+  text-transform:uppercase;font-weight:500;
+  margin-bottom:28px;
+  animation:fadeUp .5s ease both;
+}
+.slide-title{
+  font-family:var(--serif);
+  font-size:clamp(40px,10vw,72px);
+  font-weight:300;line-height:1.05;
+  letter-spacing:-1px;margin-bottom:20px;
+  animation:fadeUp .5s .1s ease both;
+}
+.slide-title em{font-style:italic;color:var(--gold);}
+.slide-body{
+  font-size:14px;font-weight:300;color:var(--w40);
+  line-height:1.8;max-width:360px;
+  animation:fadeUp .5s .2s ease both;
+}
+.slide-body strong{color:var(--w70);font-weight:400;}
+
+/* SLIDE ICONS */
+.slide-icon{
+  width:72px;height:72px;border-radius:50%;
+  border:0.5px solid var(--border);
+  background:var(--w05);
+  display:flex;align-items:center;justify-content:center;
+  font-size:28px;margin-bottom:28px;
+  animation:fadeUp .5s ease both;
+}
+
+/* PROGRESS DOTS */
+.dots{
+  display:flex;gap:8px;margin-top:40px;
+  animation:fadeUp .5s .3s ease both;
+}
+.dot{
+  width:4px;height:4px;border-radius:50%;
+  background:var(--w20);transition:all .3s;
+}
+.dot.on{background:var(--gold);width:20px;border-radius:2px;}
+
+/* NAV SLIDE BUTTONS */
+.slide-nav{
+  display:flex;gap:12px;margin-top:28px;
+  animation:fadeUp .5s .35s ease both;
+}
+.btn-next{
+  padding:12px 32px;
+  background:var(--gold);color:#000;
+  border:none;border-radius:100px;
+  font-family:var(--mono);font-size:12px;font-weight:500;
+  cursor:pointer;letter-spacing:.5px;
+  transition:opacity .15s;
+}
+.btn-next:active{opacity:.8;}
+.btn-skip{
+  padding:12px 20px;
+  background:none;border:0.5px solid var(--border);
+  border-radius:100px;color:var(--w40);
+  font-family:var(--mono);font-size:12px;
+  cursor:pointer;letter-spacing:.5px;
+  transition:all .15s;
+}
+.btn-skip:hover{border-color:var(--w20);color:var(--w70);}
+
+/* CITY BADGE */
+.city-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:8px 16px;
+  background:var(--gold2);border:0.5px solid var(--gold-b);
+  border-radius:100px;font-size:11px;color:var(--gold);
+  margin-bottom:24px;letter-spacing:.5px;
+  animation:fadeUp .5s ease both;
+}
+.city-dot{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--green);
+  box-shadow:0 0 8px rgba(45,184,122,.6);
+  animation:blink 2s ease-in-out infinite;
+}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+
+/* ── SCREEN 2: ACCORD ── */
+#s2{padding:0 24px;justify-content:flex-start;overflow-y:auto;
+  padding-top:max(48px,env(safe-area-inset-top));}
+.accord-wrap{max-width:480px;width:100%;margin:0 auto;padding:40px 0;}
+.accord-eye{font-size:9px;letter-spacing:4px;color:var(--w20);
+  text-transform:uppercase;font-weight:500;margin-bottom:24px;}
+.accord-title{
+  font-family:var(--serif);font-size:clamp(32px,8vw,52px);
+  font-weight:300;line-height:1.1;letter-spacing:-.5px;margin-bottom:12px;
+}
+.accord-title em{font-style:italic;color:var(--gold);}
+.accord-sub{font-size:13px;color:var(--w40);line-height:1.7;margin-bottom:32px;}
+
+/* TERMS PREVIEW */
+.terms-box{
+  background:var(--w05);border:0.5px solid var(--border);
+  border-radius:16px;padding:20px;margin-bottom:24px;
+  max-height:200px;overflow-y:auto;
+  scrollbar-width:thin;scrollbar-color:var(--border) transparent;
+}
+.terms-box::-webkit-scrollbar{width:3px;}
+.terms-box::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+.term-item{
+  display:flex;gap:12px;padding:10px 0;
+  border-bottom:0.5px solid rgba(245,240,232,.04);
+  font-size:12px;color:var(--w40);line-height:1.6;
+}
+.term-item:last-child{border-bottom:none;}
+.term-art{color:var(--gold);font-weight:500;flex-shrink:0;min-width:48px;}
+
+/* ACCORD CHECKBOXES */
+.accord-checks{display:flex;flex-direction:column;gap:12px;margin-bottom:28px;}
+.accord-check{
+  display:flex;align-items:flex-start;gap:14px;
+  padding:16px;background:var(--w05);border:0.5px solid var(--border);
+  border-radius:12px;cursor:pointer;transition:all .15s;
+}
+.accord-check:hover{border-color:var(--w20);}
+.accord-check.checked{
+  background:var(--gold2);border-color:var(--gold-b);
+}
+.check-box{
+  width:20px;height:20px;border-radius:6px;flex-shrink:0;
+  border:0.5px solid var(--border);background:var(--w05);
+  display:flex;align-items:center;justify-content:center;
+  transition:all .2s;margin-top:1px;
+}
+.accord-check.checked .check-box{
+  background:var(--gold);border-color:var(--gold);
+}
+.check-mark{
+  font-size:11px;color:#000;font-weight:700;
+  opacity:0;transition:opacity .15s;
+}
+.accord-check.checked .check-mark{opacity:1;}
+.check-text{font-size:13px;color:var(--w70);line-height:1.6;}
+.check-text b{color:var(--w);font-weight:500;}
+
+/* ENTER BUTTON */
+.btn-enter{
+  width:100%;min-height:54px;
+  background:var(--gold);color:#000;
+  border:none;border-radius:14px;
+  font-family:var(--mono);font-size:14px;font-weight:500;
+  cursor:pointer;letter-spacing:.5px;
+  transition:opacity .15s;
+  opacity:.35;pointer-events:none;
+}
+.btn-enter.ready{opacity:1;pointer-events:all;}
+.btn-enter:active{opacity:.8;}
+.accord-note{
+  font-size:10px;color:var(--w20);text-align:center;
+  margin-top:14px;line-height:1.8;letter-spacing:.3px;
+}
+
+/* ── SCREEN 3: CHOOSE PATH ── */
+#s3{padding:0 24px;}
+.paths-wrap{max-width:480px;width:100%;}
+.paths-eye{font-size:9px;letter-spacing:4px;color:var(--w20);
+  text-transform:uppercase;font-weight:500;margin-bottom:20px;
+  animation:fadeUp .4s ease both;}
+.paths-title{
+  font-family:var(--serif);font-size:clamp(32px,8vw,52px);
+  font-weight:300;line-height:1.1;margin-bottom:8px;
+  animation:fadeUp .4s .05s ease both;
+}
+.paths-title em{font-style:italic;color:var(--gold);}
+.paths-sub{font-size:13px;color:var(--w40);line-height:1.65;
+  margin-bottom:28px;animation:fadeUp .4s .1s ease both;}
+
+.path-card{
+  display:flex;align-items:center;gap:16px;
+  padding:18px 20px;
+  background:var(--w05);border:0.5px solid var(--border);
+  border-radius:16px;margin-bottom:10px;
+  text-decoration:none;color:inherit;
+  transition:all .2s;cursor:pointer;
+  animation:fadeUp .4s ease both;
+}
+.path-card:nth-child(1){animation-delay:.15s;}
+.path-card:nth-child(2){animation-delay:.2s;}
+.path-card:nth-child(3){animation-delay:.25s;}
+.path-card:nth-child(4){animation-delay:.3s;}
+.path-card:nth-child(5){animation-delay:.35s;}
+.path-card:hover{
+  border-color:var(--gold-b);
+  background:var(--gold-glow);
+  transform:translateX(4px);
+}
+.path-icon{
+  width:44px;height:44px;border-radius:12px;
+  background:var(--w05);border:0.5px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;flex-shrink:0;
+}
+.path-body{flex:1;min-width:0;}
+.path-name{font-size:14px;font-weight:500;color:var(--w);margin-bottom:3px;}
+.path-desc{font-size:11px;color:var(--w40);line-height:1.5;}
+.path-arrow{font-size:16px;color:var(--w20);}
+.path-badge{
+  font-size:9px;font-weight:500;letter-spacing:1px;
+  padding:2px 8px;border-radius:100px;text-transform:uppercase;flex-shrink:0;
+}
+.pb-live{background:rgba(45,184,122,.1);border:0.5px solid rgba(45,184,122,.2);color:var(--green);}
+.pb-new{background:var(--gold2);border:0.5px solid var(--gold-b);color:var(--gold);}
+
+/* BOTTOM SIGN */
+.bottom-sign{
+  text-align:center;margin-top:28px;
+  animation:fadeUp .4s .4s ease both;
+}
+.sign-text{font-size:11px;color:var(--w20);line-height:1.8;}
+.sign-logo{
+  font-family:var(--serif);font-size:24px;font-weight:300;
+  letter-spacing:6px;color:rgba(200,169,110,.3);
+  margin-bottom:6px;
+}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(16px);}
+  to{opacity:1;transform:translateY(0);}
+}
+
+/* ── LOADING LINE ── */
+.load-line{
+  position:fixed;top:0;left:0;right:0;height:1px;z-index:999;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);
+  transform:scaleX(0);transform-origin:left;
+  transition:transform 1s ease;
+}
+.load-line.go{transform:scaleX(1);}
+
+/* ── RESPONSIVE ── */
+@media(max-width:400px){
+  .splash-logo{font-size:80px;letter-spacing:12px;}
+  .slide-title{font-size:36px;}
+  .accord-title{font-size:28px;}
+  .paths-title{font-size:28px;}
+}
+</style>
+</head>
+<body>
+
+<div class="ambient"></div>
+<div class="load-line" id="load-line"></div>
+
+<!-- FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script>
+firebase.initializeApp({
+  apiKey:"AIzaSyDGv4kEClO0RHCLvXVLOT-vyPHw6bsxYVc",
+  authDomain:"vv-ep-beta.firebaseapp.com",
+  projectId:"vv-ep-beta"
+});
+var db = firebase.firestore();
+</script>
+
+<!-- ── SCREEN 0: SPLASH ── -->
+<div class="screen active" id="s0">
+  <div class="splash-logo">VV</div>
+</div>
+
+<!-- ── SCREEN 1: ONBOARDING ── -->
+<div class="screen" id="s1">
+
+  <!-- SLIDE 1 -->
+  <div class="slide show" id="slide-0">
+    <div class="city-badge" id="city-badge">
+      <div class="city-dot"></div>
+      <span id="city-name">Se detectează orașul...</span>
+    </div>
+    <div class="slide-eye">VV · Hybrid Univers</div>
+    <h1 class="slide-title">
+      Internetul evolueaza.<br>
+      <em>Simte ce cauti.</em>
+    </h1>
+    <p class="slide-body">
+      VV este primul ecosistem unde <strong>oameni reali verifică fizic</strong> ce se întâmplă în orașul tău — și îți spun adevărul.
+    </p>
+    <div class="dots">
+      <div class="dot on"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+    </div>
+    <div class="slide-nav">
+      <button class="btn-next" onclick="nextSlide()">Continuă →</button>
+    </div>
+  </div>
+
+  <!-- SLIDE 2 -->
+  <div class="slide" id="slide-1">
+    <div class="slide-icon">🔍</div>
+    <div class="slide-eye">VV NOW · VV Lea</div>
+    <h2 class="slide-title">
+      Caută.<br>
+      <em>Lea știe.</em>
+    </h2>
+    <p class="slide-body">
+      Scrii o întrebare despre orașul tău. <strong>VV Lea</strong> caută în date reale din teren, nu pe internet. Dacă nu știe — trimite un <strong>Insider</strong> să verifice fizic.
+    </p>
+    <div class="dots">
+      <div class="dot"></div>
+      <div class="dot on"></div>
+      <div class="dot"></div>
+    </div>
+    <div class="slide-nav">
+      <button class="btn-next" onclick="nextSlide()">Continuă →</button>
+      <button class="btn-skip" onclick="goToAccord()">Sari peste</button>
+    </div>
+  </div>
+
+  <!-- SLIDE 3 -->
+  <div class="slide" id="slide-2">
+    <div class="slide-icon">⬡</div>
+    <div class="slide-eye">VV Pulse · Insideri</div>
+    <h2 class="slide-title">
+      Validează.<br>
+      <em>Câștigă.</em>
+    </h2>
+    <p class="slide-body">
+      Primești misiuni în orașul tău. Mergi fizic, faci poza cu <strong>VV Proof</strong>. Câștigă <strong>VV Coins</strong> și construiești un statut în ecosistem pe care nu îl poți cumpăra — doar trăi.
+    </p>
+    <div class="dots">
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot on"></div>
+    </div>
+    <div class="slide-nav">
+      <button class="btn-next" onclick="goToAccord()">Intru în VV →</button>
+      <button class="btn-skip" onclick="goToAccord()">Sari</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- ── SCREEN 2: ACCORD ── -->
+<div class="screen" id="s2">
+  <div class="accord-wrap">
+
+    <div class="accord-eye">Acord de acces · VV Charter</div>
+    <h2 class="accord-title">
+      O singură semnătură<br>
+      <em>pentru tot universul.</em>
+    </h2>
+    <p class="accord-sub">
+      Acordul acoperă toate componentele VV — VV NOW, VV Pulse, VV Talent, VV Business Node, Inner Circle. Citești o dată, intri în tot.
+    </p>
+
+    <!-- VV CHARTER PREVIEW -->
+    <div class="terms-box">
+      <div class="term-item">
+        <span class="term-art">ART·1</span>
+        <span>Anonimat complet. VV nu stochează date de buletin, CNP sau adresă. Identitatea ta e alias-ul ales de tine.</span>
+      </div>
+      <div class="term-item">
+        <span class="term-art">ART·3</span>
+        <span>Filtru Etic Automat. Conținut ilegal, discriminatoriu sau dăunător este blocat automat înainte de publicare.</span>
+      </div>
+      <div class="term-item">
+        <span class="term-art">ART·4</span>
+        <span>Anti-Scroll. VV este orientat spre acțiune fizică reală, nu spre conținut de distracție pasivă.</span>
+      </div>
+      <div class="term-item">
+        <span class="term-art">ART·8</span>
+        <span>Maturitate 18+. Ecosistemul VV este destinat persoanelor majore conform legislației române.</span>
+      </div>
+      <div class="term-item">
+        <span class="term-art">ART·9</span>
+        <span>Expirare automată. Datele inactive se șterg automat. Niciun cont fantomă nu rămâne în sistem.</span>
+      </div>
+      <div class="term-item">
+        <span class="term-art">ART·10</span>
+        <span>GDPR complet. Datele tale rămân pe device-ul tău. Purjare automată la 24h. Dreptul la ștergere garantat tehnic.</span>
+      </div>
+      <div class="term-item">
+        <span class="term-art">ART·11</span>
+        <span>VV Proof. Misiunile validate fizic sunt singura sursă de adevăr în ecosistem. Falsificarea duce la ban permanent.</span>
+      </div>
+      <div class="term-item">
+        <span class="term-art">ART·14</span>
+        <span>Responsabilitate Socială. VV Lean servește comunitatea. Folosești ecosistemul etic sau îl pierzi.</span>
+      </div>
+    </div>
+
+    <!-- CELE 3 BIFE -->
+    <div class="accord-checks">
+
+      <div class="accord-check" id="ac1" onclick="toggleAccord(1)">
+        <div class="check-box"><span class="check-mark">✓</span></div>
+        <div class="check-text">
+          Am citit și accept <b>VV Charter</b> — legea internă a ecosistemului VV. Înțeleg că regulile se aplică automat.
+        </div>
+      </div>
+
+      <div class="accord-check" id="ac2" onclick="toggleAccord(2)">
+        <div class="check-box"><span class="check-mark">✓</span></div>
+        <div class="check-text">
+          Sunt de acord că <b>datele mele anonimizate</b> (fără identitate reală) pot îmbunătăți inteligența VV Lea pentru comunitate.
+        </div>
+      </div>
+
+      <div class="accord-check" id="ac3" onclick="toggleAccord(3)">
+        <div class="check-box"><span class="check-mark">✓</span></div>
+        <div class="check-text">
+          Confirm că am <b>minimum 18 ani</b> și înțeleg că accesez o platformă Beta în dezvoltare activă.
+        </div>
+      </div>
+
+    </div>
+
+    <button class="btn-enter" id="btn-enter" onclick="enterEcosystem()">
+      Intru în universul VV →
+    </button>
+
+    <div class="accord-note">
+      Acord conform GDPR · Legislație română și europeană · VV Charter v1.3<br>
+      Poți retrage acordul oricând ștergând datele din setările browser-ului.
+    </div>
+
+  </div>
+</div>
+
+<!-- ── SCREEN 3: CHOOSE PATH ── -->
+<div class="screen" id="s3">
+  <div class="paths-wrap">
+
+    <div class="paths-eye">Bine ai venit în VV</div>
+    <h2 class="paths-title">
+      Unde vrei<br>
+      <em>să mergi?</em>
+    </h2>
+    <p class="paths-sub" id="paths-sub">
+      Ecosistemul te așteaptă. Alege de unde începi.
+    </p>
+
+    <a class="path-card" href="https://vv-technologies.github.io/vv-nexus/vv-now.html">
+      <div class="path-icon">🔍</div>
+      <div class="path-body">
+        <div class="path-name">VV NOW</div>
+        <div class="path-desc">Caută ceva în orașul tău. VV Lea răspunde.</div>
+      </div>
+      <span class="path-badge pb-live">Live</span>
+    </a>
+
+    <a class="path-card" href="https://vv-technologies.github.io/ceo.html">
+      <div class="path-icon">⬡</div>
+      <div class="path-body">
+        <div class="path-name">VV Pulse</div>
+        <div class="path-desc">Misiuni în oraș. Validează fizic. Câștigă VV Coins.</div>
+      </div>
+      <span class="path-badge pb-live">Live</span>
+    </a>
+
+    <a class="path-card" href="https://vv-technologies.github.io/vv-nexus/business-register.html">
+      <div class="path-icon">🏢</div>
+      <div class="path-body">
+        <div class="path-name">VV Business Node</div>
+        <div class="path-desc">Înregistrează-ți locația. Clienții te găsesc prin VV NOW.</div>
+      </div>
+      <span class="path-badge pb-new">Gratuit Beta</span>
+    </a>
+
+    <a class="path-card" href="https://vv-technologies.github.io/vv-nexus/talent-register.html">
+      <div class="path-icon">⬡</div>
+      <div class="path-body">
+        <div class="path-name">VV Talent</div>
+        <div class="path-desc">Listează-te anonim. Agențiile te găsesc după skill.</div>
+      </div>
+      <span class="path-badge pb-new">Nou</span>
+    </a>
+
+    <a class="path-card" href="https://vv-technologies.github.io/vv-nexus/vv-inner-circle.html">
+      <div class="path-icon">💎</div>
+      <div class="path-body">
+        <div class="path-name">Inner Circle</div>
+        <div class="path-desc">Primii 100 Fondatori. Statut permanent în ecosistem.</div>
+      </div>
+      <span class="path-badge pb-live" id="founders-badge">— / 100</span>
+    </a>
+
+    <div class="bottom-sign">
+      <div class="sign-logo">VV</div>
+      <div class="sign-text">
+        Adevărul se validează pe stradă, nu pe ecran.<br>
+        <span style="color:rgba(200,169,110,.3)">VV Charter · Art. 4</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ── STATE ──────────────────────────────────────────────────────
+var currentSlide = 0;
+var accordState = {1:false, 2:false, 3:false};
+var _city = null;
+
+// ── SPLASH → ONBOARDING ────────────────────────────────────────
+window.addEventListener('load', function() {
+  // Verifica daca a mai intrat
+  var agreed = localStorage.getItem('vv_accord_signed');
+  
+  setTimeout(function() {
+    if (agreed) {
+      // Direct la paths
+      goToScreen('s3');
+      loadPaths();
+    } else {
+      goToScreen('s1');
+      detectCity();
+    }
+  }, 1800);
+});
+
+// ── SCREENS ────────────────────────────────────────────────────
+function goToScreen(id) {
+  document.querySelectorAll('.screen').forEach(function(s) {
+    s.classList.remove('active');
+  });
+  var el = document.getElementById(id);
+  if (el) {
+    el.classList.add('active');
+    if (id === 's3') loadPaths();
+  }
+}
+
+// ── SLIDES ─────────────────────────────────────────────────────
+function nextSlide() {
+  var slides = document.querySelectorAll('.slide');
+  slides[currentSlide].classList.remove('show');
+  currentSlide++;
+  if (currentSlide >= slides.length) {
+    goToAccord();
+    return;
+  }
+  slides[currentSlide].classList.add('show');
+}
+
+function goToAccord() {
+  goToScreen('s2');
+}
+
+// ── CITY DETECTION ─────────────────────────────────────────────
+function detectCity() {
+  var saved = localStorage.getItem('vvme_home_city');
+  if (saved) {
+    updateCityBadge(saved);
+    return;
+  }
+  if (!navigator.geolocation) {
+    updateCityBadge('România');
+    return;
+  }
+  navigator.geolocation.getCurrentPosition(function(pos) {
+    fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat=' + 
+      pos.coords.latitude + '&lon=' + pos.coords.longitude + '&accept-language=ro')
+      .then(function(r) { return r.json(); })
+      .then(function(d) {
+        var city = d.address ? (d.address.city || d.address.town || d.address.village || 'România') : 'România';
+        _city = city;
+        localStorage.setItem('vvme_home_city', city);
+        updateCityBadge(city);
+      })
+      .catch(function() { updateCityBadge('România'); });
+  }, function() {
+    updateCityBadge('România');
+  }, {timeout: 8000});
+}
+
+function updateCityBadge(city) {
+  var el = document.getElementById('city-name');
+  if (el) el.textContent = city;
+  _city = city;
+}
+
+// ── ACCORD ─────────────────────────────────────────────────────
+function toggleAccord(num) {
+  accordState[num] = !accordState[num];
+  var el = document.getElementById('ac' + num);
+  el.classList.toggle('checked', accordState[num]);
+  
+  var allChecked = accordState[1] && accordState[2] && accordState[3];
+  var btn = document.getElementById('btn-enter');
+  btn.classList.toggle('ready', allChecked);
+}
+
+async function enterEcosystem() {
+  var btn = document.getElementById('btn-enter');
+  btn.textContent = 'Se activează...';
+  btn.style.opacity = '.6';
+  btn.style.pointerEvents = 'none';
+  
+  // Loading line
+  document.getElementById('load-line').classList.add('go');
+  
+  try {
+    // Salveaza acordul in Firebase
+    await db.collection('vv_accords').add({
+      city: _city || 'necunoscut',
+      device: navigator.userAgent.includes('Mobile') ? 'mobile' : 'desktop',
+      timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+      charter_v: '1.3',
+      dataConsent: accordState[2],
+      ageConfirmed: accordState[3]
+    });
+    
+    // Salveaza local
+    localStorage.setItem('vv_accord_signed', '1');
+    localStorage.setItem('vv_accord_date', new Date().toISOString());
+    
+    // Log in VVhi
+    db.collection('vvhi_dataset').add({
+      action: 'VV_ENTRY',
+      context: { city: _city || 'necunoscut', device: navigator.userAgent.includes('Mobile') ? 'mobile' : 'desktop' },
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    }).catch(function(){});
+    
+  } catch(e) {
+    // Daca Firebase nu merge, salveaza local oricum
+    localStorage.setItem('vv_accord_signed', '1');
+  }
+  
+  setTimeout(function() {
+    goToScreen('s3');
+  }, 600);
+}
+
+// ── PATHS ──────────────────────────────────────────────────────
+async function loadPaths() {
+  // Personalizare cu orasul
+  var city = localStorage.getItem('vvme_home_city') || null;
+  if (city) {
+    var sub = document.getElementById('paths-sub');
+    if (sub) sub.textContent = 'Bine ai venit în VV. Ecosistemul din ' + city + ' te așteaptă.';
+  }
+  
+  // Founders count
+  try {
+    var snap = await db.collection('contributors').where('status','==','active').get();
+    var badge = document.getElementById('founders-badge');
+    if (badge) badge.textContent = snap.size + ' / 100';
+  } catch(e) {}
+}
+
+// ── KEYBOARD ───────────────────────────────────────────────────
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') {
+    var s1 = document.getElementById('s1');
+    if (s1.classList.contains('active')) nextSlide();
+  }
+});
+</script>
+</body>
+</html>
