@@ -445,6 +445,19 @@ async function submitNode() {
       .where('city', '==', city.toLowerCase()).get();
     var isPioneer = existingSnap.size < 10;
 
+    // Geocodeaza adresa pentru radius search
+    var coords = {lat: null, lng: null};
+    var searchAddr = (address || name) + ' ' + city + ' Romania';
+    try {
+      var geoRes = await fetch('https://nominatim.openstreetmap.org/search?format=json&q=' + 
+        encodeURIComponent(searchAddr) + '&limit=1&countrycodes=ro');
+      var geoData = await geoRes.json();
+      if(geoData && geoData[0]) {
+        coords.lat = parseFloat(geoData[0].lat);
+        coords.lng = parseFloat(geoData[0].lon);
+      }
+    } catch(e) {}
+
     await db.collection('verified_nodes').add({
       nodeId: _nodeId,
       name, type, city: city.toLowerCase(), cityDisplay: city,
@@ -452,6 +465,8 @@ async function submitNode() {
       description: desc || null,
       hours: hours || null,
       contact: contact || null,
+      lat: coords.lat,
+      lng: coords.lng,
       status: 'active',
       isPioneer,
       charterAccepted: true,
