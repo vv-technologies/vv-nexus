@@ -575,6 +575,224 @@ function enrichQueryWithCity(q) {
   return q;
 }
 
+
+// ── VV LEA · MEMORIE PERSONALĂ ───────────────────────────────
+// Lea învață din tine. Nu din toți. Din TU.
+// Tot ce e stocat rămâne local pe device-ul tău.
+
+var _leaProfile = null;
+
+function loadLeaProfile() {
+  try {
+    var raw = localStorage.getItem('vv_lea_profile');
+    _leaProfile = raw ? JSON.parse(raw) : {
+      interests: {},        // { cafea: 3, farmacie: 1 } — frecventa cautarilor
+      timePatterns: {},     // { morning_cafea: 2 } — ora + tip cautare
+      cityZones: {},        // zone frecventate
+      persona: null,        // insider / seeker
+      role: null,           // artist, student, parinte, profesionist etc
+      searchCount: 0,       // total cautari
+      firstSeen: new Date().toISOString(),
+      lastSeen: new Date().toISOString(),
+      streak: 0,            // zile consecutive
+      lastStreakDate: null
+    };
+  } catch(e) {
+    _leaProfile = { interests: {}, timePatterns: {}, cityZones: {}, searchCount: 0 };
+  }
+}
+
+function saveLeaProfile() {
+  try {
+    _leaProfile.lastSeen = new Date().toISOString();
+    localStorage.setItem('vv_lea_profile', JSON.stringify(_leaProfile));
+  } catch(e) {}
+}
+
+function leaLearnFromSearch(q, layer) {
+  if (!_leaProfile) return;
+  
+  var h = new Date().getHours();
+  var period = h<12?'morning':h<17?'afternoon':h<21?'evening':'night';
+  var l = q.toLowerCase();
+  
+  // Creste frecventa intereselor
+  var keywords = ['cafea','restaurant','pizza','farmacie','spital','metrou',
+    'hotel','parc','cinema','muzeu','sport','sala','biblioteca','coafor',
+    'salon','livrare','cumparaturi','piata','mall'];
+  keywords.forEach(function(kw) {
+    if(l.includes(kw)) {
+      _leaProfile.interests[kw] = (_leaProfile.interests[kw]||0) + 1;
+    }
+  });
+  
+  // Pattern temporal
+  if(layer) {
+    var key = period + '_' + layer;
+    _leaProfile.timePatterns[key] = (_leaProfile.timePatterns[key]||0) + 1;
+  }
+  
+  // Counter
+  _leaProfile.searchCount = (_leaProfile.searchCount||0) + 1;
+  
+  // Streak
+  var today = new Date().toDateString();
+  if(_leaProfile.lastStreakDate !== today) {
+    var yesterday = new Date(Date.now()-86400000).toDateString();
+    if(_leaProfile.lastStreakDate === yesterday) {
+      _leaProfile.streak = (_leaProfile.streak||0) + 1;
+    } else {
+      _leaProfile.streak = 1;
+    }
+    _leaProfile.lastStreakDate = today;
+  }
+  
+  // Detecteaza rol din cautari
+  if(!_leaProfile.role) {
+    if(l.includes('nota') || l.includes('compoz') || l.includes('versuri') || l.includes('cantec') || l.includes('studio')) {
+      _leaProfile.role = 'artist';
+    } else if(l.includes('camin') || l.includes('bursa') || l.includes('facultate') || l.includes('examen')) {
+      _leaProfile.role = 'student';
+    } else if(l.includes('gradinita') || l.includes('scoala') || l.includes('pediatr') || l.includes('copil')) {
+      _leaProfile.role = 'parinte';
+    } else if(l.includes('birou') || l.includes('meeting') || l.includes('client') || l.includes('coworking')) {
+      _leaProfile.role = 'profesionist';
+    }
+  }
+  
+  // Salveaza anonim in VVhi (fara date personale)
+  if(_isOnline && _leaProfile.searchCount % 5 === 0) {
+    // La fiecare 5 cautari, trimite un agregat anonim
+    db.collection('vvhi_dataset').add({
+      action: 'LEA_PATTERN',
+      context: {
+        topInterest: getTopInterest(),
+        searchCount: _leaProfile.searchCount,
+        city: localStorage.getItem('vvme_home_city') || null,
+        period: period,
+        layer: layer || null
+        // ZERO date personale
+      },
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    }).catch(function(){});
+  }
+  
+  saveLeaProfile();
+}
+
+function getTopInterest() {
+  if(!_leaProfile || !_leaProfile.interests) return null;
+  var top = null, max = 0;
+  Object.keys(_leaProfile.interests).forEach(function(k) {
+    if(_leaProfile.interests[k] > max) { max = _leaProfile.interests[k]; top = k; }
+  });
+  return top;
+}
+
+function getLeaPersonalizedGreeting() {
+  if(!_leaProfile) return null;
+  var h = new Date().getHours();
+  var city = localStorage.getItem('vvme_home_city') || null;
+  var persona = localStorage.getItem('vv_persona') || null;
+  var greeting = h<12?'Bună dimineața':h<18?'Bună ziua':h<22?'Bună seara':'Noapte bună';
+  
+  // Prima vizita
+  if(_leaProfile.searchCount === 0) {
+    return city 
+      ? greeting + '. Sunt Lea. Îți spun adevărul despre <strong style="color:var(--w)">' + city + '</strong>.'
+      : greeting + '. Sunt Lea. Îți spun adevărul despre orașul tău.';
+  }
+  
+  // Streak activ
+  if(_leaProfile.streak >= 3) {
+    return greeting + '. Ziua ' + _leaProfile.streak + ' împreună. ' + (city?city+' te așteaptă.':'Ecosistemul te așteaptă.');
+  }
+  
+  // Rol detectat
+  if(_leaProfile.role === 'artist') {
+    return greeting + '. ' + (city||'Orașul tău') + ' e plin de inspirație. Ce compunem azi?';
+  }
+  if(_leaProfile.role === 'student') {
+    return greeting + '. Lea e aici. Ce mai trebuie să știi?';
+  }
+  if(_leaProfile.role === 'parinte') {
+    return greeting + '. Lea verifică totul înainte. Tu ai grijă de ce contează.';
+  }
+  if(_leaProfile.role === 'profesionist') {
+    return greeting + '. ' + (city||'Orașul tău') + ', ' + (h<12?'dimineața':'ziua') + '. Ce rezolvăm azi?';
+  }
+  
+  // Interes detectat + ora
+  var topInterest = getTopInterest();
+  if(topInterest && h >= 7 && h <= 10 && topInterest === 'cafea') {
+    return greeting + '. Știu că îți place cafeaua dimineața. ' + (city?'Ce cafenea verificăm în '+city+'?':'Ce verificăm azi?');
+  }
+  
+  // Generic personalizat
+  if(city) {
+    return greeting + '. ' + city + ', ' + (h<12?'dimineața':h<18?'după-amiaza':h<22?'seara':'noaptea') + '. Lea e pregătită.';
+  }
+  
+  return greeting + '. Lea e pregătită. Ce vrei să știi?';
+}
+
+function getLeaContextualPlaceholder() {
+  if(!_leaProfile) return null;
+  var city = localStorage.getItem('vvme_home_city') || null;
+  var h = new Date().getHours();
+  var topInterest = getTopInterest();
+  
+  if(_leaProfile.role === 'artist' && city) return 'Studio de înregistrări în ' + city + '?';
+  if(_leaProfile.role === 'student') return 'Camin, bursa, examen — ce verificăm?';
+  if(topInterest === 'cafea' && h < 11) return city ? 'Ce cafenea verificăm în ' + city + '?' : 'Ce cafenea cauți?';
+  if(topInterest === 'pizza') return city ? 'Pizza în ' + city + ' — deschisă acum?' : 'Pizza deschisă acum?';
+  if(city) return 'Ce vrei să știi despre ' + city + '?';
+  return 'Ce vrei să știi?';
+}
+
+// Pattern temporal din VVhi — ce știe Lea din experiența colectivă
+async function getLeaCollectiveMemory(q, city) {
+  if(!_isOnline || !city) return null;
+  try {
+    var l = q.toLowerCase();
+    var cityLower = city.toLowerCase();
+    
+    // Cauta pattern-uri similare in VVhi
+    var snap = await db.collection('vvhi_dataset')
+      .where('action', '==', 'VERIFY_REQUESTED')
+      .where('context.city', '==', cityLower)
+      .orderBy('timestamp', 'desc')
+      .limit(20)
+      .get();
+    
+    if(snap.empty) return null;
+    
+    var h = new Date().getHours();
+    var period = h<12?'dimineata':h<17?'pranz':h<21?'seara':'noapte';
+    var relevantCount = 0;
+    var totalCount = snap.size;
+    
+    snap.forEach(function(doc) {
+      var d = doc.data();
+      var ctx = d.context || {};
+      var qCtx = (ctx.query||'').toLowerCase();
+      if(l.split(' ').some(function(w){ return w.length>3 && qCtx.includes(w); })) {
+        relevantCount++;
+      }
+    });
+    
+    if(relevantCount >= 2) {
+      return {
+        count: relevantCount,
+        total: totalCount,
+        period: period,
+        city: city
+      };
+    }
+    return null;
+  } catch(e) { return null; }
+}
+
 // ── NOMINATIM cu cache ─────────────────────────────────────────
 async function findLoc(q){
   var term=getTerm(q);
@@ -755,6 +973,7 @@ async function doSearch(q){
   var layer=detectLayer(q);
   addHist(q,layer);
   purgeIfCityChanged();
+  leaLearnFromSearch(q,layer);
 
   document.getElementById('hero').classList.add('compact');
   document.getElementById('hdr').classList.add('solid');
@@ -798,16 +1017,18 @@ async function doSearch(q){
   }
 
   // Cauta in paralel: date VV + locatie + web search
-  var [missions,loc,webAnswer,staticData,vvPage]=await Promise.all([
+  var city = localStorage.getItem('vvme_current_city')||localStorage.getItem('vvme_home_city')||null;
+  var [missions,loc,webAnswer,staticData,vvPage,collectiveMemory]=await Promise.all([
     findMissions(q,layer),
     findLoc(q),
     nexusWebSearch(q,layer),
     findStaticData(q),
-    findVVNowPage(q)
+    findVVNowPage(q),
+    getLeaCollectiveMemory(q,city)
   ]);
 
   document.getElementById('load').classList.remove('on');
-  renderResults(q,loc,missions,webAnswer,layer,staticData,vvPage);
+  renderResults(q,loc,missions,webAnswer,layer,staticData,vvPage,collectiveMemory);
 
   // Log
   db.collection('vvhi_dataset').add({
@@ -870,7 +1091,7 @@ function getFallbackAnswer(q, layer) {
     'Apasă VERIFY și trimitem cel mai apropiat Insider să confirme situația reală din teren.';
 }
 
-function renderResults(q,loc,missions,webAnswer,layer,staticData,vvPage){
+function renderResults(q,loc,missions,webAnswer,layer,staticData,vvPage,collectiveMemory){
   var res=document.getElementById('results');
   var html='';
   var hasMissions=missions&&missions.length>0;
@@ -935,6 +1156,20 @@ function renderResults(q,loc,missions,webAnswer,layer,staticData,vvPage){
       '<div class="card-src"><div class="src-dot dot-gold"></div>PAGINA VV NOW' + (vvPage.isSponsored?' · CONȚINUT SPONSORIZAT':'') + '</div>' +
       '<div style="font-family:var(--font);font-size:15px;font-weight:800;margin-bottom:8px">'+vvPage.title+'</div>' +
       '<div class="answer-text">'+vvPage.content+'</div>' +
+    '</div>';
+  }
+
+  // ── 2.7 MEMORIA COLECTIVĂ LEA ──
+  if(collectiveMemory && collectiveMemory.count >= 2) {
+    html += '<div class="vv-card" style="border-color:rgba(167,139,250,.15);animation-delay:.06s">' +
+      '<div class="card-src"><div class="src-dot" style="background:#a78bfa"></div>LEA · MEMORIE COLECTIVĂ</div>' +
+      '<div style="font-size:13px;color:var(--w70);line-height:1.7;margin-bottom:8px">' +
+        'Din experiența Insiderilor în <strong>' + collectiveMemory.city + '</strong> — ' +
+        collectiveMemory.count + ' verificări similare recente. ' +
+        'De obicei ' + collectiveMemory.period + ' există activitate în această zonă. ' +
+        'Vrei să confirm situația exactă acum?' +
+      '</div>' +
+      '<div style="font-size:11px;color:var(--w30)">Pattern VVhi · Agregat anonim · Nu date personale</div>' +
     '</div>';
   }
 
@@ -1136,6 +1371,18 @@ window.addEventListener('scroll',function(){
 
 // ── GREETING CONTEXTUAL ──────────────────────────────────────
 function setContextualGreeting() {
+  // Prioritate: greeting personalizat Lea
+  var leaGreeting = getLeaPersonalizedGreeting();
+  var leaPlaceholder = getLeaContextualPlaceholder();
+  
+  var sub = document.getElementById('hero-contextual');
+  if(sub && leaGreeting) { sub.innerHTML = leaGreeting; }
+  
+  var inp = document.getElementById('search-input');
+  if(inp && leaPlaceholder) { inp.placeholder = leaPlaceholder; return; }
+  
+  // Fallback la greeting standard
+  var _setContextualGreetingOriginal = function() {
   var h = new Date().getHours();
   var city = localStorage.getItem('vvme_home_city') || null;
   var persona = localStorage.getItem('vv_persona') || null;
@@ -1157,15 +1404,16 @@ function setContextualGreeting() {
     sub.textContent = 'VV Lea știe orașul tău. Insiderii confirmă fizic.';
   }
   
-  // Update search placeholder
-  var inp = document.getElementById('search-input');
   if (inp && city) {
     inp.placeholder = 'Ce vrei să știi despre ' + city + (h>=20||h<5?' noaptea?':h>=17?' seara?':'?');
   }
+  }; // end original
+  _setContextualGreetingOriginal();
 }
 
 // ── INIT ──────────────────────────────────────────────────────
 openIDB().then(function(){
+  loadLeaProfile();
   getGPS();
   renderHist();
   if(_isOnline)loadPulse();
