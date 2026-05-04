@@ -1018,17 +1018,18 @@ async function doSearch(q){
 
   // Cauta in paralel: date VV + locatie + web search
   var city = localStorage.getItem('vvme_current_city')||localStorage.getItem('vvme_home_city')||null;
-  var [missions,loc,webAnswer,staticData,vvPage,collectiveMemory]=await Promise.all([
+  var [missions,loc,webAnswer,staticData,vvPage,collectiveMemory,nearbyNodes]=await Promise.all([
     findMissions(q,layer),
     findLoc(q),
     nexusWebSearch(q,layer),
     findStaticData(q),
     findVVNowPage(q),
-    getLeaCollectiveMemory(q,city)
+    getLeaCollectiveMemory(q,city),
+    findNearbyNodes(q, 2)
   ]);
 
   document.getElementById('load').classList.remove('on');
-  renderResults(q,loc,missions,webAnswer,layer,staticData,vvPage,collectiveMemory);
+  renderResults(q,loc,missions,webAnswer,layer,staticData,vvPage,collectiveMemory,nearbyNodes);
 
   // Log
   db.collection('vvhi_dataset').add({
@@ -1039,6 +1040,115 @@ async function doSearch(q){
 }
 
 // ── RENDER ────────────────────────────────────────────────────
+
+// ── VV LEA · RADIUS SEARCH ───────────────────────────────────
+// Cauta in raza GPS a userului, nu in tot orasul
+
+function getDistanceKm(lat1, lon1, lat2, lon2) {
+  var R = 6371;
+  var dLat = (lat2-lat1) * Math.PI/180;
+  var dLon = (lon2-lon1) * Math.PI/180;
+  var a = Math.sin(dLat/2)*Math.sin(dLat/2) +
+    Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*
+    Math.sin(dLon/2)*Math.sin(dLon/2);
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+async function findNearbyNodes(q, radiusKm) {
+  if(!_isOnline || !_gps) return [];
+  radiusKm = radiusKm || 2; // default 2km raza
+  
+  try {
+    var snap = await db.collection('verified_nodes')
+      .where('status','==','active').get();
+    
+    var results = [];
+    var l = q.toLowerCase();
+    var qWords = l.split(/\s+/).filter(function(w){ return w.length > 2; });
+    
+    snap.forEach(function(doc) {
+      var d = doc.data();
+      
+      // Verifica daca are coordonate
+      if(!d.lat || !d.lng) return;
+      
+      // Calculeaza distanta
+      var dist = getDistanceKm(_gps.lat, _gps.lng, parseFloat(d.lat), parseFloat(d.lng));
+      if(dist > radiusKm) return;
+      
+      // Verifica relevanta pentru query
+      var name = (d.name||'').toLowerCase();
+      var type = (d.type||'').toLowerCase();
+      var desc = (d.description||'').toLowerCase();
+      
+      var relevant = false;
+      if(l.includes(type)) relevant = true;
+      if(qWords.some(function(w){ return name.includes(w) || type.includes(w) || desc.includes(w); })) relevant = true;
+      
+      if(relevant) {
+        results.push({...d, _dist: dist.toFixed(1)});
+      }
+    });
+    
+    // Sorteaza dupa distanta
+    results.sort(function(a,b){ return parseFloat(a._dist) - parseFloat(b._dist); });
+    return results.slice(0, 3);
+    
+  } catch(e) { return []; }
+}
+
+// Ton uman pentru lipsa de date
+function getHumanNoDataResponse(q, city, hasGps) {
+  var l = q.toLowerCase();
+  var h = new Date().getHours();
+  var topInterest = getTopInterest();
+  
+  // Detecteaza tipul de cerere
+  var isPizza = l.includes('pizza') || l.includes('mâncare') || l.includes('mancare') || l.includes('restaurant');
+  var isCafe = l.includes('cafea') || l.includes('cafenea') || l.includes('coffee');
+  var isPharmacy = l.includes('farmacie') || l.includes('medicament');
+  var isQueue = l.includes('coadă') || l.includes('coada') || l.includes('aglomerat');
+  var isOpen = l.includes('deschis') || l.includes('program');
+  
+  var locationText = hasGps ? 'în zona ta' : (city ? 'în ' + city : 'în zona ta');
+  
+  if(isPizza) {
+    if(h >= 20 || h < 5) {
+      return 'Nu am date VV verificate pentru pizza ' + locationText + ' la ora asta. ' +
+        'Noaptea opțiunile se reduc — caut pe net ce livrează acum?';
+    }
+    return 'Nu am date VV pentru pizza ' + locationText + ' momentan. ' +
+      'Pot căuta pe net ce e deschis lângă tine, sau trimit un Insider să verifice?';
+  }
+  
+  if(isCafe) {
+    if(h < 10) {
+      return 'Dimineața devreme — nu am date VV pentru cafenele ' + locationText + '. ' +
+        'Caut pe net ce s-a deschis deja?';
+    }
+    return 'Nu am date VV pentru cafenele ' + locationText + '. ' +
+      'Vreau să caut pe net sau trimiți un Insider?';
+  }
+  
+  if(isPharmacy) {
+    return 'Pentru farmacii de urgență sună 021 9599. ' +
+      'Nu am date VV verificate recent ' + locationText + '. Caut pe net?';
+  }
+  
+  if(isQueue) {
+    return 'Cozile se schimbă în timp real — nu pot știi fără un Insider acolo fizic. ' +
+      'Trimit pe cineva să verifice acum? Durează ~15 minute.';
+  }
+  
+  if(isOpen) {
+    return 'Programele se pot schimba față de ce e online. ' +
+      'Caut pe net informația sau vrei confirmare fizică de la un Insider?';
+  }
+  
+  // Generic uman
+  return 'Nu am date VV verificate pentru asta ' + locationText + ' acum. ' +
+    'Caut pe net sau trimit un Insider să verifice fizic?';
+}
 
 // ── FALLBACK RĂSPUNS ─────────────────────────────────────────
 function getFallbackAnswer(q, layer) {
@@ -1091,7 +1201,7 @@ function getFallbackAnswer(q, layer) {
     'Apasă VERIFY și trimitem cel mai apropiat Insider să confirme situația reală din teren.';
 }
 
-function renderResults(q,loc,missions,webAnswer,layer,staticData,vvPage,collectiveMemory){
+function renderResults(q,loc,missions,webAnswer,layer,staticData,vvPage,collectiveMemory,nearbyNodes){
   var res=document.getElementById('results');
   var html='';
   var hasMissions=missions&&missions.length>0;
@@ -1173,6 +1283,23 @@ function renderResults(q,loc,missions,webAnswer,layer,staticData,vvPage,collecti
     '</div>';
   }
 
+  // ── 2.8 NODURI NEARBY (GPS radius 2km) ──
+  if(nearbyNodes && nearbyNodes.length > 0) {
+    nearbyNodes.forEach(function(node) {
+      html += '<div class="vv-card" style="border-color:rgba(48,209,88,.2);animation-delay:.08s">' +
+        '<div class="card-src"><div class="src-dot dot-green"></div>VV BUSINESS NODE · ' + node._dist + 'km DE TINE</div>' +
+        '<div style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:100px;font-size:9px;font-weight:700;background:rgba(48,209,88,.08);border:0.5px solid rgba(48,209,88,.2);color:var(--green);margin-bottom:10px">📍 ' + node._dist + ' km · Verificat în VV</div>' +
+        '<div style="font-family:var(--font);font-size:16px;font-weight:800;margin-bottom:4px">' + node.name + '</div>' +
+        (node.address ? '<div style="font-size:12px;color:var(--w30);margin-bottom:8px">📍 ' + node.address + '</div>' : '') +
+        '<div style="display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--w50)">' +
+        (node.phone ? '<span>📞 ' + node.phone + '</span>' : '') +
+        (node.hours ? '<span>🕐 ' + node.hours + '</span>' : '') +
+        '</div>' +
+        (node.description ? '<div style="font-size:12px;color:var(--w50);margin-top:8px;line-height:1.6">' + node.description + '</div>' : '') +
+      '</div>';
+    });
+  }
+
   // ── 3. DATE WEB HIBRID (60%) ──
   if(webAnswer){
     html+='<div class="web-card">'+
@@ -1188,7 +1315,10 @@ function renderResults(q,loc,missions,webAnswer,layer,staticData,vvPage,collecti
       '<div class="card-src"><div class="src-dot dot-web"></div>VV LEA · RĂSPUNS GENERAL</div>'+
       '<div class="web-label">⚠ Nevalidat fizic · Informație generală</div>'+
       '<div class="web-text">'+fallbackMsg+'</div>'+
-      '<div class="web-note">VV Lea nu are date verificate din teren pentru asta încă. Apasă VERIFY și trimitem un Insider să confirme fizic.</div>'+
+      '<div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;">' +
+        '<button onclick="doSearchWeb(''+q.replace(/'/g,"\'")+'')" style="padding:7px 14px;background:rgba(255,255,255,.06);border:0.5px solid rgba(255,255,255,.15);border-radius:100px;color:var(--w70);font-family:var(--mono);font-size:11px;cursor:pointer;">🌐 Da, caută pe net</button>' +
+        '<button onclick="startVerify(''+q.replace(/'/g,"\'")+'')" style="padding:7px 14px;background:rgba(212,175,55,.08);border:0.5px solid rgba(212,175,55,.2);border-radius:100px;color:var(--gold);font-family:var(--mono);font-size:11px;cursor:pointer;">⚡ Trimit un Insider</button>' +
+      '</div>'+
     '</div>';
   }
 
