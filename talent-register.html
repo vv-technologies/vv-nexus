@@ -149,7 +149,7 @@ html,body{min-height:100vh;background:#000;color:var(--w);
   <nav class="hdr-nav">
     <a href="https://vv-technologies.github.io/vv-nexus/vv-now.html" class="hdr-link">VV NOW</a>
     <a href="https://vv-technologies.github.io/vv-nexus/business-register.html" class="hdr-link">Business</a>
-    <a href="https://vv-technologies.github.io/ceo.html" class="hdr-link">VV Beta</a>
+    <a href="https://vv-technologies.github.io/ceo.html" class="hdr-link">VV Pulse</a>
   </nav>
 </header>
 
@@ -481,6 +481,18 @@ function showToast(msg) {
 }
 
 loadStats();
+
+// Daca acordul VV e deja semnat - skip Charter si auto-bifeaza
+if(localStorage.getItem('vv_accord_signed')) {
+  ['c1','c2','c3'].forEach(function(id){
+    var el = document.getElementById(id);
+    if(el) el.classList.add('checked');
+  });
+  var note = document.querySelector('.charter-box');
+  if(note) note.insertAdjacentHTML('beforebegin', 
+    '<div style="padding:10px 14px;background:rgba(48,209,88,.06);border:0.5px solid rgba(48,209,88,.15);border-radius:10px;font-size:11px;color:rgba(48,209,88,.7);margin-bottom:12px">✓ Acord VV Charter semnat deja la intrarea în ecosistem. Termenii se aplică automat.</div>'
+  );
+}
 </script>
 </body>
 </html>
