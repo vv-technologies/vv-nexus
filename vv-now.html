@@ -194,7 +194,7 @@ html,body{min-height:100vh;background:#000;color:var(--w);
 .proof-item:last-child{border-bottom:none;}
 .proof-meta{font-size:11px;color:var(--w30);margin-top:2px;}
 
-/* VERIFY — podul spre VV Beta */
+/* VERIFY — podul spre VV Pulse */
 .verify-wrap{margin-top:14px;padding-top:14px;border-top:0.5px solid var(--border);}
 .verify-label{font-size:9px;color:rgba(212,175,55,.5);letter-spacing:2px;
   font-weight:700;margin-bottom:8px;}
@@ -290,7 +290,7 @@ html,body{min-height:100vh;background:#000;color:var(--w);
   </a>
   <div class="hdr-right">
     <button class="back-btn" id="back-btn" onclick="goBack()">← Nou</button>
-    <a href="https://vv-technologies.github.io/ceo.html" class="hdr-link">VV Beta</a>
+    <a href="https://vv-technologies.github.io/ceo.html" class="hdr-link">VV Pulse</a>
     <a href="https://vv-technologies.github.io/vv-nexus/vv-pulse.html" class="hdr-link">Pulse</a>
   </div>
 </header>
@@ -492,7 +492,7 @@ function renderHist(){
 }
 
 
-// ── VV ME · CITY INTELLIGENCE ────────────────────────────────
+// ── VV LEA · CITY INTELLIGENCE ────────────────────────────────
 var _homeCity = localStorage.getItem('vvme_home_city') || null;
 var _currentCity = localStorage.getItem('vvme_current_city') || null;
 var _cityLat = null;
@@ -537,10 +537,10 @@ async function initCityContext() {
 }
 
 function showCitySwitch(city) {
-  // Notificare discreta ca VV Me a schimbat contextul
+  // Notificare discreta ca VV Lea a schimbat contextul
   var banner = document.createElement('div');
   banner.style.cssText = 'position:fixed;top:58px;left:50%;transform:translateX(-50%);background:rgba(10,132,255,.12);border:0.5px solid rgba(10,132,255,.25);border-radius:100px;padding:6px 16px;font-size:11px;color:rgba(10,132,255,.9);z-index:100;animation:fadeUp .3s ease;pointer-events:none;';
-  banner.textContent = '📍 VV Me: context schimbat → ' + city;
+  banner.textContent = '📍 VV Lea: context schimbat → ' + city;
   document.body.appendChild(banner);
   setTimeout(function(){ banner.remove(); }, 3000);
 }
@@ -639,7 +639,7 @@ async function findMissions(q,layer){
   }catch(e){return[];}
 }
 
-// ── VV ME · WEB SEARCH (60% hibrid) ────────────────────────────
+// ── VV LEA · WEB SEARCH (60% hibrid) ────────────────────────────
 async function nexusWebSearch(q,layer){
   if(!_isOnline)return null;
 
@@ -738,7 +738,7 @@ async function doSearch(q){
   window.scrollTo({top:0,behavior:'smooth'});
 
   var res=document.getElementById('results');
-  res.innerHTML='<div style="padding:20px 0;font-size:12px;color:rgba(212,175,55,.4);text-align:center;letter-spacing:1px">VV Me scanează...</div>';
+  res.innerHTML='<div style="padding:20px 0;font-size:12px;color:rgba(212,175,55,.4);text-align:center;letter-spacing:1px">VV Lea scanează...</div>';
   res.classList.add('show');
   document.getElementById('load').classList.add('on');
 
@@ -761,7 +761,7 @@ async function doSearch(q){
   });
   if(isNonUrban){
     document.getElementById('load').classList.remove('on');
-    res.innerHTML='<div class="answer-card"><div class="card-src"><div class="src-dot dot-gold"></div>VV ME</div><div class="answer-text">VV NOW e construit pentru realitatea fizică din jurul tău — locații, cozi, accesibilitate, trafic. Pentru "<strong>'+q+'</strong>" încearcă un motor general.</div></div>';
+    res.innerHTML='<div class="answer-card"><div class="card-src"><div class="src-dot dot-gold"></div>VV LEA</div><div class="answer-text">VV NOW e construit pentru realitatea fizică din jurul tău — locații, cozi, accesibilitate, trafic. Pentru "<strong>'+q+'</strong>" încearcă un motor general.</div></div>';
     return;
   }
 
@@ -801,7 +801,7 @@ function renderResults(q,loc,missions,webAnswer,layer,staticData,vvPage){
   var layerBadge=layer?'<div class="layer-badge lb-'+layer+'">'+LAYERS[layer].label.toUpperCase()+'</div>':'';
 
   // ── 1. RASPUNS PRINCIPAL NEXUS ──
-  var srcLabel='VV ME'+(_lvl>=6?' SENSE · LVL '+_lvl:'');
+  var srcLabel='VV LEA'+(_lvl>=6?' SENSE · LVL '+_lvl:'');
   var mainText='';
   if(hasMissions){
     var name=loc?loc.display_name.split(',')[0]:'această zonă';
@@ -864,14 +864,14 @@ function renderResults(q,loc,missions,webAnswer,layer,staticData,vvPage){
   // ── 3. DATE WEB HIBRID (60%) ──
   if(webAnswer){
     html+='<div class="web-card">'+
-      '<div class="card-src"><div class="src-dot dot-web"></div>DATE PUBLICE · VV ME WEB</div>'+
+      '<div class="card-src"><div class="src-dot dot-web"></div>DATE PUBLICE · VV LEA WEB</div>'+
       '<div class="web-label">⚠ Nevalidat fizic</div>'+
       '<div class="web-text">'+webAnswer+'</div>'+
       '<div class="web-note">Sursă: internet public. Poate fi depășit. VERIFY = certitudine 100%.</div>'+
     '</div>';
   }
 
-  // ── 4. VERIFY — podul spre VV Beta ──
+  // ── 4. VERIFY — podul spre VV Pulse ──
   if(loc){
     var lat=parseFloat(loc.lat),lng=parseFloat(loc.lon);
     var inRo=lat>=RO.latMin&&lat<=RO.latMax&&lng>=RO.lngMin&&lng<=RO.lngMax;
@@ -992,7 +992,7 @@ async function doVerify(vid,locName,lat,lng,layer){
     var unsub=db.collection('missions').doc(ref.id).onSnapshot(function(doc){
       if(!doc.exists)return;
       if(doc.data().status==='approved'){
-        if(ft)ft.textContent='✅ Insider a confirmat! Dovada e în VV Beta.';
+        if(ft)ft.textContent='✅ Insider a confirmat! Dovada e în VV Pulse.';
         if(fs)fs.style.borderColor='rgba(52,199,89,.3)';
         showToast('✅ Confirmat!');
         unsub();
