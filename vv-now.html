@@ -694,11 +694,20 @@ async function findStaticData(q) {
       var kw = (d.keywords||'').toLowerCase();
       var name = (d.name||'').toLowerCase();
       var type = (d.type||'').toLowerCase();
-      if (kw.split(',').some(function(k){ return l.includes(k.trim()) && k.trim().length > 2; }) ||
-          name.split(' ').some(function(w){ return l.includes(w) && w.length > 3; }) ||
-          l.includes(type)) {
-        results.push(d);
-      }
+      var info = (d.info||'').toLowerCase();
+      var qWords = l.split(/[\s,;.!?]+/).filter(function(w){ return w.length > 2; });
+      
+      var match = false;
+      // Match pe keywords
+      if(kw.split(',').some(function(k){ return k.trim().length>1 && (l.includes(k.trim()) || qWords.some(function(w){ return k.trim().includes(w); })); })) match = true;
+      // Match pe nume
+      if(name.split(' ').some(function(w){ return w.length>2 && l.includes(w); })) match = true;
+      // Match pe tip
+      if(l.includes(type) || qWords.some(function(w){ return type.includes(w) && w.length>3; })) match = true;
+      // Match pe info
+      if(qWords.some(function(w){ return w.length>3 && info.includes(w); })) match = true;
+      
+      if(match) results.push(d);
     });
     return results.slice(0, 2);
   } catch(e) { return null; }
@@ -708,17 +717,33 @@ async function findVVNowPage(q) {
   if(!_isOnline) return null;
   try {
     var l = q.toLowerCase();
+    var qWords = l.split(/[\s,;.!?]+/).filter(function(w){ return w.length > 2; });
     var snap = await db.collection('vv_now_pages')
       .where('visible','==',true).get();
-    var match = null;
+    var bestMatch = null;
+    var bestScore = 0;
     snap.forEach(function(doc) {
       var d = doc.data();
-      var kw = (d.keywords||'').toLowerCase().split(',');
-      if (kw.some(function(k){ return l.includes(k.trim()) && k.trim().length > 2; })) {
-        match = d;
-      }
+      var kw = (d.keywords||'').toLowerCase().split(',').map(function(k){ return k.trim(); });
+      var title = (d.title||'').toLowerCase();
+      var city = (d.city||'').toLowerCase();
+      var score = 0;
+      
+      // Score bazat pe matching
+      kw.forEach(function(k) {
+        if(k.length < 2) return;
+        if(l.includes(k)) score += 3; // match exact in query
+        qWords.forEach(function(w){ if(k.includes(w)||w.includes(k)) score += 1; });
+      });
+      // Bonus daca titlul contine cuvinte din query
+      qWords.forEach(function(w){ if(title.includes(w)) score += 2; });
+      // Bonus oras
+      var userCity = (localStorage.getItem('vvme_current_city')||'').toLowerCase();
+      if(city && userCity && (city.includes(userCity)||userCity.includes(city))) score += 2;
+      
+      if(score > bestScore) { bestScore = score; bestMatch = d; }
     });
-    return match;
+    return bestScore >= 2 ? bestMatch : null;
   } catch(e) { return null; }
 }
 
@@ -793,6 +818,58 @@ async function doSearch(q){
 }
 
 // ── RENDER ────────────────────────────────────────────────────
+
+// ── FALLBACK RĂSPUNS ─────────────────────────────────────────
+function getFallbackAnswer(q, layer) {
+  var l = q.toLowerCase();
+  var city = localStorage.getItem('vvme_current_city') || localStorage.getItem('vvme_home_city') || 'orașul tău';
+  
+  // Răspunsuri contextuale bazate pe cuvinte cheie
+  if(l.includes('pizza') || l.includes('mâncare') || l.includes('restaurant') || l.includes('food')) {
+    return 'În ' + city + ' există mai multe locații cu pizza și mâncare. ' +
+      'Nu am date VV verificate fizic pentru acest moment. ' +
+      'Caută pe Google Maps sau apasă VERIFY să trimitem un Insider să verifice care e deschisă și cât durează livrarea.';
+  }
+  if(l.includes('cafea') || l.includes('cafenea') || l.includes('coffee')) {
+    return 'Cafenelele din ' + city + ' au programe variabile. ' +
+      'Nu am VV Proof recent pentru disponibilitate actuală. ' +
+      'Apasă VERIFY pentru confirmare fizică de la un Insider din zonă.';
+  }
+  if(l.includes('farmacie') || l.includes('medicament')) {
+    return 'Farmaciile de gardă sunt disponibile 24/7. ' +
+      'Sună la 021 9599 pentru Farmacia de Gardă București sau caută "farmacie nonstop" + orașul tău. ' +
+      'Verificăm datele VV pentru ' + city + ' dacă apeși VERIFY.';
+  }
+  if(l.includes('coadă') || l.includes('aglomerat') || l.includes('liber')) {
+    return 'Aglomerația variază în timp real — internetul nu știe asta. ' +
+      'Singura sursă de adevăr e un Insider care verifică fizic acum. ' +
+      'Apasă VERIFY și primești confirmarea în ~15-20 minute.';
+  }
+  if(l.includes('deschis') || l.includes('program') || l.includes('orar')) {
+    return 'Programele se pot schimba față de ce apare online. ' +
+      'Recomand să suni direct sau să apeși VERIFY pentru confirmare fizică de la un Insider local.';
+  }
+  if(l.includes('metrou') || l.includes('transport') || l.includes('autobuz')) {
+    return 'Transportul în comun din ' + city + ': verifică aplicația STB sau Moovit pentru trasee live. ' +
+      'VV Proof nu acoperă încă rețeaua de transport — dar o putem activa dacă apeși VERIFY.';
+  }
+  if(l.includes('hotel') || l.includes('cazare') || l.includes('airbnb')) {
+    return 'Pentru cazare în ' + city + ' încearcă Booking.com sau Airbnb pentru date live. ' +
+      'VV Lea nu are încă date verificate fizic pentru disponibilitate hoteluri. ' +
+      'Apasă VERIFY dacă vrei un raport de teren despre o zonă specifică.';
+  }
+  if(l.includes('spital') || l.includes('doctor') || l.includes('urgență') || l.includes('medic')) {
+    return 'URGENȚE: sună 112. ' +
+      'Spitalele cu urgențe din ' + city + ' sunt disponibile 24/7. ' +
+      'Verifică secțiunea Date Statice VV pentru adrese și telefoane confirmate de CEO.';
+  }
+  
+  // Generic fallback
+  return 'VV Lea caută date pentru "' + q + '" în ' + city + '. ' +
+    'Nu am VV Proof verificat fizic pentru asta momentan. ' +
+    'Apasă VERIFY și trimitem cel mai apropiat Insider să confirme situația reală din teren.';
+}
+
 function renderResults(q,loc,missions,webAnswer,layer,staticData,vvPage){
   var res=document.getElementById('results');
   var html='';
@@ -865,9 +942,18 @@ function renderResults(q,loc,missions,webAnswer,layer,staticData,vvPage){
   if(webAnswer){
     html+='<div class="web-card">'+
       '<div class="card-src"><div class="src-dot dot-web"></div>DATE PUBLICE · VV LEA WEB</div>'+
-      '<div class="web-label">⚠ Nevalidat fizic</div>'+
+      '<div class="web-label">⚠ Nevalidat fizic · Date publice internet</div>'+
       '<div class="web-text">'+webAnswer+'</div>'+
-      '<div class="web-note">Sursă: internet public. Poate fi depășit. VERIFY = certitudine 100%.</div>'+
+      '<div class="web-note">Sursă: internet public. Poate fi depășit. Apasă VERIFY pentru certitudine 100%.</div>'+
+    '</div>';
+  } else {
+    // Fallback inteligent — VV Lea încearcă oricum
+    var fallbackMsg = getFallbackAnswer(q, layer);
+    html+='<div class="web-card" style="border-color:rgba(255,255,255,.06)">'+
+      '<div class="card-src"><div class="src-dot dot-web"></div>VV LEA · RĂSPUNS GENERAL</div>'+
+      '<div class="web-label">⚠ Nevalidat fizic · Informație generală</div>'+
+      '<div class="web-text">'+fallbackMsg+'</div>'+
+      '<div class="web-note">VV Lea nu are date verificate din teren pentru asta încă. Apasă VERIFY și trimitem un Insider să confirme fizic.</div>'+
     '</div>';
   }
 
@@ -1048,11 +1134,42 @@ window.addEventListener('scroll',function(){
   else if(!document.getElementById('hero').classList.contains('compact'))document.getElementById('hdr').classList.remove('solid');
 });
 
+// ── GREETING CONTEXTUAL ──────────────────────────────────────
+function setContextualGreeting() {
+  var h = new Date().getHours();
+  var city = localStorage.getItem('vvme_home_city') || null;
+  var persona = localStorage.getItem('vv_persona') || null;
+  var citizenCode = localStorage.getItem('vv_citizen_code') || null;
+  
+  var period = h>=5&&h<12?'dimineața':h>=12&&h<17?'după-amiaza':h>=17&&h<21?'seara':'noaptea';
+  var greeting = h>=5&&h<12?'Bună dimineața':h>=12&&h<17?'Bună ziua':h>=17&&h<21?'Bună seara':'Noapte bună';
+  
+  var sub = document.getElementById('hero-contextual');
+  if (!sub) return;
+  
+  if (city && persona === 'insider') {
+    sub.innerHTML = greeting + '. <strong style="color:var(--w)">' + city + ', ' + period + '</strong> — ce misiune lansăm?';
+  } else if (city && persona === 'seeker') {
+    sub.innerHTML = greeting + '. <strong style="color:var(--w)">' + city + ', ' + period + '</strong> — ce vrei să știi?';
+  } else if (city) {
+    sub.innerHTML = greeting + '. Ești în <strong style="color:var(--w)">' + city + '</strong>. VV Lea e pregătită.';
+  } else {
+    sub.textContent = 'VV Lea știe orașul tău. Insiderii confirmă fizic.';
+  }
+  
+  // Update search placeholder
+  var inp = document.getElementById('search-input');
+  if (inp && city) {
+    inp.placeholder = 'Ce vrei să știi despre ' + city + (h>=20||h<5?' noaptea?':h>=17?' seara?':'?');
+  }
+}
+
 // ── INIT ──────────────────────────────────────────────────────
 openIDB().then(function(){
   getGPS();
   renderHist();
   if(_isOnline)loadPulse();
+  setContextualGreeting();
   // Prima vizita
   if(!localStorage.getItem('vvme_home_city') && !localStorage.getItem('vvme_welcomed')) {
     localStorage.setItem('vvme_welcomed','1');
