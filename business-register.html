@@ -165,7 +165,7 @@ html,body{min-height:100vh;background:#000;color:var(--w);
   <nav class="hdr-nav">
     <a href="https://vv-technologies.github.io/vv-nexus/vv-now.html" class="hdr-link">VV NOW</a>
     <a href="https://vv-technologies.github.io/vv-nexus/talent-register.html" class="hdr-link">Talent</a>
-    <a href="https://vv-technologies.github.io/ceo.html" class="hdr-link">VV Beta</a>
+    <a href="https://vv-technologies.github.io/ceo.html" class="hdr-link">VV Pulse</a>
   </nav>
 </header>
 
@@ -361,6 +361,7 @@ html,body{min-height:100vh;background:#000;color:var(--w);
 <!-- FIREBASE -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script>
 if (!firebase.apps.length) {
   firebase.initializeApp({
@@ -370,7 +371,11 @@ if (!firebase.apps.length) {
   });
 }
 var db = firebase.firestore();
+var auth = firebase.auth();
 var _nodeId = null;
+
+// Auth anonim pentru scrieri Firebase
+firebase.auth().signInAnonymously().catch(function(e){ console.log('Auth:', e); });
 
 // ── LOAD STATS ────────────────────────────────────────────────
 async function loadStats() {
@@ -508,6 +513,18 @@ function showToast(msg) {
 }
 
 loadStats();
+
+// Skip Charter dacă acordul e deja semnat
+if(localStorage.getItem('vv_accord_signed')) {
+  ['c1','c2','c3','c4'].forEach(function(id){
+    var el = document.getElementById(id);
+    if(el) el.classList.add('checked');
+  });
+  var cb = document.querySelector('.charter-box');
+  if(cb) cb.insertAdjacentHTML('beforebegin',
+    '<div style="padding:10px 14px;background:rgba(48,209,88,.06);border:0.5px solid rgba(48,209,88,.15);border-radius:10px;font-size:11px;color:rgba(48,209,88,.7);margin-bottom:12px">✓ Acord VV Charter semnat. Termenii se aplică automat — includem și verificarea spontană.</div>'
+  );
+}
 </script>
 </body>
 </html>
