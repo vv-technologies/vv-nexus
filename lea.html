@@ -4,1372 +4,582 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="theme-color" content="#000">
-<meta name="description" content="Lea — inteligența care știe orașul tău.">
 <title>Lea</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Geist+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;1,300;1,400&family=Geist+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 :root{
-  --gold:#C8A96E;
-  --gold2:rgba(200,169,110,.1);
-  --gold-b:rgba(200,169,110,.18);
-  --w:#F5F0E8;
-  --w70:rgba(245,240,232,.7);
-  --w50:rgba(245,240,232,.5);
-  --w30:rgba(245,240,232,.3);
-  --w15:rgba(245,240,232,.12);
-  --w08:rgba(245,240,232,.08);
-  --w04:rgba(245,240,232,.04);
+  --gold:#C8A96E;--gold2:rgba(200,169,110,.1);--gold-b:rgba(200,169,110,.2);
+  --w:#F5F0E8;--w70:rgba(245,240,232,.7);--w50:rgba(245,240,232,.5);
+  --w30:rgba(245,240,232,.3);--w15:rgba(245,240,232,.12);
+  --w08:rgba(245,240,232,.08);--w04:rgba(245,240,232,.04);
   --border:rgba(245,240,232,.08);
-  --green:#2DB87A;
-  --red:#FF453A;
-  --bg:#050503;
+  --green:#2DB87A;--blue:#2997FF;--bg:#050503;
   --serif:'Cormorant Garamond',Georgia,serif;
   --mono:'Geist Mono',monospace;
 }
-
-html,body{
-  height:100%;min-height:100vh;
-  background:var(--bg);color:var(--w);
-  font-family:var(--mono);
-  -webkit-font-smoothing:antialiased;
-  overflow:hidden;
-}
-
-/* GRAIN */
-body::before{
-  content:'';position:fixed;inset:0;z-index:0;
-  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
-  pointer-events:none;
-}
-
-/* AMBIENT */
-.ambient{
-  position:fixed;top:0;left:50%;transform:translateX(-50%);
-  width:500px;height:500px;
-  background:radial-gradient(ellipse,rgba(200,169,110,.05) 0%,transparent 65%);
-  pointer-events:none;z-index:0;
-  transition:opacity 1s ease;
-}
-.ambient.active{opacity:1;}
-.ambient.thinking{
-  animation:ambientPulse 1.5s ease-in-out infinite;
-}
-.ambient.listening{
-  background:radial-gradient(ellipse,rgba(45,184,122,.08) 0%,transparent 65%);
-  animation:ambientPulse .8s ease-in-out infinite;
-}
-@keyframes ambientPulse{
-  0%,100%{transform:translateX(-50%) scale(1);opacity:.6;}
-  50%{transform:translateX(-50%) scale(1.15);opacity:1;}
-}
-
-/* SETUP SCREEN */
-#setup{
-  position:fixed;inset:0;z-index:200;
-  background:var(--bg);
-  display:flex;align-items:center;justify-content:center;
-  padding:40px 24px;
-}
-#setup.hidden{display:none;}
-.setup-box{max-width:400px;width:100%;}
-.setup-logo{
-  font-family:var(--serif);font-size:52px;font-weight:300;
-  font-style:italic;letter-spacing:4px;color:var(--gold);
-  text-align:center;margin-bottom:8px;
-}
-.setup-sub{font-size:10px;letter-spacing:4px;color:var(--w30);
-  text-transform:uppercase;text-align:center;margin-bottom:40px;}
-.setup-field{margin-bottom:16px;}
-.setup-label{font-size:9px;letter-spacing:3px;color:var(--w30);
-  text-transform:uppercase;display:block;margin-bottom:8px;}
-.setup-input{
-  width:100%;background:var(--w04);border:0.5px solid var(--border);
-  border-radius:10px;padding:12px 14px;color:var(--w);
-  font-family:var(--mono);font-size:13px;outline:none;
-  transition:border-color .2s;-webkit-appearance:none;
-}
-.setup-input:focus{border-color:rgba(200,169,110,.3);}
-.setup-input::placeholder{color:var(--w30);}
-.setup-hint{font-size:11px;color:var(--w30);margin-top:6px;line-height:1.6;}
-.setup-btn{
-  width:100%;padding:14px;background:var(--gold);color:#000;
-  border:none;border-radius:10px;font-family:var(--mono);
-  font-size:13px;font-weight:500;cursor:pointer;
-  transition:opacity .15s;margin-top:8px;letter-spacing:.5px;
-}
-.setup-btn:hover{opacity:.88;}
-.setup-skip{
-  width:100%;padding:10px;background:none;
-  border:0.5px solid var(--border);border-radius:10px;
-  font-family:var(--mono);font-size:12px;color:var(--w30);
-  cursor:pointer;margin-top:8px;transition:all .2s;
-}
-.setup-skip:hover{border-color:var(--w30);color:var(--w50);}
-
-/* PREMIUM BADGE */
-.premium-badge{
-  display:inline-flex;align-items:center;gap:6px;
-  padding:3px 10px;border-radius:100px;
-  font-size:10px;font-weight:600;letter-spacing:1px;
-  text-transform:uppercase;
-}
-.pb-standard{background:var(--w04);border:0.5px solid var(--border);color:var(--w30);}
-.pb-premium{background:var(--gold2);border:0.5px solid var(--gold-b);color:var(--gold);}
-.pb-founder{background:rgba(191,90,242,.1);border:0.5px solid rgba(191,90,242,.2);color:#BF5AF2;}
-
-/* MAIN APP */
-#app{
-  position:fixed;inset:0;z-index:1;
-  display:flex;flex-direction:column;
-  padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom) 0;
-}
-
-/* TOP BAR */
-.topbar{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:16px 24px;flex-shrink:0;
-}
-.tb-logo{
-  font-family:var(--serif);font-size:22px;font-weight:300;
-  font-style:italic;color:var(--gold);letter-spacing:2px;
-}
-.tb-right{display:flex;align-items:center;gap:12px;}
-.tb-status{
-  display:flex;align-items:center;gap:5px;
-  font-size:10px;color:var(--w30);letter-spacing:.5px;
-}
-.tb-dot{width:5px;height:5px;border-radius:50%;background:var(--green);
-  box-shadow:0 0 6px rgba(45,184,122,.6);
-  animation:blink 2s ease-in-out infinite;}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
-.tb-settings{
-  width:30px;height:30px;background:none;border:0.5px solid var(--border);
-  border-radius:50%;color:var(--w30);cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
-  font-size:13px;transition:all .2s;
-}
-.tb-settings:hover{border-color:var(--w30);color:var(--w50);}
-
-/* CONVERSATION */
-.conversation{
-  flex:1;overflow-y:auto;
-  padding:20px 24px;
-  display:flex;flex-direction:column;gap:16px;
-  scrollbar-width:none;
-}
-.conversation::-webkit-scrollbar{display:none;}
-
-/* IDLE STATE */
-.idle{
-  flex:1;display:flex;flex-direction:column;
+html,body{height:100%;min-height:100vh;background:var(--bg);color:var(--w);
+  font-family:var(--mono);-webkit-font-smoothing:antialiased;overflow:hidden;}
+body::before{content:'';position:fixed;inset:0;z-index:0;opacity:.4;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events:none;}
+.ambient{position:fixed;top:50%;left:50%;transform:translate(-50%,-60%);
+  width:600px;height:600px;border-radius:50%;pointer-events:none;z-index:0;
+  background:radial-gradient(circle,rgba(200,169,110,.05) 0%,transparent 65%);
+  transition:background 1s ease;}
+.ambient.thinking{background:radial-gradient(circle,rgba(200,169,110,.08) 0%,transparent 65%);
+  animation:ap 1.5s ease-in-out infinite;}
+.ambient.listening{background:radial-gradient(circle,rgba(45,184,122,.08) 0%,transparent 65%);}
+.ambient.aer{background:radial-gradient(circle,rgba(41,151,255,.1) 0%,transparent 65%);
+  animation:ap 2s ease-in-out infinite;}
+@keyframes ap{0%,100%{transform:translate(-50%,-60%) scale(1)}50%{transform:translate(-50%,-60%) scale(1.1)}}
+.screen{position:fixed;inset:0;z-index:50;display:none;flex-direction:column;
   align-items:center;justify-content:center;
-  text-align:center;padding:40px 24px;
-  gap:8px;
-}
+  padding:max(env(safe-area-inset-top),20px) 24px max(env(safe-area-inset-bottom),20px);
+  background:var(--bg);}
+.screen.show{display:flex;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+/* ACCORD */
+.a-logo{font-family:var(--serif);font-size:64px;font-style:italic;color:var(--gold);
+  letter-spacing:4px;margin-bottom:6px;animation:fadeUp .8s ease both;}
+.a-sub{font-size:10px;letter-spacing:4px;color:var(--w30);text-transform:uppercase;
+  margin-bottom:40px;animation:fadeUp .8s .1s ease both;}
+.a-desc{font-size:13px;color:var(--w30);line-height:1.8;text-align:center;
+  max-width:340px;margin-bottom:28px;animation:fadeUp .8s .2s ease both;}
+.checks{display:flex;flex-direction:column;gap:10px;width:100%;max-width:360px;
+  margin-bottom:28px;animation:fadeUp .8s .3s ease both;}
+.ci{display:flex;align-items:flex-start;gap:12px;cursor:pointer;padding:13px 15px;
+  background:var(--w04);border:0.5px solid var(--border);border-radius:12px;transition:all .2s;}
+.ci.on{background:var(--gold2);border-color:var(--gold-b);}
+.cb{width:20px;height:20px;border-radius:6px;flex-shrink:0;border:0.5px solid var(--border);
+  background:var(--w04);display:flex;align-items:center;justify-content:center;
+  transition:all .2s;margin-top:1px;}
+.ci.on .cb{background:var(--gold);border-color:var(--gold);}
+.cm{font-size:10px;color:#000;font-weight:700;opacity:0;transition:opacity .15s;}
+.ci.on .cm{opacity:1;}
+.ct{font-size:12px;color:var(--w50);line-height:1.6;}
+.ct b{color:var(--w70);font-weight:500;}
+.a-btn{width:100%;max-width:360px;padding:14px;background:var(--gold);color:#000;
+  border:none;border-radius:12px;font-family:var(--mono);font-size:13px;font-weight:500;
+  cursor:pointer;opacity:.35;pointer-events:none;transition:opacity .2s;letter-spacing:.5px;
+  animation:fadeUp .8s .4s ease both;}
+.a-btn.ready{opacity:1;pointer-events:all;}
+.a-privacy{font-size:10px;color:var(--w15);text-align:center;margin-top:10px;line-height:1.7;
+  max-width:320px;animation:fadeUp .8s .5s ease both;}
+/* RECOGNITION */
+.rec-orb{width:140px;height:140px;border-radius:50%;
+  background:radial-gradient(circle,rgba(200,169,110,.15) 0%,transparent 70%);
+  border:0.5px solid rgba(200,169,110,.2);
+  display:flex;align-items:center;justify-content:center;margin-bottom:28px;
+  animation:orbP 1.5s ease-in-out infinite;}
+@keyframes orbP{0%,100%{box-shadow:0 0 0 0 rgba(200,169,110,.15)}50%{box-shadow:0 0 0 24px rgba(200,169,110,.0)}}
+.rec-l{font-family:var(--serif);font-size:52px;font-style:italic;color:var(--gold);}
+.rec-s{font-size:11px;letter-spacing:3px;color:var(--w30);text-transform:uppercase;margin-bottom:8px;transition:all .3s;}
+.rec-n{font-family:var(--serif);font-size:26px;font-style:italic;color:var(--w70);min-height:34px;transition:all .3s;}
+/* AER */
+.aer-title{font-family:var(--serif);font-size:clamp(28px,6vw,48px);font-weight:300;
+  font-style:italic;color:var(--w70);margin-bottom:8px;text-align:center;}
+.aer-title em{font-style:normal;color:var(--gold);}
+.aer-sub{font-size:12px;color:var(--w30);text-align:center;line-height:1.7;
+  margin-bottom:36px;max-width:300px;}
+.aer-orb{width:160px;height:160px;border-radius:50%;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;margin-bottom:32px;
+  background:radial-gradient(circle,rgba(41,151,255,.12) 0%,transparent 70%);
+  border:0.5px solid rgba(41,151,255,.2);transition:all .3s;flex-direction:column;gap:8px;}
+.aer-orb:hover{background:radial-gradient(circle,rgba(41,151,255,.2) 0%,transparent 70%);}
+.aer-orb.active{animation:aerA 1.2s ease-in-out infinite;}
+@keyframes aerA{0%,100%{box-shadow:0 0 0 0 rgba(41,151,255,.2)}50%{box-shadow:0 0 0 24px rgba(41,151,255,.0)}}
+.aer-icon{font-size:32px;}
+.aer-lbl{font-size:10px;letter-spacing:2px;color:rgba(41,151,255,.8);text-transform:uppercase;}
+.aer-st{font-size:12px;color:var(--w30);text-align:center;min-height:20px;margin-bottom:24px;transition:all .3s;}
+.aer-st.found{color:var(--green);}
+.aer-st.searching{color:var(--blue);}
+.aer-acts{display:flex;gap:10px;}
+.aer-send{padding:10px 18px;background:var(--blue);color:#fff;border:none;
+  border-radius:100px;font-family:var(--mono);font-size:11px;cursor:pointer;letter-spacing:.5px;}
+.aer-recv{padding:10px 18px;background:var(--w04);border:0.5px solid var(--border);
+  color:var(--w50);border-radius:100px;font-family:var(--mono);font-size:11px;cursor:pointer;}
+.aer-skip{background:none;border:none;color:var(--w30);font-family:var(--mono);
+  font-size:11px;cursor:pointer;margin-top:14px;}
+/* ONBOARDING */
+.ob-wrap{max-width:380px;width:100%;text-align:center;}
+.ob-slides{position:relative;height:260px;}
+.ob-slide{position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  opacity:0;transform:translateX(20px);transition:all .4s ease;pointer-events:none;}
+.ob-slide.active{opacity:1;transform:translateX(0);pointer-events:all;}
+.ob-slide.prev{opacity:0;transform:translateX(-20px);}
+.ob-icon{font-size:48px;margin-bottom:20px;}
+.ob-title{font-family:var(--serif);font-size:clamp(30px,7vw,48px);font-weight:300;
+  font-style:italic;color:var(--gold);margin-bottom:10px;}
+.ob-desc{font-size:13px;color:var(--w30);line-height:1.8;max-width:260px;margin:0 auto;}
+.ob-dots{display:flex;gap:8px;justify-content:center;margin:24px 0 20px;}
+.ob-dot{width:4px;height:4px;border-radius:50%;background:var(--w15);transition:all .3s;}
+.ob-dot.on{background:var(--gold);width:20px;border-radius:2px;}
+.ob-next{padding:12px 32px;background:var(--gold);color:#000;border:none;
+  border-radius:100px;font-family:var(--mono);font-size:12px;font-weight:500;cursor:pointer;}
+.ob-skip{background:none;border:none;color:var(--w30);font-family:var(--mono);
+  font-size:11px;cursor:pointer;margin-top:10px;display:block;margin-left:auto;margin-right:auto;}
+/* APP */
+#app{position:fixed;inset:0;z-index:1;display:flex;flex-direction:column;
+  padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0);}
+.topbar{display:flex;align-items:center;justify-content:space-between;
+  padding:13px 18px;flex-shrink:0;position:relative;z-index:2;}
+.tb-logo{font-family:var(--serif);font-size:20px;font-style:italic;color:var(--gold);letter-spacing:2px;}
+.tb-center{position:absolute;left:50%;transform:translateX(-50%);
+  display:flex;align-items:center;gap:5px;}
+.tb-dot{width:4px;height:4px;border-radius:50%;background:var(--green);
+  box-shadow:0 0 5px rgba(45,184,122,.6);animation:blink 2s ease-in-out infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+.tb-city{font-size:11px;color:var(--w30);letter-spacing:.5px;}
+.tb-right{display:flex;gap:7px;}
+.tb-btn{width:28px;height:28px;background:none;border:0.5px solid var(--border);
+  border-radius:50%;color:var(--w30);cursor:pointer;display:flex;
+  align-items:center;justify-content:center;font-size:12px;transition:all .2s;}
+.tb-btn:hover{border-color:var(--w30);color:var(--w50);}
+.conv{flex:1;overflow-y:auto;padding:14px 18px;display:flex;flex-direction:column;
+  gap:12px;scrollbar-width:none;position:relative;z-index:1;}
+.conv::-webkit-scrollbar{display:none;}
+.idle{flex:1;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;text-align:center;padding:40px 20px;}
 .idle.hidden{display:none;}
-.idle-logo{
-  font-family:var(--serif);font-size:72px;font-weight:300;
-  font-style:italic;color:rgba(200,169,110,.3);
-  line-height:1;margin-bottom:16px;
-  animation:idlePulse 4s ease-in-out infinite;
-}
-@keyframes idlePulse{0%,100%{opacity:.3}50%{opacity:.6}}
-.idle-text{font-size:14px;color:var(--w30);line-height:1.7;}
-.idle-sub{font-size:11px;color:var(--w15);margin-top:4px;}
-.idle-time{font-size:11px;color:var(--w30);margin-top:16px;letter-spacing:1px;}
-
-/* MESSAGES */
-.msg{
-  display:flex;flex-direction:column;
-  animation:msgIn .3s cubic-bezier(.16,1,.3,1) both;
-  max-width:85%;
-}
+.idle-logo{font-family:var(--serif);font-size:72px;font-style:italic;
+  color:rgba(200,169,110,.22);line-height:1;margin-bottom:18px;
+  animation:idleF 4s ease-in-out infinite;}
+@keyframes idleF{0%,100%{transform:translateY(0);opacity:.22}50%{transform:translateY(-8px);opacity:.38}}
+.idle-text{font-size:14px;color:var(--w30);line-height:1.8;}
+.idle-time{font-size:11px;color:var(--w15);margin-top:10px;letter-spacing:1px;}
+.msg{display:flex;flex-direction:column;max-width:88%;
+  animation:msgIn .3s cubic-bezier(.16,1,.3,1) both;}
 .msg.user{align-self:flex-end;align-items:flex-end;}
 .msg.lea{align-self:flex-start;align-items:flex-start;}
 @keyframes msgIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-
-.msg-bubble{
-  padding:11px 16px;border-radius:16px;
-  font-size:14px;line-height:1.65;
-}
-.msg.user .msg-bubble{
-  background:rgba(200,169,110,.12);
-  border:0.5px solid rgba(200,169,110,.2);
-  color:var(--w70);border-bottom-right-radius:4px;
-}
-.msg.lea .msg-bubble{
-  background:var(--w04);border:0.5px solid var(--border);
-  color:var(--w70);border-bottom-left-radius:4px;
-}
-.msg.lea .msg-bubble.thinking{
-  display:flex;gap:4px;align-items:center;padding:14px 18px;
-}
-.think-dot{
-  width:5px;height:5px;border-radius:50%;
-  background:var(--w30);
-  animation:thinkDot 1.2s ease-in-out infinite;
-}
-.think-dot:nth-child(2){animation-delay:.2s;}
-.think-dot:nth-child(3){animation-delay:.4s;}
-@keyframes thinkDot{0%,80%,100%{opacity:.3;transform:scale(.8)}40%{opacity:1;transform:scale(1)}}
-
-.msg-meta{
-  font-size:10px;color:var(--w15);margin-top:4px;
-  display:flex;align-items:center;gap:6px;
-}
-.msg-play{
-  background:none;border:none;color:var(--w30);cursor:pointer;
-  font-size:12px;padding:0;transition:color .2s;
-}
-.msg-play:hover{color:var(--gold);}
-
-/* VOICE VISUALIZER */
-.voice-vis{
-  display:none;align-items:center;justify-content:center;
-  gap:3px;padding:20px;
-}
-.voice-vis.active{display:flex;}
-.vv-bar{
-  width:3px;border-radius:2px;
-  background:var(--green);
-  animation:voiceBar .6s ease-in-out infinite alternate;
-  min-height:4px;
-}
-.vv-bar:nth-child(1){height:8px;animation-delay:0s;}
-.vv-bar:nth-child(2){height:16px;animation-delay:.1s;}
-.vv-bar:nth-child(3){height:24px;animation-delay:.2s;}
-.vv-bar:nth-child(4){height:16px;animation-delay:.3s;}
-.vv-bar:nth-child(5){height:8px;animation-delay:.4s;}
-.vv-bar:nth-child(6){height:20px;animation-delay:.15s;}
-.vv-bar:nth-child(7){height:12px;animation-delay:.25s;}
-@keyframes voiceBar{from{transform:scaleY(.5)}to{transform:scaleY(1.5)}}
-
-/* INPUT AREA */
-.input-area{
-  padding:12px 16px;padding-bottom:max(16px,env(safe-area-inset-bottom));
-  border-top:0.5px solid var(--border);
-  background:rgba(5,5,3,.92);
-  backdrop-filter:blur(20px);
-  flex-shrink:0;
-}
-.input-row{
-  display:flex;align-items:flex-end;gap:8px;
-  max-width:680px;margin:0 auto;
-}
-.input-box{
-  flex:1;background:var(--w04);border:0.5px solid var(--border);
-  border-radius:20px;padding:10px 16px;
-  color:var(--w);font-family:var(--mono);font-size:14px;
-  outline:none;resize:none;max-height:120px;min-height:42px;
-  line-height:1.5;transition:border-color .2s;
-  scrollbar-width:none;
-}
-.input-box:focus{border-color:rgba(200,169,110,.25);}
-.input-box::placeholder{color:var(--w30);}
-.input-box::-webkit-scrollbar{display:none;}
-
-.mic-btn{
-  width:42px;height:42px;border-radius:50%;
-  background:var(--w04);border:0.5px solid var(--border);
-  color:var(--w50);cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
-  font-size:16px;transition:all .2s;flex-shrink:0;
-}
-.mic-btn:hover{border-color:rgba(45,184,122,.3);color:var(--green);}
-.mic-btn.recording{
-  background:rgba(45,184,122,.12);
-  border-color:rgba(45,184,122,.4);
-  color:var(--green);
-  animation:micPulse .8s ease-in-out infinite;
-}
-@keyframes micPulse{0%,100%{box-shadow:0 0 0 0 rgba(45,184,122,.3)}50%{box-shadow:0 0 0 6px rgba(45,184,122,.0)}}
-
-.send-btn{
-  width:42px;height:42px;border-radius:50%;
-  background:var(--gold);border:none;
-  color:#000;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
-  font-size:14px;transition:opacity .15s;flex-shrink:0;
-}
-.send-btn:hover{opacity:.85;}
-.send-btn:disabled{opacity:.3;cursor:not-allowed;}
-
-/* SUGGESTIONS */
-.suggestions{
-  display:flex;gap:8px;overflow-x:auto;
-  padding:8px 0 12px;scrollbar-width:none;
-  max-width:680px;margin:0 auto;
-}
-.suggestions::-webkit-scrollbar{display:none;}
-.sug{
-  flex-shrink:0;padding:6px 14px;
-  background:var(--w04);border:0.5px solid var(--border);
-  border-radius:100px;font-size:11px;color:var(--w30);
-  cursor:pointer;transition:all .2s;white-space:nowrap;
-}
-.sug:hover{border-color:rgba(200,169,110,.2);color:var(--w50);}
-
-/* SETTINGS PANEL */
-#settings{
-  position:fixed;inset:0;z-index:150;
-  background:rgba(0,0,0,.8);
-  display:none;align-items:flex-end;justify-content:center;
-  padding:0;
-}
-#settings.show{display:flex;}
-.settings-sheet{
-  background:#0a0a08;border:0.5px solid var(--border);
-  border-radius:24px 24px 0 0;
-  padding:20px 24px max(24px,env(safe-area-inset-bottom));
-  width:100%;max-width:480px;
-  animation:slideUp .3s cubic-bezier(.16,1,.3,1);
-}
-@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
-.ss-handle{width:36px;height:4px;background:var(--border);
-  border-radius:2px;margin:0 auto 20px;}
-.ss-title{font-size:14px;font-weight:500;margin-bottom:20px;color:var(--w70);}
-.ss-field{margin-bottom:16px;}
-.ss-label{font-size:9px;letter-spacing:3px;color:var(--w30);
-  text-transform:uppercase;display:block;margin-bottom:6px;}
-.ss-input{
-  width:100%;background:var(--w04);border:0.5px solid var(--border);
-  border-radius:10px;padding:10px 14px;color:var(--w);
-  font-family:var(--mono);font-size:12px;outline:none;
-  -webkit-appearance:none;
-}
-.ss-input:focus{border-color:rgba(200,169,110,.3);}
-.ss-input::placeholder{color:var(--w30);}
-.ss-btn{
-  width:100%;padding:12px;background:var(--gold);color:#000;
-  border:none;border-radius:10px;font-family:var(--mono);
-  font-size:12px;font-weight:500;cursor:pointer;margin-top:4px;
-}
-.ss-close{
-  width:100%;padding:10px;background:none;
-  border:0.5px solid var(--border);border-radius:10px;
-  font-family:var(--mono);font-size:12px;color:var(--w30);cursor:pointer;
-  margin-top:8px;
-}
-
-/* TOAST */
-#toast{
-  position:fixed;bottom:calc(80px + env(safe-area-inset-bottom));
-  left:50%;transform:translateX(-50%) translateY(6px);
-  background:rgba(5,5,3,.97);border:0.5px solid var(--w08);
-  border-radius:100px;padding:8px 18px;
-  font-size:11px;color:var(--w50);
-  opacity:0;transition:all .25s;pointer-events:none;z-index:999;
-  white-space:nowrap;
-}
+.msg-b{padding:11px 15px;border-radius:16px;font-size:14px;line-height:1.65;}
+.msg.user .msg-b{background:var(--gold2);border:0.5px solid var(--gold-b);
+  color:var(--w70);border-bottom-right-radius:4px;}
+.msg.lea .msg-b{background:var(--w04);border:0.5px solid var(--border);
+  color:var(--w70);border-bottom-left-radius:4px;}
+.msg.lea .msg-b.tk{display:flex;gap:4px;align-items:center;padding:14px 15px;}
+.td{width:5px;height:5px;border-radius:50%;background:var(--w30);
+  animation:td 1.2s ease-in-out infinite;}
+.td:nth-child(2){animation-delay:.2s;}
+.td:nth-child(3){animation-delay:.4s;}
+@keyframes td{0%,80%,100%{opacity:.3;transform:scale(.8)}40%{opacity:1;transform:scale(1)}}
+.msg-meta{font-size:10px;color:var(--w15);margin-top:4px;display:flex;gap:6px;align-items:center;}
+.play-btn{background:none;border:none;color:var(--w30);cursor:pointer;font-size:11px;transition:color .2s;}
+.play-btn:hover{color:var(--gold);}
+.id-card{background:linear-gradient(135deg,rgba(200,169,110,.1),rgba(200,169,110,.04));
+  border:0.5px solid rgba(200,169,110,.22);border-radius:16px;padding:18px;
+  position:relative;overflow:hidden;width:100%;max-width:270px;}
+.id-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(200,169,110,.4),transparent);}
+.id-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;}
+.id-logo{font-family:var(--serif);font-size:14px;font-style:italic;color:rgba(200,169,110,.5);}
+.id-rank{font-size:9px;font-weight:600;letter-spacing:2px;color:var(--gold);text-transform:uppercase;}
+.id-code{font-family:var(--mono);font-size:13px;color:var(--w);letter-spacing:3px;margin-bottom:4px;}
+.id-name{font-size:11px;color:var(--w30);margin-bottom:10px;}
+.id-bottom{display:flex;justify-content:space-between;align-items:center;
+  padding-top:10px;border-top:0.5px solid rgba(200,169,110,.1);}
+.id-city{font-size:10px;color:var(--w30);}
+.id-xp{font-size:10px;color:var(--gold);}
+.vv{display:none;align-items:center;justify-content:center;gap:3px;padding:14px;}
+.vv.on{display:flex;}
+.vb{width:3px;border-radius:2px;background:var(--green);
+  animation:vb .6s ease-in-out infinite alternate;min-height:4px;}
+.vb:nth-child(1){height:8px;}.vb:nth-child(2){height:16px;animation-delay:.1s;}
+.vb:nth-child(3){height:24px;animation-delay:.2s;}.vb:nth-child(4){height:16px;animation-delay:.3s;}
+.vb:nth-child(5){height:8px;animation-delay:.4s;}.vb:nth-child(6){height:20px;animation-delay:.15s;}
+.vb:nth-child(7){height:12px;animation-delay:.25s;}
+@keyframes vb{from{transform:scaleY(.5)}to{transform:scaleY(1.5)}}
+.input-area{padding:9px 14px;padding-bottom:max(13px,env(safe-area-inset-bottom));
+  border-top:0.5px solid var(--border);background:rgba(5,5,3,.94);
+  backdrop-filter:blur(20px);flex-shrink:0;position:relative;z-index:2;}
+.sugs{display:flex;gap:7px;overflow-x:auto;padding:5px 0 9px;
+  scrollbar-width:none;max-width:680px;margin:0 auto;}
+.sugs::-webkit-scrollbar{display:none;}
+.sug{flex-shrink:0;padding:5px 12px;background:var(--w04);border:0.5px solid var(--border);
+  border-radius:100px;font-size:11px;color:var(--w30);cursor:pointer;
+  transition:all .2s;white-space:nowrap;}
+.sug:hover{border-color:var(--gold-b);color:var(--w50);}
+.irow{display:flex;align-items:flex-end;gap:7px;max-width:680px;margin:0 auto;}
+.ibox{flex:1;background:var(--w04);border:0.5px solid var(--border);
+  border-radius:20px;padding:10px 15px;color:var(--w);font-family:var(--mono);
+  font-size:14px;outline:none;resize:none;max-height:120px;min-height:40px;
+  line-height:1.5;transition:border-color .2s;scrollbar-width:none;}
+.ibox:focus{border-color:rgba(200,169,110,.25);}
+.ibox::placeholder{color:var(--w30);}
+.ibox::-webkit-scrollbar{display:none;}
+.mic{width:40px;height:40px;border-radius:50%;background:var(--w04);
+  border:0.5px solid var(--border);color:var(--w50);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;font-size:15px;
+  transition:all .2s;flex-shrink:0;}
+.mic.on{background:rgba(45,184,122,.12);border-color:rgba(45,184,122,.4);
+  color:var(--green);animation:mp .8s ease-in-out infinite;}
+@keyframes mp{0%,100%{box-shadow:0 0 0 0 rgba(45,184,122,.3)}50%{box-shadow:0 0 0 6px rgba(45,184,122,.0)}}
+.send{width:40px;height:40px;border-radius:50%;background:var(--gold);border:none;
+  color:#000;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  font-size:14px;transition:opacity .15s;flex-shrink:0;}
+.send:disabled{opacity:.3;cursor:not-allowed;}
+#sett{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.75);
+  display:none;align-items:flex-end;justify-content:center;}
+#sett.show{display:flex;}
+.ss{background:#080806;border:0.5px solid var(--border);border-radius:24px 24px 0 0;
+  padding:18px 22px;padding-bottom:max(22px,env(safe-area-inset-bottom));
+  width:100%;max-width:480px;animation:su .3s cubic-bezier(.16,1,.3,1);}
+@keyframes su{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.ss-h{width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 18px;}
+.ss-t{font-size:14px;font-weight:500;margin-bottom:14px;color:var(--w70);}
+.ss-row{display:flex;align-items:center;justify-content:space-between;
+  padding:11px 0;border-bottom:0.5px solid var(--border);}
+.ss-row:last-of-type{border-bottom:none;}
+.ss-l{font-size:12px;color:var(--w50);}
+.ss-v{font-size:11px;color:var(--w30);font-family:var(--mono);}
+.ss-b{padding:7px 14px;background:var(--w04);border:0.5px solid var(--border);
+  border-radius:8px;color:var(--w50);font-family:var(--mono);font-size:11px;cursor:pointer;}
+.ss-close{width:100%;padding:11px;background:none;border:0.5px solid var(--border);
+  border-radius:10px;color:var(--w30);font-family:var(--mono);font-size:12px;cursor:pointer;margin-top:14px;}
+.ss-aer{width:100%;padding:11px;background:rgba(41,151,255,.08);
+  border:0.5px solid rgba(41,151,255,.2);border-radius:10px;
+  color:var(--blue);font-family:var(--mono);font-size:12px;cursor:pointer;margin-top:7px;}
+.ss-out{width:100%;padding:9px;background:none;border:none;
+  color:rgba(255,69,58,.4);font-family:var(--mono);font-size:11px;cursor:pointer;margin-top:3px;}
+#toast{position:fixed;bottom:calc(68px + env(safe-area-inset-bottom));left:50%;
+  transform:translateX(-50%) translateY(6px);background:rgba(5,5,3,.97);
+  border:0.5px solid var(--w08);border-radius:100px;padding:8px 18px;
+  font-size:11px;color:var(--w50);opacity:0;transition:all .25s;
+  pointer-events:none;z-index:999;white-space:nowrap;}
 #toast.on{opacity:1;transform:translateX(-50%) translateY(0);}
-
-@media(min-width:680px){
-  .input-area{padding:16px 24px 20px;}
-  .msg{max-width:600px;}
-  .conversation{align-items:center;}
-  .msg.user{align-self:center;width:100%;max-width:600px;align-items:flex-end;}
-  .msg.lea{align-self:center;width:100%;max-width:600px;align-items:flex-start;}
+@media(min-width:640px){
+  .msg{max-width:560px;}
+  .conv{align-items:center;}
+  .msg.user,.msg.lea{width:100%;max-width:560px;}
+  .msg.user{align-items:flex-end;}
+  .msg.lea{align-items:flex-start;}
 }
-
-/* IDENTITY CARD */
-.id-card{
-  background:linear-gradient(135deg,rgba(200,169,110,.12),rgba(200,169,110,.04));
-  border:0.5px solid rgba(200,169,110,.25);
-  border-radius:20px;padding:24px;
-  position:relative;overflow:hidden;
-  margin-bottom:20px;
-}
-.id-card::before{
-  content:'';position:absolute;top:0;left:0;right:0;height:1px;
-  background:linear-gradient(90deg,transparent,rgba(200,169,110,.5),transparent);
-}
-.id-card-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;}
-.id-card-logo{font-family:var(--serif);font-size:20px;font-style:italic;color:rgba(200,169,110,.5);letter-spacing:2px;}
-.id-card-rank{font-size:10px;font-weight:600;letter-spacing:2px;color:var(--gold);text-transform:uppercase;}
-.id-card-code{font-family:var(--mono);font-size:18px;color:var(--w);letter-spacing:4px;margin-bottom:6px;}
-.id-card-name{font-size:12px;color:var(--w50);}
-.id-card-bottom{display:flex;align-items:center;justify-content:space-between;margin-top:16px;padding-top:14px;border-top:0.5px solid rgba(200,169,110,.12);}
-.id-card-city{font-size:10px;color:var(--w30);letter-spacing:1px;}
-.id-card-xp{font-size:10px;color:var(--gold);letter-spacing:1px;}
-
-/* RECOGNITION SCREEN */
-#recognition{
-  position:fixed;inset:0;z-index:180;
-  background:var(--bg);
-  display:none;flex-direction:column;
-  align-items:center;justify-content:center;
-  text-align:center;padding:40px;
-}
-#recognition.show{display:flex;}
-.rec-glow{
-  width:120px;height:120px;border-radius:50%;
-  background:radial-gradient(circle,rgba(200,169,110,.2) 0%,transparent 70%);
-  display:flex;align-items:center;justify-content:center;
-  margin-bottom:32px;
-  animation:recGlow 1.5s ease-in-out infinite;
-}
-@keyframes recGlow{
-  0%,100%{box-shadow:0 0 0 0 rgba(200,169,110,.2);}
-  50%{box-shadow:0 0 0 20px rgba(200,169,110,.0);}
-}
-.rec-logo{font-family:var(--serif);font-size:48px;font-style:italic;color:var(--gold);}
-.rec-status{font-size:11px;letter-spacing:3px;color:var(--w30);text-transform:uppercase;margin-bottom:8px;}
-.rec-name{font-family:var(--serif);font-size:24px;font-style:italic;color:var(--w70);}
-
-/* ONBOARDING */
-#onboarding{
-  position:fixed;inset:0;z-index:170;
-  background:var(--bg);
-  display:none;flex-direction:column;
-  align-items:center;justify-content:center;
-  padding:48px 32px;
-}
-#onboarding.show{display:flex;}
-.ob-slide{display:none;flex-direction:column;align-items:center;text-align:center;}
-.ob-slide.active{display:flex;}
-.ob-icon{font-size:48px;margin-bottom:24px;}
-.ob-title{font-family:var(--serif);font-size:clamp(28px,6vw,48px);font-weight:300;font-style:italic;color:var(--gold);margin-bottom:12px;line-height:1.1;}
-.ob-desc{font-size:14px;color:var(--w30);line-height:1.8;max-width:320px;}
-.ob-dots{display:flex;gap:8px;margin-top:40px;margin-bottom:32px;}
-.ob-dot{width:4px;height:4px;border-radius:50%;background:var(--w15);transition:all .3s;}
-.ob-dot.on{background:var(--gold);width:20px;border-radius:2px;}
-.ob-btn{padding:12px 32px;background:var(--gold);color:#000;border:none;border-radius:100px;font-family:var(--mono);font-size:12px;font-weight:500;cursor:pointer;letter-spacing:.5px;}
-.ob-skip{background:none;border:none;font-family:var(--mono);font-size:11px;color:var(--w30);cursor:pointer;margin-top:12px;padding:8px;}
-
 </style>
 </head>
 <body>
-
-<div class="ambient" id="ambient"></div>
-
-<!-- RECOGNITION SCREEN -->
-<div id="recognition">
-  <div class="rec-glow">
-    <div class="rec-logo">L</div>
-  </div>
-  <div class="rec-status" id="rec-status">Sincronizare identitate...</div>
-  <div class="rec-name" id="rec-name"></div>
-</div>
-
-<!-- ONBOARDING (prima dată) -->
-<div id="onboarding">
-  <div class="ob-slide active" id="ob-0">
-    <div class="ob-icon">👁</div>
-    <div class="ob-title">Lea vede.</div>
-    <div class="ob-desc">Analizează contextul urban real — din oameni reali care verifică fizic, nu din internet.</div>
-  </div>
-  <div class="ob-slide" id="ob-1">
-    <div class="ob-icon">⬡</div>
-    <div class="ob-title">Lea știe.</div>
-    <div class="ob-desc">Filtrează adevărul din zgomotul digital. Dacă nu știe — trimite pe cineva să verifice fizic.</div>
-  </div>
-  <div class="ob-slide" id="ob-2">
-    <div class="ob-icon">🎙</div>
-    <div class="ob-title">Lea vorbește.</div>
-    <div class="ob-desc">Cu vocea fondatorului VV. În timp, cu vocea ta. Personalizată pentru tine specific.</div>
-  </div>
-  <div class="ob-dots">
-    <div class="ob-dot on" id="od-0"></div>
-    <div class="ob-dot" id="od-1"></div>
-    <div class="ob-dot" id="od-2"></div>
-  </div>
-  <button class="ob-btn" id="ob-btn" onclick="nextObSlide()">Continuă →</button>
-  <button class="ob-skip" onclick="finishOnboarding()">Sari peste</button>
-</div>
-
+<div class="ambient" id="amb"></div>
 <div id="toast"></div>
 
-<!-- SETUP SCREEN · VV ID LOGIN -->
-<div id="setup">
-  <div class="setup-box">
-    <div class="setup-logo">Lea</div>
-    <div class="setup-sub">VV · Inteligența ta personală</div>
+<!-- ACORD -->
+<div class="screen show" id="s-accord">
+  <div class="a-logo">Lea</div>
+  <div class="a-sub">VV · Inteligența ta personală</div>
+  <p class="a-desc">Lea e diferită. Învață din tine, nu din toți. Datele tale rămân pe device-ul tău.</p>
+  <div class="checks">
+    <div class="ci" onclick="tc(this,0)"><div class="cb"><span class="cm">✓</span></div><div class="ct"><b>Accept VV Charter.</b> Datele mele rămân local. Zero email, zero parolă.</div></div>
+    <div class="ci" onclick="tc(this,1)"><div class="cb"><span class="cm">✓</span></div><div class="ct"><b>Confirm că am 18 ani</b> și accesez o platformă Beta.</div></div>
+    <div class="ci" onclick="tc(this,2)"><div class="cb"><span class="cm">✓</span></div><div class="ct"><b>Accept că Lea învață din mine</b> — anonim, local, pentru a deveni mai bună pentru mine.</div></div>
+  </div>
+  <button class="a-btn" id="a-btn" onclick="acceptAccord()">Intru în Lea →</button>
+  <p class="a-privacy">VV ID generat automat · Invizibil · Salvat local pe device-ul tău</p>
+</div>
 
-    <!-- STARE 1: Introducere VV ID -->
-    <div id="setup-vvid-state">
-      <div class="setup-field">
-        <label class="setup-label">Codul tău VV</label>
-        <input class="setup-input" id="setup-vvid"
-          placeholder="VV·ABC·XYZ"
-          autocomplete="off" autocapitalize="characters"
-          style="letter-spacing:3px;text-align:center;font-size:16px;">
-        <div class="setup-hint">Codul tău din ecosistemul VV. L-ai primit la intrarea în VV.</div>
-      </div>
-      <button class="setup-btn" onclick="loginWithVVID()">Intru în Lea →</button>
-      <button class="setup-skip" onclick="getVVID()">Nu am cod VV · Obține unul gratuit</button>
+<!-- RECOGNITION -->
+<div class="screen" id="s-rec">
+  <div class="rec-orb"><div class="rec-l">L</div></div>
+  <div class="rec-s" id="rec-s">Se sincronizează...</div>
+  <div class="rec-n" id="rec-n"></div>
+</div>
+
+<!-- VV AER -->
+<div class="screen" id="s-aer">
+  <h2 class="aer-title">VV <em>Aer</em></h2>
+  <p class="aer-sub">Sincronizează identitatea între device-urile tale. Fără coduri. Fără scanat. Magie.</p>
+  <div class="aer-orb" id="aer-orb">
+    <div class="aer-icon">◎</div>
+    <div class="aer-lbl" id="aer-lbl">Apasă</div>
+  </div>
+  <div class="aer-st" id="aer-st"></div>
+  <div class="aer-acts">
+    <button class="aer-send" onclick="aerSend()">Trimite identitatea mea</button>
+    <button class="aer-recv" onclick="aerRecv()">Primesc de pe alt device</button>
+  </div>
+  <button class="aer-skip" onclick="skipAer()">Nu acum · Continuu</button>
+</div>
+
+<!-- ONBOARDING -->
+<div class="screen" id="s-ob">
+  <div class="ob-wrap">
+    <div class="ob-slides">
+      <div class="ob-slide active" id="ob-0"><div class="ob-icon">👁</div><div class="ob-title">Lea vede.</div><div class="ob-desc">Oameni reali verifică fizic ce se întâmplă în orașul tău. Lea îți spune adevărul.</div></div>
+      <div class="ob-slide" id="ob-1"><div class="ob-icon">⬡</div><div class="ob-title">Lea știe.</div><div class="ob-desc">Cu fiecare zi alături de tine, Lea devine mai bună pentru tine specific. Nu pentru toți — pentru tine.</div></div>
+      <div class="ob-slide" id="ob-2"><div class="ob-icon">🎙</div><div class="ob-title">Lea vorbește.</div><div class="ob-desc">Scrie sau vorbește. Lea răspunde cu vocea fondatorului. În timp — cu vocea ta.</div></div>
     </div>
-
-    <!-- STARE 2: Se verifică -->
-    <div id="setup-loading-state" style="display:none;text-align:center;padding:40px 0;">
-      <div style="font-family:var(--serif);font-size:32px;font-style:italic;color:var(--gold);margin-bottom:16px;">L</div>
-      <div style="font-size:12px;color:var(--w30);letter-spacing:2px;">Se verifică...</div>
+    <div class="ob-dots">
+      <div class="ob-dot on" id="od-0"></div>
+      <div class="ob-dot" id="od-1"></div>
+      <div class="ob-dot" id="od-2"></div>
     </div>
-
-    <!-- STARE 3: Bine ai venit -->
-    <div id="setup-welcome-state" style="display:none;text-align:center;padding:20px 0;">
-      <div style="font-size:28px;margin-bottom:16px;">⬡</div>
-      <div style="font-family:var(--serif);font-size:20px;font-style:italic;color:var(--gold);margin-bottom:8px;" id="welcome-name">Bine ai venit.</div>
-      <div style="font-size:12px;color:var(--w30);margin-bottom:24px;" id="welcome-sub">Lea e pregătită pentru tine.</div>
-      <div id="welcome-badge" style="display:inline-block;padding:6px 16px;background:var(--gold2);border:0.5px solid var(--gold-b);border-radius:100px;font-size:11px;color:var(--gold);letter-spacing:2px;margin-bottom:24px;"></div>
-      <button class="setup-btn" onclick="enterLea()">Intru în Lea →</button>
-    </div>
-
-    <!-- STARE 4: Eroare -->
-    <div id="setup-error-state" style="display:none;text-align:center;padding:20px 0;">
-      <div style="font-size:12px;color:var(--w30);margin-bottom:16px;" id="error-msg">Codul nu a fost găsit.</div>
-      <button class="setup-btn" onclick="resetSetup()">Încearcă din nou</button>
-      <button class="setup-skip" onclick="getVVID()">Obține un cod VV gratuit</button>
-    </div>
-
+    <button class="ob-next" id="ob-next" onclick="nextOb()">Continuă →</button>
+    <button class="ob-skip" onclick="finishOb()">Sari · Intru direct</button>
   </div>
 </div>
 
-<!-- MAIN APP -->
+<!-- APP -->
 <div id="app">
-
-  <!-- TOP BAR -->
   <div class="topbar">
     <div class="tb-logo">Lea</div>
+    <div class="tb-center"><div class="tb-dot"></div><div class="tb-city" id="tb-city">—</div></div>
     <div class="tb-right">
-      <div class="tb-status">
-        <div class="tb-dot"></div>
-        <span id="tb-city">Se detectează...</span>
-      </div>
-      <button class="tb-settings" onclick="openSettings()">⚙</button>
+      <button class="tb-btn" onclick="openAer()" title="VV Aer">◎</button>
+      <button class="tb-btn" onclick="openSett()">⚙</button>
     </div>
   </div>
-
-  <!-- CONVERSATION -->
-  <div class="conversation" id="conversation">
-
-    <!-- IDLE -->
+  <div class="conv" id="conv">
     <div class="idle" id="idle">
       <div class="idle-logo">L</div>
-      <div class="idle-text">Sunt Lea.<br>Ce vrei să știi despre orașul tău?</div>
-      <div class="idle-sub">Scrie sau ține apăsat microfonul</div>
-      <div class="idle-time" id="idle-time"></div>
+      <div class="idle-text" id="idle-t">Sunt Lea.<br>Ce vrei să știi?</div>
+      <div class="idle-time" id="idle-c"></div>
     </div>
-
-    <!-- VOICE VIS -->
-    <div class="voice-vis" id="voice-vis">
-      <div class="vv-bar"></div>
-      <div class="vv-bar"></div>
-      <div class="vv-bar"></div>
-      <div class="vv-bar"></div>
-      <div class="vv-bar"></div>
-      <div class="vv-bar"></div>
-      <div class="vv-bar"></div>
-    </div>
-
+    <div class="vv" id="vv"><div class="vb"></div><div class="vb"></div><div class="vb"></div><div class="vb"></div><div class="vb"></div><div class="vb"></div><div class="vb"></div></div>
   </div>
-
-  <!-- INPUT AREA -->
   <div class="input-area">
-    <div class="suggestions" id="suggestions">
-      <div class="sug" onclick="useSug(this)">E coadă acum?</div>
-      <div class="sug" onclick="useSug(this)">Ce e deschis lângă mine?</div>
-      <div class="sug" onclick="useSug(this)">Pizza în zonă?</div>
-      <div class="sug" onclick="useSug(this)">Farmacie nonstop?</div>
-      <div class="sug" onclick="useSug(this)">Cum e traficul?</div>
-    </div>
-    <div class="input-row">
-      <textarea class="input-box" id="input-box"
-        placeholder="Întreabă-o pe Lea..."
-        rows="1"
-        onkeydown="handleKey(event)"
-        oninput="autoResize(this)"></textarea>
-      <button class="mic-btn" id="mic-btn"
-        onmousedown="startVoice()"
-        onmouseup="stopVoice()"
-        ontouchstart="startVoice()"
-        ontouchend="stopVoice()">🎙</button>
-      <button class="send-btn" id="send-btn" onclick="sendMessage()">↑</button>
+    <div class="sugs" id="sugs"></div>
+    <div class="irow">
+      <textarea class="ibox" id="ibox" placeholder="Întreabă-o pe Lea..." rows="1"
+        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();send();}"
+        oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,120)+'px'"></textarea>
+      <button class="mic" id="mic" onmousedown="startMic()" onmouseup="stopMic()" ontouchstart="startMic()" ontouchend="stopMic()">🎙</button>
+      <button class="send" onclick="send()">↑</button>
     </div>
   </div>
-
 </div>
 
 <!-- SETTINGS -->
-<div id="settings" onclick="if(event.target===this)closeSettings()">
-  <div class="settings-sheet">
-    <div class="ss-handle"></div>
-    <div class="ss-title">Setări Lea</div>
-
-    <div class="ss-field">
-      <label class="ss-label">Anthropic API Key</label>
-      <input class="ss-input" id="s-anthropic" type="password" placeholder="sk-ant-...">
-    </div>
-    <div class="ss-field">
-      <label class="ss-label">ElevenLabs API Key</label>
-      <input class="ss-input" id="s-eleven" type="password" placeholder="sk_...">
-    </div>
-    <div class="ss-field">
-      <label class="ss-label">Voice ID</label>
-      <input class="ss-input" id="s-voice" placeholder="ID voce ElevenLabs">
-    </div>
-    <div class="ss-field">
-      <label class="ss-label">Orașul tău</label>
-      <input class="ss-input" id="s-city" placeholder="ex: Slobozia, București...">
-    </div>
-
-    <button class="ss-btn" onclick="saveSettings()">Salvează</button>
-    <button class="ss-close" onclick="closeSettings()">Închide</button>
-    <button class="ss-close" onclick="logoutLea()" style="margin-top:8px;color:rgba(255,69,58,.5);border-color:rgba(255,69,58,.2);">Deconectare · Schimbă cont VV</button>
+<div id="sett" onclick="if(event.target===this)closeSett()">
+  <div class="ss">
+    <div class="ss-h"></div>
+    <div class="ss-t">Setări Lea</div>
+    <div class="ss-row"><span class="ss-l">VV ID</span><span class="ss-v" id="ss-id">—</span></div>
+    <div class="ss-row"><span class="ss-l">Rang</span><span class="ss-v" id="ss-rang">—</span></div>
+    <div class="ss-row"><span class="ss-l">Oraș</span><span class="ss-v" id="ss-city">—</span></div>
+    <div class="ss-row"><span class="ss-l">Voce Lea</span><button class="ss-b" onclick="cfgVoice()">Configurează</button></div>
+    <button class="ss-aer" onclick="openAer()">◎ VV Aer · Sync device nou</button>
+    <button class="ss-close" onclick="closeSett()">Închide</button>
+    <button class="ss-out" onclick="logout()">Deconectare · Resetează identitatea</button>
   </div>
 </div>
 
-<!-- FIREBASE + SCRIPTS -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script>
-firebase.initializeApp({
-  apiKey:"AIzaSyDGv4kEClO0RHCLvXVLOT-vyPHw6bsxYVc",
-  authDomain:"vv-ep-beta.firebaseapp.com",
-  projectId:"vv-ep-beta"
-});
-var db = firebase.firestore();
+firebase.initializeApp({apiKey:"AIzaSyDGv4kEClO0RHCLvXVLOT-vyPHw6bsxYVc",authDomain:"vv-ep-beta.firebaseapp.com",projectId:"vv-ep-beta"});
+var db=firebase.firestore();
+var _u=null,_city=null,_hist=[],_obs=0,_aerL=null,_ch=[false,false,false];
+var _ak=localStorage.getItem('lea_ak')||'',_ek=localStorage.getItem('lea_ek')||'',_vi=localStorage.getItem('lea_vi')||'';
+var _audio=null,_rec=null;
 
-// ── STATE ─────────────────────────────────────────────────────
-var _city = localStorage.getItem('vvme_home_city') || null;
-var _anthropicKey = localStorage.getItem('lea_anthropic_key') || '';
-var _elevenKey = localStorage.getItem('lea_eleven_key') || '';
-var _voiceId = localStorage.getItem('lea_voice_id') || '';
-var _history = []; // conversatie curenta
-var _recording = false;
-var _recognition = null;
-var _currentAudio = null;
-
-// ── SETUP ─────────────────────────────────────────────────────
-// ── VV ID STATE ───────────────────────────────────────────────
-var _vvUser = null; // datele userului din Firebase
-
-var _obSlide = 0;
-
-window.addEventListener('load', function() {
-  detectCity();
-  updateClock();
-  setInterval(updateClock, 60000);
-  
-  if(!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-    document.getElementById('mic-btn').style.opacity = '.3';
-  }
-  
-  // Auto-format VV ID input
-  var input = document.getElementById('setup-vvid');
-  if(input) {
-    input.addEventListener('input', function() {
-      var val = this.value.toUpperCase().replace(/[^A-Z0-9·\-]/g, '');
-      this.value = val;
-    });
-    input.addEventListener('keydown', function(e) {
-      if(e.key === 'Enter') loginWithVVID();
-    });
-  }
-  
-  // ── AUTO-RECOGNITION ────────────────────────────────────────
-  // Prioritate 1: user deja logat in Lea
-  var savedVVID = localStorage.getItem('lea_vvid');
-  var savedUser = localStorage.getItem('lea_user_data');
-  
-  if(savedVVID && savedUser) {
-    try {
-      _vvUser = JSON.parse(savedUser);
-      showRecognition(_vvUser);
-      return;
-    } catch(e) {
-      localStorage.removeItem('lea_vvid');
-      localStorage.removeItem('lea_user_data');
-    }
-  }
-  
-  // Prioritate 2: cod cetatean din vv-entry (acelasi browser)
-  var citizenCode = localStorage.getItem('vv_citizen_code');
-  var accordSigned = localStorage.getItem('vv_accord_signed');
-  
-  if(citizenCode && accordSigned) {
-    var city = localStorage.getItem('vvme_home_city');
-    var persona = localStorage.getItem('vv_persona');
-    _vvUser = {
-      vvid: citizenCode,
-      citizenCode: citizenCode,
-      userType: 'citizen',
-      city: city,
-      persona: persona
-    };
-    localStorage.setItem('lea_vvid', citizenCode);
-    localStorage.setItem('lea_user_data', JSON.stringify(_vvUser));
-    showRecognition(_vvUser);
-    return;
-  }
-  
-  // Prioritate 3: arata setup
-  // (setup screen e deja vizibil by default)
+window.addEventListener('load',function(){
+  detectCity(); updateClock(); setInterval(updateClock,60000);
+  var sid=localStorage.getItem('lea_id'),su=localStorage.getItem('lea_u');
+  if(sid&&su){try{_u=JSON.parse(su);showRec();return;}catch(e){localStorage.removeItem('lea_id');localStorage.removeItem('lea_u');}}
+  var cc=localStorage.getItem('vv_citizen_code'),as=localStorage.getItem('vv_accord_signed');
+  if(cc&&as){_u={vvid:cc,type:'citizen',city:localStorage.getItem('vvme_home_city')};localStorage.setItem('lea_id',cc);localStorage.setItem('lea_u',JSON.stringify(_u));showRec();return;}
+  show('s-accord');
 });
 
-// ── SHOW RECOGNITION ──────────────────────────────────────────
-function showRecognition(user) {
-  var rec = document.getElementById('recognition');
-  var status = document.getElementById('rec-status');
-  var name = document.getElementById('rec-name');
-  
-  document.getElementById('setup').classList.add('hidden');
-  rec.classList.add('show');
-  
-  // Animatie in 3 pasi
-  setTimeout(function() {
-    status.textContent = 'Identitate recunoscută.';
-  }, 600);
-  
-  setTimeout(function() {
-    var displayName = '';
-    if(user.userType === 'founder') displayName = 'Fondator';
-    else if(user.alias) displayName = user.alias;
-    else if(user.name) displayName = user.name;
-    else displayName = user.vvid;
-    name.textContent = displayName;
-    status.textContent = 'Bine ai revenit.';
-  }, 1200);
-  
-  setTimeout(function() {
-    rec.classList.remove('show');
-    // Prima vizita = onboarding, altfel direct in app
-    var firstTime = !localStorage.getItem('lea_onboarding_done');
-    if(firstTime) {
-      showOnboarding();
-    } else {
-      document.getElementById('setup').classList.add('hidden');
-      init();
-    }
-  }, 2200);
+function show(id){document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('show');});var e=document.getElementById(id);if(e)e.classList.add('show');}
+function hideAll(){document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('show');});}
+
+function tc(el,i){_ch[i]=!_ch[i];el.classList.toggle('on',_ch[i]);document.getElementById('a-btn').classList.toggle('ready',_ch[0]&&_ch[1]&&_ch[2]);}
+
+async function acceptAccord(){
+  if(!_ch[0]||!_ch[1]||!_ch[2])return;
+  var id=genId();_u={vvid:id,type:'citizen',city:_city,newUser:true};
+  localStorage.setItem('lea_id',id);localStorage.setItem('lea_u',JSON.stringify(_u));
+  localStorage.setItem('vv_accord_signed','1');localStorage.setItem('vv_citizen_code',id);
+  try{await db.collection('vv_accords').add({citizenCode:id,city:_city||null,device:navigator.userAgent.includes('Mobile')?'mobile':'desktop',timestamp:firebase.firestore.FieldValue.serverTimestamp(),charter_v:'1.3'});}catch(e){}
+  if(!localStorage.getItem('lea_had_aer')){show('s-aer');document.getElementById('amb').className='ambient aer';setTimeout(function(){if(document.getElementById('s-aer').classList.contains('show'))skipAer();},8000);}
+  else startOb();
 }
 
-// ── ONBOARDING ────────────────────────────────────────────────
-function showOnboarding() {
-  document.getElementById('onboarding').classList.add('show');
-  _obSlide = 0;
-  updateObSlide();
+function genId(){var c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789',p1='',p2='';for(var i=0;i<3;i++)p1+=c[Math.floor(Math.random()*c.length)];for(var i=0;i<3;i++)p2+=c[Math.floor(Math.random()*c.length)];return'VV·'+p1+'·'+p2;}
+
+function showRec(){
+  show('s-rec');document.getElementById('amb').className='ambient thinking';
+  var s=document.getElementById('rec-s'),n=document.getElementById('rec-n');
+  setTimeout(function(){s.textContent='Identitate recunoscută.';},500);
+  setTimeout(function(){n.textContent=dn();s.textContent=(_u&&_u.newUser)?'Bine ai venit.':'Bine ai revenit.';},1100);
+  setTimeout(function(){document.getElementById('amb').className='ambient';hideAll();if(!localStorage.getItem('lea_ob')&&_u&&_u.newUser)startOb();else enterApp();},2200);
 }
 
-function nextObSlide() {
-  _obSlide++;
-  if(_obSlide >= 3) {
-    finishOnboarding();
-  } else {
-    updateObSlide();
-  }
-}
+function dn(){if(!_u)return'';if(_u.type==='ceo')return'CEO · Fondator';if(_u.name)return _u.name;if(_u.alias)return _u.alias;return _u.vvid||'';}
 
-function updateObSlide() {
-  [0,1,2].forEach(function(i) {
-    var slide = document.getElementById('ob-' + i);
-    var dot = document.getElementById('od-' + i);
-    if(slide) slide.classList.toggle('active', i === _obSlide);
-    if(dot) dot.classList.toggle('on', i === _obSlide);
-  });
-  var btn = document.getElementById('ob-btn');
-  if(btn) btn.textContent = _obSlide === 2 ? 'Intru în Lea →' : 'Continuă →';
-}
-
-function finishOnboarding() {
-  localStorage.setItem('lea_onboarding_done', '1');
-  document.getElementById('onboarding').classList.remove('show');
-  init();
-  // Arata identity card
-  setTimeout(showIdentityCard, 500);
-}
-
-// ── IDENTITY CARD ─────────────────────────────────────────────
-function showIdentityCard() {
-  if(!_vvUser) return;
-  var conv = document.getElementById('conversation');
-  var idle = document.getElementById('idle');
-  if(idle) idle.classList.add('hidden');
-  
-  var rankMap = {
-    founder: '💎 Fondator · Inner Circle',
-    business: '🏢 Business Node',
-    talent: '⬡ Talent VV',
-    citizen: '⬡ Cetățean VV'
-  };
-  var rank = rankMap[_vvUser.userType] || '⬡ VV';
-  var city = _vvUser.city || _vvUser.cityDisplay || localStorage.getItem('vvme_home_city') || '—';
-  var name = _vvUser.alias || _vvUser.name || '';
-  var xp = _vvUser.userType === 'founder' ? 'XP: ∞' : 'XP: 0';
-  
-  var card = document.createElement('div');
-  card.innerHTML =
-    '<div class="msg lea" style="align-self:center;width:100%;max-width:320px;">' +
-      '<div class="id-card">' +
-        '<div class="id-card-top">' +
-          '<div class="id-card-logo">Lea</div>' +
-          '<div class="id-card-rank">' + rank + '</div>' +
-        '</div>' +
-        '<div class="id-card-code">' + _vvUser.vvid + '</div>' +
-        (name ? '<div class="id-card-name">' + name + '</div>' : '') +
-        '<div class="id-card-bottom">' +
-          '<div class="id-card-city">📍 ' + city + '</div>' +
-          '<div class="id-card-xp">' + xp + '</div>' +
-        '</div>' +
-      '</div>' +
-      '<div class="msg-meta"><span>Lea · Identitatea ta în VV</span></div>' +
-    '</div>';
-  
-  conv.appendChild(card);
-  conv.scrollTo({top: conv.scrollHeight, behavior:'smooth'});
-  
-  // Mesaj de bun venit dupa card
-  setTimeout(function() {
-    var h = new Date().getHours();
-    var greeting = h<12?'Bună dimineața':h<18?'Bună ziua':h<22?'Bună seara':'Noapte bună';
-    var welcomeMsg = greeting + '. ';
-    if(_vvUser.userType === 'founder') welcomeMsg += 'Fondator. Ce construim azi?';
-    else if(_vvUser.alias) welcomeMsg += _vvUser.alias + '. Ce vrei să știi?';
-    else welcomeMsg += 'Ce vrei să știi despre ' + city + '?';
-    addMessage('lea', welcomeMsg);
-  }, 600);
-}
-
-// ── LOGIN CU VV ID ─────────────────────────────────────────────
-async function loginWithVVID() {
-  var vvid = document.getElementById('setup-vvid').value.trim().toUpperCase();
-  
-  if(!vvid || vvid.length < 5) {
-    showSetupState('error', 'Introdu codul tău VV complet.');
-    return;
-  }
-  
-  showSetupState('loading');
-  
-  try {
-    // Cauta in toate colectiile posibile
-    var userData = null;
-    var userType = null;
-    
-    // 1. Cauta in contributors (Inner Circle)
-    var contSnap = await db.collection('contributors')
-      .where('coreId', '==', vvid).limit(1).get();
-    if(!contSnap.empty) {
-      userData = contSnap.docs[0].data();
-      userType = 'founder';
-    }
-    
-    // 2. Cauta cod cetatean din vv_accords
-    if(!userData) {
-      var citizenCode = localStorage.getItem('vv_citizen_code');
-      if(citizenCode && citizenCode === vvid) {
-        userData = {
-          citizenCode: vvid,
-          city: localStorage.getItem('vvme_home_city') || null,
-          persona: localStorage.getItem('vv_persona') || null
-        };
-        userType = 'citizen';
+async function aerSend(){
+  var id=_u?_u.vvid:localStorage.getItem('lea_id');if(!id)return;
+  var orb=document.getElementById('aer-orb'),st=document.getElementById('aer-st'),lbl=document.getElementById('aer-lbl');
+  orb.classList.add('active');lbl.textContent='Activ';st.className='aer-st searching';st.textContent='Aștept alt device...';
+  try{
+    var ref=await db.collection('vv_aer').add({vvid:id,user:JSON.stringify(_u),createdAt:firebase.firestore.FieldValue.serverTimestamp(),claimed:false});
+    _aerL=db.collection('vv_aer').doc(ref.id).onSnapshot(function(d){
+      if(d.data()&&d.data().claimed){
+        orb.classList.remove('active');st.className='aer-st found';st.textContent='✓ Sincronizat!';lbl.textContent='✓';
+        if(_aerL)_aerL();localStorage.setItem('lea_had_aer','1');
+        setTimeout(skipAer,1800);
       }
-    }
-    
-    // 3. Cauta in verified_nodes (Business Node)
-    if(!userData) {
-      var nodeSnap = await db.collection('verified_nodes')
-        .where('nodeId', '==', vvid).limit(1).get();
-      if(!nodeSnap.empty) {
-        userData = nodeSnap.docs[0].data();
-        userType = 'business';
-      }
-    }
-    
-    // 4. Cauta in vv_talents
-    if(!userData) {
-      var talentSnap = await db.collection('vv_talents')
-        .where('talentId', '==', vvid).limit(1).get();
-      if(!talentSnap.empty) {
-        userData = talentSnap.docs[0].data();
-        userType = 'talent';
-      }
-    }
-    
-    // 5. Accepta orice cod VV valid ca format
-    if(!userData && (vvid.startsWith('VV·') || vvid.startsWith('VV-'))) {
-      userData = {
-        citizenCode: vvid,
-        city: localStorage.getItem('vvme_home_city') || null
-      };
-      userType = 'citizen';
-    }
-    
-    if(userData) {
-      // Salveaza local
-      _vvUser = {...userData, vvid, userType};
-      localStorage.setItem('lea_vvid', vvid);
-      localStorage.setItem('lea_user_data', JSON.stringify(_vvUser));
-      
-      // Arata welcome
-      var welcomeName = getWelcomeName(userData, userType);
-      var welcomeSub = getWelcomeSub(userData, userType);
-      var badgeHtml = getBadgeHtml(userType);
-      
-      document.getElementById('welcome-name').textContent = welcomeName;
-      document.getElementById('welcome-sub').textContent = welcomeSub;
-      document.getElementById('welcome-badge').innerHTML = badgeHtml;
-      
-      showSetupState('welcome');
-      
-    } else {
-      showSetupState('error', 'Codul "' + vvid + '" nu a fost găsit în ecosistemul VV.');
-    }
-    
-  } catch(e) {
-    // Daca Firebase nu merge, accepta orice cod VV ca format valid
-    if(vvid.startsWith('VV·') || vvid.startsWith('VV-') || vvid.startsWith('VV ')) {
-      _vvUser = {vvid, userType:'citizen', city: localStorage.getItem('vvme_home_city')};
-      localStorage.setItem('lea_vvid', vvid);
-      localStorage.setItem('lea_user_data', JSON.stringify(_vvUser));
-      document.getElementById('welcome-name').textContent = 'Bine ai venit.';
-      document.getElementById('welcome-sub').textContent = 'Lea e pregătită pentru tine.';
-      document.getElementById('welcome-badge').innerHTML = '<span class="premium-badge pb-standard">Standard</span>';
-      showSetupState('welcome');
-    } else {
-      showSetupState('error', 'Eroare de conexiune. Verifică internetul.');
-    }
-  }
+    });
+    setTimeout(function(){if(_aerL){_aerL();_aerL=null;}orb.classList.remove('active');if(st.textContent.includes('Aștept')){st.textContent='Timeout. Încearcă din nou.';st.className='aer-st';lbl.textContent='Apasă';}db.collection('vv_aer').doc(ref.id).delete().catch(function(){});},5*60*1000);
+  }catch(e){st.textContent='Eroare conexiune.';orb.classList.remove('active');}
 }
 
-function getWelcomeName(data, type) {
-  if(type === 'founder') return 'Bine ai venit, Fondator.';
-  if(type === 'business') return 'Bine ai venit, ' + (data.name || 'Business Node') + '.';
-  if(type === 'talent') return 'Bine ai venit, ' + (data.alias || 'Talent VV') + '.';
-  return 'Bine ai venit.';
+async function aerRecv(){
+  var orb=document.getElementById('aer-orb'),st=document.getElementById('aer-st'),lbl=document.getElementById('aer-lbl');
+  orb.classList.add('active');lbl.textContent='Caută...';st.className='aer-st searching';st.textContent='Caut identitate VV...';
+  try{
+    var t5=new Date(Date.now()-5*60*1000);
+    var snap=await db.collection('vv_aer').where('claimed','==',false).where('createdAt','>=',firebase.firestore.Timestamp.fromDate(t5)).orderBy('createdAt','desc').limit(1).get();
+    if(snap.empty){orb.classList.remove('active');st.textContent='Nu am găsit niciun device activ. Apasă "Trimite" pe celălalt device.';st.className='aer-st';lbl.textContent='Apasă';return;}
+    var doc=snap.docs[0],data=doc.data();
+    await db.collection('vv_aer').doc(doc.id).update({claimed:true});
+    _u=JSON.parse(data.user);localStorage.setItem('lea_id',data.vvid);localStorage.setItem('lea_u',JSON.stringify(_u));localStorage.setItem('lea_had_aer','1');
+    orb.classList.remove('active');st.className='aer-st found';st.textContent='✓ VV Aer conectat!';lbl.textContent='✓';
+    setTimeout(function(){hideAll();document.getElementById('amb').className='ambient';enterApp();showToast('VV Aer sincronizat ✓');},1500);
+  }catch(e){orb.classList.remove('active');st.textContent='Eroare.';st.className='aer-st';lbl.textContent='Apasă';}
 }
 
-function getWelcomeSub(data, type) {
-  var city = data.city || data.cityDisplay || localStorage.getItem('vvme_home_city') || 'România';
-  if(type === 'founder') return 'Fondator · Inner Circle · ' + city;
-  if(type === 'business') return 'Business Node · ' + city;
-  if(type === 'talent') return 'VV Talent · ' + (data.domain || '') + ' · ' + city;
-  return 'Lea e pregătită pentru ' + city + '.';
+function skipAer(){if(_aerL){_aerL();_aerL=null;}document.getElementById('amb').className='ambient';startOb();}
+function openAer(){closeSett();show('s-aer');document.getElementById('amb').className='ambient aer';}
+
+function startOb(){_obs=0;updateOb();show('s-ob');}
+function nextOb(){_obs++;if(_obs>=3){finishOb();return;}updateOb();}
+function updateOb(){[0,1,2].forEach(function(i){var s=document.getElementById('ob-'+i),d=document.getElementById('od-'+i);if(s){s.classList.toggle('active',i===_obs);s.classList.toggle('prev',i<_obs);}if(d)d.classList.toggle('on',i===_obs);});var b=document.getElementById('ob-next');if(b)b.textContent=_obs===2?'Intru în Lea →':'Continuă →';}
+function finishOb(){localStorage.setItem('lea_ob','1');hideAll();enterApp();}
+
+function enterApp(){hideAll();init();setTimeout(showCard,600);}
+
+function init(){
+  var h=new Date().getHours(),g=h<12?'Bună dimineața':h<18?'Bună ziua':h<22?'Bună seara':'Noapte bună';
+  if(_u&&_u.city){_city=_u.city;localStorage.setItem('vvme_home_city',_city);}
+  var el=document.getElementById('idle-t');
+  if(el)el.innerHTML=g+(dn()?', <strong style="color:var(--w)">'+dn()+'</strong>':'')+'.'+ (_city?' Ești în <strong style="color:var(--w)">'+_city+'</strong>.':'')+'<br>Ce vrei să știi?';
+  updateCityDisp(_city);buildSugs();
 }
 
-function getBadgeHtml(type) {
-  if(type === 'founder') return '<span class="premium-badge pb-founder">💎 Fondator</span>';
-  if(type === 'business') return '<span class="premium-badge pb-premium">🏢 Business Node</span>';
-  if(type === 'talent') return '<span class="premium-badge pb-premium">⬡ Talent VV</span>';
-  return '<span class="premium-badge pb-standard">⬡ Standard</span>';
-}
-
-function showSetupState(state, errorMsg) {
-  ['vvid', 'loading', 'welcome', 'error'].forEach(function(s) {
-    var el = document.getElementById('setup-' + s + '-state');
-    if(el) el.style.display = s === state ? 'block' : 'none';
-  });
-  if(state === 'error' && errorMsg) {
-    var el = document.getElementById('error-msg');
-    if(el) el.textContent = errorMsg;
-  }
-}
-
-function resetSetup() {
-  showSetupState('vvid');
-  document.getElementById('setup-vvid').value = '';
-}
-
-function getVVID() {
-  window.open('https://vv-technologies.github.io/vv-nexus/vv-entry.html', '_blank');
-}
-
-function enterLea() {
-  document.getElementById('setup').classList.add('hidden');
-  var firstTime = !localStorage.getItem('lea_onboarding_done');
-  if(firstTime) {
-    showOnboarding();
-  } else {
-    init();
-    setTimeout(showIdentityCard, 500);
-  }
-}
-
-function logoutLea() {
-  localStorage.removeItem('lea_vvid');
-  localStorage.removeItem('lea_user_data');
-  localStorage.removeItem('lea_onboarding_done');
-  _vvUser = null;
-  location.reload();
-}
-
-// ── INIT ──────────────────────────────────────────────────────
-function init() {
-  var h = new Date().getHours();
-  var greeting = h<12?'Bună dimineața':h<18?'Bună ziua':h<22?'Bună seara':'Noapte bună';
-  
-  // Extrage city din user data sau localStorage
-  if(_vvUser && (_vvUser.city || _vvUser.cityDisplay)) {
-    _city = _vvUser.city || _vvUser.cityDisplay;
-    localStorage.setItem('vvme_home_city', _city);
-    updateCityDisplay(_city);
-  }
-  
-  var idleText = document.querySelector('.idle-text');
-  var name = '';
-  if(_vvUser) {
-    if(_vvUser.userType === 'founder') name = 'Fondator';
-    else if(_vvUser.alias) name = _vvUser.alias;
-    else if(_vvUser.name) name = _vvUser.name;
-  }
-  
-  if(idleText) {
-    var cityStr = _city ? ' Ești în <strong style="color:var(--w)">' + _city + '</strong>.' : '';
-    var nameStr = name ? ', <strong style="color:var(--w)">' + name + '</strong>' : '';
-    idleText.innerHTML = greeting + nameStr + '.' + cityStr + '<br>Sunt Lea. Ce vrei să știi?';
-  }
-  
-  // Premium features
-  if(_vvUser && _vvUser.userType === 'founder') {
-    // Founder - toate functiile active
-    _anthropicKey = localStorage.getItem('lea_anthropic_key') || '';
-    _elevenKey = localStorage.getItem('lea_eleven_key') || '';
-    _voiceId = localStorage.getItem('lea_voice_id') || '';
-  }
-  
-  updateSuggestions();
-}
-
-function updateClock() {
-  var now = new Date();
-  var h = now.getHours().toString().padStart(2,'0');
-  var m = now.getMinutes().toString().padStart(2,'0');
-  var el = document.getElementById('idle-time');
-  if(el) el.textContent = h + ':' + m;
-}
-
-function updateSuggestions() {
-  var h = new Date().getHours();
-  var city = _city || 'zonă';
-  var sugs = document.getElementById('suggestions');
-  if(!sugs) return;
-  var items = [];
-  if(h < 11) items = ['Cafea deschisă lângă mine?', 'Trafic acum?', 'Farmacie deschisă?', 'Program transport?'];
-  else if(h < 15) items = ['Restaurant în ' + city + '?', 'E coadă la supermarket?', 'Pizza acum?', 'Livrare rapidă?'];
-  else if(h < 21) items = ['Ce e deschis seara?', 'Cafenea cu loc?', 'Farmacie nonstop?', 'Parc în zonă?'];
-  else items = ['Ce livrează acum?', 'Farmacie de gardă?', 'Taxi/Uber?', 'Urgență medicală?'];
-  sugs.innerHTML = items.map(function(s) {
-    return '<div class="sug" onclick="useSug(this)">' + s + '</div>';
-  }).join('');
-}
-
-// ── CITY DETECTION ────────────────────────────────────────────
-function detectCity() {
-  var saved = localStorage.getItem('vvme_home_city');
-  if(saved) { _city = saved; updateCityDisplay(saved); return; }
-  if(!navigator.geolocation) return;
-  navigator.geolocation.getCurrentPosition(function(pos) {
-    fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat=' +
-      pos.coords.latitude + '&lon=' + pos.coords.longitude + '&accept-language=ro')
-      .then(function(r){ return r.json(); })
-      .then(function(d) {
-        var city = d.address?(d.address.city||d.address.town||d.address.village||'România'):'România';
-        _city = city;
-        localStorage.setItem('vvme_home_city', city);
-        updateCityDisplay(city);
-        init();
-      }).catch(function(){});
-  }, function(){}, {timeout:8000});
-}
-
-function updateCityDisplay(city) {
-  var el = document.getElementById('tb-city');
-  if(el) el.textContent = city;
-}
-
-// ── SEND MESSAGE ──────────────────────────────────────────────
-function sendMessage() {
-  var box = document.getElementById('input-box');
-  var text = box.value.trim();
-  if(!text) return;
-  box.value = '';
-  autoResize(box);
-  addMessage('user', text);
+function showCard(){
+  if(!_u)return;
   document.getElementById('idle').classList.add('hidden');
-  processWithLea(text);
+  var conv=document.getElementById('conv');
+  var rm={ceo:'💎 CEO · Fondator',founder:'💎 Fondator',citizen:'⬡ Cetățean VV'};
+  var rank=rm[_u.type]||'⬡ VV',city=_city||'—',name=dn(),xp=(_u.type==='ceo'||_u.type==='founder')?'XP: ∞':'XP: 1';
+  var w=document.createElement('div');
+  w.className='msg lea';w.style.cssText='align-self:center;width:100%;max-width:270px;';
+  w.innerHTML='<div class="id-card"><div class="id-top"><div class="id-logo">Lea</div><div class="id-rank">'+rank+'</div></div><div class="id-code">'+_u.vvid+'</div>'+(name&&name!==_u.vvid?'<div class="id-name">'+name+'</div>':'')+'<div class="id-bottom"><div class="id-city">📍 '+city+'</div><div class="id-xp">'+xp+'</div></div></div><div class="msg-meta">Lea · Identitatea ta · <span style="color:var(--blue);cursor:pointer" onclick="openAer()">◎ VV Aer</span></div>';
+  conv.appendChild(w);conv.scrollTo({top:conv.scrollHeight,behavior:'smooth'});
+  setTimeout(function(){
+    var h=new Date().getHours(),g=h<12?'Bună dimineața':h<18?'Bună ziua':h<22?'Bună seara':'Noapte bună';
+    var wm=g+'. ';
+    if(_u.type==='ceo')wm+='Fondator. Ce construim azi?';
+    else if(name&&name!==_u.vvid)wm+=name+'. Ce vrei să știi?';
+    else wm+='Ce vrei să știi'+(_city?' despre '+_city:''+'?');
+    addMsg('lea',wm);
+  },500);
 }
 
-function handleKey(e) {
-  if(e.key === 'Enter' && !e.shiftKey) {
-    e.preventDefault();
-    sendMessage();
-  }
-}
+function send(){var b=document.getElementById('ibox'),t=b.value.trim();if(!t)return;b.value='';b.style.height='auto';addMsg('user',t);document.getElementById('idle').classList.add('hidden');processLea(t);}
 
-function autoResize(el) {
-  el.style.height = 'auto';
-  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
-}
-
-function useSug(el) {
-  document.getElementById('input-box').value = el.textContent;
-  sendMessage();
-}
-
-// ── ADD MESSAGE ───────────────────────────────────────────────
-function addMessage(role, text, options) {
-  options = options || {};
-  var conv = document.getElementById('conversation');
-  var msg = document.createElement('div');
-  msg.className = 'msg ' + role;
-
-  var bubble = document.createElement('div');
-  bubble.className = 'msg-bubble';
-  bubble.textContent = text;
-  msg.appendChild(bubble);
-
-  // Meta pentru Lea
-  if(role === 'lea' && !options.thinking) {
-    var meta = document.createElement('div');
-    meta.className = 'msg-meta';
-    meta.innerHTML = '<span>Lea</span>';
-    if(_elevenKey && _voiceId && !options.noPlay) {
-      var playBtn = document.createElement('button');
-      playBtn.className = 'msg-play';
-      playBtn.textContent = '▶ Ascultă';
-      playBtn.onclick = function(){ playVoice(text, playBtn); };
-      meta.appendChild(playBtn);
-    }
+function addMsg(role,text,isTk){
+  var conv=document.getElementById('conv'),msg=document.createElement('div');
+  msg.className='msg '+role;if(isTk)msg.id='tk-msg';
+  var bub=document.createElement('div');bub.className='msg-b'+(isTk?' tk':'');
+  if(isTk)bub.innerHTML='<div class="td"></div><div class="td"></div><div class="td"></div>';
+  else bub.textContent=text;
+  msg.appendChild(bub);
+  if(role==='lea'&&!isTk){
+    var meta=document.createElement('div');meta.className='msg-meta';meta.innerHTML='<span>Lea</span>';
+    if(_ek&&_vi){var pb=document.createElement('button');pb.className='play-btn';pb.textContent='▶';pb.onclick=function(){playVoice(text,pb);};meta.appendChild(pb);}
     msg.appendChild(meta);
   }
-
-  conv.appendChild(msg);
-  conv.scrollTo({top: conv.scrollHeight, behavior:'smooth'});
-  return {msg, bubble};
+  conv.appendChild(msg);conv.scrollTo({top:conv.scrollHeight,behavior:'smooth'});return msg;
 }
 
-// ── THINKING BUBBLE ───────────────────────────────────────────
-function addThinking() {
-  var conv = document.getElementById('conversation');
-  var msg = document.createElement('div');
-  msg.className = 'msg lea';
-  msg.id = 'thinking-msg';
-  var bubble = document.createElement('div');
-  bubble.className = 'msg-bubble thinking';
-  bubble.innerHTML = '<div class="think-dot"></div><div class="think-dot"></div><div class="think-dot"></div>';
-  msg.appendChild(bubble);
-  conv.appendChild(msg);
-  conv.scrollTo({top: conv.scrollHeight, behavior:'smooth'});
-  // Ambient thinking
-  document.getElementById('ambient').className = 'ambient thinking';
+async function processLea(q){
+  if(!_ak){addMsg('lea','Adaugă un Anthropic API Key din setări pentru a activa Lea.');return;}
+  var tk=addMsg('lea','',true);document.getElementById('amb').className='ambient thinking';
+  var h=new Date().getHours(),p=h<12?'dimineața':h<17?'după-amiaza':h<21?'seara':'noaptea';
+  var city=_city||'România';
+  var sys='Ești Lea, asistentul urban VV. Caldă, directă, umană. MAX 2-3 propoziții. Context: Oraș='+city+', Ora='+h+':00 ('+p+'). '+(dn()?'User='+dn()+'. ':'')+'Nu spune "ca model AI". Dacă nu știi: "nu știu sigur, verificăm?". Urgență (112) — spune PRIMUL. Răspunde DOAR în română.';
+  var msgs=_hist.slice(-8).map(function(m){return{role:m.r==='lea'?'assistant':'user',content:m.t};});
+  msgs.push({role:'user',content:q});
+  try{
+    var res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:300,system:sys,messages:msgs})});
+    var data=await res.json();if(tk)tk.remove();document.getElementById('amb').className='ambient';
+    if(data.content&&data.content[0]){var ans=data.content[0].text;addMsg('lea',ans);_hist.push({r:'user',t:q});_hist.push({r:'lea',t:ans});if(_hist.length>20)_hist=_hist.slice(-20);if(_ek&&_vi)playVoice(ans,null);db.collection('vvhi_dataset').add({action:'LEA_CHAT',context:{city,userType:_u?_u.type:'unknown'},timestamp:firebase.firestore.FieldValue.serverTimestamp()}).catch(function(){});}
+  }catch(e){if(tk)tk.remove();document.getElementById('amb').className='ambient';addMsg('lea','Eroare conexiune.');}
 }
 
-function removeThinking() {
-  var el = document.getElementById('thinking-msg');
-  if(el) el.remove();
-  document.getElementById('ambient').className = 'ambient';
+async function playVoice(text,btn){
+  if(!_ek||!_vi)return;if(btn){btn.textContent='⏳';btn.disabled=true;}
+  if(_audio){_audio.pause();_audio=null;}
+  try{
+    var res=await fetch('https://api.elevenlabs.io/v1/text-to-speech/'+_vi,{method:'POST',headers:{'xi-api-key':_ek,'Content-Type':'application/json'},body:JSON.stringify({text,model_id:'eleven_multilingual_v2',voice_settings:{stability:.65,similarity_boost:.80,style:.35,use_speaker_boost:true}})});
+    if(!res.ok){if(btn){btn.textContent='▶';btn.disabled=false;}return;}
+    var blob=await res.blob();_audio=new Audio(URL.createObjectURL(blob));_audio.play();
+    if(btn){btn.textContent='⏸';btn.disabled=false;btn.onclick=function(){_audio.pause();btn.textContent='▶';btn.onclick=function(){playVoice(text,btn);};};_audio.onended=function(){btn.textContent='▶';btn.onclick=function(){playVoice(text,btn);};};}
+  }catch(e){if(btn){btn.textContent='▶';btn.disabled=false;}}
 }
 
-// ── PROCESS WITH LEA ──────────────────────────────────────────
-async function processWithLea(query) {
-  if(!_anthropicKey) {
-    addMessage('lea', 'Nu am un API key setat. Mergi la Setări și adaugă cheia Anthropic.');
-    return;
-  }
-
-  addThinking();
-
-  // Construieste system prompt cu contextul lui Lea
-  var h = new Date().getHours();
-  var period = h<12?'dimineața':h<17?'după-amiaza':h<21?'seara':'noaptea';
-  var city = _city || 'România';
-  var persona = localStorage.getItem('vv_persona') || null;
-  var role = null;
-  try { var p = JSON.parse(localStorage.getItem('vv_lea_profile')||'{}'); role = p.role; } catch(e){}
-
-  var systemPrompt = 'Ești Lea, asistentul personal urban al VV Hybrid Univers. ' +
-    'Ești caldă, directă, umană — nu robotică. Răspunzi SCURT (max 2-3 propoziții). ' +
-    'Contextul userului: Oraș = ' + city + '. Ora = ' + h + ':00 (' + period + '). ' +
-    (persona ? 'Persona = ' + persona + '. ' : '') +
-    (role ? 'Rol detectat = ' + role + '. ' : '') +
-    'Dacă nu ai date verificate fizic, spune uman că nu știi și întreabă dacă trimiți pe cineva să verifice. ' +
-    'Nu spune niciodată "ca model AI". Nu spune "nu pot". Spune "nu știu sigur" sau "verificăm". ' +
-    'Dacă e urgență (112, spital, accident) — spune asta primul. ' +
-    'Răspunde DOAR în română.';
-
-  // Construieste history pentru context
-  var messages = _history.slice(-6).map(function(m) {
-    return {role: m.role === 'lea' ? 'assistant' : 'user', content: m.text};
-  });
-  messages.push({role: 'user', content: query});
-
-  try {
-    var res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 300,
-        system: systemPrompt,
-        messages: messages
-      })
-    });
-    var data = await res.json();
-    removeThinking();
-
-    if(data.content && data.content[0]) {
-      var answer = data.content[0].text;
-      addMessage('lea', answer);
-      _history.push({role:'user',text:query});
-      _history.push({role:'lea',text:answer});
-      // Limiteaza history
-      if(_history.length > 20) _history = _history.slice(-20);
-
-      // Auto-play daca voce activa
-      if(_elevenKey && _voiceId) {
-        playVoice(answer, null);
-      }
-
-      // Log in VVhi
-      if(window.db) {
-        db.collection('vvhi_dataset').add({
-          action: 'LEA_CHAT',
-          context: {city, period, hasVoice: !!_elevenKey},
-          timestamp: firebase.firestore.FieldValue.serverTimestamp()
-        }).catch(function(){});
-      }
-    } else {
-      addMessage('lea', 'Ceva n-a mers. Încearcă din nou.');
-    }
-  } catch(e) {
-    removeThinking();
-    addMessage('lea', 'Eroare de conexiune. Verifică internetul și cheia API.');
-    console.error(e);
-  }
+function startMic(){
+  var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){showToast('Vocea nu e suportată în acest browser');return;}
+  var m=document.getElementById('mic'),vv=document.getElementById('vv');
+  m.classList.add('on');m.textContent='⏹';vv.classList.add('on');document.getElementById('amb').className='ambient listening';
+  _rec=new SR();_rec.lang='ro-RO';
+  _rec.onresult=function(e){document.getElementById('ibox').value=e.results[0][0].transcript;stopMic();setTimeout(send,200);};
+  _rec.onerror=function(){stopMic();showToast('Nu am înțeles.');};
+  _rec.onend=function(){stopMic();};_rec.start();
+}
+function stopMic(){
+  var m=document.getElementById('mic'),vv=document.getElementById('vv');
+  m.classList.remove('on');m.textContent='🎙';vv.classList.remove('on');document.getElementById('amb').className='ambient';
+  if(_rec){try{_rec.stop();}catch(e){}_rec=null;}
 }
 
-// ── ELEVENLABS VOICE ──────────────────────────────────────────
-async function playVoice(text, btn) {
-  if(!_elevenKey || !_voiceId) return;
-  if(btn) { btn.textContent = '⏳'; btn.disabled = true; }
-  // Opreste audio curent
-  if(_currentAudio) { _currentAudio.pause(); _currentAudio = null; }
-
-  try {
-    var res = await fetch('https://api.elevenlabs.io/v1/text-to-speech/' + _voiceId, {
-      method: 'POST',
-      headers: {
-        'xi-api-key': _elevenKey,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        text: text,
-        model_id: 'eleven_multilingual_v2',
-        voice_settings: {
-          stability: 0.65,
-          similarity_boost: 0.80,
-          style: 0.35,
-          use_speaker_boost: true
-        }
-      })
-    });
-
-    if(!res.ok) {
-      if(btn) { btn.textContent = '▶ Ascultă'; btn.disabled = false; }
-      showToast('Vocea nu e disponibilă · Verifică cheia ElevenLabs');
-      return;
-    }
-
-    var blob = await res.blob();
-    var url = URL.createObjectURL(blob);
-    _currentAudio = new Audio(url);
-    _currentAudio.play();
-    if(btn) {
-      btn.textContent = '⏸ Oprește';
-      btn.disabled = false;
-      btn.onclick = function() {
-        _currentAudio.pause();
-        btn.textContent = '▶ Ascultă';
-        btn.onclick = function(){ playVoice(text, btn); };
-      };
-      _currentAudio.onended = function() {
-        btn.textContent = '▶ Ascultă';
-        btn.onclick = function(){ playVoice(text, btn); };
-      };
-    }
-  } catch(e) {
-    if(btn) { btn.textContent = '▶ Ascultă'; btn.disabled = false; }
-    showToast('Eroare voce');
-  }
+function buildSugs(){
+  var h=new Date().getHours(),city=_city||'zonă',items=[];
+  if(h<11)items=['Cafea deschisă?','Trafic acum?','Farmacie?','Vreme azi?'];
+  else if(h<15)items=['Restaurant în '+city+'?','E coadă?','Pizza?','Livrare?'];
+  else if(h<21)items=['Ce e deschis?','Cafenea cu loc?','Farmacie nonstop?','Parc?'];
+  else items=['Livrare noaptea?','Farmacie gardă?','Urgență?','Taxi?'];
+  var s=document.getElementById('sugs');
+  if(s)s.innerHTML=items.map(function(i){return'<div class="sug" onclick="useSug(\''+i+'\')">'+i+'</div>';}).join('');
 }
+function useSug(t){document.getElementById('ibox').value=t;send();}
 
-// ── VOICE INPUT (Speech Recognition) ─────────────────────────
-function startVoice() {
-  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if(!SR) { showToast('Vocea nu e suportată în acest browser'); return; }
-
-  _recording = true;
-  var btn = document.getElementById('mic-btn');
-  var vis = document.getElementById('voice-vis');
-  btn.classList.add('recording');
-  btn.textContent = '⏹';
-  vis.classList.add('active');
-  document.getElementById('ambient').className = 'ambient listening';
-
-  _recognition = new SR();
-  _recognition.lang = 'ro-RO';
-  _recognition.continuous = false;
-  _recognition.interimResults = false;
-
-  _recognition.onresult = function(e) {
-    var text = e.results[0][0].transcript;
-    document.getElementById('input-box').value = text;
-    stopVoice();
-    setTimeout(sendMessage, 200);
-  };
-  _recognition.onerror = function() { stopVoice(); showToast('Nu am înțeles. Încearcă din nou.'); };
-  _recognition.onend = function() { stopVoice(); };
-  _recognition.start();
+function detectCity(){
+  var s=localStorage.getItem('vvme_home_city');if(s){_city=s;updateCityDisp(s);return;}
+  if(!navigator.geolocation)return;
+  navigator.geolocation.getCurrentPosition(function(p){
+    fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat='+p.coords.latitude+'&lon='+p.coords.longitude+'&accept-language=ro')
+      .then(function(r){return r.json();}).then(function(d){var c=d.address?(d.address.city||d.address.town||d.address.village||'România'):'România';_city=c;localStorage.setItem('vvme_home_city',c);updateCityDisp(c);if(_u&&!_u.city){_u.city=c;localStorage.setItem('lea_u',JSON.stringify(_u));}}).catch(function(){});
+  },function(){},{timeout:8000});
 }
+function updateCityDisp(c){var e=document.getElementById('tb-city');if(e&&c)e.textContent=c;}
+function updateClock(){var n=new Date(),e=document.getElementById('idle-c');if(e)e.textContent=n.getHours().toString().padStart(2,'0')+':'+n.getMinutes().toString().padStart(2,'0');}
 
-function stopVoice() {
-  _recording = false;
-  var btn = document.getElementById('mic-btn');
-  var vis = document.getElementById('voice-vis');
-  btn.classList.remove('recording');
-  btn.textContent = '🎙';
-  vis.classList.remove('active');
-  document.getElementById('ambient').className = 'ambient';
-  if(_recognition) { try { _recognition.stop(); } catch(e){} _recognition = null; }
+function openSett(){
+  if(_u){var i=document.getElementById('ss-id'),r=document.getElementById('ss-rang'),c=document.getElementById('ss-city');
+  if(i)i.textContent=_u.vvid||'—';
+  var rm={ceo:'CEO · Fondator',founder:'Fondator',citizen:'Cetățean VV'};
+  if(r)r.textContent=rm[_u.type]||'Standard';if(c)c.textContent=_city||'—';}
+  document.getElementById('sett').classList.add('show');
 }
-
-// ── SETTINGS ──────────────────────────────────────────────────
-function openSettings() {
-  document.getElementById('s-anthropic').value = _anthropicKey ? '••••••••' : '';
-  document.getElementById('s-eleven').value = _elevenKey ? '••••••••' : '';
-  document.getElementById('s-voice').value = _voiceId || '';
-  document.getElementById('s-city').value = _city || '';
-  document.getElementById('settings').classList.add('show');
-}
-
-function closeSettings() {
-  document.getElementById('settings').classList.remove('show');
-}
-
-function saveSettings() {
-  var a = document.getElementById('s-anthropic').value.trim();
-  var e = document.getElementById('s-eleven').value.trim();
-  var v = document.getElementById('s-voice').value.trim();
-  var c = document.getElementById('s-city').value.trim();
-
-  if(a && !a.startsWith('•')) { localStorage.setItem('lea_anthropic_key', a); _anthropicKey = a; }
-  if(e && !e.startsWith('•')) { localStorage.setItem('lea_eleven_key', e); _elevenKey = e; }
-  if(v) { localStorage.setItem('lea_voice_id', v); _voiceId = v; }
-  if(c) { localStorage.setItem('vvme_home_city', c); _city = c; updateCityDisplay(c); init(); }
-
-  closeSettings();
+function closeSett(){document.getElementById('sett').classList.remove('show');}
+function cfgVoice(){
+  closeSett();
+  var a=prompt('Anthropic API Key:');if(a&&a.length>10){localStorage.setItem('lea_ak',a);_ak=a;}
+  var e=prompt('ElevenLabs API Key (opțional):');if(e&&e.length>10){localStorage.setItem('lea_ek',e);_ek=e;}
+  var v=prompt('ElevenLabs Voice ID (opțional):');if(v&&v.length>5){localStorage.setItem('lea_vi',v);_vi=v;}
   showToast('Salvat ✓');
 }
-
-// ── TOAST ─────────────────────────────────────────────────────
-function showToast(msg) {
-  var t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('on');
-  clearTimeout(t._t); t._t = setTimeout(function(){ t.classList.remove('on'); }, 3000);
+function logout(){
+  if(!confirm('Resetezi identitatea VV pe acest device?'))return;
+  ['lea_id','lea_u','lea_ob','lea_had_aer','lea_ak','lea_ek','lea_vi','vv_accord_signed','vv_citizen_code','vv_persona','vvme_home_city','vv_lea_profile'].forEach(function(k){localStorage.removeItem(k);});
+  location.reload();
 }
+function showToast(m){var t=document.getElementById('toast');t.textContent=m;t.classList.add('on');clearTimeout(t._t);t._t=setTimeout(function(){t.classList.remove('on');},3000);}
 </script>
 </body>
 </html>
