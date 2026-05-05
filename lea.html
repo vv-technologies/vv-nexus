@@ -50,7 +50,9 @@ body::before{content:'';position:fixed;inset:0;z-index:0;opacity:.4;
 .checks{display:flex;flex-direction:column;gap:10px;width:100%;max-width:360px;
   margin-bottom:28px;animation:fadeUp .8s .3s ease both;}
 .ci{display:flex;align-items:flex-start;gap:12px;cursor:pointer;padding:13px 15px;
-  background:var(--w04);border:0.5px solid var(--border);border-radius:12px;transition:all .2s;}
+  background:var(--w04);border:0.5px solid var(--border);border-radius:12px;transition:all .2s;
+  user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:rgba(200,169,110,.15);}
+.ci:active{background:rgba(200,169,110,.08);}
 .ci.on{background:var(--gold2);border-color:var(--gold-b);}
 .cb{width:20px;height:20px;border-radius:6px;flex-shrink:0;border:0.5px solid var(--border);
   background:var(--w04);display:flex;align-items:center;justify-content:center;
@@ -331,10 +333,19 @@ body::before{content:'';position:fixed;inset:0;z-index:0;opacity:.4;
   <div class="a-logo">Lea</div>
   <div class="a-sub">VV · Inteligența ta personală</div>
   <p class="a-desc">Lea e diferită. Învață din tine, nu din toți. Datele tale rămân pe device-ul tău.</p>
-  <div class="checks">
-    <div class="ci" onclick="tc(this,0)"><div class="cb"><span class="cm">✓</span></div><div class="ct"><b>Accept VV Charter.</b> Datele mele rămân local. Zero email, zero parolă.</div></div>
-    <div class="ci" onclick="tc(this,1)"><div class="cb"><span class="cm">✓</span></div><div class="ct"><b>Confirm că am 18 ani</b> și accesez o platformă Beta.</div></div>
-    <div class="ci" onclick="tc(this,2)"><div class="cb"><span class="cm">✓</span></div><div class="ct"><b>Accept că Lea învață din mine</b> — anonim, local, pentru a deveni mai bună pentru mine.</div></div>
+  <div class="checks" id="checks-wrap">
+    <label class="ci" id="ci0" onclick="tc(0)">
+      <div class="cb" id="cb0"><span class="cm" id="cm0">✓</span></div>
+      <div class="ct"><b>Accept VV Charter.</b> Datele mele rămân local pe device-ul meu. Zero email, zero parolă.</div>
+    </label>
+    <label class="ci" id="ci1" onclick="tc(1)">
+      <div class="cb" id="cb1"><span class="cm" id="cm1">✓</span></div>
+      <div class="ct"><b>Confirm că am 18 ani</b> și accesez o platformă Beta în dezvoltare.</div>
+    </label>
+    <label class="ci" id="ci2" onclick="tc(2)">
+      <div class="cb" id="cb2"><span class="cm" id="cm2">✓</span></div>
+      <div class="ct"><b>Accept că Lea învață din mine</b> — anonim, local, pentru a deveni mai bună pentru mine.</div>
+    </label>
   </div>
   <button class="a-btn" id="a-btn" onclick="acceptAccord()">Intru în Lea →</button>
   <p class="a-privacy">VV ID generat automat · Invizibil · Salvat local pe device-ul tău</p>
@@ -792,7 +803,25 @@ window.addEventListener('load',function(){
 function show(id){document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('show');});var e=document.getElementById(id);if(e)e.classList.add('show');}
 function hideAll(){document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('show');});}
 
-function tc(el,i){_ch[i]=!_ch[i];el.classList.toggle('on',_ch[i]);document.getElementById('a-btn').classList.toggle('ready',_ch[0]&&_ch[1]&&_ch[2]);}
+function tc(i) {
+  _ch[i] = !_ch[i];
+  // Update visual
+  var ci = document.getElementById('ci'+i);
+  var cm = document.getElementById('cm'+i);
+  var cb = document.getElementById('cb'+i);
+  if(ci) ci.classList.toggle('on', _ch[i]);
+  if(cm) cm.style.opacity = _ch[i] ? '1' : '0';
+  if(cb) cb.style.background = _ch[i] ? 'var(--gold)' : 'var(--w04)';
+  if(cb) cb.style.borderColor = _ch[i] ? 'var(--gold)' : 'var(--border)';
+  // Update button
+  var btn = document.getElementById('a-btn');
+  if(btn) {
+    var allChecked = _ch[0] && _ch[1] && _ch[2];
+    btn.classList.toggle('ready', allChecked);
+    btn.style.opacity = allChecked ? '1' : '0.35';
+    btn.style.pointerEvents = allChecked ? 'all' : 'none';
+  }
+}
 
 async function acceptAccord(){
   if(!_ch[0]||!_ch[1]||!_ch[2])return;
