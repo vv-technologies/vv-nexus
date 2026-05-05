@@ -257,6 +257,38 @@ body::before{content:'';position:fixed;inset:0;z-index:0;opacity:.4;
   .msg.user{align-items:flex-end;}
   .msg.lea{align-items:flex-start;}
 }
+
+/* HISTORY INDICATOR */
+.hist-badge{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:3px 10px;background:var(--w04);border:0.5px solid var(--border);
+  border-radius:100px;font-size:10px;color:var(--w30);margin-bottom:12px;
+  align-self:center;
+}
+/* LIMIT BAR */
+.limit-bar{
+  height:2px;background:var(--border);border-radius:1px;
+  margin:6px 0;overflow:hidden;
+}
+.limit-fill{
+  height:100%;border-radius:1px;background:var(--gold);
+  transition:width .5s ease;
+}
+.limit-fill.warn{background:var(--red);}
+/* DONATE CARD */
+.donate-card{
+  margin:8px 0;padding:16px;
+  background:rgba(200,169,110,.06);border:0.5px solid var(--gold-b);
+  border-radius:14px;text-align:center;align-self:center;
+  width:100%;max-width:300px;
+}
+.dc-title{font-size:13px;font-weight:500;color:var(--w70);margin-bottom:6px;}
+.dc-sub{font-size:11px;color:var(--w30);line-height:1.6;margin-bottom:14px;}
+.dc-btn{padding:9px 20px;background:var(--gold);color:#000;border:none;
+  border-radius:100px;font-family:var(--mono);font-size:11px;font-weight:500;
+  cursor:pointer;letter-spacing:.5px;}
+.dc-btn:hover{opacity:.88;}
+
 </style>
 </head>
 <body>
@@ -328,6 +360,13 @@ body::before{content:'';position:fixed;inset:0;z-index:0;opacity:.4;
       <button class="tb-btn" onclick="openSett()">⚙</button>
     </div>
   </div>
+  <!-- LIMIT BAR -->
+  <div style="padding:0 18px 6px;max-width:680px;margin:0 auto;width:100%;">
+    <div class="limit-bar"><div class="limit-fill" id="limit-fill" style="width:0%"></div></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <span style="font-size:9px;color:var(--w15);letter-spacing:1px;" id="limit-lbl">0/20 azi</span>
+      <span style="font-size:9px;color:var(--w15);">Beta · Gemini · VV Lea</span>
+    </div>
   <div class="conv" id="conv">
     <div class="idle" id="idle">
       <div class="idle-logo">L</div>
@@ -369,8 +408,88 @@ body::before{content:'';position:fixed;inset:0;z-index:0;opacity:.4;
 firebase.initializeApp({apiKey:"AIzaSyDGv4kEClO0RHCLvXVLOT-vyPHw6bsxYVc",authDomain:"vv-ep-beta.firebaseapp.com",projectId:"vv-ep-beta"});
 var db=firebase.firestore();
 var _u=null,_city=null,_hist=[],_obs=0,_aerL=null,_ch=[false,false,false];
-var _ak=localStorage.getItem('lea_ak')||'',_ek=localStorage.getItem('lea_ek')||'',_vi=localStorage.getItem('lea_vi')||'';
+// !! GEMINI API KEY - gratuit la aistudio.google.com
+// Inlocuieste AIzaSy_CHEIA_TA cu cheia ta reala
+var GEMINI_KEY = localStorage.getItem('lea_gk') || 'AIzaSy_CHEIA_TA_AICI';
+var _ak = GEMINI_KEY; // pastrat pentru compatibilitate
+var _ek=localStorage.getItem('lea_ek')||'',_vi=localStorage.getItem('lea_vi')||'';
 var _audio=null,_rec=null;
+
+// ── LIMITE BETA ────────────────────────────────────────────────
+var DAILY_LIMIT = 20;      // mesaje gratuite / zi
+var PREMIUM_LIMIT = 100;   // mesaje cu donatie / zi
+var DONATE_URL = 'https://revolut.me/vv'; // schimba cu linkul tau real
+
+function getTodayKey() {
+  var d = new Date();
+  return 'lea_msgs_' + d.getFullYear() + '_' + (d.getMonth()+1) + '_' + d.getDate();
+}
+
+function getMsgCount() {
+  return parseInt(localStorage.getItem(getTodayKey()) || '0');
+}
+
+function incMsgCount() {
+  var k = getTodayKey();
+  var n = getMsgCount() + 1;
+  localStorage.setItem(k, n.toString());
+  return n;
+}
+
+function getLimit() {
+  var isPremium = localStorage.getItem('lea_premium_until');
+  if(isPremium && new Date(isPremium) > new Date()) return PREMIUM_LIMIT;
+  return DAILY_LIMIT;
+}
+
+function canSend() {
+  return getMsgCount() < getLimit();
+}
+
+function updateLimitBar() {
+  var count = getMsgCount();
+  var limit = getLimit();
+  var pct = Math.min(100, (count / limit) * 100);
+  var fill = document.getElementById('limit-fill');
+  if(fill) {
+    fill.style.width = pct + '%';
+    fill.className = 'limit-fill' + (pct >= 80 ? ' warn' : '');
+  }
+  var lbl = document.getElementById('limit-lbl');
+  if(lbl) lbl.textContent = count + '/' + limit + ' azi';
+}
+
+// ── CONVERSATIE PERSISTENTA 24H ───────────────────────────────
+var HIST_KEY = 'lea_history_v1';
+
+function saveHistory() {
+  try {
+    var toSave = _hist.slice(-40); // max 40 mesaje
+    var data = {
+      messages: toSave,
+      date: new Date().toDateString(),
+      city: _city
+    };
+    localStorage.setItem(HIST_KEY, JSON.stringify(data));
+  } catch(e) {}
+}
+
+function loadHistory() {
+  try {
+    var raw = localStorage.getItem(HIST_KEY);
+    if(!raw) return [];
+    var data = JSON.parse(raw);
+    // Pastreaza doar daca e din ultimele 24h
+    var saved = new Date(data.date);
+    var now = new Date();
+    var diffH = (now - saved) / (1000 * 60 * 60);
+    if(diffH > 24) {
+      localStorage.removeItem(HIST_KEY);
+      return [];
+    }
+    return data.messages || [];
+  } catch(e) { return []; }
+}
 
 window.addEventListener('load',function(){
   detectCity(); updateClock(); setInterval(updateClock,60000);
@@ -450,6 +569,32 @@ function finishOb(){localStorage.setItem('lea_ob','1');hideAll();enterApp();}
 
 function enterApp(){hideAll();init();setTimeout(showCard,600);}
 
+function showHistoryIfAny() {
+  var hist = loadHistory();
+  if(!hist || hist.length === 0) return;
+  _hist = hist;
+  var conv = document.getElementById('conv');
+  document.getElementById('idle').classList.add('hidden');
+  // Mostra badge istoric
+  var badge = document.createElement('div');
+  badge.className = 'hist-badge';
+  badge.innerHTML = '⏱ Conversație din ultimele 24h · ' + hist.filter(function(m){return m.r==='user';}).length + ' mesaje';
+  conv.appendChild(badge);
+  // Mostra ultimele 6 mesaje din istoric
+  var recent = hist.slice(-6);
+  recent.forEach(function(m) {
+    var msg = document.createElement('div');
+    msg.className = 'msg ' + (m.r==='lea'?'lea':'user');
+    var bub = document.createElement('div');
+    bub.className = 'msg-b';
+    bub.textContent = m.t;
+    bub.style.opacity = '.6';
+    msg.appendChild(bub);
+    conv.appendChild(msg);
+  });
+  conv.scrollTo({top:conv.scrollHeight,behavior:'smooth'});
+}
+
 function init(){
   var h=new Date().getHours(),g=h<12?'Bună dimineața':h<18?'Bună ziua':h<22?'Bună seara':'Noapte bună';
   if(_u&&_u.city){_city=_u.city;localStorage.setItem('vvme_home_city',_city);}
@@ -461,6 +606,9 @@ function init(){
 function showCard(){
   if(!_u)return;
   document.getElementById('idle').classList.add('hidden');
+  updateLimitBar();
+  // Incarca istoricul dupa card
+  setTimeout(showHistoryIfAny, 200);
   var conv=document.getElementById('conv');
   var rm={ceo:'💎 CEO · Fondator',founder:'💎 Fondator',citizen:'⬡ Cetățean VV'};
   var rank=rm[_u.type]||'⬡ VV',city=_city||'—',name=dn(),xp=(_u.type==='ceo'||_u.type==='founder')?'XP: ∞':'XP: 1';
@@ -478,7 +626,49 @@ function showCard(){
   },500);
 }
 
-function send(){var b=document.getElementById('ibox'),t=b.value.trim();if(!t)return;b.value='';b.style.height='auto';addMsg('user',t);document.getElementById('idle').classList.add('hidden');processLea(t);}
+function send(){
+  var b=document.getElementById('ibox'),t=b.value.trim();
+  if(!t)return;
+  if(!canSend()){
+    showDonateCard();
+    return;
+  }
+  b.value='';b.style.height='auto';
+  addMsg('user',t);
+  document.getElementById('idle').classList.add('hidden');
+  incMsgCount();
+  updateLimitBar();
+  processLea(t);
+}
+
+function showDonateCard() {
+  var conv = document.getElementById('conv');
+  var existing = document.getElementById('donate-card');
+  if(existing) { conv.scrollTo({top:conv.scrollHeight,behavior:'smooth'}); return; }
+  var card = document.createElement('div');
+  card.id = 'donate-card';
+  card.className = 'donate-card';
+  card.innerHTML =
+    '<div class="dc-title">Ai folosit ' + getMsgCount() + ' mesaje azi.</div>' +
+    '<div class="dc-sub">În Beta, Lea e gratuită până la ' + DAILY_LIMIT + ' mesaje/zi.<br>Donează 5€ și primești 100 mesaje/zi pentru 30 de zile.</div>' +
+    '<button class="dc-btn" onclick="donate()">Susțin Lea · 5€ →</button>';
+  conv.appendChild(card);
+  conv.scrollTo({top:conv.scrollHeight,behavior:'smooth'});
+}
+
+function donate() {
+  window.open(DONATE_URL, '_blank');
+  // Simulare activare premium (in productie, verifica plata)
+  showToast('Mulțumim! Activare manuală în 24h.');
+}
+
+// Activare premium manual de CEO
+function activatePremium(days) {
+  var until = new Date(Date.now() + (days||30) * 24 * 60 * 60 * 1000);
+  localStorage.setItem('lea_premium_until', until.toISOString());
+  showToast('Premium activat · ' + days + ' zile ✓');
+  updateLimitBar();
+}
 
 function addMsg(role,text,isTk){
   var conv=document.getElementById('conv'),msg=document.createElement('div');
@@ -496,18 +686,86 @@ function addMsg(role,text,isTk){
 }
 
 async function processLea(q){
-  if(!_ak){addMsg('lea','Adaugă un Anthropic API Key din setări pentru a activa Lea.');return;}
-  var tk=addMsg('lea','',true);document.getElementById('amb').className='ambient thinking';
+  var gk = localStorage.getItem('lea_gk') || GEMINI_KEY;
+  if(!gk || gk === 'AIzaSy_CHEIA_TA_AICI'){
+    addMsg('lea','Lea nu e activată încă. CEO-ul configurează cheia în curând.');
+    return;
+  }
+  var tk=addMsg('lea','',true);
+  document.getElementById('amb').className='ambient thinking';
   var h=new Date().getHours(),p=h<12?'dimineața':h<17?'după-amiaza':h<21?'seara':'noaptea';
   var city=_city||'România';
-  var sys='Ești Lea, asistentul urban VV. Caldă, directă, umană. MAX 2-3 propoziții. Context: Oraș='+city+', Ora='+h+':00 ('+p+'). '+(dn()?'User='+dn()+'. ':'')+'Nu spune "ca model AI". Dacă nu știi: "nu știu sigur, verificăm?". Urgență (112) — spune PRIMUL. Răspunde DOAR în română.';
-  var msgs=_hist.slice(-8).map(function(m){return{role:m.r==='lea'?'assistant':'user',content:m.t};});
-  msgs.push({role:'user',content:q});
-  try{
-    var res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:300,system:sys,messages:msgs})});
-    var data=await res.json();if(tk)tk.remove();document.getElementById('amb').className='ambient';
-    if(data.content&&data.content[0]){var ans=data.content[0].text;addMsg('lea',ans);_hist.push({r:'user',t:q});_hist.push({r:'lea',t:ans});if(_hist.length>20)_hist=_hist.slice(-20);if(_ek&&_vi)playVoice(ans,null);db.collection('vvhi_dataset').add({action:'LEA_CHAT',context:{city,userType:_u?_u.type:'unknown'},timestamp:firebase.firestore.FieldValue.serverTimestamp()}).catch(function(){});}
-  }catch(e){if(tk)tk.remove();document.getElementById('amb').className='ambient';addMsg('lea','Eroare conexiune.');}
+
+  // Construieste contextul conversatiei pentru Gemini
+  var sysPrompt = 'Ești Lea, asistentul personal urban al ecosistemului VV Hybrid Univers. ' +
+    'Ești caldă, directă, umană — niciodată robotică. Răspunzi SCURT, maxim 2-3 propoziții. ' +
+    'Context: Oraș=' + city + ', Ora=' + h + ':00 (' + p + '). ' +
+    (dn() ? 'Userul se numește ' + dn() + '. ' : '') +
+    'Dacă nu ai date verificate fizic spune uman că nu știi și întreabă dacă trimiți un Insider să verifice. ' +
+    'Nu spune niciodată "ca model AI" sau "nu pot". Spune "nu știu sigur" sau "verificăm împreună". ' +
+    'Dacă e urgență medicală sau pericol, spune 112 PRIMUL. ' +
+    'Răspunde EXCLUSIV în română. Fii Lea — nu un chatbot generic.';
+
+  // Construieste history pentru Gemini format
+  var contents = [];
+  var recentHist = _hist.slice(-8);
+  recentHist.forEach(function(m) {
+    contents.push({
+      role: m.r === 'lea' ? 'model' : 'user',
+      parts: [{text: m.t}]
+    });
+  });
+  contents.push({role:'user', parts:[{text: q}]});
+
+  try {
+    var res = await fetch(
+      'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + gk,
+      {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          system_instruction: {parts: [{text: sysPrompt}]},
+          contents: contents,
+          generationConfig: {
+            maxOutputTokens: 300,
+            temperature: 0.7,
+            topP: 0.9
+          }
+        })
+      }
+    );
+    var data = await res.json();
+    if(tk) tk.remove();
+    document.getElementById('amb').className = 'ambient';
+
+    var ans = null;
+    if(data.candidates && data.candidates[0] && data.candidates[0].content &&
+       data.candidates[0].content.parts && data.candidates[0].content.parts[0]) {
+      ans = data.candidates[0].content.parts[0].text;
+    }
+
+    if(ans) {
+      addMsg('lea', ans);
+      _hist.push({r:'user',t:q});
+      _hist.push({r:'lea',t:ans});
+      if(_hist.length > 40) _hist = _hist.slice(-40);
+      saveHistory();
+      if(_ek && _vi) playVoice(ans, null);
+      // Log VVhi anonim
+      db.collection('vvhi_dataset').add({
+        action: 'LEA_CHAT',
+        context: {city, userType: _u?_u.type:'unknown'},
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      }).catch(function(){});
+    } else {
+      addMsg('lea', 'Nu am primit un răspuns clar. Încearcă din nou.');
+    }
+  } catch(e) {
+    if(tk) tk.remove();
+    document.getElementById('amb').className = 'ambient';
+    addMsg('lea', 'Eroare de conexiune. Verifică internetul.');
+    console.error(e);
+  }
 }
 
 async function playVoice(text,btn){
@@ -569,10 +827,13 @@ function openSett(){
 function closeSett(){document.getElementById('sett').classList.remove('show');}
 function cfgVoice(){
   closeSett();
-  var a=prompt('Anthropic API Key:');if(a&&a.length>10){localStorage.setItem('lea_ak',a);_ak=a;}
-  var e=prompt('ElevenLabs API Key (opțional):');if(e&&e.length>10){localStorage.setItem('lea_ek',e);_ek=e;}
-  var v=prompt('ElevenLabs Voice ID (opțional):');if(v&&v.length>5){localStorage.setItem('lea_vi',v);_vi=v;}
-  showToast('Salvat ✓');
+  var g=prompt('Gemini API Key (AIzaSy...):');
+  if(g&&g.startsWith('AIza')){localStorage.setItem('lea_gk',g);GEMINI_KEY=g;showToast('Gemini activat ✓');}
+  var e=prompt('ElevenLabs API Key (sk_...) · opțional pentru voce:');
+  if(e&&e.length>10){localStorage.setItem('lea_ek',e);_ek=e;}
+  var v=prompt('ElevenLabs Voice ID · opțional:');
+  if(v&&v.length>5){localStorage.setItem('lea_vi',v);_vi=v;}
+  if(g||e||v) showToast('Salvat ✓');
 }
 function logout(){
   if(!confirm('Resetezi identitatea VV pe acest device?'))return;
