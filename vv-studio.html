@@ -239,9 +239,15 @@ html,body{min-height:100vh;background:#000;color:var(--w);font-family:var(--mono
           <div class="card-title">Import Rapid — Date Urgențe București</div>
           <div class="card-sub">Adaugă automat datele esențiale verificate pentru București</div>
           <div style="display:flex;gap:8px;flex-wrap:wrap">
-            <button class="btn btn-outline" onclick="importPreset('spitale_buc')">🏥 Spitale Urgențe BUC</button>
+            <button class="btn btn-outline" onclick="importPreset('spitale_buc')">🏥 Spitale BUC</button>
             <button class="btn btn-outline" onclick="importPreset('politie_buc')">🚔 Poliție BUC</button>
             <button class="btn btn-outline" onclick="importPreset('farmacii_noapte')">💊 Farmacii Noapte</button>
+            <button class="btn btn-outline" onclick="importPreset('pizza_buc')">🍕 Pizza București</button>
+            <button class="btn btn-outline" onclick="importPreset('cafenele_buc')">☕ Cafenele București</button>
+            <button class="btn btn-outline" onclick="importPreset('mancare_rapida_buc')">🍔 Fast Food + Livrare BUC</button>
+            <button class="btn btn-outline" onclick="importPreset('mancare_cluj')">🏔 Mâncare Cluj</button>
+            <button class="btn btn-outline" onclick="importPreset('mancare_timisoara')">🌆 Mâncare Timișoara</button>
+            <button class="btn btn-outline" onclick="importPreset('mancare_iasi')">🏛 Mâncare Iași</button>
             <button class="btn btn-outline" onclick="importPreset('metrou_buc')">🚇 Metrou BUC</button>
             <button class="btn btn-outline" onclick="importPreset('urgente_nationale')">🆘 Numere Urgențe RO</button>
           </div>
@@ -636,7 +642,45 @@ var PRESETS = {
     {name:'URGENȚE — 112',type:'urgenta_num',city:'România',addr:'—',phone:'112',hours:'24/7',info:'Numărul național de urgențe — Poliție, Ambulanță, Pompieri',keywords:'112,urgenta,ambulanta,politie,pompieri,ajutor'},
     {name:'TELVERDE Sănătate — 0800 800 358',type:'urgenta_num',city:'România',addr:'—',phone:'0800 800 358',hours:'24/7',info:'Linie gratuită informații medicale',keywords:'sanatate,telverde,medical,sfat,informatii'},
     {name:'Ambulanță — 112 / 021 961',type:'urgenta_num',city:'București',addr:'—',phone:'021 961',hours:'24/7',info:'Ambulanță București',keywords:'ambulanta,urgenta,112,bucuresti'}
+  ],
+
+  // ── BUCUREȘTI · MÂNCARE & CAFENELE ──
+  pizza_buc: [
+    {name:'Pizza Hut Universitate',type:'restaurant',city:'bucurești',address:'Bd. Magheru 12, Sector 1',phone:'021 311 1111',hours:'10:00-24:00',keywords:'pizza,mancare,livrare,fast food',info:'Livrare disponibilă. Non-stop weekend.',verified:true},
+    {name:'Dominos Pizza Floreasca',type:'restaurant',city:'bucurești',address:'Calea Floreasca 246',phone:'021 233 3333',hours:'10:00-24:00',keywords:'pizza,mancare,livrare,dominos',info:'Livrare rapidă în Floreasca și Dorobanți.',verified:true},
+    {name:'Dristor Kebab',type:'restaurant',city:'bucurești',address:'Str. Dristor 1, Sector 3',phone:'',hours:'00:00-24:00',keywords:'shaorma,mancare,nonstop,kebab,livrare',info:'Non-stop. Shaorma verificată de Insideri.',verified:true},
+    {name:'Ciao Pizza',type:'restaurant',city:'bucurești',address:'Calea Victoriei 45',phone:'0724 000 001',hours:'11:00-23:00',keywords:'pizza,italiana,mancare,victoriei',info:'Pizza italiană artizanală. Rezervare recomandată seara.',verified:true},
+    {name:'Viva Pizza',type:'restaurant',city:'bucurești',address:'Bd. Unirii 20, Sector 4',phone:'021 336 0000',hours:'10:00-23:00',keywords:'pizza,mancare,livrare,unirii',info:'Livrare în sectorul 4.',verified:true}
+  ],
+  cafenele_buc: [
+    {name:'Cărturești Carusel Café',type:'cafenea',city:'bucurești',address:'Str. Lipscani 55, Sector 3',phone:'',hours:'10:00-22:00',keywords:'cafea,cafenea,carti,centru,liber,loc',info:'Cafenea premiu în clădire istorică. Mereu loc disponibil dimineața.',verified:true},
+    {name:'Bob Coffee',type:'cafenea',city:'bucurești',address:'Str. Popa Soare 42, Sector 2',phone:'',hours:'08:00-20:00',keywords:'cafea,specialty,coffee,hipster',info:'Specialty coffee. Aglomerată 9-11 dimineața.',verified:true},
+    {name:'Origo Coffee',type:'cafenea',city:'bucurești',address:'Str. Academiei 28',phone:'',hours:'08:00-21:00',keywords:'cafea,coffee,specialty,centru',info:'Una din cele mai bune cafenele specialty din BUC.',verified:true},
+    {name:'Shift Pub',type:'bar',city:'bucurești',address:'Str. Bărbătescu Vechi 2',phone:'',hours:'16:00-02:00',keywords:'bar,bere,seara,pub,craft',info:'Bar craft beer. Deschis seara. Verificat de Insideri.',verified:true},
+    {name:'Kane Coffee Floreasca',type:'cafenea',city:'bucurești',address:'Calea Floreasca 163',phone:'',hours:'07:30-20:00',keywords:'cafea,coffee,floreasca,dimineata',info:'Deschide la 7:30. Ideal pentru dimineți în Floreasca.',verified:true}
+  ],
+  mancare_rapida_buc: [
+    {name:'KFC Universitate',type:'fast food',city:'bucurești',address:'Bd. Magheru 14',phone:'',hours:'08:00-24:00',keywords:'kfc,fast food,pui,mancare,rapid',info:'Deschis târziu. Coadă mare la prânz.',verified:true},
+    {name:'McDonald's Piața Unirii',type:'fast food',city:'bucurești',address:'Piața Unirii 1',phone:'',hours:'00:00-24:00',keywords:'mcdonalds,burger,fast food,nonstop,unirii',info:'Non-stop. Punct de referință în centru.',verified:true},
+    {name:'Spartan Piața Romană',type:'shaorma',city:'bucurești',address:'Piața Romană 4',phone:'021 212 0000',hours:'10:00-23:00',keywords:'shaorma,mancare,romaneasca,spartan',info:'Shaorma românească. Coadă la ore de vârf.',verified:true},
+    {name:'Glovo Hub București',type:'livrare',city:'bucurești',address:'',phone:'',hours:'08:00-24:00',keywords:'livrare,glovo,acasa,rapid,food delivery',info:'Glovo livrează în tot Bucureștiul. App: Glovo.',verified:true},
+    {name:'tazz by eMAG București',type:'livrare',city:'bucurești',address:'',phone:'',hours:'08:00-23:00',keywords:'livrare,tazz,mancare,acasa,delivery',info:'Livrare din sute de restaurante. App: tazz.',verified:true}
+  ],
+  // ── ALTE ORAȘE IMPORTANTE ──
+  mancare_cluj: [
+    {name:'Baracca Cluj',type:'restaurant',city:'cluj-napoca',address:'Str. Napoca 1',phone:'',hours:'12:00-23:00',keywords:'pizza,italiana,cluj,mancare',info:'Restaurant italian popular în Cluj.',verified:true},
+    {name:'Vivo Food Court',type:'mall',city:'cluj-napoca',address:'Calea Baciului 2-4',phone:'',hours:'10:00-22:00',keywords:'mancare,mall,vivo,Cluj,food court',info:'Multiple opțiuni de mâncare în mallul Vivo.',verified:true},
+    {name:'Glovo Cluj',type:'livrare',city:'cluj-napoca',address:'',phone:'',hours:'09:00-23:00',keywords:'livrare,glovo,acasa,delivery,cluj',info:'Livrare Glovo disponibilă în Cluj-Napoca.',verified:true}
+  ],
+  mancare_timisoara: [
+    {name:'Pizza Pazza Timișoara',type:'restaurant',city:'timișoara',address:'Str. Alba Iulia 2',phone:'',hours:'11:00-23:00',keywords:'pizza,italiana,timisoara,mancare',info:'Pizza populară în Timișoara.',verified:true},
+    {name:'Iulius Mall Food Court',type:'mall',city:'timișoara',address:'Str. Demetriade 1',phone:'',hours:'10:00-22:00',keywords:'mancare,mall,iulius,timisoara',info:'Multiple restaurante în Iulius Mall.',verified:true}
+  ],
+  mancare_iasi: [
+    {name:'Anfora Iași',type:'restaurant',city:'iași',address:'Piața Unirii 5',phone:'',hours:'10:00-23:00',keywords:'restaurant,mancare,iasi,centru',info:'Restaurant central în Iași, lângă Piața Unirii.',verified:true},
+    {name:'Palas Mall Food Court',type:'mall',city:'iași',address:'Str. Palas 7',phone:'',hours:'10:00-22:00',keywords:'mancare,mall,palas,iasi',info:'Food court cu multiple opțiuni în Palas Mall.',verified:true}
   ]
+
 };
 
 async function importPreset(key) {
