@@ -334,18 +334,18 @@ body::before{content:'';position:fixed;inset:0;z-index:0;opacity:.4;
   <div class="a-sub">VV · Inteligența ta personală</div>
   <p class="a-desc">Lea e diferită. Învață din tine, nu din toți. Datele tale rămân pe device-ul tău.</p>
   <div class="checks" id="checks-wrap">
-    <label class="ci" id="ci0" onclick="tc(0)">
+    <div class="ci" id="ci0" onclick="tc(0)">
       <div class="cb" id="cb0"><span class="cm" id="cm0">✓</span></div>
       <div class="ct"><b>Accept VV Charter.</b> Datele mele rămân local pe device-ul meu. Zero email, zero parolă.</div>
-    </label>
-    <label class="ci" id="ci1" onclick="tc(1)">
+    </div>
+    <div class="ci" id="ci1" onclick="tc(1)">
       <div class="cb" id="cb1"><span class="cm" id="cm1">✓</span></div>
       <div class="ct"><b>Confirm că am 18 ani</b> și accesez o platformă Beta în dezvoltare.</div>
-    </label>
-    <label class="ci" id="ci2" onclick="tc(2)">
+    </div>
+    <div class="ci" id="ci2" onclick="tc(2)">
       <div class="cb" id="cb2"><span class="cm" id="cm2">✓</span></div>
       <div class="ct"><b>Accept că Lea învață din mine</b> — anonim, local, pentru a deveni mai bună pentru mine.</div>
-    </label>
+    </div>
   </div>
   <button class="a-btn" id="a-btn" onclick="acceptAccord()">Intru în Lea →</button>
   <p class="a-privacy">VV ID generat automat · Invizibil · Salvat local pe device-ul tău</p>
@@ -447,8 +447,17 @@ body::before{content:'';position:fixed;inset:0;z-index:0;opacity:.4;
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script>
-firebase.initializeApp({apiKey:"AIzaSyDGv4kEClO0RHCLvXVLOT-vyPHw6bsxYVc",authDomain:"vv-ep-beta.firebaseapp.com",projectId:"vv-ep-beta"});
-var db=firebase.firestore();
+try {
+  firebase.initializeApp({apiKey:"AIzaSyDGv4kEClO0RHCLvXVLOT-vyPHw6bsxYVc",authDomain:"vv-ep-beta.firebaseapp.com",projectId:"vv-ep-beta"});
+} catch(e) {}
+var db = null;
+try { db = firebase.firestore(); } catch(e) {}
+
+// Wrapper sigur pentru Firebase
+function fbAdd(col, data) {
+  if(!db) return Promise.resolve();
+  return db.collection(col).add(data).catch(function(){});
+}
 var _u=null,_city=null,_hist=[],_obs=0,_aerL=null,_ch=[false,false,false];
 // !! GEMINI API KEY - gratuit la aistudio.google.com
 // Inlocuieste AIzaSy_CHEIA_TA cu cheia ta reala
@@ -828,7 +837,7 @@ async function acceptAccord(){
   var id=genId();_u={vvid:id,type:'citizen',city:_city,newUser:true};
   localStorage.setItem('lea_id',id);localStorage.setItem('lea_u',JSON.stringify(_u));
   localStorage.setItem('vv_accord_signed','1');localStorage.setItem('vv_citizen_code',id);
-  try{await db.collection('vv_accords').add({citizenCode:id,city:_city||null,device:navigator.userAgent.includes('Mobile')?'mobile':'desktop',timestamp:firebase.firestore.FieldValue.serverTimestamp(),charter_v:'1.3'});}catch(e){}
+  try{await fbAdd('vv_accords', {citizenCode:id,city:_city||null,device:navigator.userAgent.includes('Mobile')?'mobile':'desktop',timestamp:firebase.firestore.FieldValue.serverTimestamp(),charter_v:'1.3'});}catch(e){}
   if(!localStorage.getItem('lea_had_aer')){show('s-aer');document.getElementById('amb').className='ambient aer';setTimeout(function(){if(document.getElementById('s-aer').classList.contains('show'))skipAer();},8000);}
   else startOb();
 }
@@ -850,7 +859,7 @@ async function aerSend(){
   var orb=document.getElementById('aer-orb'),st=document.getElementById('aer-st'),lbl=document.getElementById('aer-lbl');
   orb.classList.add('active');lbl.textContent='Activ';st.className='aer-st searching';st.textContent='Aștept alt device...';
   try{
-    var ref=await db.collection('vv_aer').add({vvid:id,user:JSON.stringify(_u),createdAt:firebase.firestore.FieldValue.serverTimestamp(),claimed:false});
+    var ref=await fbAdd('vv_aer', {vvid:id,user:JSON.stringify(_u),createdAt:firebase.firestore.FieldValue.serverTimestamp(),claimed:false});
     _aerL=db.collection('vv_aer').doc(ref.id).onSnapshot(function(d){
       if(d.data()&&d.data().claimed){
         orb.classList.remove('active');st.className='aer-st found';st.textContent='✓ Sincronizat!';lbl.textContent='✓';
@@ -1018,7 +1027,7 @@ function addMsg(role,text,isTk){
 // 3. Marcheaza clar sursa
 
 async function searchVVNodes(q, intent) {
-  if(!_city) return [];
+  if(!_city || !db) return [];
   try {
     var cityLower = _city.toLowerCase().trim();
     // Normalizare oras — bucuresti = bucurești etc
@@ -1409,11 +1418,11 @@ async function processLea(q){
     if(_ek && _vi) smartPlayVoice(ans);
     updateLeaMemory(q, intent);
 
-    db.collection('vvhi_dataset').add({
+    fbAdd('vvhi_dataset', {
       action:'LEA_CHAT',
       context:{city, intent, hasVV: vvNodes.length>0, userType:_u?_u.type:'unknown'},
       timestamp:firebase.firestore.FieldValue.serverTimestamp()
-    }).catch(function(){});
+    });
 
   } catch(e) {
     clearTimeout(thinkInterval);
@@ -1571,7 +1580,7 @@ function detectCity(){
           prof.currentCity=city;
           localStorage.setItem('vv_lea_profile',JSON.stringify(prof));
         }catch(e){}
-      }).catch(function(){});
+      });
   },function(){},{timeout:8000,enableHighAccuracy:true});
 }
 function updateCityDisp(c){var e=document.getElementById('tb-city');if(e&&c)e.textContent=c;}
