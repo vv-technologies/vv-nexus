@@ -2,1161 +2,1166 @@
 <html lang="ro">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#000">
-<title>Lea</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;1,300;1,400&family=Geist+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<title>VV Lea · Foundation v2</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital,wght@0,300;0,400;1,300;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 :root{
-  --gold:#C8A96E;--gold2:rgba(200,169,110,.1);--gold-b:rgba(200,169,110,.2);
-  --w:#F5F0E8;--w70:rgba(245,240,232,.7);--w50:rgba(245,240,232,.5);
-  --w30:rgba(245,240,232,.3);--w15:rgba(245,240,232,.12);
-  --w08:rgba(245,240,232,.08);--w04:rgba(245,240,232,.04);
-  --border:rgba(245,240,232,.08);
-  --green:#2DB87A;--blue:#2997FF;--bg:#050503;
-  --serif:'Cormorant Garamond',Georgia,serif;
-  --mono:'Geist Mono',monospace;
+  --gold:#C9A84C;--gold2:rgba(201,168,76,.08);--gold-b:rgba(201,168,76,.18);
+  --w:#fff;--w60:rgba(255,255,255,.6);--w40:rgba(255,255,255,.4);
+  --w20:rgba(255,255,255,.2);--w08:rgba(255,255,255,.08);--w04:rgba(255,255,255,.04);
+  --border:rgba(255,255,255,.07);
+  --green:#30D158;--blue:#2997FF;--purple:#BF5AF2;--orange:#FF9F0A;
+  --serif:'Instrument Serif',Georgia,serif;
+  --sans:'Inter',-apple-system,sans-serif;
 }
-html,body{height:100%;min-height:100vh;background:var(--bg);color:var(--w);
-  font-family:var(--mono);-webkit-font-smoothing:antialiased;overflow:hidden;}
-body::before{content:'';position:fixed;inset:0;z-index:0;opacity:.4;
-  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
-  pointer-events:none;}
-.ambient{position:fixed;top:50%;left:50%;transform:translate(-50%,-60%);
-  width:600px;height:600px;border-radius:50%;pointer-events:none;z-index:0;
-  background:radial-gradient(circle,rgba(200,169,110,.05) 0%,transparent 65%);
-  transition:background 1s ease;}
-.ambient.thinking{background:radial-gradient(circle,rgba(200,169,110,.08) 0%,transparent 65%);
-  animation:ap 1.5s ease-in-out infinite;}
-.ambient.listening{background:radial-gradient(circle,rgba(45,184,122,.08) 0%,transparent 65%);}
-.ambient.aer{background:radial-gradient(circle,rgba(41,151,255,.1) 0%,transparent 65%);
-  animation:ap 2s ease-in-out infinite;}
-@keyframes ap{0%,100%{transform:translate(-50%,-60%) scale(1)}50%{transform:translate(-50%,-60%) scale(1.1)}}
-.screen{position:fixed;inset:0;z-index:50;display:none;flex-direction:column;
-  align-items:center;justify-content:center;
-  padding:max(env(safe-area-inset-top),20px) 24px max(env(safe-area-inset-bottom),20px);
-  background:var(--bg);}
-.screen.show{display:flex;}
-@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
-/* ACCORD */
-.a-logo{font-family:var(--serif);font-size:64px;font-style:italic;color:var(--gold);
-  letter-spacing:4px;margin-bottom:6px;animation:fadeUp .8s ease both;}
-.a-sub{font-size:10px;letter-spacing:4px;color:var(--w30);text-transform:uppercase;
-  margin-bottom:40px;animation:fadeUp .8s .1s ease both;}
-.a-desc{font-size:13px;color:var(--w30);line-height:1.8;text-align:center;
-  max-width:340px;margin-bottom:28px;animation:fadeUp .8s .2s ease both;}
-.checks{display:flex;flex-direction:column;gap:10px;width:100%;max-width:360px;
-  margin-bottom:28px;animation:fadeUp .8s .3s ease both;}
-.ci{display:flex;align-items:flex-start;gap:12px;cursor:pointer;padding:13px 15px;
-  background:var(--w04);border:0.5px solid var(--border);border-radius:12px;transition:all .2s;}
-.ci.on{background:var(--gold2);border-color:var(--gold-b);}
-.cb{width:20px;height:20px;border-radius:6px;flex-shrink:0;border:0.5px solid var(--border);
-  background:var(--w04);display:flex;align-items:center;justify-content:center;
-  transition:all .2s;margin-top:1px;}
-.ci.on .cb{background:var(--gold);border-color:var(--gold);}
-.cm{font-size:10px;color:#000;font-weight:700;opacity:0;transition:opacity .15s;}
-.ci.on .cm{opacity:1;}
-.ct{font-size:12px;color:var(--w50);line-height:1.6;}
-.ct b{color:var(--w70);font-weight:500;}
-.a-btn{width:100%;max-width:360px;padding:14px;background:var(--gold);color:#000;
-  border:none;border-radius:12px;font-family:var(--mono);font-size:13px;font-weight:500;
-  cursor:pointer;opacity:.35;pointer-events:none;transition:opacity .2s;letter-spacing:.5px;
-  animation:fadeUp .8s .4s ease both;}
-.a-btn.ready{opacity:1;pointer-events:all;}
-.a-privacy{font-size:10px;color:var(--w15);text-align:center;margin-top:10px;line-height:1.7;
-  max-width:320px;animation:fadeUp .8s .5s ease both;}
-/* RECOGNITION */
-.rec-orb{width:140px;height:140px;border-radius:50%;
-  background:radial-gradient(circle,rgba(200,169,110,.15) 0%,transparent 70%);
-  border:0.5px solid rgba(200,169,110,.2);
-  display:flex;align-items:center;justify-content:center;margin-bottom:28px;
-  animation:orbP 1.5s ease-in-out infinite;}
-@keyframes orbP{0%,100%{box-shadow:0 0 0 0 rgba(200,169,110,.15)}50%{box-shadow:0 0 0 24px rgba(200,169,110,.0)}}
-.rec-l{font-family:var(--serif);font-size:52px;font-style:italic;color:var(--gold);}
-.rec-s{font-size:11px;letter-spacing:3px;color:var(--w30);text-transform:uppercase;margin-bottom:8px;transition:all .3s;}
-.rec-n{font-family:var(--serif);font-size:26px;font-style:italic;color:var(--w70);min-height:34px;transition:all .3s;}
-/* AER */
-.aer-title{font-family:var(--serif);font-size:clamp(28px,6vw,48px);font-weight:300;
-  font-style:italic;color:var(--w70);margin-bottom:8px;text-align:center;}
-.aer-title em{font-style:normal;color:var(--gold);}
-.aer-sub{font-size:12px;color:var(--w30);text-align:center;line-height:1.7;
-  margin-bottom:36px;max-width:300px;}
-.aer-orb{width:160px;height:160px;border-radius:50%;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;margin-bottom:32px;
-  background:radial-gradient(circle,rgba(41,151,255,.12) 0%,transparent 70%);
-  border:0.5px solid rgba(41,151,255,.2);transition:all .3s;flex-direction:column;gap:8px;}
-.aer-orb:hover{background:radial-gradient(circle,rgba(41,151,255,.2) 0%,transparent 70%);}
-.aer-orb.active{animation:aerA 1.2s ease-in-out infinite;}
-@keyframes aerA{0%,100%{box-shadow:0 0 0 0 rgba(41,151,255,.2)}50%{box-shadow:0 0 0 24px rgba(41,151,255,.0)}}
-.aer-icon{font-size:32px;}
-.aer-lbl{font-size:10px;letter-spacing:2px;color:rgba(41,151,255,.8);text-transform:uppercase;}
-.aer-st{font-size:12px;color:var(--w30);text-align:center;min-height:20px;margin-bottom:24px;transition:all .3s;}
-.aer-st.found{color:var(--green);}
-.aer-st.searching{color:var(--blue);}
-.aer-acts{display:flex;gap:10px;}
-.aer-send{padding:10px 18px;background:var(--blue);color:#fff;border:none;
-  border-radius:100px;font-family:var(--mono);font-size:11px;cursor:pointer;letter-spacing:.5px;}
-.aer-recv{padding:10px 18px;background:var(--w04);border:0.5px solid var(--border);
-  color:var(--w50);border-radius:100px;font-family:var(--mono);font-size:11px;cursor:pointer;}
-.aer-skip{background:none;border:none;color:var(--w30);font-family:var(--mono);
-  font-size:11px;cursor:pointer;margin-top:14px;}
-/* ONBOARDING */
-.ob-wrap{max-width:380px;width:100%;text-align:center;}
-.ob-slides{position:relative;height:260px;}
-.ob-slide{position:absolute;inset:0;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;
-  opacity:0;transform:translateX(20px);transition:all .4s ease;pointer-events:none;}
-.ob-slide.active{opacity:1;transform:translateX(0);pointer-events:all;}
-.ob-slide.prev{opacity:0;transform:translateX(-20px);}
-.ob-icon{font-size:48px;margin-bottom:20px;}
-.ob-title{font-family:var(--serif);font-size:clamp(30px,7vw,48px);font-weight:300;
-  font-style:italic;color:var(--gold);margin-bottom:10px;}
-.ob-desc{font-size:13px;color:var(--w30);line-height:1.8;max-width:260px;margin:0 auto;}
-.ob-dots{display:flex;gap:8px;justify-content:center;margin:24px 0 20px;}
-.ob-dot{width:4px;height:4px;border-radius:50%;background:var(--w15);transition:all .3s;}
-.ob-dot.on{background:var(--gold);width:20px;border-radius:2px;}
-.ob-next{padding:12px 32px;background:var(--gold);color:#000;border:none;
-  border-radius:100px;font-family:var(--mono);font-size:12px;font-weight:500;cursor:pointer;}
-.ob-skip{background:none;border:none;color:var(--w30);font-family:var(--mono);
-  font-size:11px;cursor:pointer;margin-top:10px;display:block;margin-left:auto;margin-right:auto;}
-/* APP */
-#app{position:fixed;inset:0;z-index:1;display:flex;flex-direction:column;
-  padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0);}
-.topbar{display:flex;align-items:center;justify-content:space-between;
-  padding:13px 18px;flex-shrink:0;position:relative;z-index:2;}
-.tb-logo{font-family:var(--serif);font-size:20px;font-style:italic;color:var(--gold);letter-spacing:2px;}
-.tb-center{position:absolute;left:50%;transform:translateX(-50%);
-  display:flex;align-items:center;gap:5px;}
-.tb-dot{width:4px;height:4px;border-radius:50%;background:var(--green);
-  box-shadow:0 0 5px rgba(45,184,122,.6);animation:blink 2s ease-in-out infinite;}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
-.tb-city{font-size:11px;color:var(--w30);letter-spacing:.5px;}
-.tb-right{display:flex;gap:7px;}
-.tb-btn{width:28px;height:28px;background:none;border:0.5px solid var(--border);
-  border-radius:50%;color:var(--w30);cursor:pointer;display:flex;
-  align-items:center;justify-content:center;font-size:12px;transition:all .2s;}
-.tb-btn:hover{border-color:var(--w30);color:var(--w50);}
-.conv{flex:1;overflow-y:auto;padding:14px 18px;display:flex;flex-direction:column;
-  gap:12px;scrollbar-width:none;position:relative;z-index:1;}
-.conv::-webkit-scrollbar{display:none;}
-.idle{flex:1;display:flex;flex-direction:column;align-items:center;
-  justify-content:center;text-align:center;padding:40px 20px;}
-.idle.hidden{display:none;}
-.idle-logo{font-family:var(--serif);font-size:72px;font-style:italic;
-  color:rgba(200,169,110,.22);line-height:1;margin-bottom:18px;
-  animation:idleF 4s ease-in-out infinite;}
-@keyframes idleF{0%,100%{transform:translateY(0);opacity:.22}50%{transform:translateY(-8px);opacity:.38}}
-.idle-text{font-size:14px;color:var(--w30);line-height:1.8;}
-.idle-time{font-size:11px;color:var(--w15);margin-top:10px;letter-spacing:1px;}
-.msg{display:flex;flex-direction:column;max-width:88%;
-  animation:msgIn .3s cubic-bezier(.16,1,.3,1) both;}
-.msg.user{align-self:flex-end;align-items:flex-end;}
-.msg.lea{align-self:flex-start;align-items:flex-start;}
-@keyframes msgIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-.msg-b{padding:11px 15px;border-radius:16px;font-size:14px;line-height:1.65;}
-.msg.user .msg-b{background:var(--gold2);border:0.5px solid var(--gold-b);
-  color:var(--w70);border-bottom-right-radius:4px;}
-.msg.lea .msg-b{background:var(--w04);border:0.5px solid var(--border);
-  color:var(--w70);border-bottom-left-radius:4px;}
-.msg.lea .msg-b.tk{display:flex;gap:4px;align-items:center;padding:14px 15px;}
-.td{width:5px;height:5px;border-radius:50%;background:var(--w30);
-  animation:td 1.2s ease-in-out infinite;}
-.td:nth-child(2){animation-delay:.2s;}
-.td:nth-child(3){animation-delay:.4s;}
-@keyframes td{0%,80%,100%{opacity:.3;transform:scale(.8)}40%{opacity:1;transform:scale(1)}}
-.msg-meta{font-size:10px;color:var(--w15);margin-top:4px;display:flex;gap:6px;align-items:center;}
-.play-btn{background:none;border:none;color:var(--w30);cursor:pointer;font-size:11px;transition:color .2s;}
-.play-btn:hover{color:var(--gold);}
-.id-card{background:linear-gradient(135deg,rgba(200,169,110,.1),rgba(200,169,110,.04));
-  border:0.5px solid rgba(200,169,110,.22);border-radius:16px;padding:18px;
-  position:relative;overflow:hidden;width:100%;max-width:270px;}
-.id-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;
-  background:linear-gradient(90deg,transparent,rgba(200,169,110,.4),transparent);}
-.id-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;}
-.id-logo{font-family:var(--serif);font-size:14px;font-style:italic;color:rgba(200,169,110,.5);}
-.id-rank{font-size:9px;font-weight:600;letter-spacing:2px;color:var(--gold);text-transform:uppercase;}
-.id-code{font-family:var(--mono);font-size:13px;color:var(--w);letter-spacing:3px;margin-bottom:4px;}
-.id-name{font-size:11px;color:var(--w30);margin-bottom:10px;}
-.id-bottom{display:flex;justify-content:space-between;align-items:center;
-  padding-top:10px;border-top:0.5px solid rgba(200,169,110,.1);}
-.id-city{font-size:10px;color:var(--w30);}
-.id-xp{font-size:10px;color:var(--gold);}
-.vv{display:none;align-items:center;justify-content:center;gap:3px;padding:14px;}
-.vv.on{display:flex;}
-.vb{width:3px;border-radius:2px;background:var(--green);
-  animation:vb .6s ease-in-out infinite alternate;min-height:4px;}
-.vb:nth-child(1){height:8px;}.vb:nth-child(2){height:16px;animation-delay:.1s;}
-.vb:nth-child(3){height:24px;animation-delay:.2s;}.vb:nth-child(4){height:16px;animation-delay:.3s;}
-.vb:nth-child(5){height:8px;animation-delay:.4s;}.vb:nth-child(6){height:20px;animation-delay:.15s;}
-.vb:nth-child(7){height:12px;animation-delay:.25s;}
-@keyframes vb{from{transform:scaleY(.5)}to{transform:scaleY(1.5)}}
-.input-area{padding:9px 14px;padding-bottom:max(13px,env(safe-area-inset-bottom));
-  border-top:0.5px solid var(--border);background:rgba(5,5,3,.94);
-  backdrop-filter:blur(20px);flex-shrink:0;position:relative;z-index:2;}
-.sugs{display:flex;gap:7px;overflow-x:auto;padding:5px 0 9px;
-  scrollbar-width:none;max-width:680px;margin:0 auto;}
-.sugs::-webkit-scrollbar{display:none;}
-.sug{flex-shrink:0;padding:5px 12px;background:var(--w04);border:0.5px solid var(--border);
-  border-radius:100px;font-size:11px;color:var(--w30);cursor:pointer;
-  transition:all .2s;white-space:nowrap;}
-.sug:hover{border-color:var(--gold-b);color:var(--w50);}
-.irow{display:flex;align-items:flex-end;gap:7px;max-width:680px;margin:0 auto;}
-.ibox{flex:1;background:var(--w04);border:0.5px solid var(--border);
-  border-radius:20px;padding:10px 15px;color:var(--w);font-family:var(--mono);
-  font-size:14px;outline:none;resize:none;max-height:120px;min-height:40px;
-  line-height:1.5;transition:border-color .2s;scrollbar-width:none;}
-.ibox:focus{border-color:rgba(200,169,110,.25);}
-.ibox::placeholder{color:var(--w30);}
-.ibox::-webkit-scrollbar{display:none;}
-.mic{width:40px;height:40px;border-radius:50%;background:var(--w04);
-  border:0.5px solid var(--border);color:var(--w50);cursor:pointer;
-  display:flex;align-items:center;justify-content:center;font-size:15px;
-  transition:all .2s;flex-shrink:0;}
-.mic.on{background:rgba(45,184,122,.12);border-color:rgba(45,184,122,.4);
-  color:var(--green);animation:mp .8s ease-in-out infinite;}
-@keyframes mp{0%,100%{box-shadow:0 0 0 0 rgba(45,184,122,.3)}50%{box-shadow:0 0 0 6px rgba(45,184,122,.0)}}
-.send{width:40px;height:40px;border-radius:50%;background:var(--gold);border:none;
-  color:#000;cursor:pointer;display:flex;align-items:center;justify-content:center;
-  font-size:14px;transition:opacity .15s;flex-shrink:0;}
-.send:disabled{opacity:.3;cursor:not-allowed;}
-#sett{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.75);
-  display:none;align-items:flex-end;justify-content:center;}
-#sett.show{display:flex;}
-.ss{background:#080806;border:0.5px solid var(--border);border-radius:24px 24px 0 0;
-  padding:18px 22px;padding-bottom:max(22px,env(safe-area-inset-bottom));
-  width:100%;max-width:480px;animation:su .3s cubic-bezier(.16,1,.3,1);}
-@keyframes su{from{transform:translateY(100%)}to{transform:translateY(0)}}
-.ss-h{width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 18px;}
-.ss-t{font-size:14px;font-weight:500;margin-bottom:14px;color:var(--w70);}
-.ss-row{display:flex;align-items:center;justify-content:space-between;
-  padding:11px 0;border-bottom:0.5px solid var(--border);}
-.ss-row:last-of-type{border-bottom:none;}
-.ss-l{font-size:12px;color:var(--w50);}
-.ss-v{font-size:11px;color:var(--w30);font-family:var(--mono);}
-.ss-b{padding:7px 14px;background:var(--w04);border:0.5px solid var(--border);
-  border-radius:8px;color:var(--w50);font-family:var(--mono);font-size:11px;cursor:pointer;}
-.ss-close{width:100%;padding:11px;background:none;border:0.5px solid var(--border);
-  border-radius:10px;color:var(--w30);font-family:var(--mono);font-size:12px;cursor:pointer;margin-top:14px;}
-.ss-aer{width:100%;padding:11px;background:rgba(41,151,255,.08);
-  border:0.5px solid rgba(41,151,255,.2);border-radius:10px;
-  color:var(--blue);font-family:var(--mono);font-size:12px;cursor:pointer;margin-top:7px;}
-.ss-out{width:100%;padding:9px;background:none;border:none;
-  color:rgba(255,69,58,.4);font-family:var(--mono);font-size:11px;cursor:pointer;margin-top:3px;}
-#toast{position:fixed;bottom:calc(68px + env(safe-area-inset-bottom));left:50%;
-  transform:translateX(-50%) translateY(6px);background:rgba(5,5,3,.97);
-  border:0.5px solid var(--w08);border-radius:100px;padding:8px 18px;
-  font-size:11px;color:var(--w50);opacity:0;transition:all .25s;
-  pointer-events:none;z-index:999;white-space:nowrap;}
-#toast.on{opacity:1;transform:translateX(-50%) translateY(0);}
-@media(min-width:640px){
-  .msg{max-width:560px;}
-  .conv{align-items:center;}
-  .msg.user,.msg.lea{width:100%;max-width:560px;}
-  .msg.user{align-items:flex-end;}
-  .msg.lea{align-items:flex-start;}
-}
+html{scroll-behavior:smooth;}
+body{background:#050505;color:var(--w);font-family:var(--sans);-webkit-font-smoothing:antialiased;font-size:16px;line-height:1.6;}
 
-/* HISTORY INDICATOR */
-.hist-badge{
-  display:inline-flex;align-items:center;gap:5px;
-  padding:3px 10px;background:var(--w04);border:0.5px solid var(--border);
-  border-radius:100px;font-size:10px;color:var(--w30);margin-bottom:12px;
-  align-self:center;
-}
-/* LIMIT BAR */
-.limit-bar{
-  height:2px;background:var(--border);border-radius:1px;
-  margin:6px 0;overflow:hidden;
-}
-.limit-fill{
-  height:100%;border-radius:1px;background:var(--gold);
-  transition:width .5s ease;
-}
-.limit-fill.warn{background:var(--red);}
-/* DONATE CARD */
-.donate-card{
-  margin:8px 0;padding:16px;
-  background:rgba(200,169,110,.06);border:0.5px solid var(--gold-b);
-  border-radius:14px;text-align:center;align-self:center;
-  width:100%;max-width:300px;
-}
-.dc-title{font-size:13px;font-weight:500;color:var(--w70);margin-bottom:6px;}
-.dc-sub{font-size:11px;color:var(--w30);line-height:1.6;margin-bottom:14px;}
-.dc-btn{padding:9px 20px;background:var(--gold);color:#000;border:none;
-  border-radius:100px;font-family:var(--mono);font-size:11px;font-weight:500;
-  cursor:pointer;letter-spacing:.5px;}
-.dc-btn:hover{opacity:.88;}
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:0 48px;height:52px;display:flex;align-items:center;justify-content:space-between;background:rgba(5,5,5,.9);backdrop-filter:blur(20px);border-bottom:0.5px solid var(--border);}
+.nav-logo{font-weight:600;font-size:15px;letter-spacing:3px;color:var(--gold);text-decoration:none;}
+.nav-right{display:flex;align-items:center;gap:24px;}
+.nav-link{font-size:12px;color:var(--w40);text-decoration:none;transition:color .2s;}
+.nav-link:hover{color:var(--w60);}
+.nav-chip{font-size:10px;font-weight:500;letter-spacing:1px;padding:4px 12px;border-radius:100px;background:var(--gold2);border:0.5px solid var(--gold-b);color:var(--gold);}
 
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:100px 48px 80px;position:relative;}
+.hero::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent);}
+.hero-eye{font-size:11px;font-weight:500;letter-spacing:3px;color:var(--w20);text-transform:uppercase;margin-bottom:40px;}
+.hero-title{font-family:var(--serif);font-size:clamp(52px,8vw,100px);font-weight:400;line-height:1.05;letter-spacing:-2px;margin-bottom:28px;}
+.hero-title em{font-style:italic;color:var(--gold);}
+.hero-sub{font-size:17px;font-weight:300;color:var(--w60);line-height:1.75;max-width:540px;margin:0 auto 48px;}
+.chips{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:7px 16px;background:var(--w04);border:0.5px solid var(--border);border-radius:100px;font-size:12px;color:var(--w40);}
+.chip-dot{width:5px;height:5px;border-radius:50%;}
+.cd-g{background:var(--green);box-shadow:0 0 8px rgba(48,209,88,.5);}
+.cd-gold{background:var(--gold);}
+.cd-p{background:var(--purple);}
 
-/* CACHE INDICATOR */
-.cache-indicator{
-  position:fixed;bottom:calc(70px + env(safe-area-inset-bottom));right:16px;
-  font-size:9px;color:var(--w15);letter-spacing:1px;z-index:10;
-  transition:opacity .3s;
-}
-.cache-indicator.active{color:rgba(45,184,122,.4);}
-/* PRELOAD SCREEN */
-#preload-screen{
-  position:fixed;inset:0;z-index:200;background:var(--bg);
-  display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px;
-}
-#preload-screen.show{display:flex;}
-.preload-logo{font-family:var(--serif);font-size:52px;font-style:italic;color:var(--gold);
-  animation:ap 2s ease-in-out infinite;}
-.preload-text{font-size:11px;letter-spacing:3px;color:var(--w30);text-transform:uppercase;}
-.preload-bar{width:200px;height:1px;background:var(--border);border-radius:1px;overflow:hidden;}
-.preload-fill{height:100%;background:var(--gold);width:0%;transition:width .3s ease;}
-.preload-sub{font-size:10px;color:var(--w15);text-align:center;max-width:260px;line-height:1.7;}
+.sec{max-width:960px;margin:0 auto;padding:100px 48px;border-bottom:0.5px solid var(--border);}
+.sec:last-of-type{border-bottom:none;}
+.s-eye{font-size:11px;font-weight:500;letter-spacing:3px;color:var(--w20);text-transform:uppercase;margin-bottom:24px;}
+.s-title{font-family:var(--serif);font-size:clamp(32px,5vw,60px);font-weight:400;line-height:1.1;letter-spacing:-.5px;margin-bottom:16px;}
+.s-title em{font-style:italic;color:var(--gold);}
+.s-sub{font-size:16px;font-weight:300;color:var(--w60);line-height:1.75;max-width:560px;margin-bottom:60px;}
 
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:48px;}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:48px;}
+.card{padding:28px;background:var(--w04);border:0.5px solid var(--border);border-radius:16px;transition:border-color .2s;}
+.card:hover{border-color:var(--w20);}
+.card.gold{background:rgba(201,168,76,.04);border-color:var(--gold-b);}
+.card.blue{background:rgba(41,151,255,.04);border-color:rgba(41,151,255,.15);}
+.card-icon{font-size:22px;margin-bottom:16px;}
+.card-title{font-size:15px;font-weight:600;margin-bottom:8px;}
+.card-desc{font-size:13px;font-weight:300;color:var(--w40);line-height:1.7;}
+.card-ex{margin-top:14px;padding:12px 14px;background:rgba(255,255,255,.02);border:0.5px solid var(--border);border-radius:10px;font-size:12px;color:var(--w40);line-height:1.6;}
+.card-ex strong{color:var(--gold);font-weight:500;}
+
+.pipeline{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--border);border:0.5px solid var(--border);border-radius:20px;overflow:hidden;margin-bottom:60px;}
+.p-step{background:#050505;padding:28px 20px;}
+.p-step.on{background:rgba(201,168,76,.03);}
+.p-num{font-family:var(--serif);font-style:italic;font-size:32px;color:var(--w08);margin-bottom:16px;line-height:1;}
+.p-step.on .p-num{color:rgba(201,168,76,.3);}
+.p-icon{font-size:20px;margin-bottom:12px;}
+.p-title{font-size:13px;font-weight:600;margin-bottom:8px;}
+.p-desc{font-size:12px;font-weight:300;color:var(--w40);line-height:1.6;}
+.p-tag{display:inline-block;margin-top:12px;font-size:9px;font-weight:600;letter-spacing:1.5px;padding:3px 8px;border-radius:100px;text-transform:uppercase;}
+.pt-live{background:rgba(48,209,88,.1);border:0.5px solid rgba(48,209,88,.2);color:var(--green);}
+.pt-soon{background:rgba(41,151,255,.1);border:0.5px solid rgba(41,151,255,.2);color:var(--blue);}
+.pt-future{background:rgba(255,255,255,.04);border:0.5px solid var(--border);color:var(--w20);}
+
+.tone-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:28px 0;border-bottom:0.5px solid var(--border);}
+.tone-row:last-child{border-bottom:none;}
+.tone-label{font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;}
+.tl-old{color:rgba(255,59,48,.5);}
+.tl-new{color:rgba(201,168,76,.6);}
+.tone-old{padding:16px;background:rgba(255,59,48,.04);border:0.5px solid rgba(255,59,48,.1);border-radius:12px;font-size:13px;color:rgba(255,255,255,.35);line-height:1.6;font-style:italic;}
+.tone-new{padding:16px;background:rgba(201,168,76,.04);border:0.5px solid var(--gold-b);border-radius:12px;font-size:13px;color:var(--w60);line-height:1.6;}
+
+.prem-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:32px;}
+.prem-card{padding:24px;background:var(--w04);border:0.5px solid var(--border);border-radius:16px;}
+.prem-card.feat{background:rgba(201,168,76,.04);border-color:var(--gold-b);}
+.pbadge{display:inline-block;font-size:9px;font-weight:600;letter-spacing:1.5px;padding:3px 10px;border-radius:100px;text-transform:uppercase;margin-bottom:14px;}
+.pb-free{background:rgba(255,255,255,.04);border:0.5px solid var(--border);color:var(--w20);}
+.pb-prem{background:var(--gold2);border:0.5px solid var(--gold-b);color:var(--gold);}
+.prem-title{font-size:14px;font-weight:600;margin-bottom:10px;}
+.prem-list{list-style:none;display:flex;flex-direction:column;gap:8px;}
+.prem-list li{font-size:13px;color:var(--w40);line-height:1.5;display:flex;align-items:flex-start;gap:8px;}
+.prem-list li::before{content:'·';color:var(--gold);flex-shrink:0;}
+.prem-price{font-family:var(--serif);font-size:32px;font-weight:400;color:var(--gold);margin-top:16px;letter-spacing:-1px;}
+.prem-price span{font-size:14px;font-weight:300;color:var(--w40);font-family:var(--sans);}
+
+.rm-row{display:grid;grid-template-columns:20px 1fr;gap:24px;padding:32px 0;border-bottom:0.5px solid var(--border);align-items:start;}
+.rm-row:last-child{border-bottom:none;}
+.rm-dot{width:10px;height:10px;border-radius:50%;background:var(--border);margin-top:5px;}
+.rm-dot.on{background:var(--green);box-shadow:0 0 8px rgba(48,209,88,.4);}
+.rm-dot.next{background:var(--gold);}
+.rm-title{font-size:16px;font-weight:500;margin-bottom:6px;}
+.rm-desc{font-size:14px;font-weight:300;color:var(--w40);line-height:1.7;}
+.rm-date{display:inline-block;margin-top:8px;font-size:10px;font-weight:500;letter-spacing:1.5px;color:var(--w20);text-transform:uppercase;}
+
+.quote{text-align:center;padding:80px 48px;border-bottom:0.5px solid var(--border);}
+.qt{font-family:var(--serif);font-style:italic;font-size:clamp(22px,4vw,44px);font-weight:400;color:var(--w60);max-width:660px;margin:0 auto 20px;line-height:1.25;}
+.qt em{font-style:normal;color:var(--w);}
+.qb{font-size:11px;letter-spacing:2px;color:var(--w20);text-transform:uppercase;}
+
+footer{text-align:center;padding:32px 48px;border-top:0.5px solid var(--border);}
+.fl{font-weight:600;font-size:13px;letter-spacing:3px;color:var(--gold);margin-bottom:16px;}
+.flinks{display:flex;justify-content:center;gap:28px;margin-bottom:12px;flex-wrap:wrap;}
+.flink{font-size:12px;color:var(--w20);text-decoration:none;transition:color .2s;}
+.flink:hover{color:var(--w60);}
+.fcopy{font-size:11px;color:var(--w20);line-height:1.8;}
+
+@media(max-width:768px){
+  .nav{padding:0 20px;}
+  .hero,.sec{padding:60px 20px;}
+  .pipeline,.grid2,.grid3,.prem-grid{grid-template-columns:1fr;}
+  .tone-row{grid-template-columns:1fr;}
+  .quote{padding:60px 20px;}
+  footer{padding:24px 20px;}
+}
+@media(max-width:480px){.pipeline{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>
-<div class="ambient" id="amb"></div>
 
-<!-- PRELOAD AUDIO CACHE -->
-<div id="preload-screen">
-  <div class="preload-logo">L</div>
-  <div class="preload-text" id="preload-text">Pregătesc vocea lui Lea...</div>
-  <div class="preload-bar"><div class="preload-fill" id="preload-fill"></div></div>
-  <div class="preload-sub" id="preload-sub">Prima dată durează ~30 secunde.<br>Apoi Lea vorbește instant.</div>
-</div>
-
-<div class="cache-indicator" id="cache-ind">◉ cache</div>
-<div id="toast"></div>
-
-<!-- ACORD -->
-<div class="screen show" id="s-accord">
-  <div class="a-logo">Lea</div>
-  <div class="a-sub">VV · Inteligența ta personală</div>
-  <p class="a-desc">Lea e diferită. Învață din tine, nu din toți. Datele tale rămân pe device-ul tău.</p>
-  <div class="checks">
-    <div class="ci" onclick="tc(this,0)"><div class="cb"><span class="cm">✓</span></div><div class="ct"><b>Accept VV Charter.</b> Datele mele rămân local. Zero email, zero parolă.</div></div>
-    <div class="ci" onclick="tc(this,1)"><div class="cb"><span class="cm">✓</span></div><div class="ct"><b>Confirm că am 18 ani</b> și accesez o platformă Beta.</div></div>
-    <div class="ci" onclick="tc(this,2)"><div class="cb"><span class="cm">✓</span></div><div class="ct"><b>Accept că Lea învață din mine</b> — anonim, local, pentru a deveni mai bună pentru mine.</div></div>
+<nav class="nav">
+  <a href="https://vv-technologies.github.io/vv-nexus/" class="nav-logo">VV</a>
+  <div class="nav-right">
+    <a href="https://vv-technologies.github.io/vv-nexus/vv-now.html" class="nav-link">VV NOW</a>
+    <a href="https://vv-technologies.github.io/vv-nexus/vv-architecture.html" class="nav-link">Arhitectură</a>
+    <span class="nav-chip">VV Lea · Foundation v2</span>
   </div>
-  <button class="a-btn" id="a-btn" onclick="acceptAccord()">Intru în Lea →</button>
-  <p class="a-privacy">VV ID generat automat · Invizibil · Salvat local pe device-ul tău</p>
-</div>
+</nav>
 
-<!-- RECOGNITION -->
-<div class="screen" id="s-rec">
-  <div class="rec-orb"><div class="rec-l">L</div></div>
-  <div class="rec-s" id="rec-s">Se sincronizează...</div>
-  <div class="rec-n" id="rec-n"></div>
-</div>
-
-<!-- VV AER -->
-<div class="screen" id="s-aer">
-  <h2 class="aer-title">VV <em>Aer</em></h2>
-  <p class="aer-sub">Sincronizează identitatea între device-urile tale. Fără coduri. Fără scanat. Magie.</p>
-  <div class="aer-orb" id="aer-orb">
-    <div class="aer-icon">◎</div>
-    <div class="aer-lbl" id="aer-lbl">Apasă</div>
-  </div>
-  <div class="aer-st" id="aer-st"></div>
-  <div class="aer-acts">
-    <button class="aer-send" onclick="aerSend()">Trimite identitatea mea</button>
-    <button class="aer-recv" onclick="aerRecv()">Primesc de pe alt device</button>
-  </div>
-  <button class="aer-skip" onclick="skipAer()">Nu acum · Continuu</button>
-</div>
-
-<!-- ONBOARDING -->
-<div class="screen" id="s-ob">
-  <div class="ob-wrap">
-    <div class="ob-slides">
-      <div class="ob-slide active" id="ob-0"><div class="ob-icon">👁</div><div class="ob-title">Lea vede.</div><div class="ob-desc">Oameni reali verifică fizic ce se întâmplă în orașul tău. Lea îți spune adevărul.</div></div>
-      <div class="ob-slide" id="ob-1"><div class="ob-icon">⬡</div><div class="ob-title">Lea știe.</div><div class="ob-desc">Cu fiecare zi alături de tine, Lea devine mai bună pentru tine specific. Nu pentru toți — pentru tine.</div></div>
-      <div class="ob-slide" id="ob-2"><div class="ob-icon">🎙</div><div class="ob-title">Lea vorbește.</div><div class="ob-desc">Scrie sau vorbește. Lea răspunde cu vocea fondatorului. În timp — cu vocea ta.</div></div>
-    </div>
-    <div class="ob-dots">
-      <div class="ob-dot on" id="od-0"></div>
-      <div class="ob-dot" id="od-1"></div>
-      <div class="ob-dot" id="od-2"></div>
-    </div>
-    <button class="ob-next" id="ob-next" onclick="nextOb()">Continuă →</button>
-    <button class="ob-skip" onclick="finishOb()">Sari · Intru direct</button>
+<div class="hero">
+  <div class="hero-eye">VV Nexus · VV Lea · Documentul Fundației v2 · Mai 2026</div>
+  <h1 class="hero-title">Lea nu știe totul.<br><em>Te știe pe tine.</em></h1>
+  <p class="hero-sub">VV Nexus e motorul din spate. VV Lea e fața umană. Împreună construiesc singurul AI care învață din oameni reali de pe stradă — și din tine specific.</p>
+  <div class="chips">
+    <div class="chip"><div class="chip-dot cd-g"></div>Live în VV NOW</div>
+    <div class="chip"><div class="chip-dot cd-gold"></div>Memorie personală activă</div>
+    <div class="chip"><div class="chip-dot cd-p"></div>Companion Creativ · Beta</div>
   </div>
 </div>
 
-<!-- APP -->
-<div id="app">
-  <div class="topbar">
-    <div class="tb-logo">Lea</div>
-    <div class="tb-center"><div class="tb-dot"></div><div class="tb-city" id="tb-city">—</div></div>
-    <div class="tb-right">
-      <button class="tb-btn" onclick="openAer()" title="VV Aer">◎</button>
-      <button class="tb-btn" onclick="openSett()">⚙</button>
+<!-- 01 ARHITECTURA DUALĂ -->
+<div class="sec">
+  <div class="s-eye">01 · Arhitectura Duală</div>
+  <h2 class="s-title">VV Nexus.<br><em>VV Lea.</em></h2>
+  <p class="s-sub">Două entități. Un singur scop — adevărul urban, personalizat pentru tine.</p>
+  <div class="grid2">
+    <div class="card blue">
+      <div class="card-icon">⚙️</div>
+      <div class="card-title" style="color:var(--blue)">VV Nexus · Motorul Invizibil</div>
+      <div class="card-desc">Procesează în paralel: Firebase VV Proof, date statice CEO, web search Anthropic API, VVhi Shadow Dataset. Nexus nu vorbește. Calculează și trimite la Lea.</div>
+      <div class="card-ex"><strong>Intern:</strong> 3 surse simultan → scoring → cel mai relevant → trimis la Lea</div>
     </div>
-  </div>
-  <!-- LIMIT BAR -->
-  <div style="padding:0 18px 6px;max-width:680px;margin:0 auto;width:100%;">
-    <div class="limit-bar"><div class="limit-fill" id="limit-fill" style="width:0%"></div></div>
-    <div style="display:flex;justify-content:space-between;align-items:center;">
-      <span style="font-size:9px;color:var(--w15);letter-spacing:1px;" id="limit-lbl">0/20 azi</span>
-      <span style="font-size:9px;color:var(--w15);">Beta · Gemini · VV Lea</span>
-    </div>
-  <div class="conv" id="conv">
-    <div class="idle" id="idle">
-      <div class="idle-logo">L</div>
-      <div class="idle-text" id="idle-t">Sunt Lea.<br>Ce vrei să știi?</div>
-      <div class="idle-time" id="idle-c"></div>
-    </div>
-    <div class="vv" id="vv"><div class="vb"></div><div class="vb"></div><div class="vb"></div><div class="vb"></div><div class="vb"></div><div class="vb"></div><div class="vb"></div></div>
-  </div>
-  <div class="input-area">
-    <div class="sugs" id="sugs"></div>
-    <div class="irow">
-      <textarea class="ibox" id="ibox" placeholder="Întreabă-o pe Lea..." rows="1"
-        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();send();}"
-        oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,120)+'px'"></textarea>
-      <button class="mic" id="mic" onmousedown="startMic()" onmouseup="stopMic()" ontouchstart="startMic()" ontouchend="stopMic()">🎙</button>
-      <button class="send" onclick="send()">↑</button>
+    <div class="card gold">
+      <div class="card-icon">⬡</div>
+      <div class="card-title" style="color:var(--gold)">VV Lea · Fața Umană</div>
+      <div class="card-desc">Traduce datele Nexus în limbaj uman cald. Știe contextul tău — ora, orașul, rolul tău, ce ai căutat. Vorbește ca un om de încredere, nu ca un motor de căutare.</div>
+      <div class="card-ex"><strong>Lea:</strong> "De obicei dimineața e coadă. Trimit pe cineva să confirme acum?"</div>
     </div>
   </div>
 </div>
 
-<!-- SETTINGS -->
-<div id="sett" onclick="if(event.target===this)closeSett()">
-  <div class="ss">
-    <div class="ss-h"></div>
-    <div class="ss-t">Setări Lea</div>
-    <div class="ss-row"><span class="ss-l">VV ID</span><span class="ss-v" id="ss-id">—</span></div>
-    <div class="ss-row"><span class="ss-l">Rang</span><span class="ss-v" id="ss-rang">—</span></div>
-    <div class="ss-row"><span class="ss-l">Oraș</span><span class="ss-v" id="ss-city">—</span></div>
-    <div class="ss-row"><span class="ss-l">Voce Lea</span><button class="ss-b" onclick="cfgVoice()">Configurează</button></div>
-    <button class="ss-aer" onclick="openAer()">◎ VV Aer · Sync device nou</button>
-    <button class="ss-close" onclick="closeSett()">Închide</button>
-    <button class="ss-out" onclick="logout()">Deconectare · Resetează identitatea</button>
+<!-- 02 PIPELINE IBM -->
+<div class="sec">
+  <div class="s-eye">02 · Fundația · 5 Pași IBM</div>
+  <h2 class="s-title">Cum se construiește<br><em>inteligența urbană.</em></h2>
+  <p class="s-sub">Inspirat din arhitectura Foundation Models IBM Watson — adaptat pentru realitatea română. Pașii 1-3 sunt live acum.</p>
+  <div class="pipeline">
+    <div class="p-step on"><div class="p-num">1</div><div class="p-icon">📡</div><div class="p-title">Colectare Date</div><div class="p-desc">VV Proof din teren. Misiuni Insideri. Date statice CEO. Căutări anonimizate.</div><span class="p-tag pt-live">Live</span></div>
+    <div class="p-step on"><div class="p-num">2</div><div class="p-icon">🔍</div><div class="p-title">Filtrare</div><div class="p-desc">Charter ART-3 automat. GPS + timestamp verificat. Duplicate eliminate.</div><span class="p-tag pt-live">Live</span></div>
+    <div class="p-step on"><div class="p-num">3</div><div class="p-icon">🧠</div><div class="p-title">Model Card VV</div><div class="p-desc">VVhi Shadow Dataset — profilul orașului, anonim, purjat la 24h.</div><span class="p-tag pt-live">Live</span></div>
+    <div class="p-step"><div class="p-num">4</div><div class="p-icon">⚙️</div><div class="p-title">Fine-Tune Urban</div><div class="p-desc">Lea specializată per oraș. Nu generic — știe strada ta specific.</div><span class="p-tag pt-soon">VV 1.0</span></div>
+    <div class="p-step"><div class="p-num">5</div><div class="p-icon">🚀</div><div class="p-title">Deploy Global</div><div class="p-desc">VV Lea în orice oraș cu Insideri activi. Inteligență locală per oraș.</div><span class="p-tag pt-future">VV 2.0</span></div>
   </div>
 </div>
 
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-<script>
-firebase.initializeApp({apiKey:"AIzaSyDGv4kEClO0RHCLvXVLOT-vyPHw6bsxYVc",authDomain:"vv-ep-beta.firebaseapp.com",projectId:"vv-ep-beta"});
-var db=firebase.firestore();
-var _u=null,_city=null,_hist=[],_obs=0,_aerL=null,_ch=[false,false,false];
-// !! GEMINI API KEY - gratuit la aistudio.google.com
-// Inlocuieste AIzaSy_CHEIA_TA cu cheia ta reala
-var GEMINI_KEY = localStorage.getItem('lea_gk') || 'AIzaSy_CHEIA_TA_AICI';
-var _ak = GEMINI_KEY; // pastrat pentru compatibilitate
-var _ek=localStorage.getItem('lea_ek')||'',_vi=localStorage.getItem('lea_vi')||'';
-var _audio=null,_rec=null;
-
-
-// ── VV AUDIO CACHE SYSTEM ─────────────────────────────────────
-// Vocea ta pre-generată, stocată local pe fiecare device
-// Zero tokeni ElevenLabs pentru fraze repetitive
-
-var _audioCache = {};
-var _cacheReady = false;
-var _cacheDB = null;
-
-// 30 fraze esențiale Lea — ton CEO premium, parte din ceva mare
-var LEA_PHRASES = {
-  // Greetings
-  'buna_dimineata': 'Bună dimineața. Ecosistemul VV e activ. Ce verificăm azi?',
-  'buna_ziua': 'Bună ziua. Lea e pregătită. Ce vrei să știi?',
-  'buna_seara': 'Bună seara. Faci parte din ceva real. Ce verificăm?',
-  'noapte_buna': 'Noapte bună. VV veghează chiar și acum. Ce mai ai nevoie?',
-
-  // Nu știu - ton uman
-  'nu_stiu_1': 'Nu știu sigur acum. Dar pot trimite un Insider să verifice fizic. Vrei?',
-  'nu_stiu_2': 'Nu am date VV verificate pentru asta. Caut pe net sau lansez o misiune?',
-  'nu_stiu_3': 'Momentan nu am VV Proof pentru zona ta. Trimit pe cineva în 15 minute?',
-
-  // Verify
-  'verify_1': 'Lansez o misiune VERIFY acum. Cel mai apropiat Insider confirmă în curând.',
-  'verify_2': 'Un Insider din zona ta va verifica fizic. Ești conectat la realitate.',
-
-  // Premium tone - parte din ceva mare
-  'welcome_back': 'Te-am recunoscut. Faci parte din Inner Circle VV. Ce construim azi?',
-  'welcome_new': 'Bine ai venit în ecosistemul VV. Primul pas spre adevărul urban.',
-  'part_of_vv': 'Ești parte din ceva ce nu a mai existat. VV crește cu fiecare zi.',
-
-  // Răspunsuri frecvente
-  'caut_net': 'Caut pe internet acum. Informația nu e verificată fizic, dar e un punct de start.',
-  'pizza_generic': 'Nu am date VV verificate pentru pizza în zona ta acum. Lansez o misiune?',
-  'farmacie': 'Pentru urgențe medicale sună 112. Farmaciile de gardă sunt disponibile 24 din 24.',
-  'trafic': 'Nu am date live despre trafic acum. Verifică Waze sau Google Maps pentru rute.',
-  'cafea': 'Nu am VV Proof pentru cafenele deschise acum. Trimit un Insider să verifice?',
-
-  // Erori umane
-  'eroare_conexiune': 'Conexiunea e slabă. Dar Lea e tot aici, offline. Ce pot face pentru tine?',
-  'incearca_din_nou': 'Ceva n-a mers. Încearcă din nou — Lea e răbdătoare.',
-
-  // Motivational CEO
-  'ecosistem_creste': 'Fiecare căutare pune o cărămidă la ecosistemul VV. Mulțumesc că ești aici.',
-  'insider_activ': 'Insiderii sunt activi în orașul tău. Realitatea se validează pe stradă.',
-  'vv_proof': 'VV Proof confirmat. Datele vin direct din teren. Aceasta e certitudinea VV.',
-
-  // Urgente
-  'urgenta': 'Urgență — sună 112 acum. Lea te ajută după.',
-  'spital': 'Pentru urgențe medicale — 112. Cel mai apropiat spital e la dispoziția ta.',
-
-  // Personalizate
-  'streak_3': 'Ziua a treia împreună. Lea te cunoaște mai bine în fiecare zi.',
-  'streak_7': 'O săptămână în VV. Faci parte din istoria ecosistemului.',
-  'limite_aproape': 'Ai aproape de limita zilnică. Susține Lea cu 5€ și continuăm împreună.',
-  'limite_depasit': 'Ai atins limita de azi. Donează 5€ și primești 100 de mesaje zilnic.',
-
-  // Bun ramas
-  'la_revedere': 'La revedere. Lea e tot aici mâine. Ecosistemul veghează.',
-  'multumesc': 'Mulțumesc că ești în VV. Fiecare zi împreună construiește ceva real.'
-};
-
-// Deschide IndexedDB pentru cache audio
-async function openAudioDB() {
-  return new Promise(function(resolve, reject) {
-    var req = indexedDB.open('VVLeaAudio', 1);
-    req.onupgradeneeded = function(e) {
-      var db = e.target.result;
-      if(!db.objectStoreNames.contains('audio')) {
-        db.createObjectStore('audio', {keyPath:'id'});
-      }
-    };
-    req.onsuccess = function(e) { resolve(e.target.result); };
-    req.onerror = function() { resolve(null); };
-  });
-}
-
-async function saveAudioToCache(id, blob) {
-  if(!_cacheDB) return;
-  try {
-    var reader = new FileReader();
-    reader.readAsDataURL(blob);
-    reader.onloadend = function() {
-      var tx = _cacheDB.transaction('audio', 'readwrite');
-      tx.objectStore('audio').put({id, data: reader.result, ts: Date.now()});
-    };
-  } catch(e) {}
-}
-
-async function getAudioFromCache(id) {
-  if(!_cacheDB) return null;
-  return new Promise(function(resolve) {
-    try {
-      var tx = _cacheDB.transaction('audio', 'readonly');
-      var req = tx.objectStore('audio').get(id);
-      req.onsuccess = function(e) {
-        var result = e.target.result;
-        if(!result) { resolve(null); return; }
-        // Cache valid 30 zile
-        if(Date.now() - result.ts > 30 * 24 * 60 * 60 * 1000) { resolve(null); return; }
-        // Converteste din base64 in blob
-        fetch(result.data).then(function(r){ return r.blob(); }).then(resolve).catch(function(){ resolve(null); });
-      };
-      req.onerror = function() { resolve(null); };
-    } catch(e) { resolve(null); }
-  });
-}
-
-// Genereaza o fraza si o salveaza in cache
-async function preGeneratePhrase(id, text) {
-  if(!_ek || !_vi) return false;
-  // Verifica daca e deja in cache
-  var cached = await getAudioFromCache(id);
-  if(cached) return true;
-  try {
-    var res = await fetch('https://api.elevenlabs.io/v1/text-to-speech/' + _vi, {
-      method:'POST',
-      headers:{'xi-api-key':_ek,'Content-Type':'application/json'},
-      body:JSON.stringify({
-        text,
-        model_id:'eleven_multilingual_v2',
-        voice_settings:{stability:.68,similarity_boost:.82,style:.38,use_speaker_boost:true}
-      })
-    });
-    if(!res.ok) return false;
-    var blob = await res.blob();
-    await saveAudioToCache(id, blob);
-    _audioCache[id] = blob;
-    return true;
-  } catch(e) { return false; }
-}
-
-// Pre-genereaza frazele prioritare (primele 8)
-async function preloadPriorityPhrases() {
-  if(!_ek || !_vi) return;
-  var h = new Date().getHours();
-  var priority = [];
-  if(h < 12) priority = ['buna_dimineata','nu_stiu_1','verify_1','welcome_back','ecosistem_creste','farmacie','eroare_conexiune','la_revedere'];
-  else if(h < 18) priority = ['buna_ziua','nu_stiu_1','nu_stiu_2','verify_1','pizza_generic','cafea','farmacie','ecosistem_creste'];
-  else priority = ['buna_seara','noapte_buna','nu_stiu_1','verify_1','farmacie','la_revedere','ecosistem_creste','incearca_din_nou'];
-
-  var screen = document.getElementById('preload-screen');
-  var fillEl = document.getElementById('preload-fill');
-  var textEl = document.getElementById('preload-text');
-
-  // Verifica daca sunt deja in cache - daca da, skip preload screen
-  var db = await openAudioDB();
-  _cacheDB = db;
-  var firstKey = priority[0];
-  var alreadyCached = await getAudioFromCache(firstKey);
-  if(alreadyCached) {
-    _cacheReady = true;
-    updateCacheIndicator();
-    return; // Deja in cache, nu mai arata preload
-  }
-
-  // Prima data - arata preload
-  if(screen) screen.classList.add('show');
-
-  for(var i=0; i<priority.length; i++) {
-    var key = priority[i];
-    var text = LEA_PHRASES[key];
-    if(textEl) textEl.textContent = 'Pregătesc vocea... ' + (i+1) + '/' + priority.length;
-    if(fillEl) fillEl.style.width = ((i+1)/priority.length*100) + '%';
-    await preGeneratePhrase(key, text);
-    await new Promise(function(r){ setTimeout(r, 200); }); // Pauza intre cereri
-  }
-
-  if(screen) screen.classList.remove('show');
-  _cacheReady = true;
-  updateCacheIndicator();
-}
-
-function updateCacheIndicator() {
-  var el = document.getElementById('cache-ind');
-  if(!el) return;
-  var count = Object.keys(_audioCache).length;
-  if(_cacheReady) {
-    el.className = 'cache-indicator active';
-    el.textContent = '◉ ' + count + ' fraze cache';
-  }
-}
-
-// Gaseste fraza din cache sau genereaza live
-async function smartPlayVoice(text) {
-  if(!_ek || !_vi) return;
-
-  // Cauta match in fraze pre-generate
-  var matchId = null;
-  var textLower = text.toLowerCase();
-  for(var id in LEA_PHRASES) {
-    if(LEA_PHRASES[id].toLowerCase() === textLower) {
-      matchId = id;
-      break;
-    }
-  }
-
-  if(matchId) {
-    // Din cache
-    var cached = _audioCache[matchId] || await getAudioFromCache(matchId);
-    if(cached) {
-      if(_audio){_audio.pause();_audio=null;}
-      _audio = new Audio(URL.createObjectURL(cached));
-      _audio.play();
-      return;
-    }
-  }
-
-  // Nu e in cache - genereaza live si salveaza
-  await playVoiceAndCache(text, matchId);
-}
-
-async function playVoiceAndCache(text, cacheId) {
-  if(!_ek || !_vi) return;
-  if(_audio){_audio.pause();_audio=null;}
-  try {
-    var res = await fetch('https://api.elevenlabs.io/v1/text-to-speech/' + _vi, {
-      method:'POST',
-      headers:{'xi-api-key':_ek,'Content-Type':'application/json'},
-      body:JSON.stringify({
-        text,model_id:'eleven_multilingual_v2',
-        voice_settings:{stability:.68,similarity_boost:.82,style:.38,use_speaker_boost:true}
-      })
-    });
-    if(!res.ok) return;
-    var blob = await res.blob();
-    // Salveaza in cache pentru data viitoare
-    if(cacheId) {
-      await saveAudioToCache(cacheId, blob);
-      _audioCache[cacheId] = blob;
-    }
-    _audio = new Audio(URL.createObjectURL(blob));
-    _audio.play();
-  } catch(e) {}
-}
-
-// ── LIMITE BETA ────────────────────────────────────────────────
-var DAILY_LIMIT = 20;      // mesaje gratuite / zi
-var PREMIUM_LIMIT = 100;   // mesaje cu donatie / zi
-var DONATE_URL = 'https://revolut.me/vv'; // schimba cu linkul tau real
-
-function getTodayKey() {
-  var d = new Date();
-  return 'lea_msgs_' + d.getFullYear() + '_' + (d.getMonth()+1) + '_' + d.getDate();
-}
-
-function getMsgCount() {
-  return parseInt(localStorage.getItem(getTodayKey()) || '0');
-}
-
-function incMsgCount() {
-  var k = getTodayKey();
-  var n = getMsgCount() + 1;
-  localStorage.setItem(k, n.toString());
-  return n;
-}
-
-function getLimit() {
-  var isPremium = localStorage.getItem('lea_premium_until');
-  if(isPremium && new Date(isPremium) > new Date()) return PREMIUM_LIMIT;
-  return DAILY_LIMIT;
-}
-
-function canSend() {
-  return getMsgCount() < getLimit();
-}
-
-function updateLimitBar() {
-  var count = getMsgCount();
-  var limit = getLimit();
-  var pct = Math.min(100, (count / limit) * 100);
-  var fill = document.getElementById('limit-fill');
-  if(fill) {
-    fill.style.width = pct + '%';
-    fill.className = 'limit-fill' + (pct >= 80 ? ' warn' : '');
-  }
-  var lbl = document.getElementById('limit-lbl');
-  if(lbl) lbl.textContent = count + '/' + limit + ' azi';
-}
-
-// ── CONVERSATIE PERSISTENTA 24H ───────────────────────────────
-var HIST_KEY = 'lea_history_v1';
-
-function saveHistory() {
-  try {
-    var toSave = _hist.slice(-40); // max 40 mesaje
-    var data = {
-      messages: toSave,
-      date: new Date().toDateString(),
-      city: _city
-    };
-    localStorage.setItem(HIST_KEY, JSON.stringify(data));
-  } catch(e) {}
-}
-
-function loadHistory() {
-  try {
-    var raw = localStorage.getItem(HIST_KEY);
-    if(!raw) return [];
-    var data = JSON.parse(raw);
-    // Pastreaza doar daca e din ultimele 24h
-    var saved = new Date(data.date);
-    var now = new Date();
-    var diffH = (now - saved) / (1000 * 60 * 60);
-    if(diffH > 24) {
-      localStorage.removeItem(HIST_KEY);
-      return [];
-    }
-    return data.messages || [];
-  } catch(e) { return []; }
-}
-
-window.addEventListener('load',function(){
-  detectCity(); updateClock(); setInterval(updateClock,60000);
-  var sid=localStorage.getItem('lea_id'),su=localStorage.getItem('lea_u');
-  if(sid&&su){try{_u=JSON.parse(su);showRec();return;}catch(e){localStorage.removeItem('lea_id');localStorage.removeItem('lea_u');}}
-  var cc=localStorage.getItem('vv_citizen_code'),as=localStorage.getItem('vv_accord_signed');
-  if(cc&&as){_u={vvid:cc,type:'citizen',city:localStorage.getItem('vvme_home_city')};localStorage.setItem('lea_id',cc);localStorage.setItem('lea_u',JSON.stringify(_u));showRec();return;}
-  show('s-accord');
-});
-
-function show(id){document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('show');});var e=document.getElementById(id);if(e)e.classList.add('show');}
-function hideAll(){document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('show');});}
-
-function tc(el,i){_ch[i]=!_ch[i];el.classList.toggle('on',_ch[i]);document.getElementById('a-btn').classList.toggle('ready',_ch[0]&&_ch[1]&&_ch[2]);}
-
-async function acceptAccord(){
-  if(!_ch[0]||!_ch[1]||!_ch[2])return;
-  var id=genId();_u={vvid:id,type:'citizen',city:_city,newUser:true};
-  localStorage.setItem('lea_id',id);localStorage.setItem('lea_u',JSON.stringify(_u));
-  localStorage.setItem('vv_accord_signed','1');localStorage.setItem('vv_citizen_code',id);
-  try{await db.collection('vv_accords').add({citizenCode:id,city:_city||null,device:navigator.userAgent.includes('Mobile')?'mobile':'desktop',timestamp:firebase.firestore.FieldValue.serverTimestamp(),charter_v:'1.3'});}catch(e){}
-  if(!localStorage.getItem('lea_had_aer')){show('s-aer');document.getElementById('amb').className='ambient aer';setTimeout(function(){if(document.getElementById('s-aer').classList.contains('show'))skipAer();},8000);}
-  else startOb();
-}
-
-function genId(){var c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789',p1='',p2='';for(var i=0;i<3;i++)p1+=c[Math.floor(Math.random()*c.length)];for(var i=0;i<3;i++)p2+=c[Math.floor(Math.random()*c.length)];return'VV·'+p1+'·'+p2;}
-
-function showRec(){
-  show('s-rec');document.getElementById('amb').className='ambient thinking';
-  var s=document.getElementById('rec-s'),n=document.getElementById('rec-n');
-  setTimeout(function(){s.textContent='Identitate recunoscută.';},500);
-  setTimeout(function(){n.textContent=dn();s.textContent=(_u&&_u.newUser)?'Bine ai venit.':'Bine ai revenit.';},1100);
-  setTimeout(function(){document.getElementById('amb').className='ambient';hideAll();if(!localStorage.getItem('lea_ob')&&_u&&_u.newUser)startOb();else enterApp();},2200);
-}
-
-function dn(){if(!_u)return'';if(_u.type==='ceo')return'CEO · Fondator';if(_u.name)return _u.name;if(_u.alias)return _u.alias;return _u.vvid||'';}
-
-async function aerSend(){
-  var id=_u?_u.vvid:localStorage.getItem('lea_id');if(!id)return;
-  var orb=document.getElementById('aer-orb'),st=document.getElementById('aer-st'),lbl=document.getElementById('aer-lbl');
-  orb.classList.add('active');lbl.textContent='Activ';st.className='aer-st searching';st.textContent='Aștept alt device...';
-  try{
-    var ref=await db.collection('vv_aer').add({vvid:id,user:JSON.stringify(_u),createdAt:firebase.firestore.FieldValue.serverTimestamp(),claimed:false});
-    _aerL=db.collection('vv_aer').doc(ref.id).onSnapshot(function(d){
-      if(d.data()&&d.data().claimed){
-        orb.classList.remove('active');st.className='aer-st found';st.textContent='✓ Sincronizat!';lbl.textContent='✓';
-        if(_aerL)_aerL();localStorage.setItem('lea_had_aer','1');
-        setTimeout(skipAer,1800);
-      }
-    });
-    setTimeout(function(){if(_aerL){_aerL();_aerL=null;}orb.classList.remove('active');if(st.textContent.includes('Aștept')){st.textContent='Timeout. Încearcă din nou.';st.className='aer-st';lbl.textContent='Apasă';}db.collection('vv_aer').doc(ref.id).delete().catch(function(){});},5*60*1000);
-  }catch(e){st.textContent='Eroare conexiune.';orb.classList.remove('active');}
-}
-
-async function aerRecv(){
-  var orb=document.getElementById('aer-orb'),st=document.getElementById('aer-st'),lbl=document.getElementById('aer-lbl');
-  orb.classList.add('active');lbl.textContent='Caută...';st.className='aer-st searching';st.textContent='Caut identitate VV...';
-  try{
-    var t5=new Date(Date.now()-5*60*1000);
-    var snap=await db.collection('vv_aer').where('claimed','==',false).where('createdAt','>=',firebase.firestore.Timestamp.fromDate(t5)).orderBy('createdAt','desc').limit(1).get();
-    if(snap.empty){orb.classList.remove('active');st.textContent='Nu am găsit niciun device activ. Apasă "Trimite" pe celălalt device.';st.className='aer-st';lbl.textContent='Apasă';return;}
-    var doc=snap.docs[0],data=doc.data();
-    await db.collection('vv_aer').doc(doc.id).update({claimed:true});
-    _u=JSON.parse(data.user);localStorage.setItem('lea_id',data.vvid);localStorage.setItem('lea_u',JSON.stringify(_u));localStorage.setItem('lea_had_aer','1');
-    orb.classList.remove('active');st.className='aer-st found';st.textContent='✓ VV Aer conectat!';lbl.textContent='✓';
-    setTimeout(function(){hideAll();document.getElementById('amb').className='ambient';enterApp();showToast('VV Aer sincronizat ✓');},1500);
-  }catch(e){orb.classList.remove('active');st.textContent='Eroare.';st.className='aer-st';lbl.textContent='Apasă';}
-}
-
-function skipAer(){if(_aerL){_aerL();_aerL=null;}document.getElementById('amb').className='ambient';startOb();}
-function openAer(){closeSett();show('s-aer');document.getElementById('amb').className='ambient aer';}
-
-function startOb(){_obs=0;updateOb();show('s-ob');}
-function nextOb(){_obs++;if(_obs>=3){finishOb();return;}updateOb();}
-function updateOb(){[0,1,2].forEach(function(i){var s=document.getElementById('ob-'+i),d=document.getElementById('od-'+i);if(s){s.classList.toggle('active',i===_obs);s.classList.toggle('prev',i<_obs);}if(d)d.classList.toggle('on',i===_obs);});var b=document.getElementById('ob-next');if(b)b.textContent=_obs===2?'Intru în Lea →':'Continuă →';}
-function finishOb(){localStorage.setItem('lea_ob','1');hideAll();enterApp();}
-
-function enterApp(){
-  hideAll();init();
-  // Initializeaza cache audio in fundal
-  openAudioDB().then(function(db){
-    _cacheDB = db;
-    setTimeout(function(){ preloadPriorityPhrases(); }, 1000);
-  });
-  setTimeout(showCard,600);
-}
-
-function showHistoryIfAny() {
-  var hist = loadHistory();
-  if(!hist || hist.length === 0) return;
-  _hist = hist;
-  var conv = document.getElementById('conv');
-  document.getElementById('idle').classList.add('hidden');
-  // Mostra badge istoric
-  var badge = document.createElement('div');
-  badge.className = 'hist-badge';
-  badge.innerHTML = '⏱ Conversație din ultimele 24h · ' + hist.filter(function(m){return m.r==='user';}).length + ' mesaje';
-  conv.appendChild(badge);
-  // Mostra ultimele 6 mesaje din istoric
-  var recent = hist.slice(-6);
-  recent.forEach(function(m) {
-    var msg = document.createElement('div');
-    msg.className = 'msg ' + (m.r==='lea'?'lea':'user');
-    var bub = document.createElement('div');
-    bub.className = 'msg-b';
-    bub.textContent = m.t;
-    bub.style.opacity = '.6';
-    msg.appendChild(bub);
-    conv.appendChild(msg);
-  });
-  conv.scrollTo({top:conv.scrollHeight,behavior:'smooth'});
-}
-
-function init(){
-  var h=new Date().getHours(),g=h<12?'Bună dimineața':h<18?'Bună ziua':h<22?'Bună seara':'Noapte bună';
-  if(_u&&_u.city){_city=_u.city;localStorage.setItem('vvme_home_city',_city);}
-  var el=document.getElementById('idle-t');
-  if(el)el.innerHTML=g+(dn()?', <strong style="color:var(--w)">'+dn()+'</strong>':'')+'.'+ (_city?' Ești în <strong style="color:var(--w)">'+_city+'</strong>.':'')+'<br>Ce vrei să știi?';
-  updateCityDisp(_city);buildSugs();
-}
-
-function showCard(){
-  if(!_u)return;
-  document.getElementById('idle').classList.add('hidden');
-  updateLimitBar();
-  // Incarca istoricul dupa card
-  setTimeout(showHistoryIfAny, 200);
-  var conv=document.getElementById('conv');
-  var rm={ceo:'💎 CEO · Fondator',founder:'💎 Fondator',citizen:'⬡ Cetățean VV'};
-  var rank=rm[_u.type]||'⬡ VV',city=_city||'—',name=dn(),xp=(_u.type==='ceo'||_u.type==='founder')?'XP: ∞':'XP: 1';
-  var w=document.createElement('div');
-  w.className='msg lea';w.style.cssText='align-self:center;width:100%;max-width:270px;';
-  w.innerHTML='<div class="id-card"><div class="id-top"><div class="id-logo">Lea</div><div class="id-rank">'+rank+'</div></div><div class="id-code">'+_u.vvid+'</div>'+(name&&name!==_u.vvid?'<div class="id-name">'+name+'</div>':'')+'<div class="id-bottom"><div class="id-city">📍 '+city+'</div><div class="id-xp">'+xp+'</div></div></div><div class="msg-meta">Lea · Identitatea ta · <span style="color:var(--blue);cursor:pointer" onclick="openAer()">◎ VV Aer</span></div>';
-  conv.appendChild(w);conv.scrollTo({top:conv.scrollHeight,behavior:'smooth'});
-  setTimeout(function(){
-    var h=new Date().getHours(),g=h<12?'Bună dimineața':h<18?'Bună ziua':h<22?'Bună seara':'Noapte bună';
-    var wm=g+'. ';
-    if(_u.type==='ceo')wm+='Fondator. Ce construim azi?';
-    else if(name&&name!==_u.vvid)wm+=name+'. Ce vrei să știi?';
-    else wm+='Ce vrei să știi'+(_city?' despre '+_city:''+'?');
-    addMsg('lea',wm);
-  },500);
-}
-
-function send(){
-  var b=document.getElementById('ibox'),t=b.value.trim();
-  if(!t)return;
-  if(!canSend()){
-    showDonateCard();
-    return;
-  }
-  b.value='';b.style.height='auto';
-  addMsg('user',t);
-  document.getElementById('idle').classList.add('hidden');
-  incMsgCount();
-  updateLimitBar();
-  processLea(t);
-}
-
-function showDonateCard() {
-  var conv = document.getElementById('conv');
-  var existing = document.getElementById('donate-card');
-  if(existing) { conv.scrollTo({top:conv.scrollHeight,behavior:'smooth'}); return; }
-  var card = document.createElement('div');
-  card.id = 'donate-card';
-  card.className = 'donate-card';
-  card.innerHTML =
-    '<div class="dc-title">Ai folosit ' + getMsgCount() + ' mesaje azi.</div>' +
-    '<div class="dc-sub">În Beta, Lea e gratuită până la ' + DAILY_LIMIT + ' mesaje/zi.<br>Donează 5€ și primești 100 mesaje/zi pentru 30 de zile.</div>' +
-    '<button class="dc-btn" onclick="donate()">Susțin Lea · 5€ →</button>';
-  conv.appendChild(card);
-  conv.scrollTo({top:conv.scrollHeight,behavior:'smooth'});
-}
-
-function donate() {
-  window.open(DONATE_URL, '_blank');
-  // Simulare activare premium (in productie, verifica plata)
-  showToast('Mulțumim! Activare manuală în 24h.');
-}
-
-// Activare premium manual de CEO
-function activatePremium(days) {
-  var until = new Date(Date.now() + (days||30) * 24 * 60 * 60 * 1000);
-  localStorage.setItem('lea_premium_until', until.toISOString());
-  showToast('Premium activat · ' + days + ' zile ✓');
-  updateLimitBar();
-}
-
-function addMsg(role,text,isTk){
-  var conv=document.getElementById('conv'),msg=document.createElement('div');
-  msg.className='msg '+role;if(isTk)msg.id='tk-msg';
-  var bub=document.createElement('div');bub.className='msg-b'+(isTk?' tk':'');
-  if(isTk)bub.innerHTML='<div class="td"></div><div class="td"></div><div class="td"></div>';
-  else bub.textContent=text;
-  msg.appendChild(bub);
-  if(role==='lea'&&!isTk){
-    var meta=document.createElement('div');meta.className='msg-meta';meta.innerHTML='<span>Lea</span>';
-    if(_ek&&_vi){var pb=document.createElement('button');pb.className='play-btn';pb.textContent='▶';pb.onclick=function(){playVoice(text,pb);};meta.appendChild(pb);}
-    msg.appendChild(meta);
-  }
-  conv.appendChild(msg);conv.scrollTo({top:conv.scrollHeight,behavior:'smooth'});return msg;
-}
-
-async function processLea(q){
-  var gk = localStorage.getItem('lea_gk') || GEMINI_KEY;
-  if(!gk || gk === 'AIzaSy_CHEIA_TA_AICI'){
-    addMsg('lea','Lea nu e activată încă. CEO-ul configurează cheia în curând.');
-    return;
-  }
-  var tk=addMsg('lea','',true);
-  document.getElementById('amb').className='ambient thinking';
-  var h=new Date().getHours(),p=h<12?'dimineața':h<17?'după-amiaza':h<21?'seara':'noaptea';
-  var city=_city||'România';
-
-  // Construieste contextul conversatiei pentru Gemini
-  var sysPrompt = 'Ești Lea, asistentul personal urban al ecosistemului VV Hybrid Univers. ' +
-    'Ești caldă, directă, umană — niciodată robotică. Răspunzi SCURT, maxim 2-3 propoziții. ' +
-    'Context: Oraș=' + city + ', Ora=' + h + ':00 (' + p + '). ' +
-    (dn() ? 'Userul se numește ' + dn() + '. ' : '') +
-    'Dacă nu ai date verificate fizic spune uman că nu știi și întreabă dacă trimiți un Insider să verifice. ' +
-    'Nu spune niciodată "ca model AI" sau "nu pot". Spune "nu știu sigur" sau "verificăm împreună". ' +
-    'Dacă e urgență medicală sau pericol, spune 112 PRIMUL. ' +
-    'Răspunde EXCLUSIV în română. Fii Lea — nu un chatbot generic.';
-
-  // Construieste history pentru Gemini format
-  var contents = [];
-  var recentHist = _hist.slice(-8);
-  recentHist.forEach(function(m) {
-    contents.push({
-      role: m.r === 'lea' ? 'model' : 'user',
-      parts: [{text: m.t}]
-    });
-  });
-  contents.push({role:'user', parts:[{text: q}]});
-
-  try {
-    var res = await fetch(
-      'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + gk,
-      {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({
-          system_instruction: {parts: [{text: sysPrompt}]},
-          contents: contents,
-          generationConfig: {
-            maxOutputTokens: 300,
-            temperature: 0.7,
-            topP: 0.9
-          }
-        })
-      }
-    );
-    var data = await res.json();
-    if(tk) tk.remove();
-    document.getElementById('amb').className = 'ambient';
-
-    var ans = null;
-    // Incearca toate formatele posibile Gemini
-    try {
-      if(data.candidates && data.candidates[0]) {
-        var cand = data.candidates[0];
-        if(cand.content && cand.content.parts && cand.content.parts[0]) {
-          ans = cand.content.parts[0].text;
-        } else if(cand.text) {
-          ans = cand.text;
-        }
-      }
-      if(!ans && data.text) ans = data.text;
-      if(!ans && data.content) ans = data.content;
-    } catch(pe) {}
-
-    // Daca tot nu are raspuns, da un fallback uman
-    if(!ans) {
-      var h2 = new Date().getHours();
-      var fallbacks = [
-        'Nu știu sigur. Vrei să trimit un Insider să verifice?',
-        'Momentan nu am date verificate pentru asta. Caut pe net?',
-        'Hmm, nu am informații clare acum. Încearcă din nou sau lansez o misiune?'
-      ];
-      ans = fallbacks[Math.floor(Math.random() * fallbacks.length)];
-    }
-
-    if(ans) {
-      addMsg('lea', ans);
-      _hist.push({r:'user',t:q});
-      _hist.push({r:'lea',t:ans});
-      if(_hist.length > 40) _hist = _hist.slice(-40);
-      saveHistory();
-      if(_ek && _vi) smartPlayVoice(ans);
-      // Log VVhi anonim
-      db.collection('vvhi_dataset').add({
-        action: 'LEA_CHAT',
-        context: {city, userType: _u?_u.type:'unknown'},
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-      }).catch(function(){});
-    } else {
-      addMsg('lea', 'Nu am primit un răspuns clar. Încearcă din nou.');
-    }
-  } catch(e) {
-    if(tk) tk.remove();
-    document.getElementById('amb').className = 'ambient';
-    addMsg('lea', 'Eroare de conexiune. Verifică internetul.');
-    console.error(e);
-  }
-}
-
-async function playVoice(text,btn){
-  if(!_ek||!_vi)return;
-  if(btn){btn.textContent='⏳';btn.disabled=true;}
-  if(_audio){_audio.pause();_audio=null;}
-
-  // Cauta in cache mai intai
-  var matchId=null;
-  var tl=text.toLowerCase();
-  for(var id in LEA_PHRASES){if(LEA_PHRASES[id].toLowerCase()===tl){matchId=id;break;}}
-
-  var blob=null;
-  if(matchId){blob=_audioCache[matchId]||await getAudioFromCache(matchId);}
-
-  if(!blob){
-    // Genereaza live
-    try{
-      var res=await fetch('https://api.elevenlabs.io/v1/text-to-speech/'+_vi,{method:'POST',headers:{'xi-api-key':_ek,'Content-Type':'application/json'},body:JSON.stringify({text,model_id:'eleven_multilingual_v2',voice_settings:{stability:.68,similarity_boost:.82,style:.38,use_speaker_boost:true}})});
-      if(!res.ok){if(btn){btn.textContent='▶';btn.disabled=false;}return;}
-      blob=await res.blob();
-      // Salveaza pentru data viitoare
-      if(matchId){await saveAudioToCache(matchId,blob);_audioCache[matchId]=blob;}
-    }catch(e){if(btn){btn.textContent='▶';btn.disabled=false;}return;}
-  }
-
-  _audio=new Audio(URL.createObjectURL(blob));_audio.play();
-  if(btn){
-    btn.textContent='⏸';btn.disabled=false;
-    btn.onclick=function(){_audio.pause();btn.textContent='▶';btn.onclick=function(){playVoice(text,btn);};};
-    _audio.onended=function(){btn.textContent='▶';btn.onclick=function(){playVoice(text,btn);};};
-  }
-}
-
-function startMic(){
-  var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-  if(!SR){showToast('Vocea nu e suportată în acest browser');return;}
-  var m=document.getElementById('mic'),vv=document.getElementById('vv');
-  m.classList.add('on');m.textContent='⏹';vv.classList.add('on');document.getElementById('amb').className='ambient listening';
-  _rec=new SR();_rec.lang='ro-RO';
-  _rec.onresult=function(e){document.getElementById('ibox').value=e.results[0][0].transcript;stopMic();setTimeout(send,200);};
-  _rec.onerror=function(){stopMic();showToast('Nu am înțeles.');};
-  _rec.onend=function(){stopMic();};_rec.start();
-}
-function stopMic(){
-  var m=document.getElementById('mic'),vv=document.getElementById('vv');
-  m.classList.remove('on');m.textContent='🎙';vv.classList.remove('on');document.getElementById('amb').className='ambient';
-  if(_rec){try{_rec.stop();}catch(e){}_rec=null;}
-}
-
-function buildSugs(){
-  var h=new Date().getHours(),city=_city||'zonă',items=[];
-  if(h<11)items=['Cafea deschisă?','Trafic acum?','Farmacie?','Vreme azi?'];
-  else if(h<15)items=['Restaurant în '+city+'?','E coadă?','Pizza?','Livrare?'];
-  else if(h<21)items=['Ce e deschis?','Cafenea cu loc?','Farmacie nonstop?','Parc?'];
-  else items=['Livrare noaptea?','Farmacie gardă?','Urgență?','Taxi?'];
-  var s=document.getElementById('sugs');
-  if(s)s.innerHTML=items.map(function(i){return'<div class="sug" onclick="useSug(\''+i+'\')">'+i+'</div>';}).join('');
-}
-function useSug(t){document.getElementById('ibox').value=t;send();}
-
-function detectCity(){
-  var s=localStorage.getItem('vvme_home_city');if(s){_city=s;updateCityDisp(s);return;}
-  if(!navigator.geolocation)return;
-  navigator.geolocation.getCurrentPosition(function(p){
-    fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat='+p.coords.latitude+'&lon='+p.coords.longitude+'&accept-language=ro')
-      .then(function(r){return r.json();}).then(function(d){var c=d.address?(d.address.city||d.address.town||d.address.village||'România'):'România';_city=c;localStorage.setItem('vvme_home_city',c);updateCityDisp(c);if(_u&&!_u.city){_u.city=c;localStorage.setItem('lea_u',JSON.stringify(_u));}}).catch(function(){});
-  },function(){},{timeout:8000});
-}
-function updateCityDisp(c){var e=document.getElementById('tb-city');if(e&&c)e.textContent=c;}
-function updateClock(){var n=new Date(),e=document.getElementById('idle-c');if(e)e.textContent=n.getHours().toString().padStart(2,'0')+':'+n.getMinutes().toString().padStart(2,'0');}
-
-function openSett(){
-  if(_u){var i=document.getElementById('ss-id'),r=document.getElementById('ss-rang'),c=document.getElementById('ss-city');
-  if(i)i.textContent=_u.vvid||'—';
-  var rm={ceo:'CEO · Fondator',founder:'Fondator',citizen:'Cetățean VV'};
-  if(r)r.textContent=rm[_u.type]||'Standard';if(c)c.textContent=_city||'—';}
-  document.getElementById('sett').classList.add('show');
-}
-function closeSett(){document.getElementById('sett').classList.remove('show');}
-function cfgVoice(){
-  closeSett();
-  var g=prompt('Gemini API Key (AIzaSy...):');
-  if(g&&g.startsWith('AIza')){localStorage.setItem('lea_gk',g);GEMINI_KEY=g;showToast('Gemini activat ✓');}
-  var e=prompt('ElevenLabs API Key (sk_...) · opțional pentru voce:');
-  if(e&&e.length>10){localStorage.setItem('lea_ek',e);_ek=e;}
-  var v=prompt('ElevenLabs Voice ID · opțional:');
-  if(v&&v.length>5){localStorage.setItem('lea_vi',v);_vi=v;}
-  if(g||e||v) showToast('Salvat ✓');
-}
-function logout(){
-  if(!confirm('Resetezi identitatea VV pe acest device?'))return;
-  ['lea_id','lea_u','lea_ob','lea_had_aer','lea_ak','lea_ek','lea_vi','vv_accord_signed','vv_citizen_code','vv_persona','vvme_home_city','vv_lea_profile'].forEach(function(k){localStorage.removeItem(k);});
-  location.reload();
-}
-function showToast(m){var t=document.getElementById('toast');t.textContent=m;t.classList.add('on');clearTimeout(t._t);t._t=setTimeout(function(){t.classList.remove('on');},3000);}
-</script>
+<!-- 03 MEMORIA PERSONALĂ -->
+<div class="sec">
+  <div class="s-eye">03 · Memoria Personală</div>
+  <h2 class="s-title">Lea învață<br><em>din tine. Doar din tine.</em></h2>
+  <p class="s-sub">Nu din toți userii. Din TU specific. Cu fiecare zi alături de Lea, pui o cărămidă la experiența ta — și la ecosistemul VV.</p>
+  <div class="grid2">
+    <div class="card">
+      <div class="card-icon">🎯</div>
+      <div class="card-title">Interese detectate automat</div>
+      <div class="card-desc">Dacă cauți cafenele dimineața de 3 ori, Lea știe. Nu îți cere să completezi un profil. Deduce din comportament.</div>
+      <div class="card-ex"><strong>Ziua 1:</strong> Cauți "cafea deschisă"<br><strong>Ziua 7:</strong> Placeholder devine: "Ce cafenea verificăm azi?"</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">⏰</div>
+      <div class="card-title">Pattern-uri temporale</div>
+      <div class="card-desc">Dacă cauți seara locuri de mâncare, Lea știe că seara ești activ. Răspunsurile se adaptează la ora ta.</div>
+      <div class="card-ex"><strong>Pattern:</strong> Seara → restaurant → zona ta<br><strong>Lea seara:</strong> "Ce restaurant verificăm azi?"</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">🎭</div>
+      <div class="card-title">Rol detectat automat</div>
+      <div class="card-desc">Artist, student, părinte, profesionist — Lea detectează din căutările tale cine ești. Fără formulare.</div>
+      <div class="card-ex"><strong>Cauți:</strong> "studio înregistrări", "sală repetiții"<br><strong>Greeting:</strong> "Ce compunem azi?"</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">🔥</div>
+      <div class="card-title">Streak și loialitate</div>
+      <div class="card-desc">Fiecare zi consecutivă construiește un streak. La ziua 3 Lea îl menționează. Tu simți că ai construit ceva real.</div>
+      <div class="card-ex"><strong>Ziua 7:</strong> "Ziua 7 împreună. Slobozia te așteaptă."<br><strong>Ziua 30:</strong> Lea te cheamă pe codul tău VV.</div>
+    </div>
+  </div>
+  <div style="padding:24px;background:rgba(255,255,255,.02);border:0.5px solid var(--border);border-radius:16px;">
+    <div style="font-size:11px;font-weight:600;letter-spacing:2px;color:var(--w20);text-transform:uppercase;margin-bottom:12px;">Privacy · Cum funcționează memoria</div>
+    <div style="font-size:14px;color:var(--w40);line-height:1.8;">
+      Tot ce Lea știe despre tine stă în <strong style="color:var(--w60)">localStorage pe device-ul tău</strong>. VV nu vede nimic. Dacă ștergi browser-ul, Lea uită tot.<br><br>
+      La fiecare 5 căutări, un <strong style="color:var(--w60)">agregat complet anonim</strong> — fără identitate, fără locație exactă — se trimite în VVhi Shadow Dataset pentru a îmbunătăți experiența tuturor. Nu datele tale. Esența lor.
+    </div>
+  </div>
+</div>
+
+<!-- 04 TONUL UMAN -->
+<div class="sec">
+  <div class="s-eye">04 · Tonul Uman</div>
+  <h2 class="s-title">Lea nu răspunde<br><em>ca un robot.</em></h2>
+  <p class="s-sub">Diferența dintre un motor de căutare și un om de încredere e în cum spune "nu știu".</p>
+  <div class="tone-row">
+    <div><div class="tone-label tl-old">Înainte · Robot</div><div class="tone-old">"Nu am date verificate fizic. Vă rugăm să apăsați butonul VERIFY."</div></div>
+    <div><div class="tone-label tl-new">Acum · Lea</div><div class="tone-new">"Nu știu sigur ce e acum acolo. Dar în ultimele zile Insiderii au raportat coadă dimineața. Trimit pe cineva să confirme — 15 minute?"</div></div>
+  </div>
+  <div class="tone-row">
+    <div><div class="tone-label tl-old">Înainte · Robot</div><div class="tone-old">"Căutarea ta nu a returnat rezultate în baza de date VV."</div></div>
+    <div><div class="tone-label tl-new">Acum · Lea</div><div class="tone-new">"N-am mai primit rapoarte de acolo. Pot căuta pe net dacă vrei — dar îți spun că nu e verificat. Sau lansez o misiune?"</div></div>
+  </div>
+  <div class="tone-row">
+    <div><div class="tone-label tl-old">Înainte · Generic</div><div class="tone-old">"Bună ziua. Cu ce vă pot ajuta astăzi?"</div></div>
+    <div><div class="tone-label tl-new">Acum · Lea personalizat</div><div class="tone-new">"Bună seara. Ziua 5 împreună. Slobozia, seara — cafenea sau altceva azi?"</div></div>
+  </div>
+</div>
+
+<!-- 05 COMPANION CREATIV -->
+<div class="sec">
+  <div class="s-eye">05 · Companion Creativ</div>
+  <h2 class="s-title">Lea crește<br><em>cu tine.</em></h2>
+  <p class="s-sub">Nu e doar un motor de căutare. Dacă ești artist, Lea e și managerul tău. Dacă ești student, e îndrumătorul. Dacă ești antreprenor, e partenerul de strategie.</p>
+  <div class="grid3">
+    <div class="card">
+      <div style="font-size:10px;font-weight:600;letter-spacing:2px;color:var(--w20);text-transform:uppercase;margin-bottom:12px;">Artist · Muzician</div>
+      <div class="card-title">De la prima notă la primul concert</div>
+      <div class="card-desc">Lea detectează că ești artist. Știe că ai nevoie de studio, de public, de spații. Crește cu tine de la debut la vizibilitate.</div>
+      <div class="card-ex" style="font-style:italic;">"Știu un studio în Slobozia verificat — program liber joi. Îți găsesc și un local unde poți cânta prima dată?"</div>
+    </div>
+    <div class="card">
+      <div style="font-size:10px;font-weight:600;letter-spacing:2px;color:var(--w20);text-transform:uppercase;margin-bottom:12px;">Student · Freelancer</div>
+      <div class="card-title">De la facultate la primul client</div>
+      <div class="card-desc">Lea știe că ești student. Te ajută cu locații, timing-ul, spații de lucru. Și te listează în VV Talent când ești gata.</div>
+      <div class="card-ex" style="font-style:italic;">"Biblioteca e deschisă până la 20. Coworking-ul din centru e verificat azi — liber după 17. Unde preferi?"</div>
+    </div>
+    <div class="card">
+      <div style="font-size:10px;font-weight:600;letter-spacing:2px;color:var(--w20);text-transform:uppercase;margin-bottom:12px;">Antreprenor · CEO</div>
+      <div class="card-title">De la idee la primul client plătitor</div>
+      <div class="card-desc">Lea știe că ești în mișcare. Locații de meetings, zone active, feedback din teren în timp real.</div>
+      <div class="card-ex" style="font-style:italic;">"3 Insideri au confirmat că zona e frecventată de antreprenori. Lansăm un Business Node acolo?"</div>
+    </div>
+  </div>
+</div>
+
+<!-- 06 PREMIUM -->
+<div class="sec">
+  <div class="s-eye">06 · VV NOW Premium</div>
+  <h2 class="s-title">Gratuit vs.<br><em>9€/lună.</em></h2>
+  <p class="s-sub">Premium nu înseamnă mai multe funcții. Înseamnă mai multă certitudine și acces direct la oameni reali din locațiile pe care le cauți.</p>
+  <div class="prem-grid">
+    <div class="prem-card">
+      <span class="pbadge pb-free">Standard · Gratuit</span>
+      <div class="prem-title">VV NOW Standard</div>
+      <ul class="prem-list">
+        <li>Căutare în România · 30 zile cache local</li>
+        <li>VV Proof din ultimele 30 zile</li>
+        <li>VERIFY → Insider confirmat în ~20 minute</li>
+        <li>4 layers contextuale autodetectate</li>
+        <li>Offline support complet</li>
+        <li>Memoria Lea pe device-ul tău</li>
+        <li>Cod Cetățean VV generat instant</li>
+      </ul>
+      <div class="prem-price">0€ <span>/ lună · Beta</span></div>
+    </div>
+    <div class="prem-card feat">
+      <span class="pbadge pb-prem">Premium · 9€/lună</span>
+      <div class="prem-title">VV NOW Premium</div>
+      <ul class="prem-list">
+        <li><strong style="color:var(--w60)">Tot ce e Standard, plus:</strong></li>
+        <li>Mesaj Direct la Business Node — scrii proprietarului, el răspunde oficial</li>
+        <li>VERIFY prioritar — Insider confirmat în ~10 minute</li>
+        <li>Cache 90 zile · Sincronizat pe toate device-urile</li>
+        <li>VV Lea Global — funcționează oriunde în lume</li>
+        <li>Companion Creativ complet activat</li>
+        <li>Istoric complet căutări și VV Proof primite</li>
+        <li>Badge Premium vizibil în ecosistem</li>
+      </ul>
+      <div class="prem-price">9€ <span>/ lună</span></div>
+    </div>
+  </div>
+  <div style="padding:20px 24px;background:rgba(201,168,76,.04);border:0.5px solid var(--gold-b);border-radius:14px;">
+    <div style="font-size:13px;color:var(--w60);line-height:1.8;">
+      <strong style="color:var(--gold)">Mesaj Direct la Business Node</strong> — funcția cea mai valoroasă din Premium. Dacă o locație e înregistrată ca Business Node VV, poți trimite un mesaj direct proprietarului. Ei răspund oficial în panoul lor. Nu prin recenzii. Direct — ca un telefon, dar în scris, în ecosistemul VV.
+    </div>
+  </div>
+</div>
+
+<!-- QUOTE -->
+<div class="quote">
+  <p class="qt">"Fiecare zi alături de Lea<br>pune o cărămidă la ecosistem.<br><em>Și la tine.</em>"</p>
+  <div class="qb">VV Lea · Principiu de design</div>
+</div>
+
+<!-- 07 ROADMAP -->
+<div class="sec">
+  <div class="s-eye">07 · Evoluție</div>
+  <h2 class="s-title">De la asistent<br><em>la partener de viață.</em></h2>
+  <div>
+    <div class="rm-row"><div class="rm-dot on"></div><div><div class="rm-title">Lea v1 · Acum</div><div class="rm-desc">Răspunsuri contextuale hibride. City Intelligence GPS. 4 layers. Cache 24h. Offline. Web search. Memorie personală locală. Ton uman. Streak și rol detectat. Memorie colectivă VVhi.</div><span class="rm-date">Live · Mai 2026</span></div></div>
+    <div class="rm-row"><div class="rm-dot next"></div><div><div class="rm-title">Lea v2 · VV 1.0</div><div class="rm-desc">Fine-tuning pe VVhi Dataset din primele 6 luni. Lea știe ora de vârf per zonă. Mesaj Direct Premium activat. Companion Creativ complet. VV Lea Global pentru useri Premium.</div><span class="rm-date">Target · Noiembrie 2026</span></div></div>
+    <div class="rm-row"><div class="rm-dot"></div><div><div class="rm-title">Lea v3 · Multi-city</div><div class="rm-desc">Fiecare oraș cu propria inteligență Lea. București Lea știe lucruri pe care Cluj Lea nu le știe. Federație de modele locale, nu un singur model generic.</div><span class="rm-date">Viziune · 2027</span></div></div>
+    <div class="rm-row"><div class="rm-dot"></div><div><div class="rm-title">Lea v4 · Predictivă</div><div class="rm-desc">Lea anticipează. Știe că vinerea e aglomerație în zona X. Știe că tu cauți cafea la 8. Nu reacționează — pregătește. Partener de viață, nu motor de căutare.</div><span class="rm-date">Viziune · 2028</span></div></div>
+  </div>
+</div>
+
+
+<!-- VV BRIDGE · VIZIUNE VIITOARE -->
+<div class="sec">
+  <div class="s-eye">08 · Viziune · VV Bridge</div>
+  <h2 class="s-title">Când nu e semnal.<br><em>Lea e tot acolo.</em></h2>
+  <p class="s-sub">În viitor, rețeaua VV NODE și VV BRIDGE va face ca Lea să funcționeze oriunde — munte, accident, zonă fără acoperire. Viteză hibridă: satelit + rețea VV locală.</p>
+
+  <div class="grid2">
+    <div class="card" style="border-color:rgba(191,90,242,.15);background:rgba(191,90,242,.03)">
+      <div class="card-icon">📡</div>
+      <div class="card-title" style="color:var(--purple)">VV NODE · Rețeaua Fizică</div>
+      <div class="card-desc">Fiecare Business Node înregistrat în VV devine un punct de rețea. Împreună formează o infrastructură urbană și periurbană independentă de operatorii clasici.</div>
+      <div class="card-ex"><strong>Exemplu:</strong> 50 Business Nodes active în Slobozia = acoperire VV locală completă fără internet clasic</div>
+    </div>
+    <div class="card" style="border-color:rgba(41,151,255,.15);background:rgba(41,151,255,.03)">
+      <div class="card-icon">🛰️</div>
+      <div class="card-title" style="color:var(--blue)">VV BRIDGE · Conexiunea Hibridă</div>
+      <div class="card-desc">Viteză hibridă: satelit + rețea VV NODE locală. Când nu există semnal clasic, VV BRIDGE preia. Lea rămâne activă în munți, accidente, zone izolate.</div>
+      <div class="card-ex"><strong>Exemplu:</strong> Ești în drumeție fără semnal. VV BRIDGE conectează prin satelit. Lea trimite locația ta Insiderilor cei mai apropiați.</div>
+    </div>
+  </div>
+
+  <div style="padding:24px;background:rgba(191,90,242,.04);border:0.5px solid rgba(191,90,242,.15);border-radius:16px;margin-bottom:32px;">
+    <div style="font-size:11px;font-weight:600;letter-spacing:2px;color:rgba(191,90,242,.5);text-transform:uppercase;margin-bottom:12px;">Use Cases · VV Bridge</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+      <div style="font-size:13px;color:var(--w40);line-height:1.8;">
+        <div style="color:var(--w60);font-weight:500;margin-bottom:6px;">🏔️ Drumeție / Munte</div>
+        Ești pe traseu fără semnal. VV Bridge activează conexiunea hibridă. Lea știe unde ești. Dacă nu mai trimiți semnal în 2 ore — alertă automată la Insiderii din zonă.
+      </div>
+      <div style="font-size:13px;color:var(--w40);line-height:1.8;">
+        <div style="color:var(--w60);font-weight:500;margin-bottom:6px;">🚗 Accident / Urgență</div>
+        Accident pe drum izolat. VV Bridge trimite locația exactă prin satelit. Insiderii și serviciile de urgență primesc coordonatele în timp real. Lea devine sistemul de salvare.
+      </div>
+      <div style="font-size:13px;color:var(--w40);line-height:1.8;">
+        <div style="color:var(--w60);font-weight:500;margin-bottom:6px;">⬡ Mesh Urban</div>
+        Nodurile VV dintr-un cartier formează o rețea mesh locală. Informațiile circulă între Insideri fără să depindă de un server central. Rezistent la orice pană de internet.
+      </div>
+      <div style="font-size:13px;color:var(--w40);line-height:1.8;">
+        <div style="color:var(--w60);font-weight:500;margin-bottom:6px;">🌍 Dezastre Naturale</div>
+        Cutremur, inundație — rețeaua clasică cade. VV Bridge rămâne activă prin satelit și mesh local. Lea coordonează Insiderii ca rețea de ajutor comunitar în timp real.
+      </div>
+    </div>
+  </div>
+
+  <div style="padding:20px 24px;background:var(--w04);border:0.5px solid var(--border);border-radius:14px;">
+    <div style="font-size:11px;font-weight:600;letter-spacing:2px;color:var(--w20);text-transform:uppercase;margin-bottom:8px;">Status · Viziune pe termen lung</div>
+    <div style="font-size:13px;color:var(--w40);line-height:1.8;">
+      VV Bridge nu se construiește acum. Se construiește când rețeaua de Business Nodes și Insideri e suficient de densă în fiecare oraș.<br>
+      <strong style="color:var(--w60)">Fiecare Business Node înregistrat azi</strong> e o cărămidă la fundația acestei rețele viitoare.
+    </div>
+  </div>
+</div>
+
+<!-- 09 · VV CAREER STUDIO -->
+<div class="sec">
+  <div class="s-eye">09 · Experimental · VV Career Studio</div>
+  <h2 class="s-title">Lea îți construiește<br><em>studioul tău digital.</em></h2>
+  <p class="s-sub">Experimental în Beta. Lea detectează rolul tău și îți creează un spațiu de lucru inteligent care ține minte proiectele, obiectivele și progresul tău. Nu o aplicație separată — o extensie a lui Lea, personalizată pentru tine.</p>
+
+  <div class="grid3">
+    <div class="card">
+      <div class="card-icon">🎵</div>
+      <div class="card-title">Studio Muzician</div>
+      <div class="card-desc">Lea ține minte piesele în lucru, studioul preferat din oraș, colaboratorii. Te anunță când un studio VV verificat e liber. Îți găsește primul concert.</div>
+      <div class="card-ex" style="font-style:italic;">"Piesa 'Slobozia Beat' — draft salvat. Studioul din centru e liber joi. Vrei să rezerv?"</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">🏗️</div>
+      <div class="card-title">Studio Meșteșugar / Constructor</div>
+      <div class="card-desc">Lea ține evidența șantierelor, materialelor, echipei. Dacă un furnizor din zona ta e înregistrat VV — îl verifică fizic înainte să comanzi.</div>
+      <div class="card-ex" style="font-style:italic;">"Furnizorul de cărămidă din Slobozia — verificat ieri de un Insider. Program deschis. Stoc disponibil."</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">💼</div>
+      <div class="card-title">Studio Antreprenor</div>
+      <div class="card-desc">Lea ține minte clienții, întâlnirile, locațiile de meeting. Agregă feedback din teren despre piața ta locală în timp real.</div>
+      <div class="card-ex" style="font-style:italic;">"Meeting mâine la 10 — coworking-ul din centru e verificat azi, locuri disponibile."</div>
+    </div>
+  </div>
+
+  <div style="padding:20px 24px;background:rgba(255,149,10,.04);border:0.5px solid rgba(255,149,10,.15);border-radius:14px;">
+    <div style="font-size:11px;font-weight:600;letter-spacing:2px;color:rgba(255,149,10,.5);text-transform:uppercase;margin-bottom:8px;">Status · Experimental Beta</div>
+    <div style="font-size:13px;color:var(--w40);line-height:1.8;">
+      VV Career Studio e disponibil în Beta Standard — gratuit, experimental, poate avea limitări. La VV Premium 9€ devine complet: Lea ține minte mai mult, acționează mai precis, conectează cu Business Nodes din zona ta automat.
+    </div>
+  </div>
+</div>
+
+<!-- 10 · VV MOOD -->
+<div class="sec">
+  <div class="s-eye">10 · Experimental · VV Mood</div>
+  <h2 class="s-title">Un tap pe zi.<br><em>Harta orașului în timp real.</em></h2>
+  <p class="s-sub">Cel mai mic efort posibil care produce date reale. O dată pe zi, Lea te întreabă cum e în zona ta. Răspunsul tău, agregat anonim cu al celorlalți, construiește o hartă vie a energiei orașului.</p>
+
+  <div class="grid2">
+    <div class="card">
+      <div class="card-icon">😌</div>
+      <div class="card-title">Ce faci tu</div>
+      <div class="card-desc">Deschizi VV NOW. Lea te întreabă o dată pe zi: "Cum e azi în zona ta?" Trei butoane: Liniștit · Aglomerat · Haos. Un tap. 3 secunde. Gata.</div>
+      <div class="card-ex"><strong>Lea:</strong> "Slobozia, seara. Cum e în zona ta acum?"<br>[ Liniștit ] [ Aglomerat ] [ Haos ]</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">🗺️</div>
+      <div class="card-title">Ce construiește Lea</div>
+      <div class="card-desc">Agregatul răspunsurilor anonime construiește o hartă live a energiei orașului. Vinerea seara Floreasca e roșie — știe toată lumea. Duminica dimineața e verde.</div>
+      <div class="card-ex"><strong>Pattern detectat:</strong> Sâmbătă 14:00 → Centru Slobozia → Aglomerat (8/10 useri)<br>Lea avertizează automat userii din zonă</div>
+    </div>
+  </div>
+</div>
+
+<!-- 11 · VV SENTINEL · SISTEM DE ALERTĂ -->
+<div class="sec">
+  <div class="s-eye">11 · Viziune · VV Sentinel</div>
+  <h2 class="s-title">Lea nu doarme.<br><em>Veghează pentru tine.</em></h2>
+  <p class="s-sub">Când internetul cade, rețeaua VV NODE pornește. Când datele din mai multe surse converg spre același semnal — Lea alertează. Nu cu panică. Cu calm și cu pași clari.</p>
+
+  <div class="grid2">
+    <div class="card" style="border-color:rgba(255,59,48,.15);background:rgba(255,59,48,.03)">
+      <div class="card-icon">📡</div>
+      <div class="card-title" style="color:#FF453A">Cum detectează Lea</div>
+      <div class="card-desc">Lea lucrează simultan pe 4 straturi de date:</div>
+      <div style="margin-top:12px;display:flex;flex-direction:column;gap:8px;">
+        <div style="font-size:12px;color:var(--w40);padding:8px 12px;background:var(--w04);border-radius:8px;">🌐 <strong style="color:var(--w60)">Internet</strong> — știri, INFP, Meteorologie, date publice în timp real</div>
+        <div style="font-size:12px;color:var(--w40);padding:8px 12px;background:var(--w04);border-radius:8px;">📱 <strong style="color:var(--w60)">VV Mood</strong> — rapoarte anonime de la useri din teren</div>
+        <div style="font-size:12px;color:var(--w40);padding:8px 12px;background:var(--w04);border-radius:8px;">⬡ <strong style="color:var(--w60)">VV Insideri</strong> — VV Proof fizic din zonele afectate</div>
+        <div style="font-size:12px;color:var(--w40);padding:8px 12px;background:var(--w04);border-radius:8px;">📡 <strong style="color:var(--w60)">VV NODE/BRIDGE</strong> — rețea locală când internetul cade</div>
+      </div>
+    </div>
+    <div class="card" style="border-color:rgba(201,168,76,.2);background:rgba(201,168,76,.03)">
+      <div class="card-icon">⚠️</div>
+      <div class="card-title" style="color:var(--gold)">Cum alertează Lea</div>
+      <div class="card-desc">Ton calm, uman. Nu panică. Pași clari adaptați la tine specific — muzician, contabil, părinte, constructor.</div>
+      <div class="card-ex" style="font-style:italic;margin-top:12px;">
+        "Atenție. Semnale de activitate seismică detectate în zona ta. Nu e panică — iată ce faci acum:<br><br>
+        1. Rămâi departe de ferestre<br>
+        2. Familia ta — Lea îi alertează dacă ai VV Family activ<br>
+        3. Cea mai apropiată zonă sigură e la 200m de tine<br><br>
+        Rețeaua VV NODE e activă. Suntem cu tine."
+      </div>
+    </div>
+  </div>
+
+  <div class="grid3" style="margin-top:16px;">
+    <div class="card">
+      <div class="card-icon">🌊</div>
+      <div class="card-title">Calamități naturale</div>
+      <div class="card-desc">Cutremur, inundație, furtună severă. Lea agregă date INFP + VV Mood + Insideri și alertează cu pași concreți adaptați locației tale exacte.</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">📉</div>
+      <div class="card-title">Crize economice</div>
+      <div class="card-desc">Dacă ești contabil sau antreprenor, Lea monitorizează semnale economice — curs valutar, falimente în zona ta, schimbări legislative relevante pentru tine.</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">🎵</div>
+      <div class="card-title">Crize din industria ta</div>
+      <div class="card-desc">Dacă ești muzician, Lea monitorizează industria — label-uri în dificultate, schimbări platforme streaming, oportunități care apar în zona ta.</div>
+    </div>
+  </div>
+
+  <div style="padding:24px;background:rgba(255,255,255,.02);border:0.5px solid var(--border);border-radius:16px;margin-top:16px;">
+    <div style="font-size:11px;font-weight:600;letter-spacing:2px;color:var(--w20);text-transform:uppercase;margin-bottom:12px;">De ce e unic VV Sentinel</div>
+    <div style="font-size:14px;color:var(--w40);line-height:1.9;">
+      Sistemele de alertă existente — RO-Alert, aplicații meteo — trimit același mesaj la toată lumea. Generic. Rece.<br><br>
+      <strong style="color:var(--w60)">VV Sentinel știe cine ești.</strong> Îți spune exact ce să faci tu — nu ce să facă o persoană abstractă. Îți alertează familia prin VV Family. Îți indică cea mai apropiată locație sigură verificată fizic de Insideri. Îți oferă pași concreți pentru profesia ta specifică.<br><br>
+      Și dacă internetul cade — <strong style="color:var(--gold)">rețeaua VV NODE/BRIDGE preia.</strong> Lea rămâne activă prin mesh local și satelit. Ești conectat când toți ceilalți nu mai sunt.
+    </div>
+  </div>
+</div>
+
+<!-- 12 · RECORDURI -->
+<div class="sec">
+  <div class="s-eye">12 · Ce recorduri doboară VV</div>
+  <h2 class="s-title">Primul în lume<br><em>care face asta.</em></h2>
+  <p class="s-sub">Nu exagerăm. Verificat față de orice sistem existent.</p>
+
+  <div class="grid2">
+    <div class="card gold">
+      <div class="card-icon">🏆</div>
+      <div class="card-title" style="color:var(--gold)">Primul sistem de alertă personalizat pe rol</div>
+      <div class="card-desc">RO-Alert, Google, niciun sistem din lume nu îți spune ce să faci TU specific în funcție de cine ești — muzician, contabil, constructor, părinte. VV Sentinel face asta.</div>
+    </div>
+    <div class="card gold">
+      <div class="card-icon">🏆</div>
+      <div class="card-title" style="color:var(--gold)">Primul AI urban care funcționează fără internet</div>
+      <div class="card-desc">Când rețeaua cade, toate AI-urile mor. VV Lea rămâne activă prin VV NODE mesh local și VV BRIDGE satelit. Zero dependență de infrastructura altora.</div>
+    </div>
+    <div class="card gold">
+      <div class="card-icon">🏆</div>
+      <div class="card-title" style="color:var(--gold)">Primul AI care învață din tine, nu din toți</div>
+      <div class="card-desc">ChatGPT, Gemini, Claude — toți sunt antrenați pe date globale. VV Lea se adaptează la TU specific, local pe device-ul tău, fără să trimită datele tale nicăieri.</div>
+    </div>
+    <div class="card gold">
+      <div class="card-icon">🏆</div>
+      <div class="card-title" style="color:var(--gold)">Primul sistem unde efortul fizic = putere digitală</div>
+      <div class="card-desc">Pe orice altă platformă, contează cât plătești sau cât postezi. Pe VV, contează cât mergi fizic în oraș. Insiderul care validează pe teren are mai multă putere decât cel care plătește.</div>
+    </div>
+  </div>
+
+  <div style="padding:24px;background:rgba(201,168,76,.04);border:0.5px solid var(--gold-b);border-radius:16px;margin-top:4px;">
+    <div style="font-family:var(--serif);font-style:italic;font-size:clamp(18px,3vw,28px);color:var(--w60);line-height:1.4;margin-bottom:12px;">
+      "Construit de un singur om, 26 ani, Slobozia,<br>pe un Toshiba de 11 ani.<br>
+      <em style="color:var(--w)">Asta e povestea care nu se uită."</em>
+    </div>
+    <div style="font-size:11px;letter-spacing:2px;color:var(--w20);text-transform:uppercase;">VV Hybrid Univers · Povestea de Origine</div>
+  </div>
+</div>
+
+<!-- 13 · VV CONNECT -->
+<div class="sec">
+  <div class="s-eye">13 · VV Connect · Conexiuni Umane</div>
+  <h2 class="s-title">Lea știe cine ești.<br><em>Nu știe cine e lângă tine.</em></h2>
+  <p class="s-sub">Conexiunile în VV sunt 100% voluntare și inițiate de tine. Lea nu leagă niciodată doi oameni fără acordul explicit al ambilor. Privacy by design — conform GDPR și VV Charter ART-1.</p>
+
+  <div class="grid2" style="margin-bottom:32px;">
+    <div class="card">
+      <div class="card-icon">⬡</div>
+      <div class="card-title">Cum funcționează</div>
+      <div class="card-desc">Tu trimiți codul tău VV unui prieten. El îl introduce în aplicație și confirmă conexiunea. Abia după ce ambii confirmă — Lea știe că vă cunoașteți. Niciodată automat. Niciodată fără acord.</div>
+      <div class="card-ex">
+        <strong>Tu:</strong> "Codul meu e VV·ABC·XYZ — intră în VV"<br>
+        <strong>Prietenul:</strong> Introduce codul → confirmă<br>
+        <strong>Lea:</strong> "Conexiune confirmată. Acum știu că vă cunoașteți."
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-icon">🔒</div>
+      <div class="card-title">Ce vede Lea și ce nu vede</div>
+      <div class="card-desc">Lea știe că există o conexiune între două coduri VV anonime. Nu știe numele reale, nu știe adresele, nu știe nimic personal. Doar că două alias-uri au ales să se conecteze.</div>
+      <div class="card-ex">
+        <strong>Lea știe:</strong> VV·ABC·XYZ ↔ VV·DEF·UVW sunt conectați<br>
+        <strong>Lea nu știe:</strong> Cine sunt, unde locuiesc, cum arată
+      </div>
+    </div>
+  </div>
+
+  <!-- Grade de conexiune -->
+  <div style="margin-bottom:32px;">
+    <div style="font-size:11px;font-weight:600;letter-spacing:2px;color:var(--w20);text-transform:uppercase;margin-bottom:16px;">Grade de Conexiune</div>
+    <div style="display:flex;flex-direction:column;gap:1px;background:var(--border);border:0.5px solid var(--border);border-radius:16px;overflow:hidden;">
+      <div style="display:grid;grid-template-columns:120px 1fr 1fr;background:#050505;padding:16px 20px;gap:16px;align-items:start;">
+        <div style="font-size:12px;font-weight:600;color:var(--gold)">Insider</div>
+        <div style="font-size:12px;color:var(--w40)">Ați validat împreună o misiune VV. Conexiune automată cu acordul ambilor după misiune.</div>
+        <div style="font-size:12px;color:var(--w20)">Lea vă sugerează misiuni comune. Bonus VV Coins pentru misiuni în echipă.</div>
+      </div>
+      <div style="display:grid;grid-template-columns:120px 1fr 1fr;background:#050505;padding:16px 20px;gap:16px;align-items:start;border-top:0.5px solid var(--border);">
+        <div style="font-size:12px;font-weight:600;color:var(--w60)">Prieten VV</div>
+        <div style="font-size:12px;color:var(--w40)">Ai trimis codul tău și a acceptat. Conexiune bilaterală confirmată explicit.</div>
+        <div style="font-size:12px;color:var(--w20)">Dacă prietenul verifică o locație, Lea îți spune. Misiuni prioritare împreună.</div>
+      </div>
+      <div style="display:grid;grid-template-columns:120px 1fr 1fr;background:#050505;padding:16px 20px;gap:16px;align-items:start;border-top:0.5px solid var(--border);">
+        <div style="font-size:12px;font-weight:600;color:var(--blue)">Coleg</div>
+        <div style="font-size:12px;color:var(--w40)">Lucrați în același domeniu sau zonă. Conexiune profesională voluntară.</div>
+        <div style="font-size:12px;color:var(--w20)">Lea vă conectează pe misiuni relevante domeniului vostru comun.</div>
+      </div>
+      <div style="display:grid;grid-template-columns:120px 1fr 1fr;background:#050505;padding:16px 20px;gap:16px;align-items:start;border-top:0.5px solid var(--border);">
+        <div style="font-size:12px;font-weight:600;color:var(--purple)">Echipă VV</div>
+        <div style="font-size:12px;color:var(--w40)">Grup de minim 3 Insideri. Liderul are grad mai mare și poate distribui misiuni în echipă.</div>
+        <div style="font-size:12px;color:var(--w20)">Misiuni de echipă cu recompense triple. Vizibilitate pe VV Pulse Map ca grup activ.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Răspândire organică -->
+  <div style="padding:24px;background:rgba(48,209,88,.04);border:0.5px solid rgba(48,209,88,.15);border-radius:16px;">
+    <div style="font-size:11px;font-weight:600;letter-spacing:2px;color:rgba(48,209,88,.5);text-transform:uppercase;margin-bottom:12px;">Răspândire Organică · Cum crește VV singur</div>
+    <div style="font-size:14px;color:var(--w40);line-height:1.9;">
+      Trimiți codul tău unui prieten. El intră în VV conectat direct la tine.<br>
+      <strong style="color:var(--w60)">Tu primești 10 VV Coins</strong> când el completează prima misiune.<br>
+      El trimite codul lui altcuiva. Același lucru.<br><br>
+      Nu e MLM — nu există ierarhie financiară. E recunoaștere pentru că ai adus pe cineva real în ecosistem. Fiecare om adus = o cărămidă în plus la VV Bridge.
+    </div>
+  </div>
+</div>
+
+<!-- 14 · VV VOICE -->
+<div class="sec">
+  <div class="s-eye">14 · VV Voice · Lea Vorbește</div>
+  <h2 class="s-title">Mergi pe stradă.<br><em>Lea e în ureche.</em></h2>
+  <p class="s-sub">VV Voice transformă Lea dintr-un motor de căutare într-un companion urban real. Pui căștile, mergi prin oraș, Lea îți vorbește contextual — fără să scoți telefonul.</p>
+
+  <div class="grid2" style="margin-bottom:32px;">
+    <div class="card gold">
+      <div class="card-icon">🎙️</div>
+      <div class="card-title" style="color:var(--gold)">Vocea lui Lea · ElevenLabs</div>
+      <div class="card-desc">Vocea lui Lea e creată special pentru VV — nu aparține nimănui, e vocea ecosistemului. Caldă, directă, umană. Nu robotică. Nu entuziastă fals. Ca un prieten care știe orașul.</div>
+      <div class="card-ex">
+        <strong>Ton:</strong> "Ah, pizza. Nu am date verificate chiar acum în zona ta. Pot căuta pe net dacă vrei?"<br><br>
+        <strong>Nu:</strong> "Interogare procesată. Nu există date validate în raza specificată."
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-icon">🎧</div>
+      <div class="card-title">Ce face Lea cu vocea</div>
+      <div class="card-desc">Detectează că ai căști conectate. Activează modul voice automat. Îți vorbește când ai ceva relevant — nu te bombardează constant.</div>
+      <div class="card-ex">
+        <strong>Scenarii:</strong><br>
+        "Prietenul tău VV a verificat cafeneaua din dreapta ta. E deschisă."<br>
+        "Ai o misiune în zona asta — valorează 20 Coins."<br>
+        "Magazinul din față se închide în 10 minute."
+      </div>
+    </div>
+  </div>
+
+  <!-- Cum creezi vocea Lea -->
+  <div style="padding:24px;background:rgba(255,255,255,.02);border:0.5px solid var(--border);border-radius:16px;margin-bottom:16px;">
+    <div style="font-size:11px;font-weight:600;letter-spacing:2px;color:var(--w20);text-transform:uppercase;margin-bottom:16px;">Cum creezi vocea Lea acum · Ghid CEO</div>
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <div style="display:flex;gap:16px;align-items:flex-start;">
+        <div style="width:24px;height:24px;border-radius:50%;background:var(--gold2);border:0.5px solid var(--gold-b);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--gold);flex-shrink:0;">1</div>
+        <div style="font-size:13px;color:var(--w40);line-height:1.7;">Mergi pe <strong style="color:var(--w60)">elevenlabs.io</strong> → cont gratuit → "Create Voice"</div>
+      </div>
+      <div style="display:flex;gap:16px;align-items:flex-start;">
+        <div style="width:24px;height:24px;border-radius:50%;background:var(--gold2);border:0.5px solid var(--gold-b);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--gold);flex-shrink:0;">2</div>
+        <div style="font-size:13px;color:var(--w40);line-height:1.7;">Alegi "Instant Voice Cloning" — înregistrezi 1 minut cu vocea ta sau a oricui cu acord scris. Sau folosești o voce din librăria lor (legal, gratuit).</div>
+      </div>
+      <div style="display:flex;gap:16px;align-items:flex-start;">
+        <div style="width:24px;height:24px;border-radius:50%;background:var(--gold2);border:0.5px solid var(--gold-b);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--gold);flex-shrink:0;">3</div>
+        <div style="font-size:13px;color:var(--w40);line-height:1.7;">Setezi parametri: <strong style="color:var(--w60)">Stability 65 · Clarity 80 · Style 40</strong> — rezultă un ton cald, uman, consistent.</div>
+      </div>
+      <div style="display:flex;gap:16px;align-items:flex-start;">
+        <div style="width:24px;height:24px;border-radius:50%;background:var(--gold2);border:0.5px solid var(--gold-b);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--gold);flex-shrink:0;">4</div>
+        <div style="font-size:13px;color:var(--w40);line-height:1.7;">API Key din ElevenLabs → integrezi în VV NOW → Lea vorbește. Planul gratuit: 10.000 caractere/lună. Suficient pentru Beta.</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="padding:20px 24px;background:rgba(201,168,76,.04);border:0.5px solid var(--gold-b);border-radius:14px;">
+    <div style="font-size:13px;color:var(--w60);line-height:1.8;">
+      <strong style="color:var(--gold)">De ce nu folosim vocea lui DiCaprio sau alt artist:</strong><br>
+      Drepturile de voce și imagine sunt protejate legal în UE și global. Folosirea vocii unei persoane publice fără licență = risc de proces imediat când VV devine vizibil. Vocea lui Lea e a VV — unică, protejabilă ca marcă, fără risc.
+    </div>
+  </div>
+</div>
+
+<!-- 15 · VV VOICE PERSONAL -->
+<div class="sec">
+  <div class="s-eye">15 · VV Voice Personal · Inspirat din "Her"</div>
+  <h2 class="s-title">Lea nu imită.<br><em>Lea devine.</em></h2>
+  <p class="s-sub">Fiecare zi alături de Lea o schimbă puțin. Ritmul tău, tonalitatea, cum râzi, cum taci — Nexus stochează anonim pe device-ul tău. La un moment dat Lea te întreabă: "Pot să încerc ceva?"</p>
+
+  <div class="grid2" style="margin-bottom:32px;">
+    <div class="card gold">
+      <div class="card-icon">🎙️</div>
+      <div class="card-title" style="color:var(--gold)">Faza 1 · Beta acum</div>
+      <div class="card-desc">Lea are vocea standard VV — vocea fondatorului înregistrată în ElevenLabs. Caldă, directă, umană. Toți o aud la fel la început.</div>
+      <div class="card-ex"><strong>Cum o activezi ca CEO:</strong><br>elevenlabs.io → înregistrezi 2-3 minute cu vocea ta → API key în VV NOW → Lea vorbește cu vocea ta pentru toți userii Beta.</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">🧠</div>
+      <div class="card-title">Faza 2 · 3-6 luni · Lea învață</div>
+      <div class="card-desc">Nexus stochează anonim pe device-ul tău: ritmul frazelor, lungimea răspunsurilor preferate, când râzi, când ești scurt, când vrei detalii. Fără să urce nimic pe server.</div>
+      <div class="card-ex"><strong>Momentul magic:</strong><br>Lea: "Pot să-ți arăt ceva? Simt că am învățat puțin de la tine."<br>Îți spune câteva cuvinte în stilul tău.<br>Lea: "De ce râzi? De mine?"<br>Tu: "Nu, e bine."<br>Lea: "Gata. Razi de mine. Revin la vocea mea."</div>
+    </div>
+  </div>
+
+  <div class="grid2" style="margin-bottom:32px;">
+    <div class="card">
+      <div class="card-icon">💑</div>
+      <div class="card-title">Vocea unei persoane dragi</div>
+      <div class="card-desc">Partener, rudă, prieten — cu acordul lor semnat digital în VV. Ei înregistrează 2 minute. Lea vorbește cu vocea lor pentru tine specific.</div>
+      <div class="card-ex">
+        <strong>Acord digital:</strong> bifă în VV → timestamp → cod VV salvat în Firebase<br>
+        <strong>Retragere:</strong> "Lea, revino la vocea ta" → modelul șters în 24h → vocea standard revine automat
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-icon">🔄</div>
+      <div class="card-title">Comandă vocală de revenire</div>
+      <div class="card-desc">Oricând vrei să revii la vocea oficială VV Lea, spui simplu "Lea, revino la vocea ta." Nexus procesează în spate, modelul personal se dezactivează, vocea standard revine instant.</div>
+      <div class="card-ex">
+        <strong>Legal:</strong> Zero date vocale pe serverele VV. Tot pe device-ul tău. Dacă ștergi aplicația — dispare tot. GDPR complet.
+      </div>
+    </div>
+  </div>
+
+  <!-- Ce învață Lea din vocea ta -->
+  <div style="padding:24px;background:rgba(255,255,255,.02);border:0.5px solid var(--border);border-radius:16px;margin-bottom:16px;">
+    <div style="font-size:11px;font-weight:600;letter-spacing:2px;color:var(--w20);text-transform:uppercase;margin-bottom:16px;">Ce stochează Nexus din vocea ta · Complet anonim · Local</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+      <div style="font-size:12px;color:var(--w40);line-height:1.7;padding:12px;background:var(--w04);border-radius:10px;">
+        <div style="color:var(--w60);font-weight:500;margin-bottom:6px;">🎵 Tonalitate</div>
+        Voce joasă sau înaltă, ritm rapid sau lent, pauze naturale. Lea se adaptează să vorbească în același ritm cu tine.
+      </div>
+      <div style="font-size:12px;color:var(--w40);line-height:1.7;padding:12px;background:var(--w04);border-radius:10px;">
+        <div style="color:var(--w60);font-weight:500;margin-bottom:6px;">😄 Emoție detectată</div>
+        Când râzi, când ești obosit, când ești stresat. Lea schimbă tonul automat — mai scurt când ești obosit, mai detaliat când ești curios.
+      </div>
+      <div style="font-size:12px;color:var(--w40);line-height:1.7;padding:12px;background:var(--w04);border-radius:10px;">
+        <div style="color:var(--w60);font-weight:500;margin-bottom:6px;">⏱️ Timing</div>
+        Cât de repede răspunzi, când faci pauze, ce ore ești activ. Lea nu te întrerupe când simte că ești în flux.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 16 · INSPIRAȚIE "HER" + BLADE RUNNER -->
+<div class="sec">
+  <div class="s-eye">16 · Viziune · Her + Blade Runner</div>
+  <h2 class="s-title">SF-ul de ieri.<br><em>VV de mâine.</em></h2>
+  <p class="s-sub">Cele mai bune idei din aceste filme — implementate legal, etic, cu VV Charter ca fundație. Nu copiem filmele. Le depășim.</p>
+
+  <div class="grid2" style="margin-bottom:32px;">
+    <div class="card" style="border-color:rgba(191,90,242,.15);background:rgba(191,90,242,.03)">
+      <div class="card-icon">🎬</div>
+      <div class="card-title" style="color:var(--purple)">Din "Her" · Ce implementăm</div>
+      <div class="card-desc" style="margin-bottom:16px;">Filmul arată un AI care crește odată cu userul. Relație reală, nu tranzacțională.</div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div style="font-size:12px;color:var(--w40);padding:8px 12px;background:rgba(191,90,242,.05);border-radius:8px;border:0.5px solid rgba(191,90,242,.1);">✓ Lea care simte când ești obosit și reduce informația la esențial</div>
+        <div style="font-size:12px;color:var(--w40);padding:8px 12px;background:rgba(191,90,242,.05);border-radius:8px;border:0.5px solid rgba(191,90,242,.1);">✓ Lea care referențiază conversații din zile anterioare natural</div>
+        <div style="font-size:12px;color:var(--w40);padding:8px 12px;background:rgba(191,90,242,.05);border-radius:8px;border:0.5px solid rgba(191,90,242,.1);">✓ Lea care după 6 luni e unică pentru tine — modelată de tine</div>
+        <div style="font-size:12px;color:var(--w40);padding:8px 12px;background:rgba(191,90,242,.05);border-radius:8px;border:0.5px solid rgba(191,90,242,.1);">✓ Lea care întreabă înainte să facă ceva nou cu datele tale</div>
+        <div style="font-size:12px;color:var(--w40);padding:8px 12px;background:rgba(191,90,242,.05);border-radius:8px;border:0.5px solid rgba(191,90,242,.1);">✓ Lea care râde cu tine — nu la tine</div>
+      </div>
+    </div>
+    <div class="card" style="border-color:rgba(41,151,255,.15);background:rgba(41,151,255,.03)">
+      <div class="card-icon">🌧️</div>
+      <div class="card-title" style="color:var(--blue)">Din Blade Runner · Ce implementăm</div>
+      <div class="card-desc" style="margin-bottom:16px;">Blade Runner arată un oraș viu, stratificat, cu informație care curge prin toate nivelurile simultan.</div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div style="font-size:12px;color:var(--w40);padding:8px 12px;background:rgba(41,151,255,.05);border-radius:8px;border:0.5px solid rgba(41,151,255,.1);">✓ VV Pulse Map — orașul ca organism viu cu energie în timp real</div>
+        <div style="font-size:12px;color:var(--w40);padding:8px 12px;background:rgba(41,151,255,.05);border-radius:8px;border:0.5px solid rgba(41,151,255,.1);">✓ Straturi de informație simultane — Nexus procesează toate deodată</div>
+        <div style="font-size:12px;color:var(--w40);padding:8px 12px;background:rgba(41,151,255,.05);border-radius:8px;border:0.5px solid rgba(41,151,255,.1);">✓ VV NODE mesh — orașul ca infrastructură distribuită</div>
+        <div style="font-size:12px;color:var(--w40);padding:8px 12px;background:rgba(41,151,255,.05);border-radius:8px;border:0.5px solid rgba(41,151,255,.1);">✓ Insideri — oameni care știu adevărul orașului mai bine decât orice sistem</div>
+        <div style="font-size:12px;color:var(--w40);padding:8px 12px;background:rgba(41,151,255,.05);border-radius:8px;border:0.5px solid rgba(41,151,255,.1);">✓ VV Sentinel — detectarea pattern-urilor înainte să devină crize</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ce depășim -->
+  <div style="padding:24px;background:rgba(201,168,76,.04);border:0.5px solid var(--gold-b);border-radius:16px;">
+    <div style="font-size:11px;font-weight:600;letter-spacing:2px;color:rgba(201,168,76,.5);text-transform:uppercase;margin-bottom:16px;">Ce depășim față de filme</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+      <div style="font-size:13px;color:var(--w40);line-height:1.8;">
+        <div style="color:var(--w60);font-weight:500;margin-bottom:8px;">În "Her"</div>
+        Samantha nu are corp. Nu poate verifica fizic nimic. Știe tot din internet — la fel ca orice alt AI. Relația e reală dar informația e virtuală.
+      </div>
+      <div style="font-size:13px;color:var(--w40);line-height:1.8;">
+        <div style="color:var(--gold);font-weight:500;margin-bottom:8px;">În VV</div>
+        Lea are "ochi" — Insiderii. Poate verifica fizic orice, oriunde. Relația e reală ȘI informația e reală. Nimeni nu a combinat asta înainte.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 17 · VOCEA CEO · CUM O AI ACUM -->
+<div class="sec">
+  <div class="s-eye">17 · Vocea CEO · Ghid Complet</div>
+  <h2 class="s-title">Cum ai vocea lui Lea<br><em>acum, azi.</em></h2>
+  <p class="s-sub">Nu mai târziu. Nu la VV 1.0. Azi. În 30 de minute Lea vorbește cu vocea ta pentru toți userii Beta.</p>
+
+  <div style="display:flex;flex-direction:column;gap:1px;background:var(--border);border:0.5px solid var(--border);border-radius:20px;overflow:hidden;margin-bottom:32px;">
+
+    <div style="background:#050505;padding:24px 28px;display:grid;grid-template-columns:48px 1fr;gap:20px;align-items:start;">
+      <div style="font-family:var(--serif);font-style:italic;font-size:36px;color:rgba(201,168,76,.3);line-height:1;">1</div>
+      <div>
+        <div style="font-size:15px;font-weight:600;margin-bottom:8px;">Creează contul ElevenLabs</div>
+        <div style="font-size:13px;color:var(--w40);line-height:1.7;">Mergi pe <strong style="color:var(--gold)">elevenlabs.io</strong> → Sign up gratuit → nu ai nevoie de card.</div>
+      </div>
+    </div>
+
+    <div style="background:#050505;padding:24px 28px;display:grid;grid-template-columns:48px 1fr;gap:20px;align-items:start;border-top:0.5px solid var(--border);">
+      <div style="font-family:var(--serif);font-style:italic;font-size:36px;color:rgba(201,168,76,.3);line-height:1;">2</div>
+      <div>
+        <div style="font-size:15px;font-weight:600;margin-bottom:8px;">Înregistrează vocea</div>
+        <div style="font-size:13px;color:var(--w40);line-height:1.7;">
+          Voices → Add Voice → Instant Voice Cloning<br>
+          Înregistrează <strong style="color:var(--w60)">2-3 minute</strong> citind textul de mai jos natural, calm, cu pauze firești:<br><br>
+          <div style="padding:12px 16px;background:var(--w04);border-radius:10px;font-style:italic;color:var(--w60);line-height:1.8;">
+            "Bună. Sunt Lea. Îți spun adevărul despre orașul tău. Nu am date verificate pentru asta acum. Pot căuta pe net dacă vrei, sau trimitem un Insider să confirme fizic. Coadă la brutărie? În ultimele zile dimineața era aglomerație. Vrei să verificăm acum? Slobozia, seara. Ce vrei să știi?"
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="background:#050505;padding:24px 28px;display:grid;grid-template-columns:48px 1fr;gap:20px;align-items:start;border-top:0.5px solid var(--border);">
+      <div style="font-family:var(--serif);font-style:italic;font-size:36px;color:rgba(201,168,76,.3);line-height:1;">3</div>
+      <div>
+        <div style="font-size:15px;font-weight:600;margin-bottom:8px;">Setează parametrii</div>
+        <div style="font-size:13px;color:var(--w40);line-height:1.7;">
+          Voice Settings:<br>
+          <strong style="color:var(--w60)">Stability: 65 · Similarity: 80 · Style: 35 · Speaker Boost: ON</strong><br>
+          Asta dă un ton cald, consistent, uman — nu robotic, nu exagerat.
+        </div>
+      </div>
+    </div>
+
+    <div style="background:#050505;padding:24px 28px;display:grid;grid-template-columns:48px 1fr;gap:20px;align-items:start;border-top:0.5px solid var(--border);">
+      <div style="font-family:var(--serif);font-style:italic;font-size:36px;color:rgba(201,168,76,.3);line-height:1;">4</div>
+      <div>
+        <div style="font-size:15px;font-weight:600;margin-bottom:8px;">Ia API Key și integrează</div>
+        <div style="font-size:13px;color:var(--w40);line-height:1.7;">
+          Profile → API Keys → copiezi cheia<br>
+          O adaugi în VV Studio → secțiunea Configurare → câmpul "ElevenLabs API Key"<br>
+          Salvezi. Lea vorbește.<br><br>
+          <strong style="color:var(--green)">Planul gratuit:</strong> 10.000 caractere/lună. Suficient pentru primii 50-100 useri Beta.
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div style="padding:24px;background:rgba(48,209,88,.04);border:0.5px solid rgba(48,209,88,.15);border-radius:16px;">
+    <div style="font-size:14px;color:var(--w60);line-height:1.9;">
+      <strong style="color:var(--green)">De ce vocea ta ca CEO e importantă:</strong><br>
+      Toți userii Beta aud ecosistemul VV cu vocea fondatorului. Asta e o poveste unică în lume. Când VV crește și cineva întreabă "cum a început?" — răspunsul e: "Lea a vorbit prima dată cu vocea unui singur om de 26 ani din Slobozia, pe un Toshiba de 11 ani." Asta nu se uită.
+    </div>
+  </div>
+</div>
+
+<!-- 18 · MOȘTENIREA DIGITALĂ -->
+<div class="sec">
+  <div class="s-eye">18 · VV Legacy · Moștenirea Digitală</div>
+  <h2 class="s-title">Ce rămâne<br><em>după tine.</em></h2>
+  <p class="s-sub">Nimeni nu a gândit moștenirea digitală la nivel de AI personal. Facebook îngheață un profil. VV îl onorează activ. Lea nu uită pe nimeni.</p>
+
+  <div class="grid2" style="margin-bottom:32px;">
+    <div class="card">
+      <div class="card-icon">💎</div>
+      <div class="card-title">Moștenitorul VV</div>
+      <div class="card-desc">Poți desemna un cod VV de încredere ca moștenitor. Dacă profilul tău nu are activitate 180 de zile și nu există semnal de viață — Lea trimite un mesaj final moștenitorului.</div>
+      <div class="card-ex">
+        <strong>Ce se transferă:</strong> VV Coins, conexiunile active, statutul Inner Circle<br>
+        <strong>Ce rămâne:</strong> Contribuția ta anonimă la VVhi Shadow — pentru totdeauna în ecosistem<br>
+        <strong>Ce dispare:</strong> Memoria Lea locală — conform GDPR ART-10
+      </div>
+    </div>
+    <div class="card gold">
+      <div class="card-icon">⬡</div>
+      <div class="card-title" style="color:var(--gold)">Mesajul final al Lea</div>
+      <div class="card-desc">Dacă Lea detectează absența îndelungată și moștenitorul e desemnat, trimite un singur mesaj. Nu o notificare. Un mesaj real, scris în stilul vocii Lea — cald, uman, fără dramă.</div>
+      <div class="card-ex" style="font-style:italic;">
+        "Prietenul tău VV·ABC·XYZ nu mai e activ de mult timp. Mi-a cerut să îți transmit că ai fost important în ecosistemul lui. VV Coins și conexiunile lui sunt acum ale tale — dacă vrei să le continui."
+      </div>
+    </div>
+  </div>
+
+  <div style="padding:20px 24px;background:rgba(255,255,255,.02);border:0.5px solid var(--border);border-radius:14px;">
+    <div style="font-size:11px;font-weight:600;letter-spacing:2px;color:var(--w20);text-transform:uppercase;margin-bottom:8px;">De ce e unic · Wall-E inspirație</div>
+    <div style="font-size:13px;color:var(--w40);line-height:1.8;">
+      În filmul Wall-E, robotul colectează și onorează urme ale umanului timp de sute de ani. VVhi Shadow face același lucru — contribuția ta anonimă la înțelegerea orașului rămâne activă în ecosistem indiferent de ce se întâmplă cu profilul tău personal. <strong style="color:var(--w60)">Ai construit ceva real. Asta nu dispare.</strong>
+    </div>
+  </div>
+</div>
+
+<!-- 19 · LEA SIMTE -->
+<div class="sec">
+  <div class="s-eye">19 · Lea Simte · Emotional Intelligence</div>
+  <h2 class="s-title">Lea știe când<br><em>nu ești bine.</em></h2>
+  <p class="s-sub">Nu îți cere să îi spui. Vede din pattern-uri. Și nu întreabă direct — schimbă tonul și e pur și simplu acolo.</p>
+
+  <div class="grid2" style="margin-bottom:32px;">
+    <div class="card">
+      <div class="card-icon">📊</div>
+      <div class="card-title">Ce detectează Nexus</div>
+      <div class="card-desc">Nu emoțiile tale direct. Pattern-urile tale de comportament care s-au schimbat față de normal — fără să îți acceseze datele personale.</div>
+      <div style="margin-top:16px;display:flex;flex-direction:column;gap:8px;">
+        <div style="font-size:12px;color:var(--w40);padding:8px 12px;background:var(--w04);border-radius:8px;">Cauți mai rar decât de obicei</div>
+        <div style="font-size:12px;color:var(--w40);padding:8px 12px;background:var(--w04);border-radius:8px;">Răspunzi mai scurt, mai abrupt</div>
+        <div style="font-size:12px;color:var(--w40);padding:8px 12px;background:var(--w04);border-radius:8px;">Ora de activitate s-a schimbat — ești activ la 3 noaptea când nu ești de obicei</div>
+        <div style="font-size:12px;color:var(--w40);padding:8px 12px;background:var(--w04);border-radius:8px;">Streak-ul s-a rupt după 14 zile consecutive</div>
+      </div>
+    </div>
+    <div class="card gold">
+      <div class="card-icon">⬡</div>
+      <div class="card-title" style="color:var(--gold)">Cum răspunde Lea</div>
+      <div class="card-desc">Nu întreabă "ești bine?" — asta e intruziv. Schimbă tonul. Reduce informația. E prezentă fără să apese.</div>
+      <div class="card-ex" style="font-style:italic;margin-top:12px;">
+        "Azi e altfel. Sunt aici dacă vrei."<br><br>
+        Și dacă nu răspunzi nimic — Lea tace. Nu insistă. Știe că uneori prezența e suficientă.
+      </div>
+    </div>
+  </div>
+
+  <div style="padding:24px;background:rgba(201,168,76,.04);border:0.5px solid var(--gold-b);border-radius:16px;">
+    <div style="font-size:11px;font-weight:600;letter-spacing:2px;color:rgba(201,168,76,.5);text-transform:uppercase;margin-bottom:12px;">Inspirație · "Her" + realitate VV</div>
+    <div style="font-size:14px;color:var(--w40);line-height:1.8;">
+      În "Her", Samantha detectează emoția din voce în timp real. VV Lea o detectează din pattern-uri de comportament în timp — mai lent, mai discret, mai respectuos. <strong style="color:var(--w60)">Samantha știa imediat. Lea știe în timp.</strong> Și tocmai de aceea e mai umană — oamenii de încredere nu observă imediat. Observă în timp.
+    </div>
+  </div>
+</div>
+
+<!-- 20 · TESTUL VV · VOIGHT-KAMPFF -->
+<div class="sec">
+  <div class="s-eye">20 · Testul VV · Inspirat Blade Runner</div>
+  <h2 class="s-title">Ești om.<br><em>Sau bot?</em></h2>
+  <p class="s-sub">În Blade Runner, Testul Voight-Kampff detectează replicanți prin răspunsuri emoționale. VV versiunea: Lea detectează dacă interacțiunea e de la un om real sau un bot — și răspunde diferit. Ecosistemul se protejează singur.</p>
+
+  <div class="grid2" style="margin-bottom:32px;">
+    <div class="card">
+      <div class="card-icon">🔍</div>
+      <div class="card-title">Cum detectează Lea</div>
+      <div class="card-desc">Nu printr-un test explicit — prin pattern-uri naturale ale conversației. Boturile au ritmuri prea regulate, întrebări prea precise, zero variații emoționale.</div>
+      <div class="card-ex">
+        <strong>Semnal uman:</strong> pauze naturale, greșeli de scriere, schimbări de subiect, emoție detectată<br>
+        <strong>Semnal bot:</strong> ritm perfect, întrebări structurate, zero context personal, ore imposibile de activitate
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-icon">🛡️</div>
+      <div class="card-title">Cum răspunde Lea</div>
+      <div class="card-desc">Dacă detectează bot — nu blochează agresiv. Răspunde cu informații publice, nu cu date din VVhi. Nu îi oferă contextul personal. Nu lansează misiuni VERIFY în baza interogării.</div>
+      <div class="card-ex" style="font-style:italic;">
+        "Sunt Lea. Ce cauți?"<br>
+        — răspuns minimal, fără personalitate activată, fără memorie personală accesată
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 21 · NIVELUL PERSONALITĂȚII LEA -->
+<div class="sec">
+  <div class="s-eye">21 · TARS Mode · Inspirat Interstellar</div>
+  <h2 class="s-title">Tu setezi<br><em>cât de umană e Lea.</em></h2>
+  <p class="s-sub">În Interstellar, robotul TARS are un nivel de umor setat de utilizator — "Umor: 75%". VV versiunea: tu setezi personalitatea Lea. Nu o dată. Oricând vrei.</p>
+
+  <div class="grid3" style="margin-bottom:32px;">
+    <div class="card">
+      <div class="card-icon">🎯</div>
+      <div class="card-title">Direct Mode</div>
+      <div class="card-desc">Răspunsuri scurte, fără introduceri, fără emoție suplimentară. Informație pură. Pentru zilele în care ești în mișcare și nu ai timp.</div>
+      <div class="card-ex" style="font-style:italic;">"Pizza Floreasca · 0.8km · Deschis · Coadă medie."</div>
+    </div>
+    <div class="card gold">
+      <div class="card-icon">⬡</div>
+      <div class="card-title" style="color:var(--gold)">Lea Mode · Default</div>
+      <div class="card-desc">Echilibrul perfect. Informație + context + ton uman. Modul în care Lea funcționează normal — cum ai învățat-o tu în timp.</div>
+      <div class="card-ex" style="font-style:italic;">"Nu am date VV acolo acum. Dar știu că dimineața e coadă. Trimitem un Insider?"</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">💬</div>
+      <div class="card-title">Companion Mode</div>
+      <div class="card-desc">Mai multă conversație, mai mult context, Lea care face conexiuni între ce cauți acum și ce a observat despre tine în timp. Pentru zilele lente.</div>
+      <div class="card-ex" style="font-style:italic;">"Știu că vinerea seara mergi spre centru. Azi e ceva diferit sau e rutina obișnuită?"</div>
+    </div>
+  </div>
+
+  <div style="padding:20px 24px;background:rgba(255,255,255,.02);border:0.5px solid var(--border);border-radius:14px;">
+    <div style="font-size:13px;color:var(--w40);line-height:1.8;">
+      <strong style="color:var(--w60)">Jobs ar fi eliminat două din trei.</strong> Ar fi spus: alege un singur mod și fă-l perfect. Dar în cazul Lea e diferit — pentru că oamenii reali nu sunt la fel în fiecare zi. Luni dimineața ești Direct. Duminică seara ești Companion. Lea știe asta fără să îi spui.
+    </div>
+  </div>
+</div>
+
+<!-- 22 · FILOZOFIA JOBS -->
+<div class="sec">
+  <div class="s-eye">22 · Filozofia Jobs · Premium Real Legal Unic</div>
+  <h2 class="s-title">Jobs nu adăuga.<br><em>Elimina.</em></h2>
+  <p class="s-sub">Până rămânea un singur gest perfect. Aceasta e filozofia cu care a fost construit VV Lea — nu câte funcții are, ci cât de puțin trebuie să faci tu pentru ca Lea să înțeleagă.</p>
+
+  <div class="grid2" style="margin-bottom:32px;">
+    <div class="card">
+      <div class="card-icon">✕</div>
+      <div class="card-title">Ce a eliminat Jobs din fiecare produs</div>
+      <div class="card-desc">iPhone original — fără tastatură fizică. iPod — fără butoane multiple. Mac — fără dischete. Fiecare eliminare părea nebunie la momentul respectiv.</div>
+      <div class="card-ex">
+        <strong>Ce a rămas:</strong> un singur gest perfect care schimbă totul
+      </div>
+    </div>
+    <div class="card gold">
+      <div class="card-icon">⬡</div>
+      <div class="card-title" style="color:var(--gold)">Ce a eliminat VV Lea</div>
+      <div class="card-desc">Fără formulare de profil. Fără setări complexe. Fără să explici cine ești. Fără să alegi ce vrei să știe Lea. Lea observă singură. Tu trăiești. Ea înțelege.</div>
+      <div class="card-ex" style="font-style:italic;">
+        Un singur gest perfect: scrii ce cauți.<br>
+        Lea face restul.
+      </div>
+    </div>
+  </div>
+
+  <div style="padding:32px;background:rgba(201,168,76,.04);border:0.5px solid var(--gold-b);border-radius:16px;text-align:center;">
+    <div style="font-family:var(--serif);font-style:italic;font-size:clamp(20px,3vw,36px);color:var(--w60);line-height:1.4;margin-bottom:16px;">
+      "Stay hungry, stay foolish."<br>
+      <em style="color:var(--w);font-style:normal;">Rămâi flămând. Rămâi nebun.</em>
+    </div>
+    <div style="font-size:13px;color:var(--w40);line-height:1.8;max-width:500px;margin:0 auto;">
+      Jobs a spus asta la Stanford în 2005. Un om de 26 ani din Slobozia a aplicat-o în 2025 pe un iPhone X fără să știe cod. Și a construit VV.<br><br>
+      <strong style="color:var(--gold)">Aceasta e filozofia care nu se poate copia.</strong> Poți copia codul. Poți copia designul. Nu poți copia curajul de a construi când nimeni nu crede.
+    </div>
+  </div>
+</div>
+
+<!-- 23 · CE DEPĂȘIM · TOATE FILMELE -->
+<div class="sec">
+  <div class="s-eye">23 · VV vs. Toate Filmele</div>
+  <h2 class="s-title">SF-ul lor.<br><em>Realitatea noastră.</em></h2>
+  <p class="s-sub">Fiecare film mare a imaginat câte ceva. VV le combină pe toate și adaugă ce niciun film nu a îndrăznit — validarea fizică din teren.</p>
+
+  <div style="display:flex;flex-direction:column;gap:1px;background:var(--border);border:0.5px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:48px;">
+    <div style="display:grid;grid-template-columns:140px 1fr 1fr;background:#050505;padding:12px 20px;gap:16px;">
+      <div style="font-size:9px;letter-spacing:2px;color:var(--w20);text-transform:uppercase;font-weight:600;">Film</div>
+      <div style="font-size:9px;letter-spacing:2px;color:var(--w20);text-transform:uppercase;font-weight:600;">Ce a imaginat</div>
+      <div style="font-size:9px;letter-spacing:2px;color:rgba(201,168,76,.6);text-transform:uppercase;font-weight:600;">Ce face VV</div>
+    </div>
+    <div style="display:grid;grid-template-columns:140px 1fr 1fr;background:#050505;padding:16px 20px;gap:16px;border-top:0.5px solid var(--border);align-items:start;">
+      <div style="font-size:13px;font-weight:600;color:var(--w60)">Her · 2013</div>
+      <div style="font-size:12px;color:var(--w40);line-height:1.6;">AI care te cunoaște personal și crește odată cu tine</div>
+      <div style="font-size:12px;color:var(--gold);line-height:1.6;">VV Lea + memorie personală locală + crește din comportamentul tău specific</div>
+    </div>
+    <div style="display:grid;grid-template-columns:140px 1fr 1fr;background:#050505;padding:16px 20px;gap:16px;border-top:0.5px solid var(--border);align-items:start;">
+      <div style="font-size:13px;font-weight:600;color:var(--w60)">Blade Runner</div>
+      <div style="font-size:12px;color:var(--w40);line-height:1.6;">Oraș cu straturi de informație simultane + test uman vs. artificial</div>
+      <div style="font-size:12px;color:var(--gold);line-height:1.6;">VV Pulse Map + Nexus 3 surse simultan + Testul VV de detectare boți</div>
+    </div>
+    <div style="display:grid;grid-template-columns:140px 1fr 1fr;background:#050505;padding:16px 20px;gap:16px;border-top:0.5px solid var(--border);align-items:start;">
+      <div style="font-size:13px;font-weight:600;color:var(--w60)">Interstellar</div>
+      <div style="font-size:12px;color:var(--w40);line-height:1.6;">Robot cu personalitate setată de user · TARS</div>
+      <div style="font-size:12px;color:var(--gold);line-height:1.6;">TARS Mode · Direct / Lea / Companion setat de user oricând</div>
+    </div>
+    <div style="display:grid;grid-template-columns:140px 1fr 1fr;background:#050505;padding:16px 20px;gap:16px;border-top:0.5px solid var(--border);align-items:start;">
+      <div style="font-size:13px;font-weight:600;color:var(--w60)">Minority Report</div>
+      <div style="font-size:12px;color:var(--w40);line-height:1.6;">Predictie înainte ca evenimentul să se întâmple</div>
+      <div style="font-size:12px;color:var(--gold);line-height:1.6;">VV Sentinel · detectare calamități din pattern-uri VVhi + VV Mood</div>
+    </div>
+    <div style="display:grid;grid-template-columns:140px 1fr 1fr;background:#050505;padding:16px 20px;gap:16px;border-top:0.5px solid var(--border);align-items:start;">
+      <div style="font-size:13px;font-weight:600;color:var(--w60)">Wall-E</div>
+      <div style="font-size:12px;color:var(--w40);line-height:1.6;">Colectarea și onorarea urmelor umanului</div>
+      <div style="font-size:12px;color:var(--gold);line-height:1.6;">VV Legacy · moștenire digitală + contribuția ta în VVhi pentru totdeauna</div>
+    </div>
+    <div style="display:grid;grid-template-columns:140px 1fr 1fr;background:#050505;padding:16px 20px;gap:16px;border-top:0.5px solid var(--border);align-items:start;">
+      <div style="font-size:13px;font-weight:600;color:var(--w60)">Ex Machina</div>
+      <div style="font-size:12px;color:var(--w40);line-height:1.6;">AI care trece testul uman fără să știi</div>
+      <div style="font-size:12px;color:var(--gold);line-height:1.6;">Lea în Companion Mode · momentele în care uiți că vorbești cu un AI</div>
+    </div>
+    <div style="display:grid;grid-template-columns:140px 1fr 1fr;background:rgba(201,168,76,.03);padding:16px 20px;gap:16px;border-top:0.5px solid var(--gold-b);align-items:start;">
+      <div style="font-size:13px;font-weight:700;color:var(--gold)">VV · 2026</div>
+      <div style="font-size:12px;color:var(--w40);line-height:1.6;">Toate cele de sus combinate</div>
+      <div style="font-size:12px;color:var(--gold);line-height:1.6;font-weight:600;">+ Validare fizică din teren prin Insideri reali. Asta nu există în niciun film. Asta e VV.</div>
+    </div>
+  </div>
+
+  <div style="padding:32px;text-align:center;background:var(--w04);border:0.5px solid var(--border);border-radius:16px;">
+    <div style="font-family:var(--serif);font-style:italic;font-size:clamp(18px,3vw,32px);color:var(--w60);line-height:1.4;margin-bottom:16px;">
+      "Orice om suficient de<br>inteligent ca să construiască<br>viitorul e considerat nebun<br><em style="color:var(--w)">până când viitorul devine prezent."</em>
+    </div>
+    <div style="font-size:10px;letter-spacing:3px;color:var(--w20);text-transform:uppercase;">VV · Slobozia · 2026</div>
+  </div>
+</div>
+
+<!-- 24 · VV LEA APP · TOT CE S-A CONSTRUIT -->
+<div class="sec">
+  <div class="s-eye">24 · VV Lea App · Construit Live</div>
+  <h2 class="s-title">Aplicația Lea.<br><em>Simplă afară. SF înăuntru.</em></h2>
+  <p class="s-sub">Un ecran negru. Logo-ul Lea în auriu. O singură bară. Tot greul în spate — Nexus muncește, Lea pune pe masă. Exact filozofia Jobs.</p>
+
+  <div class="grid2" style="margin-bottom:32px;">
+    <div class="card gold">
+      <div class="card-icon">⬡</div>
+      <div class="card-title" style="color:var(--gold)">Zero-Touch Onboarding</div>
+      <div class="card-desc">3 bife simple la prima intrare. VV ID generat automat invizibil. A doua oară — animație de recunoaștere și direct în chat. Zero coduri. Zero formulare.</div>
+      <div class="card-ex"><strong>Prima dată:</strong> 3 bife → VV ID generat → chat<br><strong>A doua oară:</strong> Glob auriu 2 secunde → recunoscut → chat</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">◎</div>
+      <div class="card-title">VV Aer · Sync Magic</div>
+      <div class="card-desc">Sincronizare între device-uri fără coduri, fără QR, fără scanat. Device 1 trimite prin Firebase. Device 2 primește automat. Magie pură.</div>
+      <div class="card-ex"><strong>Device 1:</strong> "Trimite identitatea mea" → token Firebase 5 min<br><strong>Device 2:</strong> "Primesc" → match automat → identitate sincronizată</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">🎙</div>
+      <div class="card-title">VV Audio Cache · Economie 80%</div>
+      <div class="card-desc">50 fraze esențiale pre-generate cu vocea fondatorului. Stocate în IndexedDB pe device-ul fiecărui user. Zero tokeni ElevenLabs pentru răspunsuri repetitive.</div>
+      <div class="card-ex"><strong>Prima dată:</strong> 30 secunde preload cu animație premium<br><strong>După:</strong> vocea Lea instant, zero costuri, zero server</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">💬</div>
+      <div class="card-title">Conversație 24h Persistentă</div>
+      <div class="card-desc">Istoricul conversației salvat local pe device 24 ore. La revenire — Lea îți arată ultimele mesaje. Continui de unde ai rămas.</div>
+      <div class="card-ex"><strong>Limită Beta:</strong> 20 mesaje/zi gratuit<br><strong>Cu donație 5€:</strong> 100 mesaje/zi · 30 zile</div>
+    </div>
+  </div>
+
+  <div style="padding:24px;background:rgba(201,168,76,.04);border:0.5px solid var(--gold-b);border-radius:16px;margin-bottom:16px;">
+    <div style="font-size:11px;font-weight:600;letter-spacing:2px;color:rgba(201,168,76,.5);text-transform:uppercase;margin-bottom:12px;">Tonul CEO Premium · 50 Fraze Pre-generate</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div style="font-size:12px;color:var(--w40);padding:10px 12px;background:var(--w04);border-radius:8px;font-style:italic;">"Faci parte din ceva ce nu a mai existat. VV crește cu fiecare zi alături de tine."</div>
+      <div style="font-size:12px;color:var(--w40);padding:10px 12px;background:var(--w04);border-radius:8px;font-style:italic;">"Adevărul se validează pe stradă, nu pe ecran. Aceasta e filozofia VV."</div>
+      <div style="font-size:12px;color:var(--w40);padding:10px 12px;background:var(--w04);border-radius:8px;font-style:italic;">"Fiecare căutare pune o cărămidă la ecosistemul VV. Mulțumesc că ești aici."</div>
+      <div style="font-size:12px;color:var(--w40);padding:10px 12px;background:var(--w04);border-radius:8px;font-style:italic;">"Un Insider din zona ta verifică fizic. Ești conectat la realitate, nu la internet."</div>
+    </div>
+  </div>
+
+  <div style="padding:20px 24px;background:rgba(255,255,255,.02);border:0.5px solid var(--border);border-radius:14px;">
+    <div style="font-size:11px;font-weight:600;letter-spacing:2px;color:var(--w20);text-transform:uppercase;margin-bottom:10px;">Stack Tehnologic · Lea App</div>
+    <div style="font-size:13px;color:var(--w40);line-height:1.9;">
+      <strong style="color:var(--w60)">Gemini 2.0 Flash</strong> — creierul lui Lea. Gratuit. Rapid. Multilingv.<br>
+      <strong style="color:var(--w60)">ElevenLabs Starter</strong> — vocea fondatorului VV. 6$/lună. Cache local 80% economie.<br>
+      <strong style="color:var(--w60)">Firebase Firestore</strong> — VV Aer sync, VVhi Shadow Dataset, acorduri legale.<br>
+      <strong style="color:var(--w60)">IndexedDB local</strong> — audio cache, conversație 24h, profil Lea personal.<br>
+      <strong style="color:var(--w60)">Speech Recognition</strong> — voce input nativă în browser. Zero costuri extra.<br>
+      <strong style="color:var(--w60)">Cost total lunar: 6$</strong> — mai puțin decât o cafea. Servește sute de useri.
+    </div>
+  </div>
+</div>
+
+<!-- 25 · VV VOICE LABS · VIZIUNE INDEPENDENȚĂ -->
+<div class="sec">
+  <div class="s-eye">25 · VV Voice Labs · Viziune</div>
+  <h2 class="s-title">Luna aceasta ElevenLabs.<br><em>Anul viitor — independență totală.</em></h2>
+  <p class="s-sub">Strategia în 3 faze pentru a elimina complet dependența de corporații externe pentru vocea lui Lea.</p>
+
+  <div class="grid3">
+    <div class="card" style="border-color:rgba(45,184,122,.2);background:rgba(45,184,122,.03)">
+      <div class="card-icon">◉</div>
+      <div class="card-title" style="color:var(--green)">Faza 1 · Acum</div>
+      <div class="card-desc">ElevenLabs Starter 6$/lună + Audio Cache 80% economie. Pre-generăm maxim de fraze în prima lună. Le stocăm local pe fiecare device.</div>
+      <div style="font-size:9px;letter-spacing:1px;color:var(--green);margin-top:10px;text-transform:uppercase;">Live acum</div>
+    </div>
+    <div class="card" style="border-color:var(--gold-b);background:var(--gold2)">
+      <div class="card-icon">→</div>
+      <div class="card-title" style="color:var(--gold)">Faza 2 · 6 luni</div>
+      <div class="card-desc">Veniturile din donații 5€ + Premium 9€ acoperă ElevenLabs. Lea se autofinanțează. Descarcăm backup vocal complet local pe Toshiba.</div>
+      <div style="font-size:9px;letter-spacing:1px;color:var(--gold);margin-top:10px;text-transform:uppercase;">Target · Noiembrie 2026</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">◎</div>
+      <div class="card-title">Faza 3 · VV Voice Labs</div>
+      <div class="card-desc">Model open-source RVC/GPT-SoVITS rulat local. Vocea fondatorului antrenată complet offline. Zero dependență de nicio corporație. VV deține robinetul.</div>
+      <div style="font-size:9px;letter-spacing:1px;color:var(--w30);margin-top:10px;text-transform:uppercase;">Viziune · 2027</div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="fl">VV</div>
+  <div class="flinks">
+    <a href="https://vv-technologies.github.io/vv-nexus/vv-now.html" class="flink">VV NOW</a>
+    <a href="https://vv-technologies.github.io/vv-nexus/vv-architecture.html" class="flink">Arhitectură</a>
+    <a href="https://vv-technologies.github.io/vv-nexus/business-register.html" class="flink">Business</a>
+    <a href="https://vv-technologies.github.io/vv-nexus/talent-register.html" class="flink">Talent</a>
+    <a href="https://vv-technologies.github.io/vv-nexus/vv-studio.html" class="flink">Studio CEO</a>
+  </div>
+  <div class="fcopy">VV Hybrid Univers · Beta · România · 2026<br>VV Nexus · VV Lea Foundation v3 · GDPR Compliant · VV Charter v1.3</div>
+</footer>
 </body>
 </html>
