@@ -1285,7 +1285,7 @@ function renderResults(q,loc,missions,webAnswer,layer,staticData,vvPage,collecti
 
   // ── 2.8 NODURI NEARBY (GPS radius 2km) ──
   if(nearbyNodes && nearbyNodes.length > 0) {
-    nearbyNodes.forEach(function(node) {
+    nearbyNodes.filter(function(node){ return !isDupe(node.name, node.city); }).forEach(function(node) {
       html += '<div class="vv-card" style="border-color:rgba(48,209,88,.2);animation-delay:.08s">' +
         '<div class="card-src"><div class="src-dot dot-green"></div>VV BUSINESS NODE · ' + node._dist + 'km DE TINE</div>' +
         '<div style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:100px;font-size:9px;font-weight:700;background:rgba(48,209,88,.08);border:0.5px solid rgba(48,209,88,.2);color:var(--green);margin-bottom:10px">📍 ' + node._dist + ' km · Verificat în VV</div>' +
