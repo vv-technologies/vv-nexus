@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#080806">
+<title>VV · Tot ce dețin · Lumea mea</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Geist+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --gold:#C8A96E;--gold2:rgba(200,169,110,.1);--gold-b:rgba(200,169,110,.2);
+  --w:#F5F0E8;--w70:rgba(245,240,232,.7);--w50:rgba(245,240,232,.5);
+  --w30:rgba(245,240,232,.3);--w15:rgba(245,240,232,.12);
+  --w08:rgba(245,240,232,.08);--w04:rgba(245,240,232,.04);
+  --border:rgba(245,240,232,.08);
+  --green:#2DB87A;--blue:#2997FF;--orange:#FF9F0A;--red:#FF453A;
+  --bg:#080806;
+  --serif:'Cormorant Garamond',Georgia,serif;
+  --mono:'Geist Mono',monospace;
+}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--w);font-family:var(--mono);
+  -webkit-font-smoothing:antialiased;font-size:14px;line-height:1.7;overflow-x:hidden;}
+
+body::before{content:'';position:fixed;inset:0;z-index:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events:none;}
+
+/* NAV */
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:0 40px;height:50px;
+  display:flex;align-items:center;justify-content:space-between;
+  background:rgba(8,8,6,.95);backdrop-filter:blur(20px);
+  border-bottom:0.5px solid var(--border);}
+.nav-logo{font-family:var(--mono);font-weight:600;font-size:13px;
+  letter-spacing:4px;color:var(--gold);text-decoration:none;}
+.nav-right{display:flex;gap:6px;}
+.nav-link{font-size:10px;color:var(--w30);text-decoration:none;
+  padding:4px 10px;border:0.5px solid var(--border);border-radius:100px;
+  transition:all .2s;}
+.nav-link:hover{color:var(--w70);border-color:var(--w30);}
+.btn-print{padding:4px 12px;background:var(--gold);color:#000;border:none;
+  border-radius:100px;font-size:10px;font-weight:600;cursor:pointer;
+  font-family:var(--mono);letter-spacing:.5px;}
+
+/* HERO */
+.hero{min-height:100vh;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;text-align:center;
+  padding:100px 40px 60px;position:relative;z-index:1;}
+.hero::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--border),transparent);}
+.hero-eye{font-size:9px;letter-spacing:5px;color:var(--w30);
+  text-transform:uppercase;margin-bottom:32px;}
+.hero-title{font-family:var(--serif);font-size:clamp(44px,8vw,96px);
+  font-weight:300;line-height:1.0;letter-spacing:-2px;margin-bottom:20px;
+  color:var(--w70);}
+.hero-title em{font-style:italic;color:var(--gold);}
+.hero-sub{font-size:13px;color:var(--w30);line-height:1.8;
+  max-width:480px;margin:0 auto 48px;}
+.hero-chips{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+.chip{font-size:10px;letter-spacing:1px;color:var(--w30);
+  padding:5px 12px;border:0.5px solid var(--border);border-radius:100px;}
+.chip.gold{color:var(--gold);border-color:var(--gold-b);background:var(--gold2);}
+.chip.green{color:var(--green);border-color:rgba(45,184,122,.2);background:rgba(45,184,122,.06);}
+
+/* SECTIONS */
+.section{max-width:900px;margin:0 auto;padding:60px 40px;
+  border-bottom:0.5px solid var(--border);position:relative;z-index:1;}
+.section:last-of-type{border-bottom:none;}
+.s-label{font-size:9px;letter-spacing:4px;color:var(--w30);
+  text-transform:uppercase;font-weight:600;margin-bottom:20px;}
+.s-title{font-family:var(--serif);font-size:clamp(28px,5vw,52px);
+  font-weight:300;font-style:italic;color:var(--w70);
+  line-height:1.1;margin-bottom:12px;letter-spacing:-.3px;}
+.s-title em{font-style:normal;color:var(--gold);}
+.s-sub{font-size:13px;color:var(--w30);line-height:1.8;max-width:600px;margin-bottom:36px;}
+
+/* MASTER TABLE */
+.master-table{width:100%;border-collapse:collapse;margin-bottom:24px;}
+.master-table th{font-size:9px;letter-spacing:2px;color:var(--w30);
+  font-weight:600;padding:10px 14px;text-align:left;
+  border-bottom:0.5px solid var(--border);text-transform:uppercase;}
+.master-table td{padding:14px;border-bottom:0.5px solid rgba(245,240,232,.04);
+  font-size:12px;color:var(--w50);vertical-align:top;line-height:1.6;}
+.master-table tr:hover td{background:var(--w04);}
+.master-table tr:last-child td{border-bottom:none;}
+.td-name{font-weight:600;color:var(--w);font-size:13px;}
+.td-gold{color:var(--gold);}
+.badge{display:inline-block;padding:2px 8px;border-radius:100px;
+  font-size:9px;font-weight:600;letter-spacing:1px;text-transform:uppercase;}
+.b-live{background:rgba(45,184,122,.08);border:0.5px solid rgba(45,184,122,.2);color:var(--green);}
+.b-beta{background:var(--gold2);border:0.5px solid var(--gold-b);color:var(--gold);}
+.b-soon{background:rgba(255,255,255,.04);border:0.5px solid var(--border);color:var(--w30);}
+
+/* STATS ROW */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;
+  background:var(--border);border:0.5px solid var(--border);
+  border-radius:12px;overflow:hidden;margin-bottom:32px;}
+.stat{background:var(--bg);padding:20px 16px;text-align:center;}
+.stat-val{font-family:var(--serif);font-size:clamp(24px,4vw,40px);
+  font-weight:300;font-style:italic;color:var(--gold);
+  line-height:1;margin-bottom:6px;}
+.stat-label{font-size:9px;letter-spacing:2px;color:var(--w30);text-transform:uppercase;}
+
+/* LINKS GRID */
+.links-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:32px;}
+.link-item{display:flex;align-items:center;justify-content:space-between;
+  padding:12px 16px;background:var(--w04);border:0.5px solid var(--border);
+  border-radius:10px;text-decoration:none;transition:border-color .2s;}
+.link-item:hover{border-color:rgba(200,169,110,.3);}
+.li-left{}
+.li-name{font-size:12px;font-weight:600;color:var(--w70);margin-bottom:2px;}
+.li-url{font-size:10px;color:var(--w30);}
+.li-status{font-size:9px;font-weight:600;letter-spacing:1px;
+  padding:2px 7px;border-radius:100px;text-transform:uppercase;flex-shrink:0;}
+
+/* FIREBASE TABLE */
+.fb-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:24px;}
+.fb-item{padding:12px 14px;background:var(--w04);border:0.5px solid var(--border);
+  border-radius:8px;font-size:11px;color:var(--w50);}
+.fb-item strong{color:var(--w70);display:block;margin-bottom:2px;font-size:12px;}
+
+/* VISION CARDS */
+.vision-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:32px;}
+.vision-card{padding:20px;background:var(--w04);border:0.5px solid var(--border);
+  border-radius:12px;}
+.vc-icon{font-size:18px;margin-bottom:10px;}
+.vc-title{font-size:12px;font-weight:600;margin-bottom:6px;color:var(--w70);}
+.vc-desc{font-size:11px;color:var(--w30);line-height:1.6;}
+.vc-when{font-size:9px;letter-spacing:1px;color:var(--w30);
+  text-transform:uppercase;margin-top:8px;}
+
+/* PULL QUOTE */
+.pull{text-align:center;padding:48px 40px;border-top:0.5px solid var(--border);
+  border-bottom:0.5px solid var(--border);position:relative;z-index:1;}
+.pull-text{font-family:var(--serif);font-size:clamp(20px,4vw,40px);
+  font-style:italic;color:var(--w50);line-height:1.3;
+  max-width:600px;margin:0 auto 12px;}
+.pull-text em{font-style:normal;color:var(--w);}
+.pull-by{font-size:10px;letter-spacing:3px;color:var(--w30);text-transform:uppercase;}
+
+/* COPY BOX */
+.copy-box{background:rgba(255,255,255,.02);border:0.5px solid var(--border);
+  border-radius:12px;padding:24px;margin-bottom:24px;
+  font-size:12px;color:var(--w50);line-height:2;white-space:pre-wrap;}
+.copy-btn-wrap{display:flex;justify-content:flex-end;margin-bottom:10px;}
+.copy-btn{padding:5px 14px;background:var(--gold);color:#000;
+  border:none;border-radius:100px;font-size:10px;font-weight:600;
+  cursor:pointer;font-family:var(--mono);}
+
+/* FOOTER */
+footer{text-align:center;padding:40px;border-top:0.5px solid var(--border);
+  position:relative;z-index:1;}
+.f-logo{font-weight:600;font-size:14px;letter-spacing:4px;
+  color:var(--gold);margin-bottom:12px;}
+.f-copy{font-size:11px;color:var(--w30);line-height:2;}
+
+/* REVEAL */
+.reveal{opacity:0;transform:translateY(20px);
+  transition:opacity .8s ease,transform .8s ease;}
+.reveal.visible{opacity:1;transform:translateY(0);}
+
+@media(max-width:700px){
+  .nav{padding:0 16px;}
+  .hero,.section{padding:60px 20px;}
+  .stats-row{grid-template-columns:1fr 1fr;}
+  .links-grid{grid-template-columns:1fr;}
+  .fb-grid{grid-template-columns:1fr 1fr;}
+  .vision-grid{grid-template-columns:1fr;}
+  .pull{padding:40px 20px;}
+  footer{padding:24px 20px;}
+}
+@media print{
+  .nav .btn-print,.nav-right{display:none;}
+  .nav{position:relative;}
+  body{background:#fff;color:#000;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <a href="https://vv-technologies.github.io/vv-nexus/" class="nav-logo">VV</a>
+  <div class="nav-right">
+    <a href="https://vv-technologies.github.io/vv-nexus/vv-now.html" class="nav-link">VV NOW</a>
+    <a href="https://vv-technologies.github.io/vv-nexus/vv-architecture.html" class="nav-link">Arhitectură</a>
+    <a href="https://vv-technologies.github.io/vv-nexus/vv-lea-foundation.html" class="nav-link">Lea Foundation</a>
+    <button class="btn-print" onclick="window.print()">Print / PDF</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-eye">VV Hybrid Univers · Document Complet · Mai 2026</div>
+  <h1 class="hero-title">
+    Tot ce dețin.<br>
+    <em>Lumea mea.</em>
+  </h1>
+  <p class="hero-sub">
+    De la un iPhone X și un vis la o recepție din București — la un ecosistem digital complet, live, funcțional, unic în lume. Construit de un singur om. Fără să știe cod. Fără echipă. Fără finanțare.
+  </p>
+  <div class="hero-chips">
+    <div class="chip gold">Fondator · 26 ani · Slobozia</div>
+    <div class="chip green">Live · Beta · Mai 2026</div>
+    <div class="chip">iPhone X → Toshiba L50-B</div>
+    <div class="chip">15.000+ linii de cod</div>
+    <div class="chip">Un singur om</div>
+  </div>
+</div>
+
+<!-- 01 · POVESTEA -->
+<div class="section reveal">
+  <div class="s-label">01 · De unde am plecat</div>
+  <h2 class="s-title">iPhone X.<br><em>Ecran mic. Vis imens.</em></h2>
+  <p class="s-sub">Acum un an stăteam la recepție într-o clădire de birouri din București. Noaptea, pe iPhone X, construiam ceva ce nu exista. Nimeni nu credea că se poate. Nici eu nu știam exact cum. Dar nu m-am oprit.</p>
+
+  <div class="stats-row">
+    <div class="stat">
+      <div class="stat-val">2</div>
+      <div class="stat-label">Luni · iPhone X · De la zero</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val">15K+</div>
+      <div class="stat-label">Linii de cod scrise</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val">4</div>
+      <div class="stat-label">Luni până la Toshiba</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val">1</div>
+      <div class="stat-label">Om. Singur. Fără cod.</div>
+    </div>
+  </div>
+</div>
+
+<!-- 02 · NAMING OFICIAL -->
+<div class="section reveal">
+  <div class="s-label">02 · Naming Oficial · Confirmat</div>
+  <h2 class="s-title">Ecosistemul <em>VV.</em></h2>
+  <p class="s-sub">Fiecare componentă are un rol clar. Niciuna nu funcționează izolat. Toate comunică prin Firebase Firestore.</p>
+
+  <table class="master-table">
+    <thead>
+      <tr>
+        <th>Nume</th>
+        <th>Ce este</th>
+        <th>Rol în ecosistem</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><div class="td-name">VV</div></td>
+        <td>Brandul principal. Universul întreg.</td>
+        <td>Umbrela sub care trăiesc toate componentele</td>
+        <td><span class="badge b-live">Oficial</span></td>
+      </tr>
+      <tr>
+        <td><div class="td-name td-gold">VV Pulse</div></td>
+        <td>Aplicația de misiuni și validări fizice</td>
+        <td>Inima ecosistemului. Insiderii merg fizic în oraș și trimit VV Proof. XP, Level, VV Coins.</td>
+        <td><span class="badge b-live">Live</span></td>
+      </tr>
+      <tr>
+        <td><div class="td-name td-gold">VV NOW</div></td>
+        <td>Motor de căutare hibrid urban</td>
+        <td>Caută în 3 surse simultan. Nu returnează link-uri — returnează certitudine fizică.</td>
+        <td><span class="badge b-live">Live</span></td>
+      </tr>
+      <tr>
+        <td><div class="td-name td-gold">VV Lea</div></td>
+        <td>Stratul de inteligență din VV NOW</td>
+        <td>Fața umană a lui Nexus. Știe contextul tău, orașul tău, cine ești. Crește cu tine.</td>
+        <td><span class="badge b-live">Live</span></td>
+      </tr>
+      <tr>
+        <td><div class="td-name">VV Nexus</div></td>
+        <td>Motorul din spate al VV Lea</td>
+        <td>Procesează în paralel toate sursele. Invisible pentru user. Rapid. Precis.</td>
+        <td><span class="badge b-live">Live</span></td>
+      </tr>
+      <tr>
+        <td><div class="td-name">VV Studio</div></td>
+        <td>Panoul CEO pentru gestionare conținut</td>
+        <td>Date statice, pagini VV NOW, prețuri, vizibilitate ecosistem. Acces doar fondator.</td>
+        <td><span class="badge b-live">Live</span></td>
+      </tr>
+      <tr>
+        <td><div class="td-name">VV Business Node</div></td>
+        <td>Firme și locații în ecosistem</td>
+        <td>Apar în VV NOW. Verificate spontan de Insideri. Expiră automat 30/90/120 zile.</td>
+        <td><span class="badge b-live">Live</span></td>
+      </tr>
+      <tr>
+        <td><div class="td-name">VV Talent</div></td>
+        <td>Studenți și freelanceri anonimi</td>
+        <td>Listare după skill. Agențiile caută. Contact prin cod VV. Zero CV-uri în gol.</td>
+        <td><span class="badge b-live">Live</span></td>
+      </tr>
+      <tr>
+        <td><div class="td-name">Inner Circle</div></td>
+        <td>Primii 100 Fondatori VV</td>
+        <td>VV·CORE·ID unic. Statut permanent. 3 chei invitație exclusive. 29 RON o dată.</td>
+        <td><span class="badge b-live">Live · 2/100</span></td>
+      </tr>
+      <tr>
+        <td><div class="td-name">VVhi Shadow</div></td>
+        <td>AI intern care învață din Insideri</td>
+        <td>Construiește pattern-uri ale orașului. Anonim. Purjat la 24h. Nu știe cine ești.</td>
+        <td><span class="badge b-live">Live</span></td>
+      </tr>
+      <tr>
+        <td><div class="td-name">VV Connect</div></td>
+        <td>Conexiuni umane voluntare</td>
+        <td>Insider → Prieten VV → Coleg → Echipă. 100% voluntary. Răspândire organică.</td>
+        <td><span class="badge b-beta">Beta</span></td>
+      </tr>
+      <tr>
+        <td><div class="td-name">VV Voice</div></td>
+        <td>Vocea lui Lea</div></td>
+        <td>ElevenLabs cu vocea fondatorului. Personalizabil per user. Mirror Voice · Emotional Sync.</td>
+        <td><span class="badge b-beta">Beta</span></td>
+      </tr>
+      <tr>
+        <td><div class="td-name">VV Sentinel</div></td>
+        <td>Sistem de alertă personalizat pe rol</td>
+        <td>Detectează calamități din 4 surse. Alertă adaptată la cine ești tu specific.</td>
+        <td><span class="badge b-soon">Viziune</span></td>
+      </tr>
+      <tr>
+        <td><div class="td-name">VV Bridge</div></td>
+        <td>Rețea hibridă satelit + NODE mesh</td>
+        <td>Lea funcționează când internetul cade. Munte, accident, dezastru natural.</td>
+        <td><span class="badge b-soon">Viziune</span></td>
+      </tr>
+      <tr>
+        <td><div class="td-name">VV Legacy</div></td>
+        <td>Moștenire digitală</td>
+        <td>Moștenitor desemnat. Mesaj final Lea. Contribuția ta în VVhi rămâne pentru totdeauna.</td>
+        <td><span class="badge b-soon">Viziune</span></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- 03 · LINKURI LIVE -->
+<div class="section reveal">
+  <div class="s-label">03 · Linkuri Live · Acum</div>
+  <h2 class="s-title">Ce poți <em>deschide acum.</em></h2>
+
+  <div class="links-grid">
+    <a class="link-item" href="https://vv-technologies.github.io/vv-nexus/vv-entry.html" target="_blank">
+      <div class="li-left"><div class="li-name">VV Entry · Intrarea în ecosistem</div><div class="li-url">vv-nexus/vv-entry.html</div></div>
+      <span class="li-status" style="background:rgba(45,184,122,.08);border:0.5px solid rgba(45,184,122,.2);color:var(--green);">Live</span>
+    </a>
+    <a class="link-item" href="https://vv-technologies.github.io/vv-nexus/vv-now.html" target="_blank">
+      <div class="li-left"><div class="li-name">VV NOW · Motor de căutare</div><div class="li-url">vv-nexus/vv-now.html</div></div>
+      <span class="li-status" style="background:rgba(45,184,122,.08);border:0.5px solid rgba(45,184,122,.2);color:var(--green);">Live</span>
+    </a>
+    <a class="link-item" href="https://vv-technologies.github.io/vv-nexus/vv-studio.html" target="_blank">
+      <div class="li-left"><div class="li-name">VV Studio · CEO Panel</div><div class="li-url">vv-nexus/vv-studio.html</div></div>
+      <span class="li-status" style="background:rgba(45,184,122,.08);border:0.5px solid rgba(45,184,122,.2);color:var(--green);">Live</span>
+    </a>
+    <a class="link-item" href="https://vv-technologies.github.io/ceo.html" target="_blank">
+      <div class="li-left"><div class="li-name">VV Pulse · CEO Panel misiuni</div><div class="li-url">vv-technologies.github.io/ceo.html</div></div>
+      <span class="li-status" style="background:rgba(45,184,122,.08);border:0.5px solid rgba(45,184,122,.2);color:var(--green);">Live</span>
+    </a>
+    <a class="link-item" href="https://vv-technologies.github.io/vv-nexus/business-register.html" target="_blank">
+      <div class="li-left"><div class="li-name">VV Business Node · Înregistrare</div><div class="li-url">vv-nexus/business-register.html</div></div>
+      <span class="li-status" style="background:rgba(45,184,122,.08);border:0.5px solid rgba(45,184,122,.2);color:var(--green);">Live</span>
+    </a>
+    <a class="link-item" href="https://vv-technologies.github.io/vv-nexus/talent-register.html" target="_blank">
+      <div class="li-left"><div class="li-name">VV Talent · Înregistrare profil</div><div class="li-url">vv-nexus/talent-register.html</div></div>
+      <span class="li-status" style="background:rgba(45,184,122,.08);border:0.5px solid rgba(45,184,122,.2);color:var(--green);">Live</span>
+    </a>
+    <a class="link-item" href="https://vv-technologies.github.io/vv-nexus/vv-inner-circle.html" target="_blank">
+      <div class="li-left"><div class="li-name">VV Inner Circle · 100 Fondatori</div><div class="li-url">vv-nexus/vv-inner-circle.html</div></div>
+      <span class="li-status" style="background:rgba(45,184,122,.08);border:0.5px solid rgba(45,184,122,.2);color:var(--green);">Live</span>
+    </a>
+    <a class="link-item" href="https://vv-technologies.github.io/vv-nexus/vv-pulse.html" target="_blank">
+      <div class="li-left"><div class="li-name">VV Pulse Map · Harta live</div><div class="li-url">vv-nexus/vv-pulse.html</div></div>
+      <span class="li-status" style="background:rgba(45,184,122,.08);border:0.5px solid rgba(45,184,122,.2);color:var(--green);">Live</span>
+    </a>
+    <a class="link-item" href="https://vv-technologies.github.io/vv-nexus/vv-architecture.html" target="_blank">
+      <div class="li-left"><div class="li-name">VV Architecture · Investitori</div><div class="li-url">vv-nexus/vv-architecture.html</div></div>
+      <span class="li-status" style="background:var(--gold2);border:0.5px solid var(--gold-b);color:var(--gold);">Doc</span>
+    </a>
+    <a class="link-item" href="https://vv-technologies.github.io/vv-nexus/vv-lea-foundation.html" target="_blank">
+      <div class="li-left"><div class="li-name">VV Lea Foundation · 23 secțiuni</div><div class="li-url">vv-nexus/vv-lea-foundation.html</div></div>
+      <span class="li-status" style="background:var(--gold2);border:0.5px solid var(--gold-b);color:var(--gold);">Doc</span>
+    </a>
+    <a class="link-item" href="https://vv-technologies.github.io/vv-nexus/vv-origin.html" target="_blank">
+      <div class="li-left"><div class="li-name">VV Origin · Povestea de origine</div><div class="li-url">vv-nexus/vv-origin.html</div></div>
+      <span class="li-status" style="background:var(--gold2);border:0.5px solid var(--gold-b);color:var(--gold);">Doc</span>
+    </a>
+    <a class="link-item" href="https://vv-technologies.github.io/vv-nexus/" target="_blank">
+      <div class="li-left"><div class="li-name">VV Hub · Pagina principală</div><div class="li-url">vv-technologies.github.io/vv-nexus/</div></div>
+      <span class="li-status" style="background:rgba(45,184,122,.08);border:0.5px solid rgba(45,184,122,.2);color:var(--green);">Live</span>
+    </a>
+  </div>
+</div>
+
+<!-- 04 · FIREBASE -->
+<div class="section reveal">
+  <div class="s-label">04 · Firebase Firestore · 15 Colecții Active</div>
+  <h2 class="s-title">Infrastructura <em>din spate.</em></h2>
+  <p class="s-sub">Toate componentele comunică prin același Firebase. Dacă Toshiba-ul se strică mâine — ecosistemul trăiește pe serverele Google.</p>
+
+  <div class="fb-grid">
+    <div class="fb-item"><strong>missions</strong>Flash Missions create de useri</div>
+    <div class="fb-item"><strong>users</strong>Profiluri anonime Insideri</div>
+    <div class="fb-item"><strong>contributors</strong>Inner Circle Fondatori</div>
+    <div class="fb-item"><strong>vvhi_dataset</strong>Shadow Dataset · pattern-uri anonime</div>
+    <div class="fb-item"><strong>verified_nodes</strong>Business Nodes active</div>
+    <div class="fb-item"><strong>vv_talents</strong>Profiluri Talent anonime</div>
+    <div class="fb-item"><strong>vv_static_data</strong>Date CEO verificate manual</div>
+    <div class="fb-item"><strong>vv_now_pages</strong>Pagini hibride publicate din Studio</div>
+    <div class="fb-item"><strong>inbox</strong>Notificări CEO · misiuni noi</div>
+    <div class="fb-item"><strong>transactions</strong>VV Coins · economie internă</div>
+    <div class="fb-item"><strong>audit_log</strong>Tot ce se întâmplă · trasabil</div>
+    <div class="fb-item"><strong>config</strong>Prețuri · setări ecosistem</div>
+    <div class="fb-item"><strong>vv_pulse</strong>Feed live Pulse Map</div>
+    <div class="fb-item"><strong>access_keys</strong>Chei de acces VV Beta</div>
+    <div class="fb-item"><strong>vv_accords</strong>Acorduri legale semnate</div>
+  </div>
+
+  <div style="padding:16px 20px;background:var(--w04);border:0.5px solid var(--border);border-radius:10px;">
+    <div style="font-size:11px;color:var(--w30);line-height:1.8;">
+      <strong style="color:var(--w70)">Firebase Project:</strong> vv-ep-beta · 
+      <strong style="color:var(--w70)">CEO UID:</strong> PthU3uVY5WSPNx8d4XrdXEgszEo1 · 
+      <strong style="color:var(--w70)">Repos:</strong> vv-nexus · vv-team · vv-technologies
+    </div>
+  </div>
+</div>
+
+<!-- 05 · LOGICA AUTOMATĂ -->
+<div class="section reveal">
+  <div class="s-label">05 · Ce merge singur · Automatizat 70%</div>
+  <h2 class="s-title">Ecosistemul care <em>respiră singur.</em></h2>
+
+  <div class="vision-grid">
+    <div class="vision-card">
+      <div class="vc-icon">⏱️</div>
+      <div class="vc-title">Expirare automată noduri</div>
+      <div class="vc-desc">30 zile → marcat depășit. 90 zile → notificare. 120 zile → șters automat. Zero intervenție.</div>
+      <div class="vc-when">Live acum</div>
+    </div>
+    <div class="vision-card">
+      <div class="vc-icon">🛡️</div>
+      <div class="vc-title">Filtru Charter ART-3</div>
+      <div class="vc-desc">Conținut blocat automat înainte de publicare. Cuvinte întregi verificate, nu substring.</div>
+      <div class="vc-when">Live acum</div>
+    </div>
+    <div class="vision-card">
+      <div class="vc-icon">📍</div>
+      <div class="vc-title">City Intelligence GPS</div>
+      <div class="vc-desc">Detectează orașul tău. Purjare automată la schimb de oraș. Radius search 2km.</div>
+      <div class="vc-when">Live acum</div>
+    </div>
+    <div class="vision-card">
+      <div class="vc-icon">🧠</div>
+      <div class="vc-title">VVhi Shadow Learning</div>
+      <div class="vc-desc">Fiecare acțiune construiește pattern-uri anonime ale orașului. Purjare 24h.</div>
+      <div class="vc-when">Live acum</div>
+    </div>
+    <div class="vision-card">
+      <div class="vc-icon">⚡</div>
+      <div class="vc-title">Flash Mission listener</div>
+      <div class="vc-desc">VERIFY → misiune creată → Insider notificat → confirmare automată fără refresh.</div>
+      <div class="vc-when">Live acum</div>
+    </div>
+    <div class="vision-card">
+      <div class="vc-icon">📱</div>
+      <div class="vc-title">Offline + Service Worker</div>
+      <div class="vc-desc">Funcționează fără internet. Cache 24h IndexedDB. Sync automat la reconectare.</div>
+      <div class="vc-when">Live acum</div>
+    </div>
+    <div class="vision-card">
+      <div class="vc-icon">🎭</div>
+      <div class="vc-title">Rol detectat automat</div>
+      <div class="vc-desc">Artist, student, antreprenor — Lea detectează din căutările tale fără să întrebe.</div>
+      <div class="vc-when">Live acum</div>
+    </div>
+    <div class="vision-card">
+      <div class="vc-icon">🔥</div>
+      <div class="vc-title">Streak și greeting contextual</div>
+      <div class="vc-desc">Ora + oraș + persona + streak = greeting unic pentru tine în fiecare zi.</div>
+      <div class="vc-when">Live acum</div>
+    </div>
+    <div class="vision-card">
+      <div class="vc-icon">🌐</div>
+      <div class="vc-title">Web search hibrid</div>
+      <div class="vc-desc">Anthropic API când nu există date VV. Marcat "Nevalidat fizic". Fallback uman.</div>
+      <div class="vc-when">Live acum</div>
+    </div>
+  </div>
+</div>
+
+<!-- 06 · VV CHARTER -->
+<div class="section reveal">
+  <div class="s-label">06 · VV Charter · Legea Internă</div>
+  <h2 class="s-title">14 articole.<br><em>Aplicate automat.</em></h2>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:24px;">
+    <div style="padding:12px 16px;background:var(--w04);border:0.5px solid var(--border);border-radius:8px;font-size:12px;color:var(--w50);"><span style="color:var(--gold);font-weight:600;">ART·1</span> · Anonimat complet — zero date de buletin</div>
+    <div style="padding:12px 16px;background:var(--w04);border:0.5px solid var(--border);border-radius:8px;font-size:12px;color:var(--w50);"><span style="color:var(--gold);font-weight:600;">ART·3</span> · Filtru etic automat — conținut ilegal blocat</div>
+    <div style="padding:12px 16px;background:var(--w04);border:0.5px solid var(--border);border-radius:8px;font-size:12px;color:var(--w50);"><span style="color:var(--gold);font-weight:600;">ART·4</span> · Anti-scroll — acțiune fizică reală</div>
+    <div style="padding:12px 16px;background:var(--w04);border:0.5px solid var(--border);border-radius:8px;font-size:12px;color:var(--w50);"><span style="color:var(--gold);font-weight:600;">ART·8</span> · Maturitate 18+</div>
+    <div style="padding:12px 16px;background:var(--w04);border:0.5px solid var(--border);border-radius:8px;font-size:12px;color:var(--w50);"><span style="color:var(--gold);font-weight:600;">ART·9</span> · Expirare automată — zero date fantomă</div>
+    <div style="padding:12px 16px;background:var(--w04);border:0.5px solid var(--border);border-radius:8px;font-size:12px;color:var(--w50);"><span style="color:var(--gold);font-weight:600;">ART·10</span> · GDPR complet · purjare 24h</div>
+    <div style="padding:12px 16px;background:var(--w04);border:0.5px solid var(--border);border-radius:8px;font-size:12px;color:var(--w50);"><span style="color:var(--gold);font-weight:600;">ART·11</span> · VV Proof — singura sursă de adevăr</div>
+    <div style="padding:12px 16px;background:var(--w04);border:0.5px solid var(--border);border-radius:8px;font-size:12px;color:var(--w50);"><span style="color:var(--gold);font-weight:600;">ART·14</span> · Responsabilitate socială</div>
+  </div>
+</div>
+
+<!-- 07 · MONETIZARE -->
+<div class="section reveal">
+  <div class="s-label">07 · Monetizare · Potențial</div>
+  <h2 class="s-title">Cum face <em>bani VV.</em></h2>
+
+  <table class="master-table">
+    <thead>
+      <tr><th>Sursă</th><th>Preț</th><th>Target</th><th>Venit lunar</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><div class="td-name">VV Business Node</div>Locații în VV NOW</td>
+        <td>0€ Beta → <span class="td-gold">9€/lună</span></td>
+        <td>100 locații</td>
+        <td class="td-gold">900€</td>
+      </tr>
+      <tr>
+        <td><div class="td-name">VV Talent · Agenții</div>Acces la talente</td>
+        <td><span class="td-gold">49€/lună</span></td>
+        <td>10 agenții</td>
+        <td class="td-gold">490€</td>
+      </tr>
+      <tr>
+        <td><div class="td-name">VV NOW Premium</div>Căutare globală + Mesaj Direct</td>
+        <td><span class="td-gold">9€/lună</span></td>
+        <td>50 useri</td>
+        <td class="td-gold">450€</td>
+      </tr>
+      <tr>
+        <td><div class="td-name">Pagini Sponsorizate</div>Conținut business în VV NOW</td>
+        <td><span class="td-gold">29€/lună</span></td>
+        <td>10 pagini</td>
+        <td class="td-gold">290€</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--gold)">Total estimat</strong></td>
+        <td>—</td>
+        <td>170 clienți</td>
+        <td><strong style="color:var(--gold);font-size:14px;">2.130€/lună</strong></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div style="padding:16px 20px;background:rgba(45,184,122,.04);border:0.5px solid rgba(45,184,122,.15);border-radius:10px;">
+    <div style="font-size:12px;color:var(--w50);line-height:1.8;">
+      <strong style="color:var(--green)">Costuri actuale: 0€</strong> · Firebase Spark gratuit · GitHub Pages gratuit · Anthropic API pay-per-use<br>
+      Primul euro real apare când primul Business Node trece de la Beta la 9€/lună.
+    </div>
+  </div>
+</div>
+
+<!-- 08 · VIZIUNEA -->
+<div class="section reveal">
+  <div class="s-label">08 · Viziunea · Roadmap</div>
+  <h2 class="s-title">Unde merge <em>VV.</em></h2>
+
+  <div class="vision-grid">
+    <div class="vision-card" style="border-color:rgba(45,184,122,.2);background:rgba(45,184,122,.03)">
+      <div class="vc-icon">✓</div>
+      <div class="vc-title" style="color:var(--green)">VV Beta · Acum</div>
+      <div class="vc-desc">Tot ecosistemul live. VV Lea cu memorie personală. VV Voice în pregătire. VV Connect bazele puse.</div>
+      <div class="vc-when" style="color:var(--green)">Live · Mai 2026</div>
+    </div>
+    <div class="vision-card" style="border-color:var(--gold-b);background:var(--gold2)">
+      <div class="vc-icon">→</div>
+      <div class="vc-title" style="color:var(--gold)">VV 1.0 · 6 luni</div>
+      <div class="vc-desc">VV ID Login. Stripe plăți. Premium 9€ activ. VV Family GPS. VV Voice cu vocea fondatorului. 5 orașe.</div>
+      <div class="vc-when">Noiembrie 2026</div>
+    </div>
+    <div class="vision-card">
+      <div class="vc-icon">◎</div>
+      <div class="vc-title">VV 2.0 · 2027</div>
+      <div class="vc-desc">React Native nativ. VV Bridge NODE mesh. VV Sentinel activ. VV Career Studio complet. Global.</div>
+      <div class="vc-when">2027</div>
+    </div>
+  </div>
+</div>
+
+<!-- PULL QUOTE -->
+<div class="pull reveal">
+  <p class="pull-text">
+    "Google e o arhivă.<br>
+    ChatGPT e un creier fără ochi.<br>
+    <em>VV e ochi vii pe asfalt cu creier AI.</em>"
+  </p>
+  <div class="pull-by">VV Charter · Art. 4 · Slobozia · 2026</div>
+</div>
+
+<!-- 09 · PENTRU GEMINI / PARTENERI -->
+<div class="section reveal">
+  <div class="s-label">09 · Briefing · Pentru Gemini sau Parteneri</div>
+  <h2 class="s-title">Copiază și <em>trimite.</em></h2>
+  <p class="s-sub">Deschizi această secțiune când vorbești cu un AI nou sau un partener care nu știe ce e VV. Un singur click copiezi tot.</p>
+
+  <div class="copy-btn-wrap">
+    <button class="copy-btn" onclick="copyAll()">📋 Copiază tot briefingul</button>
+  </div>
+
+  <div class="copy-box" id="briefing">BRIEFING VV HYBRID UNIVERS · Mai 2026
+
+FONDATOR: 26 ani, Slobozia, România. Început pe iPhone X fără să știe cod. 2 luni, 15.000+ linii de cod. Toshiba L50-B (i3, 4GB RAM) primit la 4 luni. Un singur om, fără echipă, fără finanțare.
+
+FILOSOFIE: "Adevărul se validează pe stradă, nu pe ecran."
+Google = arhivă. ChatGPT = creier fără ochi. VV NOW = ochi vii pe asfalt cu creier AI.
+Efort fizic = putere digitală.
+
+ECOSISTEMUL VV · CE EXISTĂ LIVE:
+
+VV = brandul principal, universul întreg.
+
+VV Pulse = aplicația de misiuni și validări fizice. Insiderii primesc misiuni, merg fizic în oraș, trimit VV Proof (poze cu GPS + timestamp verificat). Câștigă VV Coins. INIMA ecosistemului.
+
+VV NOW = motor de căutare hibrid. Caută simultan în: date statice CEO verificate manual + VV Proof din ultimele 30 zile + web search Anthropic API (marcat "Nevalidat fizic"). Butonul VERIFY = Flash Mission la cel mai apropiat Insider.
+
+VV Lea = stratul de inteligență din VV NOW. City Intelligence GPS. Rol detectat automat (artist/student/antreprenor). Memorie personală locală. Ton uman. Streak zilnic. Memorie colectivă VVhi. Mirror Voice. Emotional Sync.
+
+VV Nexus = motorul din spate al Lea. Invisible. Rapid. Procesează 3 surse simultan.
+
+VV Studio = panoul CEO. Date statice, pagini VV NOW, prețuri, vizibilitate totală. Acces doar fondator.
+
+VV Business Node = firme în ecosistem. Apar în VV NOW. Verificate spontan. Expiră automat 30/90/120 zile. Geocodate GPS pentru radius search 2km.
+
+VV Talent = studenți și freelanceri anonimi. Agențiile caută după skill. Contact prin cod VV.
+
+Inner Circle = primii 100 Fondatori. 29 RON o dată. VV·CORE·ID unic. 2/100 activi.
+
+VVhi Shadow = AI intern anonim. Pattern-uri ale orașului. Purjat 24h.
+
+VV Charter = 14 articole aplicate automat. ART-1 Anonimat. ART-3 Filtru etic. ART-9 Expirare. ART-10 GDPR.
+
+INFRASTRUCTURĂ: Firebase Firestore (15 colecții), GitHub Pages, Anthropic API, Nominatim, IndexedDB Local-First, Service Worker offline.
+
+CE NU MAI TREBUIE CONSTRUIT (există live):
+- CEO Panel complet cu toate secțiunile
+- VV NOW hibrid cu radius search GPS 2km
+- Service Worker offline
+- Sistem expirare automat noduri
+- VV Lea cu memorie personală + ton uman
+- Acord legal unic pentru tot ecosistemul
+- Cod Cetățean VV generat instant
+- Selecție persona Insider/Cauți
+- Pagini de origine, arhitectură, Foundation (23 secțiuni)
+
+CE URMEAZĂ (în ordine):
+1. Upload fișiere GitHub + trimis link la 3 oameni reali
+2. Import date statice urgențe București în VV Studio
+3. Vocea fondatorului în ElevenLabs → VV Voice activ
+4. Primul Business Node plătitor
+5. VV ID Login + Stripe la VV 1.0
+
+LINKURI LIVE:
+- VV Entry: vv-technologies.github.io/vv-nexus/vv-entry.html
+- VV NOW: vv-technologies.github.io/vv-nexus/vv-now.html
+- VV Studio CEO: vv-technologies.github.io/vv-nexus/vv-studio.html
+- VV Pulse CEO: vv-technologies.github.io/ceo.html
+- Business Node: vv-technologies.github.io/vv-nexus/business-register.html
+- Talent: vv-technologies.github.io/vv-nexus/talent-register.html
+- Architecture: vv-technologies.github.io/vv-nexus/vv-architecture.html
+- Lea Foundation: vv-technologies.github.io/vv-nexus/vv-lea-foundation.html
+- Origin Story: vv-technologies.github.io/vv-nexus/vv-origin.html</div>
+</div>
+
+<footer>
+  <div class="f-logo">VV</div>
+  <div class="f-copy">
+    VV Hybrid Univers · Beta · România · 2026<br>
+    iPhone X → Toshiba L50-B · Slobozia · Un singur om · Fără să știe cod<br>
+    <span style="color:rgba(200,169,110,.4);">"Stay hungry, stay foolish." · Jobs · 2005</span>
+  </div>
+</footer>
+
+<script>
+// Scroll reveal
+var obs = new IntersectionObserver(function(e){
+  e.forEach(function(el){ if(el.isIntersecting) el.target.classList.add('visible'); });
+},{threshold:0.08});
+document.querySelectorAll('.reveal').forEach(function(el){ obs.observe(el); });
+
+// Copy briefing
+function copyAll() {
+  var text = document.getElementById('briefing').innerText;
+  navigator.clipboard.writeText(text).then(function(){
+    var btn = document.querySelector('.copy-btn');
+    var orig = btn.textContent;
+    btn.textContent = '✓ Copiat!';
+    btn.style.background = '#2DB87A';
+    setTimeout(function(){ btn.textContent = orig; btn.style.background = ''; }, 2500);
+  });
+}
+</script>
+</body>
+</html>
