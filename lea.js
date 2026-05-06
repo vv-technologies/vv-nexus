@@ -909,7 +909,11 @@ function checkAndOfferPin(ans, locationName) {
       var pinOffer = document.createElement('div');
       pinOffer.style.cssText = 'align-self:flex-start;margin-top:-8px;';
       var safeName = (locationName||'').replace(/'/g,'').replace(/"/g,'');
-      pinOffer.innerHTML = '<button onclick="addGhostPin(\''+safeName+'\',\'\',2);this.parentElement.remove();" style="padding:5px 12px;background:rgba(41,151,255,.1);border:0.5px solid rgba(41,151,255,.2);border-radius:100px;color:var(--blue);font-family:var(--mono);font-size:10px;cursor:pointer;">📍 Pin · 2h</button>';
+      var pbtn = document.createElement('button');
+      pbtn.textContent = '📍 Pin · 2h';
+      pbtn.style.cssText = 'padding:5px 12px;background:rgba(41,151,255,.1);border:0.5px solid rgba(41,151,255,.2);border-radius:100px;color:var(--blue);font-family:var(--mono);font-size:10px;cursor:pointer;';
+      pbtn.onclick = function(){ addGhostPin(safeName,'',2); this.parentElement.remove(); };
+      pinOffer.appendChild(pbtn);
       conv.appendChild(pinOffer);
       conv.scrollTo({top:conv.scrollHeight,behavior:'smooth'});
     }, 800);
@@ -1357,7 +1361,11 @@ function showDonate(){
   var conv=document.getElementById('conv');
   var ex=document.getElementById('donate-card');if(ex){conv.scrollTo({top:conv.scrollHeight,behavior:'smooth'});return;}
   var d=document.createElement('div');d.id='donate-card';d.className='donate';
-  d.innerHTML='<div class="donate-t">'+getCount()+' mesaje azi.</div><div class="donate-s">Beta: '+DAILY_LIMIT+' mesaje/zi gratuit.<br>Donează 5€ → 100 mesaje/zi · 30 zile.</div><button class="donate-btn" onclick="window.open(\'https://revolut.me/vv\',\'_blank\')">Susțin Lea · 5€ →</button>';
+  var _dt=document.createElement('div');_dt.className='donate-t';_dt.textContent=getCount()+' mesaje azi.';
+  var _ds=document.createElement('div');_ds.className='donate-s';_ds.textContent='Beta: '+DAILY_LIMIT+' mesaje/zi. Donează 5€ pentru 100 mesaje/zi.';
+  var _db=document.createElement('button');_db.className='donate-btn';_db.textContent='Susțin Lea · 5€ →';
+  _db.onclick=function(){window.open('https://revolut.me/vv','_blank');};
+  d.appendChild(_dt);d.appendChild(_ds);d.appendChild(_db);
   conv.appendChild(d);conv.scrollTo({top:conv.scrollHeight,behavior:'smooth'});
 }
 
@@ -1385,7 +1393,7 @@ function buildSugs(){
   else if(h<19) items=['Cafenea cu loc?','Ce e deschis după 18?','Transport?','Magazin deschis?'];
   else items=['Ce livrează seara?','Bar deschis?','Farmacie nonstop?','Taxi spre casă?'];
   var s=document.getElementById('sugs');
-  if(s)s.innerHTML=items.map(function(i){return'<div class="sug" onclick="useSug(\''+i.replace(/'/g,"\\'")+'\')">'+ i+'</div>';}).join('');
+  if(s)s.innerHTML=items.map(function(i){var safe=i.replace(/"/g,'&quot;');return'<div class="sug" onclick="useSug(this.textContent)">'+safe+'</div>';}).join('');
 }
 function useSug(t){document.getElementById('ibox').value=t;send();}
 
