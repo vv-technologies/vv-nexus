@@ -560,8 +560,7 @@ function learnFromInteraction(q, intent, ans, city) {
 
   // Invata locuri favorite
   if(ans && city) {
-    var nameMatch = ans.match(/✓[^·
-]+/);
+    var nameMatch = ans.match(/✓[^·\n]+/);
     if(nameMatch) {
       var placeName = nameMatch[0].replace('✓','').trim();
       if(placeName && !SHELVES.places.favorites.find(function(p){return p.name===placeName;})) {
@@ -643,11 +642,8 @@ function checkAndOfferPin(ans, locationName) {
       var conv = document.getElementById('conv');
       var pinOffer = document.createElement('div');
       pinOffer.style.cssText = 'align-self:flex-start;margin-top:-8px;';
-      pinOffer.innerHTML =
-        '<button onclick="addGhostPin('' + locationName.replace(/'/g,"\'") + '','',2);this.parentElement.remove();" ' +
-        'style="padding:5px 12px;background:rgba(41,151,255,.1);border:0.5px solid rgba(41,151,255,.2);' +
-        'border-radius:100px;color:var(--blue);font-family:var(--mono);font-size:10px;cursor:pointer;letter-spacing:.5px;">' +
-        '📍 Pune un pin · Se șterge în 2h</button>';
+      var safeName = (locationName||'').replace(/'/g,'').replace(/"/g,'');
+      pinOffer.innerHTML = '<button onclick="addGhostPin(\''+safeName+'\',\'\',2);this.parentElement.remove();" style="padding:5px 12px;background:rgba(41,151,255,.1);border:0.5px solid rgba(41,151,255,.2);border-radius:100px;color:var(--blue);font-family:var(--mono);font-size:10px;cursor:pointer;">📍 Pin · 2h</button>';
       conv.appendChild(pinOffer);
       conv.scrollTo({top:conv.scrollHeight,behavior:'smooth'});
     }, 800);
