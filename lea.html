@@ -436,7 +436,12 @@ function fbAdd(col, data) {
 // ── STATE ─────────────────────────────────────────────────────
 var _u = null, _city = null, _hist = [], _obs = 0, _aerL = null;
 var _ck = [false, false, false];
-var _gk = localStorage.getItem('lea_gk') || '';
+// ── CHEIA CEO ─────────────────────────────────────────────────
+// Bagi cheia ta o singura data aici — toti userii o folosesc
+// Inlocuieste textul de mai jos cu cheia ta reala de la aistudio.google.com
+var CEO_GK = 'PUNE_CHEIA_GEMINI_AICI';
+// ──────────────────────────────────────────────────────────────
+var _gk = localStorage.getItem('lea_gk') || CEO_GK;
 var _ek = localStorage.getItem('lea_ek') || '';
 var _vi = localStorage.getItem('lea_vi') || '';
 var _audio = null, _rec = null;
@@ -453,6 +458,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function bootLea() {
+  loadShelves();
   // 1. Deja logat?
   var sid = localStorage.getItem('lea_id');
   var su = localStorage.getItem('lea_u');
@@ -734,6 +740,289 @@ function addMsg(role, text, isTk) {
   return msg;
 }
 
+
+// ── VV PATTERN SCORE SYSTEM ───────────────────────────────────
+// Înlocuiește recenziile cu starea reală în timp real
+
+async function getPatternScore(locationName, city) {
+  if(!db || !locationName) return null;
+  try {
+    var cityL = (city||_city||'').toLowerCase();
+    var nameL = locationName.toLowerCase();
+    var since24h = new Date(Date.now() - 24*60*60*1000);
+
+    // Cauta VV Proof pentru aceasta locatie
+    var snap = await db.collection('missions')
+      .where('status','==','completed')
+      .where('createdAt','>=',firebase.firestore.Timestamp.fromDate(since24h))
+      .limit(20).get();
+
+    var matches = [];
+    snap.forEach(function(doc) {
+      var d = doc.data();
+      var mLoc = (d.location||d.address||d.description||'').toLowerCase();
+      var mCity = (d.city||'').toLowerCase();
+      if(mLoc.includes(nameL.split(' ')[0]) || nameL.includes(mLoc.split(' ')[0])) {
+        if(!cityL || mCity.includes(cityL) || cityL.includes(mCity)) {
+          matches.push(d);
+        }
+      }
+    });
+
+    if(matches.length === 0) return {score:0, label:'◌◌◌', text:'Nevalidat VV', age:null};
+
+    // Calculeaza scorul
+    var score = Math.min(3, matches.length);
+    var latest = matches.reduce(function(a,b){
+      var at = a.createdAt ? a.createdAt.toDate() : new Date(0);
+      var bt = b.createdAt ? b.createdAt.toDate() : new Date(0);
+      return at > bt ? a : b;
+    });
+    var ageMs = Date.now() - (latest.createdAt ? latest.createdAt.toDate().getTime() : 0);
+    var ageText = getHumanAge(ageMs);
+
+    var labels = ['◌◌◌','⬡◌◌','⬡⬡◌','⬡⬡⬡'];
+    var texts = ['Nevalidat','Confirmare slabă','Confirmare bună','Confirmare puternică'];
+
+    return {
+      score: score,
+      label: labels[score],
+      text: texts[score],
+      age: ageText,
+      count: matches.length,
+      status: latest.status || null
+    };
+  } catch(e) { return null; }
+}
+
+function getHumanAge(ms) {
+  var min = Math.floor(ms/60000);
+  var h = Math.floor(ms/3600000);
+  var d = Math.floor(ms/86400000);
+  if(min < 2) return 'acum';
+  if(min < 60) return 'acum ' + min + ' min';
+  if(h < 24) return 'acum ' + h + (h===1?' oră':' ore');
+  return 'acum ' + d + (d===1?' zi':' zile');
+}
+
+function renderPatternBadge(pattern) {
+  if(!pattern) return '';
+  var colors = ['rgba(255,255,255,.1)','rgba(255,159,10,.15)','rgba(200,169,110,.2)','rgba(45,184,122,.2)'];
+  var textColors = ['var(--w30)','#FF9F0A','var(--gold)','var(--green)'];
+  var bg = colors[pattern.score] || colors[0];
+  var tc = textColors[pattern.score] || textColors[0];
+  return '<div style="display:inline-flex;align-items:center;gap:6px;padding:4px 10px;' +
+    'background:'+bg+';border-radius:100px;font-size:10px;color:'+tc+';margin-top:6px;letter-spacing:.5px;">' +
+    pattern.label + ' ' + pattern.text +
+    (pattern.age ? ' · ' + pattern.age : '') +
+    (pattern.count > 0 ? ' · ' + pattern.count + ' Insider' + (pattern.count>1?'i':'') : '') +
+    '</div>';
+}
+
+// Lanseaza misiune automata daca nu e validata
+function autoLaunchMission(locationName, city) {
+  if(!db || !locationName) return;
+  var missionText = 'Verifică dacă ' + locationName + ' e deschis acum · ' + (city||_city||'');
+  db.collection('missions').add({
+    title: missionText,
+    location: locationName,
+    city: (city||_city||'').toLowerCase(),
+    type: 'VERIFY',
+    status: 'open',
+    autoLaunched: true,
+    reward: 15,
+    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+  }).catch(function(){});
+}
+
+
+// ── VV RAFTURI PERSONALE ─────────────────────────────────────
+// Local pe device. Zero server. Zero GDPR.
+// Fiecare raft e un obiect mic in localStorage.
+
+var SHELVES = {
+  // Raft 1 — Familie & Context
+  family: {
+    hasKids: false,        // are copii
+    kidsAge: null,         // varsta copiilor
+    hasCar: false,         // merge cu masina
+    petFriendly: false,    // are animale
+    mobilityNeeds: false   // nevoi speciale mobilitate
+  },
+  // Raft 2 — Preferinte & Gusturi
+  prefs: {
+    foodTypes: [],         // pizza, sushi, shaorma etc
+    avoidFood: [],         // ce evita
+    cafeStyle: null,       // linistit, animat, coworking
+    budget: null,          // economic, mediu, premium
+    seatingPref: null      // terasa, interior, bar
+  },
+  // Raft 3 — Obiceiuri & Timing
+  habits: {
+    morningRitual: null,   // cafea, sport, etc
+    lunchPattern: null,    // la birou, iesit, acasa
+    eveningPattern: null,  // iesit, acasa, sport
+    weekendStyle: null,    // activ, relaxat, familie
+    peakHours: {}          // ce cauta la ce ora
+  },
+  // Raft 4 — Emotii & Stari
+  mood: {
+    lastMood: null,        // obosit, energic, stresat
+    moodHistory: [],       // ultimele 7 stari
+    stressIndicators: 0    // nr de cautari urgente
+  },
+  // Raft 5 — Locuri & Pini
+  places: {
+    favorites: [],         // locuri vizitate des
+    avoided: [],           // locuri evitate
+    ghostPins: [],         // pini temporari activi
+    homeZone: null,        // zona de acasa
+    workZone: null         // zona de munca
+  }
+};
+
+function loadShelves() {
+  try {
+    var saved = localStorage.getItem('vv_shelves');
+    if(saved) SHELVES = Object.assign({}, SHELVES, JSON.parse(saved));
+  } catch(e) {}
+}
+
+function saveShelves() {
+  try { localStorage.setItem('vv_shelves', JSON.stringify(SHELVES)); } catch(e) {}
+}
+
+// Invata din fiecare interactiune
+function learnFromInteraction(q, intent, ans, city) {
+  var l = q.toLowerCase();
+  var h = new Date().getHours();
+
+  // Invata preferinte mancare
+  if(intent === 'mancare') {
+    var foods = ['pizza','sushi','shaorma','burger','kebab','paste','salata','grill'];
+    foods.forEach(function(f) {
+      if(l.includes(f) && !SHELVES.prefs.foodTypes.includes(f)) {
+        SHELVES.prefs.foodTypes.push(f);
+        if(SHELVES.prefs.foodTypes.length > 8) SHELVES.prefs.foodTypes.shift();
+      }
+    });
+  }
+
+  // Invata pattern temporal
+  var period = h<6?'noapte':h<12?'dimineata':h<17?'pranz':h<21?'seara':'noapte_tarziu';
+  if(!SHELVES.habits.peakHours[period]) SHELVES.habits.peakHours[period] = {};
+  SHELVES.habits.peakHours[period][intent] = (SHELVES.habits.peakHours[period][intent]||0) + 1;
+
+  // Detecteaza context familie din query
+  if(/copil|copii|bebe|scaun copil|loc joaca/i.test(l)) SHELVES.family.hasKids = true;
+  if(/parcare|masina|mașina|loc parcare/i.test(l)) SHELVES.family.hasCar = true;
+  if(/catel|pisica|animal|pet/i.test(l)) SHELVES.family.petFriendly = true;
+
+  // Detecteaza stres/oboseala
+  if(/urgent|repede|rapid|acum|imediat/i.test(l)) SHELVES.mood.stressIndicators++;
+  if(/obosit|oboseala|stres|relaxa/i.test(l)) {
+    SHELVES.mood.lastMood = 'obosit';
+    SHELVES.mood.moodHistory.push({mood:'obosit',h,date:new Date().toDateString()});
+    if(SHELVES.mood.moodHistory.length > 7) SHELVES.mood.moodHistory.shift();
+  }
+
+  // Invata locuri favorite
+  if(ans && city) {
+    var nameMatch = ans.match(/✓[^·
+]+/);
+    if(nameMatch) {
+      var placeName = nameMatch[0].replace('✓','').trim();
+      if(placeName && !SHELVES.places.favorites.find(function(p){return p.name===placeName;})) {
+        SHELVES.places.favorites.push({name:placeName,city,intent,count:1,lastSeen:Date.now()});
+        if(SHELVES.places.favorites.length > 20) SHELVES.places.favorites.shift();
+      }
+    }
+  }
+
+  saveShelves();
+}
+
+// Construieste context personal pentru Gemini
+function buildPersonalContext() {
+  loadShelves();
+  var ctx = [];
+
+  if(SHELVES.family.hasKids) ctx.push('Are copii — filtrează locuri cu facilități pentru copii.');
+  if(SHELVES.family.hasCar) ctx.push('Merge cu mașina — menționează disponibilitatea parcării când e relevant.');
+  if(SHELVES.family.petFriendly) ctx.push('Are animale — preferă locuri pet-friendly.');
+
+  if(SHELVES.prefs.foodTypes.length > 0) {
+    ctx.push('Preferințe culinare: ' + SHELVES.prefs.foodTypes.join(', ') + '.');
+  }
+
+  if(SHELVES.mood.lastMood === 'obosit') {
+    ctx.push('Utilizatorul pare obosit — sugerează opțiuni liniștite, fără cozi.');
+  }
+
+  var h = new Date().getHours();
+  var period = h<6?'noapte':h<12?'dimineata':h<17?'pranz':h<21?'seara':'noapte_tarziu';
+  var topIntent = null, topCount = 0;
+  if(SHELVES.habits.peakHours[period]) {
+    Object.keys(SHELVES.habits.peakHours[period]).forEach(function(k) {
+      if(SHELVES.habits.peakHours[period][k] > topCount) {
+        topCount = SHELVES.habits.peakHours[period][k];
+        topIntent = k;
+      }
+    });
+    if(topCount >= 2 && topIntent) {
+      ctx.push('La această oră de obicei caută ' + topIntent + ' — anticipează nevoia.');
+    }
+  }
+
+  return ctx.length > 0 ? '
+Context personal: ' + ctx.join(' ') : '';
+}
+
+// ── GHOST PIN SYSTEM ──────────────────────────────────────────
+function addGhostPin(name, address, autoDeleteH) {
+  loadShelves();
+  autoDeleteH = autoDeleteH || 2; // default 2 ore
+  var pin = {
+    id: Date.now(),
+    name: name,
+    address: address,
+    createdAt: Date.now(),
+    expiresAt: Date.now() + autoDeleteH * 3600000
+  };
+  SHELVES.places.ghostPins.push(pin);
+  // Curata pinii expirate
+  SHELVES.places.ghostPins = SHELVES.places.ghostPins.filter(function(p) {
+    return p.expiresAt > Date.now();
+  });
+  saveShelves();
+  showToast('📍 Pin adăugat · Se șterge în ' + autoDeleteH + 'h');
+  return pin;
+}
+
+function getActiveGhostPins() {
+  loadShelves();
+  return SHELVES.places.ghostPins.filter(function(p) { return p.expiresAt > Date.now(); });
+}
+
+function checkAndOfferPin(ans, locationName) {
+  if(!locationName) return;
+  // Daca Lea da o adresa, ofera pin
+  if(/stradă|strada|bd\.|bulevard|nr\.|sector/i.test(ans)) {
+    setTimeout(function() {
+      var conv = document.getElementById('conv');
+      var pinOffer = document.createElement('div');
+      pinOffer.style.cssText = 'align-self:flex-start;margin-top:-8px;';
+      pinOffer.innerHTML =
+        '<button onclick="addGhostPin('' + locationName.replace(/'/g,"\'") + '','',2);this.parentElement.remove();" ' +
+        'style="padding:5px 12px;background:rgba(41,151,255,.1);border:0.5px solid rgba(41,151,255,.2);' +
+        'border-radius:100px;color:var(--blue);font-family:var(--mono);font-size:10px;cursor:pointer;letter-spacing:.5px;">' +
+        '📍 Pune un pin · Se șterge în 2h</button>';
+      conv.appendChild(pinOffer);
+      conv.scrollTo({top:conv.scrollHeight,behavior:'smooth'});
+    }, 800);
+  }
+}
+
 // ── NEXUS INTELLIGENCE ────────────────────────────────────────
 function detectIntent(q) {
   var l=q.toLowerCase();
@@ -782,7 +1071,13 @@ async function searchVVNodes(q, intent) {
 }
 
 async function processLea(q) {
-  if(!_gk){ addMsg('l','Lea nu e activată. Adaugă Gemini API Key din setări (⚙).'); return; }
+  // Prioritate: cheia personala > cheia CEO din cod
+var activeKey = localStorage.getItem('lea_gk') || CEO_GK;
+if(!activeKey || activeKey === 'PUNE_CHEIA_GEMINI_AICI'){
+  addMsg('l','Lea nu e activată încă. CEO-ul finalizează configurarea în curând.');
+  return;
+}
+_gk = activeKey;
   var intent=detectIntent(q);
   if(intent==='urgenta'){
     var em='Sună 112 ACUM dacă e urgență reală. Lea e cu tine — ce s-a întâmplat?';
@@ -796,9 +1091,11 @@ async function processLea(q) {
   var thinkTimer=setTimeout(function(){var bub=document.querySelector('#tk-msg .msg-b');if(bub){bub.className='msg-b';bub.style.cssText='font-size:12px;color:var(--w30);font-style:italic;padding:11px 15px;';bub.textContent='Caut în '+city+'...';} },2000);
   // Hybrid search
   var vvP=searchVVNodes(q,intent);
-  var sysP='Ești Lea, asistentul urban VV. Caldă, directă, umană. MAX 3 propoziții. '+
+  var personalCtx = buildPersonalContext();
+var sysP='Ești Lea, asistentul urban VV. Caldă, directă, umană. MAX 3 propoziții. '+
     'Context: Oraș='+city+', Ora='+h+':00 ('+p+'). '+
     (displayName()?'User='+displayName()+'. ':'')+
+    personalCtx+
     (h>=22||h<6?'NOAPTEA — majorit. locuri sunt închise. Menționează asta. ':'')+
     (intent==='mancare'&&h>=12&&h<=14?'ORA DE PRÂNZ — posibilă coadă. Avertizează. ':'')+
     'Nu spune "ca model AI". Dacă nu știi: spune "nu știu sigur, verificăm?". '+
@@ -808,11 +1105,52 @@ async function processLea(q) {
   var gemP=fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key='+_gk,{
     method:'POST',headers:{'Content-Type':'application/json'},
     body:JSON.stringify({system_instruction:{parts:[{text:sysP}]},contents:contents,generationConfig:{maxOutputTokens:200,temperature:0.75}})
-  }).then(function(r){return r.json();}).catch(function(){return null;});
+  }).then(function(r){
+    if(r.status===429){return {_rateLimit:true};}
+    if(r.status===403){return {_authError:true};}
+    return r.json();
+  }).catch(function(){return null;});
   var res=await Promise.all([vvP,gemP]);
   clearTimeout(thinkTimer);
   var vvNodes=res[0]||[],gemData=res[1];
   if(tk)tk.remove();document.getElementById('amb').className='';
+  // Rate limit check
+  if(gemData && gemData._rateLimit) {
+    if(tk) tk.remove();
+    document.getElementById('amb').className='';
+    // Pulsatie lenta - Lea "respira"
+    document.getElementById('amb').style.background='radial-gradient(circle,rgba(200,169,110,.06) 0%,transparent 65%)';
+    document.getElementById('amb').style.animation='ap 3s ease-in-out infinite';
+    var rlMsg='Sunt solicitată intens acum. Îmi trag sufletul 30 de secunde și revenim. Rămâi în ecosistem.';
+    addMsg('l', rlMsg);
+    if(_ek&&_vi) playVoice(rlMsg, null);
+    // Countdown discret
+    var cdEl=document.createElement('div');
+    cdEl.style.cssText='align-self:center;font-size:10px;color:var(--w15);margin-top:-8px;';
+    cdEl.id='cd-el';
+    document.getElementById('conv').appendChild(cdEl);
+    var cd=30;
+    var cdInt=setInterval(function(){
+      cd--;
+      var el=document.getElementById('cd-el');
+      if(el) el.textContent='Revin în '+cd+' secunde...';
+      if(cd<=0){
+        clearInterval(cdInt);
+        document.getElementById('amb').style.animation='';
+        if(el) el.textContent='Lea e din nou pregătită.';
+        setTimeout(function(){if(el)el.remove();},2000);
+      }
+    },1000);
+    return;
+  }
+
+  if(gemData && gemData._authError) {
+    if(tk) tk.remove();
+    document.getElementById('amb').className='';
+    addMsg('l','Cheia API nu e validă. CEO-ul rezolvă în curând.');
+    return;
+  }
+
   var netAns=null;
   try{if(gemData&&gemData.candidates&&gemData.candidates[0]&&gemData.candidates[0].content)netAns=gemData.candidates[0].content.parts[0].text;}catch(e){}
   var ans='';
