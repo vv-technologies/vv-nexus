@@ -39,6 +39,25 @@ var PREMIUM_LIMIT = 100;
 var VV_PROXY = localStorage.getItem('vv_proxy_url') || 'https://script.google.com/macros/s/AKfycbxk2t1vLAYshmMVwxww--uJo2haL2z8mI22xPoFTK49rV98r97ao0znb25GJdfcwKPY8w/exec';
 // ──────────────────────────────────────────────────────────────
 
+
+// ── STREAK ────────────────────────────────────────────────────
+function getStreak() {
+  try {
+    var today = new Date().toDateString();
+    var data = JSON.parse(localStorage.getItem('vv_streak')||'{}');
+    var yesterday = new Date(Date.now()-86400000).toDateString();
+    if(data.last === today) return data.count || 1;
+    if(data.last === yesterday) {
+      data.count = (data.count||1) + 1;
+    } else {
+      data.count = 1;
+    }
+    data.last = today;
+    localStorage.setItem('vv_streak', JSON.stringify(data));
+    return data.count;
+  } catch(e) { return 1; }
+}
+
 // ── NAME ONBOARDING ───────────────────────────────────────────
 var _userName = '';
 
@@ -118,10 +137,43 @@ function learnVoicePattern(transcript, confidence) {
 function getVoiceContext() {
   var shelf = loadVoiceShelf();
   if(!shelf.lastVoice) return '';
-  var mood = shelf.currentMood;
-  if(mood === 'obosit') return 'Vocea utilizatorului sugerează oboseală — răspunsuri scurte și directe.';
-  if(mood === 'energic') return 'Utilizatorul e activ — poți fi mai detaliat.';
-  return '';
+  var mood = shelf.currentMood || 'normal';
+  var h = new Date().getHours();
+  var period = h<6?'noapte':h<12?'dimineata':h<17?'pranz':h<21?'seara':'noapte';
+  var ctx = '';
+
+  // Adapteaza lungimea si tonul raspunsului
+  if(mood === 'obosit') {
+    ctx = 'Utilizatorul pare obosit sau e in zgomot. Răspunde în MAX 1-2 propoziții. Fii direct, zero introduceri. Zero întrebări suplimentare.';
+  } else if(mood === 'energic') {
+    ctx = 'Utilizatorul e activ și alert. Poți adăuga 1 idee extra dacă e relevant.';
+  } else {
+    ctx = 'Răspuns normal, max 2-3 propoziții.';
+  }
+
+  // Pattern temporal — daca stim cum e la ora asta de obicei
+  if(shelf.patterns && shelf.patterns[period] && shelf.patterns[period].count >= 3) {
+    var avgConf = shelf.patterns[period].avgConfidence;
+    if(avgConf < 0.6) ctx += ' La această oră de obicei e mai greu de înțeles — fii extra concis.';
+  }
+
+  return ctx;
+}
+
+// Adapteaza vizual dupa starea vocala (discret)
+function applyVoiceAdaptation() {
+  var shelf = loadVoiceShelf();
+  var mood = shelf.currentMood || 'normal';
+  var amb = document.getElementById('amb');
+  if(!amb) return;
+  // Subtil — nu radical
+  if(mood === 'obosit') {
+    document.body.style.filter = 'brightness(0.92)';
+  } else if(mood === 'energic') {
+    document.body.style.filter = 'brightness(1.0)';
+  } else {
+    document.body.style.filter = '';
+  }
 }
 
 // Voice Sync — conectare prin voce pe device nou
@@ -254,6 +306,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function bootLea() {
   loadShelves();
+  applyVoiceAdaptation(); // adapteaza vizual din prima
   // Restaureaza numele salvat
   var savedName = localStorage.getItem('lea_name');
   if(savedName) {
@@ -499,11 +552,27 @@ function showCard() {
   conv.appendChild(w);
   conv.scrollTo({top:conv.scrollHeight,behavior:'smooth'});
   setTimeout(function(){
-    var h=new Date().getHours(),g=h<12?'Bună dimineața':h<18?'Bună ziua':h<22?'Bună seara':'Noapte bună';
-    var wm=g+'. ';
-    if(_u.type==='ceo') wm+='Fondator. Ecosistemul te așteaptă.';
-    else if(name) wm+=name+'. Ce vrei să știi?';
-    else wm+='Ce vrei să știi'+(_city?' despre '+_city:''+'?');
+    var h=new Date().getHours();
+    var g=h<6?'Noapte bună':h<12?'Bună dimineața':h<18?'Bună ziua':h<22?'Bună seara':'Noapte bună';
+    var wm='';
+    var streak = getStreak();
+    var city = _city||'';
+
+    if(_u.type==='ceo') {
+      wm = g + '. Fondator. Ecosistemul e activ.';
+    } else if(streak === 1) {
+      wm = g + (name?', '+name:'') + '. Prima zi în VV. Bine ai venit în ecosistem.';
+    } else if(streak === 3) {
+      wm = g + (name?', '+name:'') + '. Ziua a treia împreună. Lea te cunoaște mai bine în fiecare zi.';
+    } else if(streak === 7) {
+      wm = g + (name?', '+name:'') + '. O săptămână în VV. Faci parte din istoria ecosistemului.';
+    } else if(streak === 30) {
+      wm = g + (name?', '+name:'') + '. O lună în VV. Ești unul dintre cei care au construit asta.';
+    } else {
+      wm = g + (name?', '+name:'') + '.';
+      if(city && city !== 'zona ta') wm += ' ' + city + '.';
+      wm += ' Ce vrei să știi?';
+    }
     addMsg('l', wm);
   }, 400);
 }
@@ -1072,7 +1141,15 @@ var sysP='Ești Lea, asistentul urban VV. Caldă, directă, umană. MAX 3 propoz
         if(d && d.status==='rateLimit') return {_rateLimit:true};
         if(d && d.status==='authError') return {_authError:true};
         return d;
-      }).catch(function(){ return null; });
+      }).catch(function(){
+        // Proxy down — incearca direct cu cheia personala
+        var dk = localStorage.getItem('lea_gk') || '';
+        if(!dk) return null;
+        return fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key='+dk,{
+          method:'POST',headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({system_instruction:{parts:[{text:sysP}]},contents:contents,generationConfig:{maxOutputTokens:200,temperature:0.75}})
+        }).then(function(r){return r.json();}).catch(function(){return null;});
+      });
   } else if(userKey) {
     // Fallback — cheia personala a userului
     gemP = fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key='+userKey,{
@@ -1084,10 +1161,22 @@ var sysP='Ești Lea, asistentul urban VV. Caldă, directă, umană. MAX 3 propoz
       return r.json();
     }).catch(function(){return null;});
   } else {
-    // Nimic configurat
+    // Nimic configurat sau offline — incearca cache
+    var offlineCache = getCache(intent, city);
+    if(offlineCache) {
+      if(tk) tk.remove();
+      document.getElementById('amb').className='';
+      addMsg('l', offlineCache.response);
+      var badge = document.createElement('div');
+      badge.style.cssText='align-self:flex-start;font-size:9px;color:rgba(255,255,255,.2);padding:2px 8px;margin-top:-8px;';
+      badge.textContent='📦 Offline · din cache · ' + formatCacheAge(offlineCache.ageMs);
+      document.getElementById('conv').appendChild(badge);
+      _hist.push({r:'u',t:q});_hist.push({r:'l',t:offlineCache.response});saveHistory();
+      return;
+    }
     if(tk) tk.remove();
     document.getElementById('amb').className='';
-    addMsg('l','Lea se configurează. Revin în curând.');
+    addMsg('l','Sunt offline acum. Dar am ' + getCacheSize() + ' răspunsuri salvate. Încearcă o întrebare pe care am mai discutat-o.');
     return;
   }
   var res=await Promise.all([vvP,gemP]);
@@ -1157,6 +1246,8 @@ var sysP='Ești Lea, asistentul urban VV. Caldă, directă, umană. MAX 3 propoz
     ans = await emergencySearch(q, intent, city);
   }
   addMsg('l',ans);_hist.push({r:'u',t:q});_hist.push({r:'l',t:ans});
+  // Invitatie la Studio dupa intrebari complexe
+  checkStudioInvite(q, intent);
   if(ans && intent !== 'urgenta' && intent !== 'salut') saveCache(intent, city, ans);
   if(_hist.length>40)_hist=_hist.slice(-40);saveHistory();
   if(_ek&&_vi)playVoice(ans,null);
@@ -1215,8 +1306,9 @@ function startMic(e) {
     _rec.onresult = function(ev) {
       var txt = ev.results[0][0].transcript;
       var conf = ev.results[0][0].confidence || 0.8;
-      // Invata pattern vocal
+      // Invata pattern vocal si adapteaza vizual discret
       learnVoicePattern(txt, conf);
+      applyVoiceAdaptation();
       document.getElementById('ibox').value = txt;
       stopMic(null);
       setTimeout(send, 300);
@@ -1271,6 +1363,20 @@ function showDonate(){
 
 // ── SUGGESTIONS ───────────────────────────────────────────────
 function buildSugs(){
+  // Hint microfon prima data
+  if(!localStorage.getItem('vv_mic_hint_shown')) {
+    setTimeout(function(){
+      var hint = document.createElement('div');
+      hint.style.cssText='align-self:center;font-size:10px;color:rgba(255,255,255,.25);padding:3px 10px;text-align:center;animation:mi .3s ease both;';
+      hint.textContent='🎙 Știai că poți vorbi cu Lea? Apasă microfonul.';
+      var conv = document.getElementById('conv');
+      if(conv) {
+        conv.appendChild(hint);
+        setTimeout(function(){ hint.style.opacity='0'; hint.style.transition='opacity 1s'; setTimeout(function(){hint.remove();},1000); }, 4000);
+      }
+      localStorage.setItem('vv_mic_hint_shown','1');
+    }, 3000);
+  }
   var h=new Date().getHours(),city=_city||'zonă';
   var items;
   if(h<6) items=['Farmacie gardă?','Taxi acum?','Ce livrează noaptea?','Urgență?'];
@@ -1343,6 +1449,28 @@ function logout(){
   if(!confirm('Resetezi identitatea VV pe acest device?'))return;
   ['lea_id','lea_u','lea_ob_done','lea_had_aer','lea_gk','lea_ek','lea_vi','vv_accord_signed','vv_citizen_code','vv_persona','vvme_home_city','vvme_current_city','vv_lea_profile',HKEY].forEach(function(k){localStorage.removeItem(k);});
   location.reload();
+}
+
+
+// Invita la VV Studio pentru intrebari complexe
+function checkStudioInvite(q, intent) {
+  if(localStorage.getItem('vv_studio_invite_shown')) return;
+  var complex = q.length > 40 || ['divertisment','general'].includes(intent);
+  if(!complex) return;
+  setTimeout(function(){
+    var conv = document.getElementById('conv');
+    var invite = document.createElement('div');
+    invite.style.cssText = 'align-self:flex-start;margin-top:-4px;';
+    invite.innerHTML =
+      '<button onclick="window.location.href='vv-studios.html'" ' +
+      'style="padding:6px 14px;background:rgba(41,151,255,.08);' +
+      'border:0.5px solid rgba(41,151,255,.15);border-radius:100px;' +
+      'color:rgba(41,151,255,.7);font-family:var(--mono);font-size:10px;' +
+      'cursor:pointer;letter-spacing:.5px;">◎ Deschide VV Studio pentru asta →</button>';
+    conv.appendChild(invite);
+    conv.scrollTo({top:conv.scrollHeight,behavior:'smooth'});
+    localStorage.setItem('vv_studio_invite_shown','1');
+  }, 1000);
 }
 
 function showCardManual() {
