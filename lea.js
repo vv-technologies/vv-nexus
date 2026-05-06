@@ -1461,13 +1461,11 @@ function checkStudioInvite(q, intent) {
     var conv = document.getElementById('conv');
     var invite = document.createElement('div');
     invite.style.cssText = 'align-self:flex-start;margin-top:-4px;';
-    invite.innerHTML =
-      '<button onclick="window.location.href='vv-studios.html'" ' +
-      'style="padding:6px 14px;background:rgba(41,151,255,.08);' +
-      'border:0.5px solid rgba(41,151,255,.15);border-radius:100px;' +
-      'color:rgba(41,151,255,.7);font-family:var(--mono);font-size:10px;' +
-      'cursor:pointer;letter-spacing:.5px;">◎ Deschide VV Studio pentru asta →</button>';
-    conv.appendChild(invite);
+    var btn = document.createElement('button');
+    btn.textContent = '◎ Deschide VV Studio →';
+    btn.style.cssText = 'padding:6px 14px;background:rgba(41,151,255,.08);border:0.5px solid rgba(41,151,255,.15);border-radius:100px;color:rgba(41,151,255,.7);font-family:monospace;font-size:10px;cursor:pointer;';
+    btn.onclick = function(){ window.location.href='vv-studios.html'; };
+    invite.appendChild(btn);
     conv.scrollTo({top:conv.scrollHeight,behavior:'smooth'});
     localStorage.setItem('vv_studio_invite_shown','1');
   }, 1000);
