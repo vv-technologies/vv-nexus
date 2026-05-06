@@ -386,7 +386,7 @@ async function getPatternScore(locationName, city) {
     // Cauta VV Proof pentru aceasta locatie
     var snap = await db.collection('missions')
       .where('status','==','completed')
-      .where('createdAt','>=',firebase.firestore.Timestamp.fromDate(since24h))
+      .limit(20)
       .limit(20).get();
 
     var matches = [];
@@ -454,17 +454,19 @@ function renderPatternBadge(pattern) {
 // Lanseaza misiune automata daca nu e validata
 function autoLaunchMission(locationName, city) {
   if(!db || !locationName) return;
-  var missionText = 'Verifică dacă ' + locationName + ' e deschis acum · ' + (city||_city||'');
-  db.collection('missions').add({
-    title: missionText,
-    location: locationName,
-    city: (city||_city||'').toLowerCase(),
-    type: 'VERIFY',
-    status: 'open',
-    autoLaunched: true,
-    reward: 15,
-    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-  }).catch(function(){});
+  try {
+    var missionText = 'Verifică dacă ' + locationName + ' e deschis acum · ' + (city||_city||'');
+    fbAdd('missions', {
+      title: missionText,
+      location: locationName,
+      city: (city||_city||'').toLowerCase(),
+      type: 'VERIFY',
+      status: 'open',
+      autoLaunched: true,
+      reward: 15,
+      ts: Date.now()
+    });
+  } catch(e) {}
 }
 
 
@@ -968,19 +970,32 @@ async function playVoice(text,btn){
     if(btn){btn.textContent='⏸';btn.disabled=false;btn.onclick=function(){_audio.pause();btn.textContent='▶';btn.onclick=function(){playVoice(text,btn);};};_audio.onended=function(){btn.textContent='▶';btn.onclick=function(){playVoice(text,btn);};};}
   }catch(e){if(btn){btn.textContent='▶';btn.disabled=false;}}
 }
-function startMic(){
+var _micActive = false;
+function startMic(e){
+  if(e) { e.preventDefault(); e.stopPropagation(); }
+  if(_micActive) return;
   var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
   if(!SR){showToast('Vocea nu e suportată în acest browser');return;}
+  _micActive = true;
   var m=document.getElementById('mic-b'),vv=document.getElementById('vvis');
-  m.classList.add('on');m.textContent='⏹';vv.classList.add('on');document.getElementById('amb').className='listen';
-  _rec=new SR();_rec.lang='ro-RO';
-  _rec.onresult=function(e){document.getElementById('ibox').value=e.results[0][0].transcript;stopMic();setTimeout(send,200);};
-  _rec.onerror=function(){stopMic();showToast('Nu am înțeles.');};
-  _rec.onend=function(){stopMic();};_rec.start();
+  m.classList.add('on');m.textContent='⏹';vv.classList.add('on');
+  document.getElementById('amb').className='listen';
+  _rec=new SR();_rec.lang='ro-RO';_rec.continuous=false;_rec.interimResults=false;
+  _rec.onresult=function(e){
+    var txt=e.results[0][0].transcript;
+    document.getElementById('ibox').value=txt;
+    stopMic();setTimeout(send,200);
+  };
+  _rec.onerror=function(){stopMic();showToast('Nu am înțeles. Încearcă din nou.');};
+  _rec.onend=function(){if(_micActive)stopMic();};
+  try{_rec.start();}catch(e){stopMic();}
 }
-function stopMic(){
+function stopMic(e){
+  if(e){e.preventDefault();e.stopPropagation();}
+  _micActive=false;
   var m=document.getElementById('mic-b'),vv=document.getElementById('vvis');
-  m.classList.remove('on');m.textContent='🎙';vv.classList.remove('on');document.getElementById('amb').className='';
+  m.classList.remove('on');m.textContent='🎙';vv.classList.remove('on');
+  document.getElementById('amb').className='';
   if(_rec){try{_rec.stop();}catch(e){}_rec=null;}
 }
 
