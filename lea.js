@@ -31,6 +31,46 @@ var _audio = null, _rec = null;
 var DAILY_LIMIT = 20;
 var PREMIUM_LIMIT = 100;
 
+
+// ── PROXY CEO ─────────────────────────────────────────────────
+// CEO baga URL-ul o singura data aici
+// Toti userii folosesc cheia CEO automat
+// Ei nu vad nimic, nu introduc nimic
+var VV_PROXY = localStorage.getItem('vv_proxy_url') || 
+  '
+                        https://script.google.com/macros/s/AKfycbybXrcEOc7yXjCVwJqT_hwaOaCav8HnBEBvnSLbDvt9rdNxjWc0lH7e-JxURTe9k4QnRw/exec'; // script.google.com/macros/s/.../exec
+// ──────────────────────────────────────────────────────────────
+
+// ── NAME ONBOARDING ───────────────────────────────────────────
+var _userName = '';
+
+function onNameInput(val) {
+  _userName = val.trim();
+  var btn = document.getElementById('name-btn');
+  if(btn) {
+    btn.classList.toggle('on', _userName.length >= 2);
+    btn.style.opacity = _userName.length >= 2 ? '1' : '0.35';
+    btn.style.cursor = _userName.length >= 2 ? 'pointer' : 'not-allowed';
+  }
+}
+
+function goToTerms() {
+  if(_userName.length < 2) return;
+  // Salveaza numele local
+  localStorage.setItem('lea_name', _userName);
+  // Anima tranzitia
+  var stepName = document.getElementById('step-name');
+  var stepTerms = document.getElementById('step-terms');
+  var greeting = document.getElementById('terms-greeting');
+  if(greeting) greeting.textContent = 'Bine ai venit, ' + _userName + '.';
+  if(stepName) { stepName.style.opacity='0'; stepName.style.transform='translateX(-16px)'; stepName.style.transition='all .3s'; }
+  setTimeout(function() {
+    if(stepName) stepName.style.display='none';
+    if(stepTerms) { stepTerms.style.display='flex'; stepTerms.style.opacity='0'; stepTerms.style.transform='translateX(16px)'; stepTerms.style.transition='all .3s'; }
+    setTimeout(function() { if(stepTerms){ stepTerms.style.opacity='1'; stepTerms.style.transform='translateX(0)'; } }, 50);
+  }, 300);
+}
+
 // ── BOOT ──────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', function() {
   initFirebase();
@@ -42,6 +82,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function bootLea() {
   loadShelves();
+  // Restaureaza numele salvat
+  var savedName = localStorage.getItem('lea_name');
+  if(savedName) {
+    _userName = savedName;
+    var inp = document.getElementById('name-input');
+    if(inp) inp.value = savedName;
+  }
   // 1. Deja logat?
   var sid = localStorage.getItem('lea_id');
   var su = localStorage.getItem('lea_u');
@@ -102,12 +149,14 @@ function ck(i) {
 // ── ACCORD ────────────────────────────────────────────────────
 async function acceptAccord() {
   if(!_ck[0] || !_ck[1] || !_ck[2]) { showToast('Bifează toate cele 3'); return; }
+  var name = localStorage.getItem('lea_name') || _userName || 'Anonim';
   var id = genId();
-  _u = {vvid:id, type:'citizen', city:_city, newUser:true};
+  _u = {vvid:id, type:'citizen', city:_city, name:name, newUser:true};
   localStorage.setItem('lea_id', id);
   localStorage.setItem('lea_u', JSON.stringify(_u));
   localStorage.setItem('vv_accord_signed', '1');
   localStorage.setItem('vv_citizen_code', id);
+  // Stocam DOAR ID-ul anonim — numele ramane local pe device
   fbAdd('vv_accords', {citizenCode:id, city:_city||null, device:navigator.userAgent.includes('Mobile')?'mobile':'desktop', ts:Date.now()});
   // VV Aer sau onboarding
   if(!localStorage.getItem('lea_had_aer')) {
@@ -148,8 +197,10 @@ function showRec() {
 function displayName() {
   if(!_u) return '';
   if(_u.type === 'ceo') return 'CEO · Fondator';
+  // Numele e stocat local — il citim din localStorage
+  var localName = localStorage.getItem('lea_name');
+  if(localName) return localName;
   if(_u.name) return _u.name;
-  if(_u.alias) return _u.alias;
   return '';
 }
 
@@ -684,14 +735,46 @@ var sysP='Ești Lea, asistentul urban VV. Caldă, directă, umană. MAX 3 propoz
     'Urgență=112 PRIMUL. Răspunde DOAR în română.';
   var contents=_hist.slice(-6).map(function(m){return{role:m.r==='l'?'model':'user',parts:[{text:m.t}]};});
   contents.push({role:'user',parts:[{text:q}]});
-  var gemP=fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key='+_gk,{
-    method:'POST',headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({system_instruction:{parts:[{text:sysP}]},contents:contents,generationConfig:{maxOutputTokens:200,temperature:0.75}})
-  }).then(function(r){
-    if(r.status===429){return {_rateLimit:true};}
-    if(r.status===403){return {_authError:true};}
-    return r.json();
-  }).catch(function(){return null;});
+  // Proxy CEO — cheia e la Google, userii nu stiu ca exista
+  var activeProxy = VV_PROXY !== 'PUNE_URL_APPS_SCRIPT_AICI' ? VV_PROXY : 
+                    localStorage.getItem('vv_proxy_url') || '';
+  var userKey = localStorage.getItem('lea_gk') || ''; // cheia personala optional
+  
+  var gemP;
+  if(activeProxy) {
+    // Prin proxy — CEO key in spate
+    gemP = fetch(activeProxy, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        action:'gemini',
+        system: sysP,
+        contents: contents,
+        userKey: userKey // daca userul are cheie proprie, o foloseste pe a lui
+      })
+    }).then(function(r){ return r.json(); })
+      .then(function(d){
+        if(d.status==='rateLimit') return {_rateLimit:true};
+        if(d.status==='authError') return {_authError:true};
+        return d;
+      }).catch(function(){ return null; });
+  } else if(userKey) {
+    // Fallback — cheia personala a userului
+    gemP = fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key='+userKey,{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({system_instruction:{parts:[{text:sysP}]},contents:contents,generationConfig:{maxOutputTokens:200,temperature:0.75}})
+    }).then(function(r){
+      if(r.status===429) return {_rateLimit:true};
+      if(r.status===403) return {_authError:true};
+      return r.json();
+    }).catch(function(){return null;});
+  } else {
+    // Nimic configurat
+    if(tk) tk.remove();
+    document.getElementById('amb').className='';
+    addMsg('l','Lea se configurează. Revin în curând.');
+    return;
+  }
   var res=await Promise.all([vvP,gemP]);
   clearTimeout(thinkTimer);
   var vvNodes=res[0]||[],gemData=res[1];
@@ -843,13 +926,27 @@ function openSett(){
 function closeSett(){document.getElementById('sett').classList.remove('on');}
 function cfgVoice(){
   closeSett();
-  var g=prompt('Gemini API Key (AIzaSy...):\n\nSe salvează DOAR local pe device-ul tău.\nNu ajunge niciodată pe server sau GitHub.');
-  if(g&&g.startsWith('AIza')){localStorage.setItem('lea_gk',g);_gk=g;showToast('Gemini activat ✓');}
-  var e=prompt('ElevenLabs API Key (sk_...) · opțional pentru voce:');
+  // Schimbare nume
+  var currentName = localStorage.getItem('lea_name') || '';
+  var newName = prompt('Numele tău în Lea:\n(actual: ' + (currentName||'Anonim') + ')', currentName);
+  if(newName && newName.trim().length >= 2) {
+    var trimmed = newName.trim();
+    localStorage.setItem('lea_name', trimmed);
+    _userName = trimmed;
+    if(_u) { _u.name = trimmed; localStorage.setItem('lea_u', JSON.stringify(_u)); }
+    showToast('Numele actualizat: ' + trimmed);
+  }
+  // Proxy URL
+  var p=prompt('URL Google Apps Script · opțional\n(lasă gol dacă nu ai):');
+  if(p&&p.includes('script.google.com')){localStorage.setItem('vv_proxy_url',p);showToast('Proxy activat ✓');}
+  // Cheia personala
+  var g=prompt('Gemini API Key personală · opțional:');
+  if(g&&g.startsWith('AIza')){localStorage.setItem('lea_gk',g);_gk=g;}
+  var e=prompt('ElevenLabs API Key · opțional:');
   if(e&&e.length>10){localStorage.setItem('lea_ek',e);_ek=e;}
   var v=prompt('ElevenLabs Voice ID · opțional:');
   if(v&&v.length>5){localStorage.setItem('lea_vi',v);_vi=v;}
-  if(g||e||v) showToast('Salvat local ✓ · Zero risc');
+  showToast('Salvat ✓');
 }
 function logout(){
   if(!confirm('Resetezi identitatea VV pe acest device?'))return;
