@@ -13,27 +13,46 @@
 <div id="amb"></div>
 <div id="toast"></div>
 
-<!-- ACORD -->
+<!-- ONBOARDING — NAME FIRST -->
 <div class="sc on" id="s-accord">
   <div class="a-logo">Lea</div>
-  <div class="a-sub">VV · Inteligența ta personală</div>
-  <p class="a-desc">Lea e diferită. Învață din tine, nu din toți. Datele rămân pe device-ul tău.</p>
-  <div class="checks">
-    <div class="ck" id="ck0" onclick="ck(0)">
-      <div class="ck-box" id="ckb0">✓</div>
-      <div class="ck-text"><b>Accept VV Charter.</b> Datele mele rămân local. Zero email, zero parolă.</div>
+  <div class="a-sub">VV · Ecosistemul tău personal</div>
+
+  <!-- STEP 1: Numele -->
+  <div id="step-name" style="width:100%;max-width:320px;display:flex;flex-direction:column;align-items:center;">
+    <p class="a-desc">Cum vrei să te știe Lea?<br>Orice nume. Al tău sau unul ales de tine.</p>
+    <div class="name-wrap">
+      <span class="name-label">Numele tău</span>
+      <input class="name-input" id="name-input" type="text"
+        placeholder="ex: Alex, Vulpea, Cosmin..."
+        maxlength="30" autocomplete="off" autocorrect="off"
+        oninput="onNameInput(this.value)"
+        onkeydown="if(event.key==='Enter')goToTerms()">
     </div>
-    <div class="ck" id="ck1" onclick="ck(1)">
-      <div class="ck-box" id="ckb1">✓</div>
-      <div class="ck-text"><b>Confirm că am 18 ani</b> și accesez o platformă Beta.</div>
-    </div>
-    <div class="ck" id="ck2" onclick="ck(2)">
-      <div class="ck-box" id="ckb2">✓</div>
-      <div class="ck-text"><b>Accept că Lea învață din mine</b> — anonim, local, pentru mine.</div>
-    </div>
+    <button class="a-btn" id="name-btn" onclick="goToTerms()">Continuă →</button>
+    <p class="a-note">Numele rămâne doar pe device-ul tău · Zero server · Zero email</p>
   </div>
-  <button class="a-btn" id="a-btn" onclick="acceptAccord()">Intru în Lea →</button>
-  <p class="a-note">VV ID generat automat · Invizibil · Doar pe device-ul tău</p>
+
+  <!-- STEP 2: Termeni -->
+  <div id="step-terms" style="width:100%;max-width:320px;display:none;flex-direction:column;align-items:center;">
+    <p class="a-desc" id="terms-greeting">Bine ai venit.</p>
+    <div class="checks">
+      <div class="ck" id="ck0" onclick="ck(0)">
+        <div class="ck-box" id="ckb0">✓</div>
+        <div class="ck-text"><b>Accept VV Charter.</b> Datele mele rămân local. Zero email, zero parolă.</div>
+      </div>
+      <div class="ck" id="ck1" onclick="ck(1)">
+        <div class="ck-box" id="ckb1">✓</div>
+        <div class="ck-text"><b>Confirm că am 18 ani</b> și accesez o platformă Beta.</div>
+      </div>
+      <div class="ck" id="ck2" onclick="ck(2)">
+        <div class="ck-box" id="ckb2">✓</div>
+        <div class="ck-text"><b>Accept că Lea învață din mine</b> — anonim, local, pentru mine.</div>
+      </div>
+    </div>
+    <button class="a-btn" id="a-btn" onclick="acceptAccord()">Intru în Lea →</button>
+    <p class="a-note">VV ID generat automat · Invizibil · Doar pe device-ul tău</p>
+  </div>
 </div>
 
 <!-- RECOGNITION -->
