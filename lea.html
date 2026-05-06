@@ -2,7 +2,7 @@
 <html lang="ro">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#000">
 <title>Lea</title>
@@ -140,8 +140,9 @@
         onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();send();}"
         oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px'"></textarea>
       <button class="mic-b" id="mic-b"
-        onmousedown="startMic()" onmouseup="stopMic()"
-        ontouchstart="startMic()" ontouchend="stopMic()">🎙</button>
+        onmousedown="startMic(event)" onmouseup="stopMic(event)"
+        ontouchstart="startMic(event)" ontouchend="stopMic(event)"
+        oncontextmenu="return false;">🎙</button>
       <button class="send-b" onclick="send()">↑</button>
     </div>
   </div>
