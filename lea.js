@@ -650,6 +650,58 @@ function checkAndOfferPin(ans, locationName) {
   }
 }
 
+
+// Cautare de urgenta — Lea nu tace niciodata
+
+// Refresh cache la cerere
+async function processLeaFresh(q, intent) {
+  // Sterge cache-ul pentru aceasta intentie si ruleaza din nou
+  try {
+    var cache = JSON.parse(localStorage.getItem(CACHE_KEY) || '{}');
+    var bucket = getCacheBucket(intent, _city||'');
+    delete cache[bucket];
+    localStorage.setItem(CACHE_KEY, JSON.stringify(cache));
+  } catch(e) {}
+  processLea(q);
+}
+
+async function emergencySearch(q, intent, city) {
+  var gk = localStorage.getItem('lea_gk') || '';
+  var proxy = VV_PROXY || '';
+  if(!proxy && !gk) {
+    return 'Nu am date pentru ' + city + ' acum. Lansez o misiune VV pentru confirmare fizică?';
+  }
+  var h = new Date().getHours();
+  var urgentPrompt = 'Ești Lea, asistentul urban VV. Context: ' + city + ', ora ' + h + ':00. ' +
+    'Întrebarea e: "' + q + '". ' +
+    'Nu ai date verificate din teren. ' +
+    'Răspunde UTIL și SCURT (2 propoziții max) bazat pe ce știi despre ' + city + '. ' +
+    'Fii specific pentru ' + city + ' dacă poți. ' +
+    'La final adaugă: "Nu am confirmare fizică VV încă." ' +
+    'Răspunde DOAR în română.';
+  try {
+    var result = null;
+    if(proxy) {
+      var r = await fetch(proxy, {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({action:'gemini', system:urgentPrompt, contents:[{role:'user',parts:[{text:q}]}], userKey:gk})
+      });
+      var d = await r.json();
+      if(d.candidates && d.candidates[0] && d.candidates[0].content) result = d.candidates[0].content.parts[0].text;
+    } else if(gk) {
+      var r2 = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key='+gk, {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({system_instruction:{parts:[{text:urgentPrompt}]}, contents:[{role:'user',parts:[{text:q}]}], generationConfig:{maxOutputTokens:150,temperature:0.7}})
+      });
+      var d2 = await r2.json();
+      if(d2.candidates && d2.candidates[0] && d2.candidates[0].content) result = d2.candidates[0].content.parts[0].text;
+    }
+    return result || 'Nu am date pentru ' + city + ' acum. Lansez o misiune VV?';
+  } catch(e) {
+    return 'Conexiune slabă acum. Încearcă din nou sau lansez o misiune fizică în ' + city + '?';
+  }
+}
+
 // ── NEXUS INTELLIGENCE ────────────────────────────────────────
 function detectIntent(q) {
   var l=q.toLowerCase();
@@ -695,6 +747,73 @@ async function searchVVNodes(q, intent) {
     var seen={};
     return results.filter(function(r){var k=(r.name||'').toLowerCase();if(seen[k])return false;seen[k]=true;return true;}).slice(0,3);
   } catch(e){return[];}
+}
+
+
+// ── VV SMART CACHE ───────────────────────────────────────────
+// Stocheaza raspunsuri 48h dupa INTENTIE + ORAS + PERIOD
+// "pizza buna" si "unde mananc pizza" = acelasi cache
+// Dimineata si seara = cache-uri diferite (contextul se schimba)
+
+var CACHE_KEY = 'vv_smart_cache';
+var CACHE_TTL = 48 * 3600000; // 48 ore
+
+function getCacheBucket(intent, city) {
+  // Bucket = intentie + oras + perioada zilei
+  // Nu conteza textul exact al intrebarii
+  var h = new Date().getHours();
+  var period = h<6?'n':h<12?'d':h<18?'a':h<22?'s':'n'; // noapte/dimineata/amiaza/seara
+  return (intent + '_' + (city||'').toLowerCase().substring(0,10) + '_' + period)
+    .replace(/[^a-z0-9_]/g,'');
+}
+
+function saveCache(intent, city, response) {
+  try {
+    var cache = JSON.parse(localStorage.getItem(CACHE_KEY) || '{}');
+    var bucket = getCacheBucket(intent, city);
+    cache[bucket] = {
+      r: response,
+      t: Date.now(),
+      city: city,
+      intent: intent,
+      age: 0
+    };
+    // Max 80 intrari — sterge cele mai vechi
+    var keys = Object.keys(cache);
+    if(keys.length > 80) {
+      keys.sort(function(a,b){return (cache[a]||{t:0}).t-(cache[b]||{t:0}).t;});
+      keys.slice(0,keys.length-80).forEach(function(k){delete cache[k];});
+    }
+    localStorage.setItem(CACHE_KEY, JSON.stringify(cache));
+  } catch(e) {}
+}
+
+function getCache(intent, city) {
+  try {
+    var cache = JSON.parse(localStorage.getItem(CACHE_KEY) || '{}');
+    var bucket = getCacheBucket(intent, city);
+    var entry = cache[bucket];
+    if(!entry) return null;
+    var age = Date.now() - entry.t;
+    if(age > CACHE_TTL) { delete cache[bucket]; localStorage.setItem(CACHE_KEY, JSON.stringify(cache)); return null; }
+    if(entry.city && city && entry.city.toLowerCase() !== city.toLowerCase()) return null;
+    return {response: entry.r, ageMs: age};
+  } catch(e) { return null; }
+}
+
+function formatCacheAge(ms) {
+  var min = Math.floor(ms/60000);
+  var h = Math.floor(ms/3600000);
+  if(min < 60) return min + ' min';
+  if(h < 24) return h + (h===1?' oră':' ore');
+  return Math.floor(h/24) + ' zile';
+}
+
+function getCacheSize() {
+  try {
+    var cache = JSON.parse(localStorage.getItem(CACHE_KEY) || '{}');
+    return Object.keys(cache).length;
+  } catch(e) { return 0; }
 }
 
 async function processLea(q) {
@@ -808,22 +927,30 @@ var sysP='Ești Lea, asistentul urban VV. Caldă, directă, umană. MAX 3 propoz
   var netAns=null;
   try{if(gemData&&gemData.candidates&&gemData.candidates[0]&&gemData.candidates[0].content)netAns=gemData.candidates[0].content.parts[0].text;}catch(e){}
   var ans='';
-  if(vvNodes.length>0&&netAns){
-    var np='✓ Date VV în '+city+': ';
-    vvNodes.slice(0,1).forEach(function(n){np+=(n.name||'')+(n.hours?' · '+n.hours:'')+(n.address?' · '+n.address:'')+'. ';});
-    ans=np+'\n'+netAns;
+  if(vvNodes.length>0 && netAns){
+    // CEL MAI BUN: date VV + context net
+    var np='';
+    vvNodes.slice(0,1).forEach(function(n){
+      np+=(n.name||'')+(n.hours?' · '+n.hours:'')+(n.address?' · '+n.address:'')+'. ';
+    });
+    ans = np ? '✓ ' + np + '\n' + netAns : netAns;
   } else if(vvNodes.length>0){
-    ans='În '+city+' am găsit: ';
-    vvNodes.slice(0,2).forEach(function(n){ans+=(n.name||'')+(n.hours?' · '+n.hours:'')+'. ';});
-    ans+='Date verificate VV.';
+    // Date VV fara net
+    var nodeText='';
+    vvNodes.slice(0,2).forEach(function(n){nodeText+=(n.name||'')+(n.hours?' · '+n.hours:'')+'. ';});
+    ans='✓ În '+city+': '+nodeText+'Date confirmate VV.';
   } else if(netAns){
-    ans=netAns;
-    if(['mancare','cafea','cumparaturi'].includes(intent))ans+='\n⚠ Date internet — neverificate fizic în '+city+'. Trimit un Insider?';
+    // Doar net — marcheaza clar dar da raspuns util
+    ans = netAns;
+    if(['mancare','cafea','cumparaturi','divertisment'].includes(intent)){
+      ans += '\n\n⚠ Date internet — neverificate fizic. Trimit un Insider să confirme?';
+    }
   } else {
-    var fb={mancare:'Nu am date în '+city+' acum. Lansez o misiune — un Insider confirmă în 15 min?',cafea:'Nu am cafenele VV în '+city+'. Trimit un Insider?',sanatate:'Urgențe — 112. Farmacii de gardă — 021 9599.',general:'Nu știu sigur. Lansez o verificare fizică în '+city+'?'};
-    ans=fb[intent]||fb.general;
+    // Nimic — Lea face o cautare de urgenta prin Gemini cu context mai specific
+    ans = await emergencySearch(q, intent, city);
   }
   addMsg('l',ans);_hist.push({r:'u',t:q});_hist.push({r:'l',t:ans});
+  if(ans && intent !== 'urgenta' && intent !== 'salut') saveCache(intent, city, ans);
   if(_hist.length>40)_hist=_hist.slice(-40);saveHistory();
   if(_ek&&_vi)playVoice(ans,null);
   fbAdd('vvhi_dataset',{action:'LEA_CHAT',context:{city,intent,hasVV:vvNodes.length>0},ts:Date.now()});
