@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>VV Studios</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;1,300;1,400&family=Geist+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+:root{
+  --bg:#060608;--w:rgba(255,255,255,.9);--w70:rgba(255,255,255,.7);
+  --w50:rgba(255,255,255,.5);--w30:rgba(255,255,255,.3);--w15:rgba(255,255,255,.12);
+  --w08:rgba(255,255,255,.08);--w04:rgba(255,255,255,.04);
+  --border:rgba(255,255,255,.07);--green:#2DB87A;--blue:#2997FF;--red:#FF453A;
+  --gold:rgba(200,169,110,.7);
+  --serif:'Cormorant Garamond',serif;--mono:'Geist Mono',monospace;
+}
+html,body{height:100%;background:var(--bg);color:var(--w);
+  font-family:var(--mono);-webkit-font-smoothing:antialiased;font-size:16px;
+  overflow:hidden;}
+
+/* AMBIENT */
+#amb{position:fixed;top:50%;left:50%;transform:translate(-50%,-55%);
+  width:500px;height:500px;border-radius:50%;pointer-events:none;z-index:0;
+  background:radial-gradient(circle,rgba(255,255,255,.02) 0%,transparent 60%);
+  transition:all 1.5s ease;}
+#amb.me{background:radial-gradient(circle,rgba(41,151,255,.04) 0%,transparent 60%);}
+#amb.studio{background:radial-gradient(circle,rgba(45,184,122,.04) 0%,transparent 60%);}
+
+/* SWITCHER */
+.switcher{
+  position:fixed;top:max(env(safe-area-inset-top),16px);left:50%;
+  transform:translateX(-50%);z-index:10;
+  display:flex;background:rgba(255,255,255,.04);
+  border:0.5px solid var(--border);border-radius:100px;padding:3px;
+}
+.sw-btn{padding:7px 20px;border-radius:100px;font-family:var(--mono);
+  font-size:11px;letter-spacing:1px;cursor:pointer;transition:all .3s;
+  background:none;border:none;color:var(--w30);}
+.sw-btn.on{background:rgba(255,255,255,.08);color:var(--w70);}
+
+/* BACK & SETTINGS */
+.top-actions{position:fixed;top:max(env(safe-area-inset-top),16px);
+  left:16px;right:16px;z-index:10;
+  display:flex;justify-content:space-between;align-items:center;}
+.top-btn{width:32px;height:32px;background:var(--w04);border:0.5px solid var(--border);
+  border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:13px;cursor:pointer;color:var(--w50);}
+
+/* MODES */
+.mode{position:fixed;inset:0;z-index:1;
+  display:none;flex-direction:column;
+  padding:max(env(safe-area-inset-top),60px) 0 max(env(safe-area-inset-bottom),20px);
+  transition:opacity .4s ease;}
+.mode.on{display:flex;}
+
+/* ── VV ME MODE ── */
+#mode-me{align-items:center;justify-content:center;}
+.me-orb{width:110px;height:110px;border-radius:50%;
+  background:radial-gradient(circle,rgba(41,151,255,.08) 0%,transparent 70%);
+  border:0.5px solid rgba(41,151,255,.15);
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:20px;cursor:pointer;transition:all .3s;}
+.me-orb:active{transform:scale(.96);}
+.me-orb-l{font-family:var(--serif);font-size:40px;font-style:italic;
+  color:rgba(255,255,255,.6);}
+.me-name{font-family:var(--serif);font-size:32px;font-style:italic;
+  color:var(--w70);margin-bottom:6px;text-align:center;}
+.me-id{font-size:10px;letter-spacing:3px;color:var(--w30);
+  text-align:center;margin-bottom:32px;}
+.me-cards{display:flex;flex-direction:column;gap:8px;
+  width:100%;max-width:340px;padding:0 20px;}
+.me-card{padding:14px 16px;background:var(--w04);border:0.5px solid var(--border);
+  border-radius:12px;display:flex;align-items:center;gap:12px;cursor:pointer;
+  transition:all .2s;}
+.me-card:active{background:var(--w08);}
+.me-card-ic{font-size:18px;width:28px;text-align:center;}
+.me-card-t{font-size:13px;color:var(--w70);}
+.me-card-s{font-size:11px;color:var(--w30);margin-top:2px;}
+.me-card-arr{margin-left:auto;color:var(--w15);font-size:12px;}
+
+/* ── VV STUDIO MODE ── */
+#mode-studio{padding-top:max(env(safe-area-inset-top),60px);}
+.studio-header{padding:12px 20px 0;flex-shrink:0;}
+.studio-mode-tabs{display:flex;gap:6px;overflow-x:auto;
+  padding:12px 20px;scrollbar-width:none;flex-shrink:0;}
+.studio-mode-tabs::-webkit-scrollbar{display:none;}
+.smt{padding:7px 14px;background:var(--w04);border:0.5px solid var(--border);
+  border-radius:100px;font-size:11px;color:var(--w30);cursor:pointer;
+  white-space:nowrap;transition:all .2s;}
+.smt.on{background:rgba(255,255,255,.1);color:var(--w70);
+  border-color:rgba(255,255,255,.15);}
+.studio-content{flex:1;overflow-y:auto;padding:0 20px 20px;scrollbar-width:none;}
+.studio-content::-webkit-scrollbar{display:none;}
+
+/* Studio panels */
+.panel{display:none;}
+.panel.on{display:block;}
+.panel-title{font-size:10px;letter-spacing:3px;color:var(--w30);
+  text-transform:uppercase;margin-bottom:14px;padding-top:4px;}
+
+/* Note area */
+.note-area{width:100%;min-height:140px;background:var(--w04);
+  border:0.5px solid var(--border);border-radius:12px;padding:14px;
+  color:var(--w70);font-family:var(--mono);font-size:15px;line-height:1.7;
+  outline:none;resize:none;margin-bottom:8px;}
+.note-area::placeholder{color:var(--w15);}
+.btn-sm{padding:8px 18px;background:var(--w08);border:0.5px solid var(--border);
+  border-radius:100px;color:var(--w50);font-family:var(--mono);
+  font-size:11px;cursor:pointer;transition:all .2s;}
+.btn-sm:active{background:var(--w15);}
+
+/* Lea ask */
+.ask-row{display:flex;gap:8px;margin-bottom:12px;}
+.ask-inp{flex:1;background:var(--w04);border:0.5px solid var(--border);
+  border-radius:100px;padding:10px 16px;color:var(--w);font-family:var(--mono);
+  font-size:15px;outline:none;}
+.ask-inp::placeholder{color:var(--w30);}
+.ask-btn{padding:10px 16px;background:var(--w08);border:0.5px solid var(--border);
+  border-radius:100px;color:var(--w50);font-family:var(--mono);
+  font-size:12px;cursor:pointer;white-space:nowrap;}
+.lea-resp{padding:14px;background:var(--w04);border:0.5px solid var(--border);
+  border-radius:12px;font-size:15px;color:var(--w70);line-height:1.7;
+  min-height:80px;white-space:pre-wrap;}
+
+/* Goals */
+.goal-item{display:flex;align-items:center;gap:12px;padding:12px 14px;
+  background:var(--w04);border:0.5px solid var(--border);border-radius:12px;
+  margin-bottom:7px;cursor:pointer;transition:all .2s;}
+.g-check{width:20px;height:20px;border-radius:50%;
+  border:0.5px solid var(--w30);flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:11px;}
+.g-check.done{background:var(--green);border-color:var(--green);color:#000;}
+.g-text{font-size:14px;color:var(--w70);flex:1;line-height:1.4;}
+.g-text.done{text-decoration:line-through;color:var(--w30);}
+
+/* Saved notes */
+.note-card{padding:13px 14px;background:var(--w04);border:0.5px solid var(--border);
+  border-radius:12px;margin-bottom:7px;position:relative;}
+.note-text{font-size:14px;color:var(--w70);line-height:1.6;white-space:pre-wrap;}
+.note-meta{font-size:9px;color:var(--w15);margin-top:5px;letter-spacing:.5px;}
+.note-del{position:absolute;top:10px;right:12px;background:none;border:none;
+  color:var(--w15);cursor:pointer;font-size:12px;padding:2px 6px;}
+
+/* Raft display */
+.raft-section{padding:14px;background:var(--w04);border:0.5px solid var(--border);
+  border-radius:12px;margin-bottom:10px;}
+.raft-title{font-size:10px;letter-spacing:2px;color:var(--w30);
+  text-transform:uppercase;margin-bottom:8px;}
+.raft-row{font-size:13px;color:var(--w50);line-height:1.9;}
+
+/* Toast */
+#toast{position:fixed;bottom:calc(20px + env(safe-area-inset-bottom));
+  left:50%;transform:translateX(-50%) translateY(6px);
+  background:rgba(5,5,5,.97);border:0.5px solid var(--w08);
+  border-radius:100px;padding:7px 16px;font-size:11px;color:var(--w50);
+  opacity:0;transition:all .25s;pointer-events:none;z-index:999;}
+#toast.on{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* Invitation overlay */
+#invite{position:fixed;inset:0;z-index:50;background:rgba(6,6,8,.92);
+  display:none;align-items:center;justify-content:center;
+  backdrop-filter:blur(20px);}
+#invite.on{display:flex;}
+.invite-box{text-align:center;padding:32px 24px;max-width:300px;}
+.invite-ic{font-size:48px;margin-bottom:16px;}
+.invite-t{font-family:var(--serif);font-size:28px;font-style:italic;
+  color:var(--w70);margin-bottom:8px;}
+.invite-s{font-size:13px;color:var(--w30);line-height:1.7;margin-bottom:24px;}
+.invite-btn{padding:12px 28px;background:rgba(255,255,255,.08);
+  border:0.5px solid rgba(255,255,255,.15);border-radius:100px;
+  color:var(--w70);font-family:var(--mono);font-size:12px;cursor:pointer;
+  letter-spacing:1px;display:block;width:100%;margin-bottom:8px;}
+.invite-skip{background:none;border:none;color:var(--w30);
+  font-family:var(--mono);font-size:11px;cursor:pointer;}
+</style>
+</head>
+<body>
+<div id="amb"></div>
+<div id="toast"></div>
+
+<!-- INVITE OVERLAY — prima vizita -->
+<div id="invite">
+  <div class="invite-box">
+    <div class="invite-ic">⬡</div>
+    <div class="invite-t">VV Studios</div>
+    <div class="invite-s">Spațiul tău personal.<br>Notițe, obiective, Lea în modul adânc.<br>Totul rămâne pe device-ul tău.</div>
+    <button class="invite-btn" onclick="closeInvite('me')">Intru în VV Me →</button>
+    <button class="invite-btn" onclick="closeInvite('studio')" style="background:rgba(45,184,122,.08);border-color:rgba(45,184,122,.2);color:rgba(45,184,122,.8);">Deschid Studio-ul meu →</button>
+    <button class="invite-skip" onclick="closeInvite('studio')">Sari</button>
+  </div>
+</div>
+
+<!-- TOP ACTIONS -->
+<div class="top-actions">
+  <div class="top-btn" onclick="window.location.href='lea.html'" title="Înapoi la Lea">←</div>
+  <div class="switcher">
+    <button class="sw-btn on" id="sw-me" onclick="switchMode('me')">⬡ Me</button>
+    <button class="sw-btn" id="sw-studio" onclick="switchMode('studio')">◎ Studio</button>
+  </div>
+  <div class="top-btn" id="top-name" style="width:auto;padding:0 10px;font-size:11px;">—</div>
+</div>
+
+<!-- VV ME MODE -->
+<div class="mode on" id="mode-me">
+  <div class="me-orb" onclick="showToast('VV Me · Identitatea ta · Local')">
+    <div class="me-orb-l">L</div>
+  </div>
+  <div class="me-name" id="me-name">—</div>
+  <div class="me-id" id="me-id">VV ID</div>
+  <div class="me-cards">
+    <div class="me-card" onclick="switchMode('studio');showPanel('notes')">
+      <div class="me-card-ic">📝</div>
+      <div><div class="me-card-t">Notițele mele</div><div class="me-card-s" id="notes-count">—</div></div>
+      <div class="me-card-arr">→</div>
+    </div>
+    <div class="me-card" onclick="switchMode('studio');showPanel('goals')">
+      <div class="me-card-ic">⬡</div>
+      <div><div class="me-card-t">Obiectivele mele</div><div class="me-card-s" id="goals-count">—</div></div>
+      <div class="me-card-arr">→</div>
+    </div>
+    <div class="me-card" onclick="switchMode('studio');showPanel('lea')">
+      <div class="me-card-ic">🎙</div>
+      <div><div class="me-card-t">Lea în profunzime</div><div class="me-card-s">Context personal complet</div></div>
+      <div class="me-card-arr">→</div>
+    </div>
+    <div class="me-card" onclick="switchMode('studio');showPanel('raft')">
+      <div class="me-card-ic">📦</div>
+      <div><div class="me-card-t">Rafturile mele</div><div class="me-card-s" id="raft-count">—</div></div>
+      <div class="me-card-arr">→</div>
+    </div>
+  </div>
+</div>
+
+<!-- VV STUDIO MODE -->
+<div class="mode" id="mode-studio">
+  <div class="studio-mode-tabs">
+    <div class="smt on" id="smt-notes" onclick="showPanel('notes')">📝 Note</div>
+    <div class="smt" id="smt-goals" onclick="showPanel('goals')">⬡ Obiective</div>
+    <div class="smt" id="smt-lea" onclick="showPanel('lea')">🎙 Lea</div>
+    <div class="smt" id="smt-raft" onclick="showPanel('raft')">📦 Rafturi</div>
+  </div>
+  <div class="studio-content">
+
+    <!-- NOTES PANEL -->
+    <div class="panel on" id="panel-notes">
+      <div class="panel-title">Notițele mele · salvate local</div>
+      <textarea class="note-area" id="note-inp" placeholder="Scrie orice — idei, gânduri, planuri..." rows="4"></textarea>
+      <button class="btn-sm" onclick="saveNote()">Salvează →</button>
+      <div style="margin-top:16px;" id="notes-list"></div>
+    </div>
+
+    <!-- GOALS PANEL -->
+    <div class="panel" id="panel-goals">
+      <div class="panel-title">Obiectivele mele</div>
+      <div id="goals-list"></div>
+      <div style="display:flex;gap:8px;margin-top:10px;">
+        <input class="ask-inp" id="goal-inp" placeholder="Adaugă obiectiv..."
+          onkeydown="if(event.key==='Enter')addGoal()">
+        <button class="ask-btn" onclick="addGoal()">+</button>
+      </div>
+    </div>
+
+    <!-- LEA PANEL -->
+    <div class="panel" id="panel-lea">
+      <div class="panel-title">Lea · Context personal complet</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;">
+        <button class="smt on" id="lea-mode-btn" onclick="setLeaMode('normal',this)">Normal</button>
+        <button class="smt" onclick="setLeaMode('profesor',this)">Profesor</button>
+        <button class="smt" onclick="setLeaMode('impreuna',this)">Învățăm împreună</button>
+        <button class="smt" onclick="setLeaMode('deep',this)">Adânc</button>
+      </div>
+      <div class="ask-row">
+        <input class="ask-inp" id="lea-q" placeholder="Întreabă-o pe Lea..."
+          onkeydown="if(event.key==='Enter')askLea()">
+        <button class="ask-btn" onclick="askLea()">→</button>
+      </div>
+      <div class="lea-resp" id="lea-r">Lea te ascultă...</div>
+    </div>
+
+    <!-- RAFT PANEL -->
+    <div class="panel" id="panel-raft">
+      <div class="panel-title">Rafturile tale · zero server · privat</div>
+      <div id="raft-display"></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+var PROXY = localStorage.getItem('vv_proxy_url') ||
+  'https://script.google.com/macros/s/AKfycbxk2t1vLAYshmMVwxww--uJo2haL2z8mI22xPoFTK49rV98r97ao0znb25GJdfcwKPY8w/exec';
+var _leaMode = 'normal';
+var _currentMode = 'me';
+
+document.addEventListener('DOMContentLoaded', function() {
+  loadIdentity();
+  renderNotes();
+  renderGoals();
+  renderRaft();
+  updateCounts();
+  // Prima vizita
+  if(!localStorage.getItem('vv_studios_visited')) {
+    document.getElementById('invite').classList.add('on');
+  }
+  document.getElementById('amb').className = 'me';
+});
+
+function closeInvite(mode) {
+  document.getElementById('invite').classList.remove('on');
+  localStorage.setItem('vv_studios_visited','1');
+  switchMode(mode);
+}
+
+// IDENTITY
+function loadIdentity() {
+  var name = localStorage.getItem('lea_name') || '';
+  var u = JSON.parse(localStorage.getItem('lea_u')||'{}');
+  var nameEl = document.getElementById('me-name');
+  var idEl = document.getElementById('me-id');
+  var topEl = document.getElementById('top-name');
+  if(nameEl) nameEl.textContent = name || 'Anonim';
+  if(idEl) idEl.textContent = u.vvid || '—';
+  if(topEl) topEl.textContent = name || '—';
+}
+
+// MODE SWITCHER
+function switchMode(mode) {
+  _currentMode = mode;
+  document.querySelectorAll('.mode').forEach(function(m){m.classList.remove('on');});
+  document.querySelectorAll('.sw-btn').forEach(function(b){b.classList.remove('on');});
+  var modeEl = document.getElementById('mode-'+mode);
+  var btnEl = document.getElementById('sw-'+mode);
+  if(modeEl) modeEl.classList.add('on');
+  if(btnEl) btnEl.classList.add('on');
+  var amb = document.getElementById('amb');
+  if(amb) amb.className = mode;
+  // Blur effect
+  document.body.style.filter = '';
+}
+
+function showPanel(name) {
+  document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('on');});
+  document.querySelectorAll('.smt').forEach(function(t){
+    if(t.id && t.id.startsWith('smt-')) t.classList.remove('on');
+  });
+  var p = document.getElementById('panel-'+name);
+  var t = document.getElementById('smt-'+name);
+  if(p) p.classList.add('on');
+  if(t) t.classList.add('on');
+}
+
+// NOTES
+function saveNote() {
+  var inp = document.getElementById('note-inp');
+  var txt = (inp.value||'').trim();
+  if(!txt) return;
+  var notes = JSON.parse(localStorage.getItem('vv_studio_notes')||'[]');
+  notes.unshift({text:txt, ts:Date.now()});
+  if(notes.length>50) notes=notes.slice(0,50);
+  localStorage.setItem('vv_studio_notes', JSON.stringify(notes));
+  inp.value='';
+  renderNotes();
+  updateCounts();
+  toast('Notă salvată ✓');
+}
+
+function renderNotes() {
+  var notes = JSON.parse(localStorage.getItem('vv_studio_notes')||'[]');
+  var el = document.getElementById('notes-list');
+  if(!el) return;
+  if(!notes.length){el.innerHTML='<div style="color:var(--w15);font-size:12px;padding:16px 0;text-align:center;">Nicio notă încă</div>';return;}
+  el.innerHTML = notes.map(function(n,i){
+    return '<div class="note-card">'+
+      '<div class="note-text">'+esc(n.text)+'</div>'+
+      '<div class="note-meta">'+age(Date.now()-n.ts)+'</div>'+
+      '<button class="note-del" onclick="delNote('+i+')">✕</button>'+
+      '</div>';
+  }).join('');
+}
+
+function delNote(i){
+  var notes=JSON.parse(localStorage.getItem('vv_studio_notes')||'[]');
+  notes.splice(i,1);
+  localStorage.setItem('vv_studio_notes',JSON.stringify(notes));
+  renderNotes();updateCounts();
+}
+
+// GOALS
+function addGoal(){
+  var inp=document.getElementById('goal-inp');
+  var txt=(inp.value||'').trim();if(!txt)return;
+  var goals=JSON.parse(localStorage.getItem('vv_studio_goals')||'[]');
+  goals.push({text:txt,done:false,ts:Date.now()});
+  localStorage.setItem('vv_studio_goals',JSON.stringify(goals));
+  inp.value='';renderGoals();updateCounts();
+}
+
+function toggleGoal(i){
+  var goals=JSON.parse(localStorage.getItem('vv_studio_goals')||'[]');
+  goals[i].done=!goals[i].done;
+  localStorage.setItem('vv_studio_goals',JSON.stringify(goals));
+  renderGoals();
+}
+
+function renderGoals(){
+  var goals=JSON.parse(localStorage.getItem('vv_studio_goals')||'[]');
+  var el=document.getElementById('goals-list');if(!el)return;
+  if(!goals.length){el.innerHTML='<div style="color:var(--w15);font-size:12px;padding:16px 0;text-align:center;">Niciun obiectiv</div>';return;}
+  el.innerHTML=goals.map(function(g,i){
+    return '<div class="goal-item" onclick="toggleGoal('+i+')">'+
+      '<div class="g-check'+(g.done?' done':'')+'">'+(g.done?'✓':'')+'</div>'+
+      '<div class="g-text'+(g.done?' done':'')+'">'+esc(g.text)+'</div>'+
+      '</div>';
+  }).join('');
+}
+
+// LEA IN STUDIO
+var _leaModes = {
+  normal: 'Ești Lea, asistent personal VV. Răspunde în max 3 propoziții, uman și direct.',
+  profesor: 'Ești Lea în modul Profesor. Explică pas cu pas, cu exemple clare. Ești răbdătoare și încurajatoare. Adaptezi complexitatea la nivelul întrebării.',
+  impreuna: 'Ești Lea în modul Explorare. Nu predai — explorezi împreună. Pui întrebări, propui perspective, cauți alături de user. Ești curios, nu atotștiutor.',
+  deep: 'Ești Lea în modul Adânc. Răspunsuri complete, detaliate, cu context, cu implicații. Userul vrea să înțeleagă în profunzime.'
+};
+
+function setLeaMode(mode, btn) {
+  _leaMode = mode;
+  document.querySelectorAll('#panel-lea .smt').forEach(function(b){b.classList.remove('on');});
+  if(btn) btn.classList.add('on');
+  toast('Lea: modul ' + mode);
+}
+
+async function askLea() {
+  var q = (document.getElementById('lea-q').value||'').trim();
+  if(!q) return;
+  var r = document.getElementById('lea-r');
+  r.textContent = '...';
+  var name = localStorage.getItem('lea_name')||'';
+  var city = localStorage.getItem('vvme_current_city')||'România';
+  var h = new Date().getHours();
+  var notes = JSON.parse(localStorage.getItem('vv_studio_notes')||'[]');
+  var recentNote = notes.length>0 ? notes[0].text.substring(0,80) : '';
+  var goals = JSON.parse(localStorage.getItem('vv_studio_goals')||'[]');
+  var activeGoals = goals.filter(function(g){return !g.done;}).map(function(g){return g.text;}).slice(0,3).join(', ');
+  var sys = (_leaModes[_leaMode]||_leaModes.normal) + ' ' +
+    'Context user: '+city+', ora '+h+'. '+
+    (name?'Numele: '+name+'. ':'')+
+    (recentNote?'Ultima notiță: "'+recentNote+'". ':'')+
+    (activeGoals?'Obiective active: '+activeGoals+'. ':'')+
+    'Răspunde DOAR în română.';
+  try {
+    var params = new URLSearchParams({
+      action:'gemini',system:sys,q:q,city:city,
+      userKey:localStorage.getItem('lea_gk')||''
+    });
+    var res = await fetch(PROXY+'?'+params.toString());
+    var data = await res.json();
+    var ans = '';
+    if(data.candidates&&data.candidates[0]&&data.candidates[0].content) {
+      ans = data.candidates[0].content.parts[0].text;
+    }
+    r.textContent = ans||'Nu am primit răspuns. Încearcă din nou.';
+    document.getElementById('lea-q').value='';
+  } catch(e) {
+    r.textContent='Eroare conexiune.';
+  }
+}
+
+// RAFT
+function renderRaft(){
+  var el=document.getElementById('raft-display');if(!el)return;
+  var s=JSON.parse(localStorage.getItem('vv_shelves')||'{}');
+  var v=JSON.parse(localStorage.getItem('vv_voice_shelf')||'{}');
+  var cache=JSON.parse(localStorage.getItem('vv_smart_cache')||'{}');
+  var streak=JSON.parse(localStorage.getItem('vv_streak')||'{}');
+  var html='';
+
+  html+='<div class="raft-section"><div class="raft-title">Identitate</div><div class="raft-row">';
+  html+='Streak: '+(streak.count||1)+' zile<br>';
+  html+='Stare vocală: '+(v.currentMood||'necunoscută')+'<br>';
+  html+='Cache local: '+Object.keys(cache).length+' răspunsuri stocate';
+  html+='</div></div>';
+
+  var fam=s.family||{};
+  html+='<div class="raft-section"><div class="raft-title">Familie</div><div class="raft-row">';
+  html+=(fam.hasKids?'✓ Copii detectați':'◌ Fără copii')+'<br>';
+  html+=(fam.hasCar?'✓ Mașină':'◌ Transport nedetectat')+'<br>';
+  html+=(fam.petFriendly?'✓ Animale':'◌ Animale nedetectate');
+  html+='</div></div>';
+
+  var prefs=s.prefs||{};
+  html+='<div class="raft-section"><div class="raft-title">Preferințe</div><div class="raft-row">';
+  html+='Mâncare: '+((prefs.foodTypes||[]).join(', ')||'nedetectată');
+  html+='</div></div>';
+
+  if(v.patterns){
+    html+='<div class="raft-section"><div class="raft-title">Raft Vocal</div><div class="raft-row">';
+    Object.keys(v.patterns).forEach(function(p){
+      var pat=v.patterns[p];
+      if(pat.count>0){
+        html+=p+': '+pat.count+' interacțiuni, '+(pat.avgConfidence*100).toFixed(0)+'% confidence<br>';
+      }
+    });
+    html+='</div></div>';
+  }
+
+  el.innerHTML=html;
+}
+
+function updateCounts(){
+  var notes=JSON.parse(localStorage.getItem('vv_studio_notes')||'[]');
+  var goals=JSON.parse(localStorage.getItem('vv_studio_goals')||'[]');
+  var done=goals.filter(function(g){return g.done;}).length;
+  var nc=document.getElementById('notes-count');
+  var gc=document.getElementById('goals-count');
+  var rc=document.getElementById('raft-count');
+  if(nc)nc.textContent=notes.length+' notițe salvate';
+  if(gc)gc.textContent=done+'/'+goals.length+' completate';
+  if(rc){
+    var cache=JSON.parse(localStorage.getItem('vv_smart_cache')||'{}');
+    rc.textContent=Object.keys(cache).length+' răspunsuri în cache';
+  }
+}
+
+function esc(t){return(t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function age(ms){
+  var min=Math.floor(ms/60000),h=Math.floor(ms/3600000),d=Math.floor(ms/86400000);
+  if(min<2)return'acum';if(min<60)return'acum '+min+' min';
+  if(h<24)return'acum '+h+(h===1?' oră':' ore');return'acum '+d+(d===1?' zi':' zile');
+}
+function toast(m){
+  var t=document.getElementById('toast');t.textContent=m;t.classList.add('on');
+  setTimeout(function(){t.classList.remove('on');},2500);
+}
+function showToast(m){toast(m);}
+</script>
+</body>
+</html>
