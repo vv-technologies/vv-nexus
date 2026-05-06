@@ -69,6 +69,180 @@ function goToTerms() {
   }, 300);
 }
 
+
+// ── VV VOICE SYNC ─────────────────────────────────────────────
+// Spui codul VV cu vocea → Lea te recunoaște pe device nou
+// Plus: Raft Vocal — Lea învață cum vorbești tu specific
+
+var VOICE_SHELF_KEY = 'vv_voice_shelf';
+
+// Raft Vocal — stochează pattern-uri vocale locale
+function loadVoiceShelf() {
+  try { return JSON.parse(localStorage.getItem(VOICE_SHELF_KEY)||'{}'); } catch(e) { return {}; }
+}
+
+function saveVoiceShelf(shelf) {
+  try { localStorage.setItem(VOICE_SHELF_KEY, JSON.stringify(shelf)); } catch(e) {}
+}
+
+function learnVoicePattern(transcript, confidence) {
+  var shelf = loadVoiceShelf();
+  var h = new Date().getHours();
+  var period = h<6?'noapte':h<12?'dimineata':h<17?'pranz':h<21?'seara':'noapte';
+  
+  if(!shelf.patterns) shelf.patterns = {};
+  if(!shelf.patterns[period]) shelf.patterns[period] = {
+    avgConfidence: 0, count: 0, wordCount: 0, samples: []
+  };
+  
+  var p = shelf.patterns[period];
+  var words = transcript.trim().split(' ').length;
+  p.count++;
+  p.avgConfidence = (p.avgConfidence * (p.count-1) + confidence) / p.count;
+  p.wordCount = (p.wordCount * (p.count-1) + words) / p.count;
+  
+  // Pastreaza ultimele 5 sample-uri pentru pattern
+  p.samples.push({t: transcript.substring(0,30), c: confidence, ts: Date.now()});
+  if(p.samples.length > 5) p.samples.shift();
+  
+  // Detecteaza starea vocala
+  if(confidence < 0.6) shelf.currentMood = 'obosit'; // recunoastere slaba = obosit/zgomot
+  else if(confidence > 0.85) shelf.currentMood = 'energic';
+  else shelf.currentMood = 'normal';
+  
+  shelf.lastVoice = {period, confidence, words, ts: Date.now()};
+  saveVoiceShelf(shelf);
+  return shelf;
+}
+
+function getVoiceContext() {
+  var shelf = loadVoiceShelf();
+  if(!shelf.lastVoice) return '';
+  var mood = shelf.currentMood;
+  if(mood === 'obosit') return 'Vocea utilizatorului sugerează oboseală — răspunsuri scurte și directe.';
+  if(mood === 'energic') return 'Utilizatorul e activ — poți fi mai detaliat.';
+  return '';
+}
+
+// Voice Sync — conectare prin voce pe device nou
+function startVoiceSync() {
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(!SR) { showToast('Vocea nu e disponibilă în acest browser'); return; }
+  
+  var orb = document.getElementById('aer-orb');
+  var msg = document.getElementById('aer-msg');
+  var lbl = document.getElementById('aer-lbl');
+  
+  if(orb) orb.classList.add('go');
+  if(lbl) lbl.textContent = 'Ascult...';
+  if(msg) { msg.textContent = 'Spune codul tău VV cu vocea'; msg.className = 'aer-msg searching'; }
+  
+  // Ambient pulsează cu vocea
+  document.getElementById('amb').className = 'aer';
+  
+  var sr = new SR();
+  sr.lang = 'ro-RO';
+  sr.continuous = false;
+  sr.interimResults = false;
+  
+  sr.onresult = async function(e) {
+    var said = e.results[0][0].transcript.toUpperCase().trim();
+    var conf = e.results[0][0].confidence;
+    
+    if(orb) orb.classList.remove('go');
+    if(msg) msg.textContent = 'Am auzit: "' + said + '" · Verific...';
+    
+    // Curata textul - extrage codul VV
+    var codeMatch = said.match(/VV[\s·\-]?([A-Z0-9]{2,6})[\s·\-]?([A-Z0-9]{2,6})/i);
+    var searchCode = null;
+    
+    if(codeMatch) {
+      searchCode = 'VV·' + codeMatch[1].substring(0,3) + '·' + codeMatch[2].substring(0,3);
+    } else if(said.includes('VV')) {
+      // Incearca sa extraga orice dupa VV
+      var parts = said.replace('VV','').trim().split(/[\s·\-]+/).filter(function(p){return p.length>=2;});
+      if(parts.length >= 2) searchCode = 'VV·' + parts[0].substring(0,3) + '·' + parts[1].substring(0,3);
+    }
+    
+    if(!searchCode) {
+      if(msg) msg.textContent = 'Nu am înțeles codul. Spune "VV" urmat de codul tău.';
+      document.getElementById('amb').className = '';
+      setTimeout(function(){ if(orb)orb.classList.remove('go'); if(lbl)lbl.textContent='Apasă'; }, 2000);
+      return;
+    }
+    
+    // Cauta in Firebase
+    if(!db) {
+      // Fallback localStorage
+      var localId = localStorage.getItem('lea_id') || localStorage.getItem('vv_citizen_code');
+      if(localId && localId.toUpperCase().includes(searchCode.substring(3,6))) {
+        voiceSyncSuccess(JSON.parse(localStorage.getItem('lea_u')||'{}'), conf);
+        return;
+      }
+    }
+    
+    try {
+      // Cauta token activ sau ID direct
+      var snap = await db.collection('vv_aer')
+        .where('claimed','==',false)
+        .orderBy('ts','desc').limit(10).get();
+      
+      var found = null;
+      snap.forEach(function(doc) {
+        var d = doc.data();
+        if(d.vvid && d.vvid.toUpperCase().includes(searchCode.replace('VV·','').replace('·',''))) {
+          found = {doc: doc, data: d};
+        }
+      });
+      
+      if(found) {
+        await db.collection('vv_aer').doc(found.doc.id).update({claimed:true});
+        var user = JSON.parse(found.data.user||'{}');
+        voiceSyncSuccess(user, conf);
+      } else {
+        if(msg) msg.textContent = 'Cod "' + searchCode + '" negăsit. Asigură-te că ai apăsat "Trimite" pe celălalt device.';
+        document.getElementById('amb').className='';
+        if(lbl) lbl.textContent = 'Apasă';
+      }
+    } catch(err) {
+      if(msg) msg.textContent = 'Eroare conexiune. Încearcă din nou.';
+      document.getElementById('amb').className='';
+    }
+  };
+  
+  sr.onerror = function() {
+    if(orb) orb.classList.remove('go');
+    if(msg) msg.textContent = 'Nu am înțeles. Mai încearcă.';
+    if(lbl) lbl.textContent = 'Apasă';
+    document.getElementById('amb').className='';
+  };
+  
+  sr.start();
+}
+
+function voiceSyncSuccess(user, confidence) {
+  _u = user;
+  localStorage.setItem('lea_id', user.vvid||'');
+  localStorage.setItem('lea_u', JSON.stringify(user));
+  localStorage.setItem('lea_had_aer','1');
+  
+  // Salveaza pattern vocal la succes
+  learnVoicePattern(user.vvid||'sync', confidence);
+  
+  var msg = document.getElementById('aer-msg');
+  var lbl = document.getElementById('aer-lbl');
+  if(msg) { msg.className='aer-msg ok'; msg.textContent='✓ Recunoscut prin voce! Identitate sincronizată.'; }
+  if(lbl) lbl.textContent='✓';
+  
+  document.getElementById('amb').className='';
+  
+  setTimeout(function(){
+    hideAll();
+    enterApp();
+    showToast('VV Voice Sync ✓');
+  }, 1500);
+}
+
 // ── BOOT ──────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', function() {
   initFirebase();
@@ -241,12 +415,21 @@ async function aerRecv() {
   var lbl = document.getElementById('aer-lbl');
   orb.classList.add('go'); lbl.textContent='Caută...'; msg.textContent='Caut identitate VV...'; msg.className='aer-msg';
   try {
-    var t5 = new Date(Date.now()-5*60*1000);
-    var snap = await db.collection('vv_aer').where('claimed','==',false).where('ts','>=',t5.getTime()).orderBy('ts','desc').limit(1).get();
+    // Cauta cele mai recente tokene neclamate (fara filtru timestamp - evita index issues)
+    var snap = await db.collection('vv_aer')
+      .where('claimed','==',false)
+      .orderBy('ts','desc')
+      .limit(5).get();
+    // Filtreaza local pe 5 minute
+    var t5 = Date.now() - 5*60*1000;
+    var validDocs = [];
+    snap.forEach(function(d){ if(d.data().ts >= t5) validDocs.push(d); });
+    if(validDocs.length === 0) snap = {empty:true, docs:[]};
+    else snap = {empty:false, docs:validDocs};
     if(snap.empty){
       orb.classList.remove('go'); msg.textContent='Nu am găsit niciun device activ. Apasă "Trimite" pe celălalt device.'; lbl.textContent='Apasă'; return;
     }
-    var doc = snap.docs[0], data = doc.data();
+    var doc = snap.docs[0], data = doc.data ? doc.data() : doc.data;
     await db.collection('vv_aer').doc(doc.id).update({claimed:true});
     _u = JSON.parse(data.user);
     localStorage.setItem('lea_id', data.vvid); localStorage.setItem('lea_u', JSON.stringify(_u)); localStorage.setItem('lea_had_aer','1');
@@ -273,7 +456,19 @@ function finishOb() { localStorage.setItem('lea_ob_done','1'); hideAll(); enterA
 function enterApp() {
   hideAll();
   init();
-  setTimeout(showCard, 500);
+  // Card VV nu mai apare automat — user il vede din setari
+  // Prima data: salut simplu
+  setTimeout(function(){
+    var h = new Date().getHours();
+    var g = h<12?'Bună dimineața':h<18?'Bună ziua':h<22?'Bună seara':'Noapte bună';
+    var name = displayName();
+    var city = _city || 'România';
+    var msg = g + (name ? ', ' + name : '') + '. ';
+    if(city && city !== 'România') msg += 'Ești în ' + city + '. ';
+    msg += 'Ce vrei să știi?';
+    document.getElementById('idle').classList.add('off');
+    addMsg('l', msg);
+  }, 400);
 }
 
 function init() {
@@ -713,6 +908,7 @@ function detectIntent(q) {
   if(/film|cinema|concert|teatru|muzeu|parc/i.test(l)) return 'divertisment';
   if(/cumpăr|magazin|mall|supermarket|lidl|kaufland/i.test(l)) return 'cumparaturi';
   if(/vreme|ploaie|soare|temperatură|meteo/i.test(l)) return 'vreme';
+  if(/cât e ceasul|ce ora|ce oră|ora exacta|cat e ceasul/i.test(l)) return 'ceas';
   if(/bună|buna|salut|hello|hey|ce mai/i.test(l)) return 'salut';
   return 'general';
 }
@@ -820,6 +1016,15 @@ async function processLea(q) {
   var activeKey = localStorage.getItem('lea_gk') || '';
   _gk = activeKey;
   var intent=detectIntent(q);
+  // Raspunde direct la intrebari despre ceas - zero API
+  if(intent==='ceas') {
+    var now = new Date();
+    var hh = now.getHours().toString().padStart(2,'0');
+    var mm = now.getMinutes().toString().padStart(2,'0');
+    addMsg('l', 'E ' + hh + ':' + mm + '.');
+    return;
+  }
+
   if(intent==='urgenta'){
     var em='Sună 112 ACUM dacă e urgență reală. Lea e cu tine — ce s-a întâmplat?';
     addMsg('l',em);_hist.push({r:'u',t:q});_hist.push({r:'l',t:em});saveHistory();
@@ -827,12 +1032,12 @@ async function processLea(q) {
   }
   var tk=addMsg('l','',true);document.getElementById('amb').className='think';
   var h=new Date().getHours(),p=h<6?'noaptea':h<12?'dimineața':h<17?'după-amiaza':h<21?'seara':'noaptea';
-  var city=_city||'România';
+  var city=_city||localStorage.getItem('vvme_home_city')||'zona ta';
   // Thinking message după 2s
   var thinkTimer=setTimeout(function(){var bub=document.querySelector('#tk-msg .msg-b');if(bub){bub.className='msg-b';bub.style.cssText='font-size:12px;color:var(--w30);font-style:italic;padding:11px 15px;';bub.textContent='Caut în '+city+'...';} },2000);
   // Hybrid search
   var vvP=searchVVNodes(q,intent);
-  var personalCtx = buildPersonalContext();
+  var personalCtx = buildPersonalContext() + ' ' + getVoiceContext();
 var sysP='Ești Lea, asistentul urban VV. Caldă, directă, umană. MAX 3 propoziții. '+
     'Context: Oraș='+city+', Ora='+h+':00 ('+p+'). '+
     (displayName()?'User='+displayName()+'. ':'')+
@@ -971,32 +1176,78 @@ async function playVoice(text,btn){
   }catch(e){if(btn){btn.textContent='▶';btn.disabled=false;}}
 }
 var _micActive = false;
-function startMic(e){
-  if(e) { e.preventDefault(); e.stopPropagation(); }
-  if(_micActive) return;
-  var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-  if(!SR){showToast('Vocea nu e suportată în acest browser');return;}
-  _micActive = true;
-  var m=document.getElementById('mic-b'),vv=document.getElementById('vvis');
-  m.classList.add('on');m.textContent='⏹';vv.classList.add('on');
-  document.getElementById('amb').className='listen';
-  _rec=new SR();_rec.lang='ro-RO';_rec.continuous=false;_rec.interimResults=false;
-  _rec.onresult=function(e){
-    var txt=e.results[0][0].transcript;
-    document.getElementById('ibox').value=txt;
-    stopMic();setTimeout(send,200);
-  };
-  _rec.onerror=function(){stopMic();showToast('Nu am înțeles. Încearcă din nou.');};
-  _rec.onend=function(){if(_micActive)stopMic();};
-  try{_rec.start();}catch(e){stopMic();}
+var _audioCtx = null;
+
+// Deblocheaza audio pe iOS la prima interactiune
+function unlockAudio() {
+  if(_audioCtx) return;
+  try {
+    _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    var buf = _audioCtx.createBuffer(1,1,22050);
+    var src = _audioCtx.createBufferSource();
+    src.buffer = buf; src.connect(_audioCtx.destination); src.start(0);
+  } catch(e) {}
 }
-function stopMic(e){
-  if(e){e.preventDefault();e.stopPropagation();}
-  _micActive=false;
-  var m=document.getElementById('mic-b'),vv=document.getElementById('vvis');
-  m.classList.remove('on');m.textContent='🎙';vv.classList.remove('on');
-  document.getElementById('amb').className='';
-  if(_rec){try{_rec.stop();}catch(e){}_rec=null;}
+
+function startMic(e) {
+  if(e) { e.preventDefault(); e.stopPropagation(); }
+  unlockAudio();
+  if(_micActive) { stopMic(); return; }
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(!SR) {
+    // Fallback: deschide tastatura
+    document.getElementById('ibox').focus();
+    showToast('Scrie mesajul tău');
+    return;
+  }
+  _micActive = true;
+  var m = document.getElementById('mic-b');
+  var vv = document.getElementById('vvis');
+  if(m) { m.classList.add('on'); m.textContent = '⏹'; }
+  if(vv) vv.classList.add('on');
+  document.getElementById('amb').className = 'listen';
+  try {
+    _rec = new SR();
+    _rec.lang = 'ro-RO';
+    _rec.continuous = false;
+    _rec.interimResults = false;
+    _rec.maxAlternatives = 1;
+    _rec.onresult = function(ev) {
+      var txt = ev.results[0][0].transcript;
+      var conf = ev.results[0][0].confidence || 0.8;
+      // Invata pattern vocal
+      learnVoicePattern(txt, conf);
+      document.getElementById('ibox').value = txt;
+      stopMic(null);
+      setTimeout(send, 300);
+    };
+    _rec.onerror = function(ev) {
+      stopMic(null);
+      if(ev.error !== 'aborted') showToast('Nu am înțeles. Mai încearcă.');
+    };
+    _rec.onend = function() { stopMic(null); };
+    _rec.start();
+  } catch(err) {
+    stopMic(null);
+    showToast('Microfonul nu e disponibil pe acest browser.');
+  }
+}
+
+function stopMic(e) {
+  if(e) { e.preventDefault(); e.stopPropagation(); }
+  _micActive = false;
+  var m = document.getElementById('mic-b');
+  var vv = document.getElementById('vvis');
+  if(m) { m.classList.remove('on'); m.textContent = '🎙'; }
+  if(vv) vv.classList.remove('on');
+  document.getElementById('amb').className = '';
+  if(_rec) { try { _rec.stop(); } catch(err) {} _rec = null; }
+}
+
+// Voce playback cu iOS unlock
+async function playVoiceUnlocked(text, btn) {
+  unlockAudio();
+  await playVoice(text, btn);
 }
 
 // ── LIMIT & DONATE ────────────────────────────────────────────
@@ -1040,7 +1291,10 @@ function detectCity(){
   navigator.geolocation.getCurrentPosition(function(p){
     fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat='+p.coords.latitude+'&lon='+p.coords.longitude+'&accept-language=ro')
       .then(function(r){return r.json();}).then(function(d){
-        var city=d.address?(d.address.city||d.address.town||d.address.village||'România'):'România';
+        var addr = d.address || {};
+        var city = addr.city || addr.town || addr.village || addr.county || addr.state || 'zona ta';
+        // Nu folosi "Romania" ca oras — e prea generic
+        if(city === 'România' || city === 'Romania') city = addr.county || addr.state || 'zona ta';
         _city=city;localStorage.setItem('vvme_current_city',city);if(!localStorage.getItem('vvme_home_city'))localStorage.setItem('vvme_home_city',city);
         updateCityDisp(city);buildSugs();if(_u&&!_u.city){_u.city=city;localStorage.setItem('lea_u',JSON.stringify(_u));}
       }).catch(function(){});
@@ -1051,7 +1305,13 @@ function updateClock(){var n=new Date(),e=document.getElementById('idle-c');if(e
 
 // ── SETTINGS ──────────────────────────────────────────────────
 function openSett(){
-  if(_u){var i=document.getElementById('ss-id'),r=document.getElementById('ss-rang'),c=document.getElementById('ss-city');if(i)i.textContent=_u.vvid||'—';var rm={ceo:'CEO',founder:'Fondator',citizen:'Cetățean VV'};if(r)r.textContent=rm[_u.type]||'Standard';if(c)c.textContent=_city||'—';}
+  if(_u){
+    var i=document.getElementById('ss-id'),r=document.getElementById('ss-rang'),c=document.getElementById('ss-city');
+    if(i)i.textContent=_u.vvid||'—';
+    var rm={ceo:'💎 CEO',founder:'💎 Fondator',citizen:'⬡ Cetățean VV'};
+    if(r)r.textContent=rm[_u.type]||'Standard';
+    if(c)c.textContent=_city||'—';
+  }
   document.getElementById('sett').classList.add('on');
 }
 function closeSett(){document.getElementById('sett').classList.remove('on');}
@@ -1084,4 +1344,22 @@ function logout(){
   ['lea_id','lea_u','lea_ob_done','lea_had_aer','lea_gk','lea_ek','lea_vi','vv_accord_signed','vv_citizen_code','vv_persona','vvme_home_city','vvme_current_city','vv_lea_profile',HKEY].forEach(function(k){localStorage.removeItem(k);});
   location.reload();
 }
+
+function showCardManual() {
+  if(!_u) return;
+  var conv = document.getElementById('conv');
+  document.getElementById('idle').classList.add('off');
+  var rankMap = {ceo:'💎 CEO · Fondator',founder:'💎 Fondator',citizen:'⬡ Cetățean VV'};
+  var rank = rankMap[_u.type]||'⬡ VV';
+  var city = _city||'—';
+  var name = displayName();
+  var xp = (_u.type==='ceo'||_u.type==='founder')?'XP: ∞':'XP: 1';
+  var w = document.createElement('div');
+  w.className='msg l';
+  w.style.cssText='align-self:center;width:100%;max-width:260px;';
+  w.innerHTML='<div class="id-card"><div class="id-top"><div class="id-logo">Lea</div><div class="id-rank">'+rank+'</div></div><div class="id-code">'+_u.vvid+'</div>'+(name?'<div class="id-name">'+name+'</div>':'')+'<div class="id-bot"><div class="id-city">📍 '+city+'</div><div class="id-xp">'+xp+'</div></div></div><div class="msg-meta">Lea · Identitatea ta</div>';
+  conv.appendChild(w);
+  conv.scrollTo({top:conv.scrollHeight,behavior:'smooth'});
+}
+
 function showToast(m){var t=document.getElementById('toast');t.textContent=m;t.classList.add('on');clearTimeout(t._t);t._t=setTimeout(function(){t.classList.remove('on');},3000);}
