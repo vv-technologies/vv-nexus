@@ -16,7 +16,8 @@
   --mono:'Geist Mono',monospace;
 }
 html,body{height:100%;background:var(--bg);color:var(--w);
-  font-family:var(--mono);-webkit-font-smoothing:antialiased;overflow:hidden;}
+  font-family:var(--mono);-webkit-font-smoothing:antialiased;overflow:hidden;
+  font-size:16px;-webkit-text-size-adjust:100%;}
 
 /* AMBIENT */
 #amb{position:fixed;top:50%;left:50%;transform:translate(-50%,-60%);
@@ -200,7 +201,7 @@ html,body{height:100%;background:var(--bg);color:var(--w);
 .msg.u{align-self:flex-end;align-items:flex-end;}
 .msg.l{align-self:flex-start;align-items:flex-start;}
 @keyframes mi{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-.msg-b{padding:11px 15px;border-radius:16px;font-size:14px;line-height:1.65;white-space:pre-wrap;}
+.msg-b{padding:13px 16px;border-radius:16px;font-size:16px;line-height:1.7;white-space:pre-wrap;}
 .msg.u .msg-b{background:var(--gold2);border:0.5px solid var(--gold-b);color:var(--w70);border-bottom-right-radius:4px;}
 .msg.l .msg-b{background:var(--w04);border:0.5px solid var(--border);color:var(--w70);border-bottom-left-radius:4px;}
 .msg.l .msg-b.tk{display:flex;gap:4px;align-items:center;padding:14px 15px;}
@@ -245,14 +246,14 @@ html,body{height:100%;background:var(--bg);color:var(--w);
   backdrop-filter:blur(20px);flex-shrink:0;position:relative;z-index:2;}
 .sugs{display:flex;gap:7px;overflow-x:auto;padding:4px 0 8px;scrollbar-width:none;}
 .sugs::-webkit-scrollbar{display:none;}
-.sug{flex-shrink:0;padding:5px 12px;background:var(--w04);border:0.5px solid var(--border);
-  border-radius:100px;font-size:11px;color:var(--w30);cursor:pointer;
+.sug{flex-shrink:0;padding:7px 14px;background:var(--w04);border:0.5px solid var(--border);
+  border-radius:100px;font-size:13px;color:var(--w30);cursor:pointer;
   transition:all .2s;white-space:nowrap;}
 .sug:hover,.sug:active{border-color:var(--gold-b);color:var(--w50);}
 .inp-row{display:flex;align-items:flex-end;gap:7px;max-width:680px;margin:0 auto;}
 .ibox{flex:1;background:var(--w04);border:0.5px solid var(--border);
-  border-radius:20px;padding:9px 15px;color:var(--w);font-family:var(--mono);
-  font-size:14px;outline:none;resize:none;max-height:100px;min-height:38px;
+  border-radius:20px;padding:11px 16px;color:var(--w);font-family:var(--mono);
+  font-size:16px;outline:none;resize:none;max-height:100px;min-height:38px;
   line-height:1.5;transition:border-color .2s;scrollbar-width:none;}
 .ibox:focus{border-color:rgba(200,169,110,.25);}
 .ibox::placeholder{color:var(--w30);}
