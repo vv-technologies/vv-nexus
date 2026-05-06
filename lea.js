@@ -36,7 +36,7 @@ var PREMIUM_LIMIT = 100;
 // CEO baga URL-ul o singura data aici
 // Toti userii folosesc cheia CEO automat
 // Ei nu vad nimic, nu introduc nimic
-var VV_PROXY = localStorage.getItem('vv_proxy_url') || 'https://script.google.com/macros/s/AKfycbybXrcEOc7yXjCVwJqT_hwaOaCav8HnBEBvnSLbDvt9rdNxjWc0lH7e-JxURTe9k4QnRw/exec';
+var VV_PROXY = localStorage.getItem('vv_proxy_url') || 'https://script.google.com/macros/s/AKfycbxk2t1vLAYshmMVwxww--uJo2haL2z8mI22xPoFTK49rV98r97ao0znb25GJdfcwKPY8w/exec';
 // ──────────────────────────────────────────────────────────────
 
 // ── NAME ONBOARDING ───────────────────────────────────────────
@@ -684,10 +684,8 @@ async function emergencySearch(q, intent, city) {
   try {
     var result = null;
     if(proxy) {
-      var r = await fetch(proxy, {
-        method:'POST', headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({action:'gemini', system:urgentPrompt, contents:[{role:'user',parts:[{text:q}]}], userKey:gk})
-      });
+      var ep = new URLSearchParams({action:'gemini',system:urgentPrompt,q:q,city:city,userKey:gk||''});
+      var r = await fetch(proxy + '?' + ep.toString(), {method:'GET'});
       var d = await r.json();
       if(d.candidates && d.candidates[0] && d.candidates[0].content) result = d.candidates[0].content.parts[0].text;
     } else if(gk) {
@@ -853,19 +851,21 @@ var sysP='Ești Lea, asistentul urban VV. Caldă, directă, umană. MAX 3 propoz
   var gemP;
   if(activeProxy) {
     // Prin proxy — CEO key in spate
-    gemP = fetch(activeProxy, {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        action:'gemini',
-        system: sysP,
-        contents: contents,
-        userKey: userKey // daca userul are cheie proprie, o foloseste pe a lui
-      })
+    // GET in loc de POST — evita CORS complet
+    var proxyParams = new URLSearchParams({
+      action: 'gemini',
+      system: sysP,
+      q: q,
+      city: city,
+      userKey: userKey || '',
+      h: String(h)
+    });
+    gemP = fetch(activeProxy + '?' + proxyParams.toString(), {
+      method: 'GET'
     }).then(function(r){ return r.json(); })
       .then(function(d){
-        if(d.status==='rateLimit') return {_rateLimit:true};
-        if(d.status==='authError') return {_authError:true};
+        if(d && d.status==='rateLimit') return {_rateLimit:true};
+        if(d && d.status==='authError') return {_authError:true};
         return d;
       }).catch(function(){ return null; });
   } else if(userKey) {
