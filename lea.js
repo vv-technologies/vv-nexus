@@ -36,9 +36,7 @@ var PREMIUM_LIMIT = 100;
 // CEO baga URL-ul o singura data aici
 // Toti userii folosesc cheia CEO automat
 // Ei nu vad nimic, nu introduc nimic
-var VV_PROXY = localStorage.getItem('vv_proxy_url') || 
-  '
-                        https://script.google.com/macros/s/AKfycbybXrcEOc7yXjCVwJqT_hwaOaCav8HnBEBvnSLbDvt9rdNxjWc0lH7e-JxURTe9k4QnRw/exec'; // script.google.com/macros/s/.../exec
+var VV_PROXY = localStorage.getItem('vv_proxy_url') || 'https://script.google.com/macros/s/AKfycbybXrcEOc7yXjCVwJqT_hwaOaCav8HnBEBvnSLbDvt9rdNxjWc0lH7e-JxURTe9k4QnRw/exec';
 // ──────────────────────────────────────────────────────────────
 
 // ── NAME ONBOARDING ───────────────────────────────────────────
@@ -704,13 +702,8 @@ async function searchVVNodes(q, intent) {
 }
 
 async function processLea(q) {
-  // Prioritate: cheia personala > cheia CEO din cod
-var activeKey = localStorage.getItem('lea_gk') || CEO_GK;
-if(!activeKey || activeKey === 'PUNE_CHEIA_GEMINI_AICI'){
-  addMsg('l','Lea nu e activată încă. CEO-ul finalizează configurarea în curând.');
-  return;
-}
-_gk = activeKey;
+  var activeKey = localStorage.getItem('lea_gk') || '';
+  _gk = activeKey;
   var intent=detectIntent(q);
   if(intent==='urgenta'){
     var em='Sună 112 ACUM dacă e urgență reală. Lea e cu tine — ce s-a întâmplat?';
