@@ -28,8 +28,8 @@
       <input class="name-input" id="name-input" type="text"
         placeholder="ex: Alex, Vulpea, Cosmin..."
         maxlength="30" autocomplete="off" autocorrect="off"
-        oninput="onNameInput(this.value)"
-        onkeydown="if(event.key==='Enter')goToTerms()">
+        oninput="if(typeof onNameInput==='function')onNameInput(this.value)"
+        onkeydown="if(event.key==='Enter'&&typeof goToTerms==='function')goToTerms()">
     </div>
     <button class="a-btn" id="name-btn" onclick="goToTerms()">Continuă →</button>
     <p class="a-note">Numele rămâne doar pe device-ul tău · Zero server · Zero email</p>
@@ -179,6 +179,6 @@
 <!-- Firebase (opțional) -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js" onerror="console.log('Firebase offline')"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js" onerror="console.log('Firestore offline')"></script>
-<script src="lea.js"></script>
+<script src="lea.js" defer></script>
 </body>
 </html>
