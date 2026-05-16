@@ -229,6 +229,43 @@ html, body {
   display: flex; flex-direction: column;
 }
 
+/* ── HOME / CHAT SCREENS ──────────────────────────── */
+.home-screen {
+  flex: 1;
+  display: flex; flex-direction: column;
+  align-items: center;
+  padding: 20px 20px 16px;
+  overflow-y: auto;
+  opacity: 1;
+  transition: opacity .2s ease, transform .2s ease;
+  transform: translateY(0);
+  pointer-events: all;
+}
+.chat-screen {
+  position: absolute; inset: 0;
+  top: calc(56px + var(--safe-top));
+  display: flex; flex-direction: column;
+  opacity: 0;
+  transform: translateY(24px);
+  pointer-events: none;
+  transition: opacity .25s ease, transform .25s ease;
+}
+
+/* HOME state (default) */
+body:not(.app-chat) .home-screen { opacity: 1; transform: none; pointer-events: all; }
+body:not(.app-chat) .chat-screen { opacity: 0; transform: translateY(24px); pointer-events: none; }
+body:not(.app-chat) #tb-back     { display: none !important; }
+body:not(.app-chat) #tb-logo     { display: block; }
+
+/* CHAT state */
+body.app-chat .home-screen { opacity: 0; transform: translateY(-16px); pointer-events: none; }
+body.app-chat .chat-screen { opacity: 1; transform: none; pointer-events: all; }
+body.app-chat #tb-back     { display: flex !important; }
+body.app-chat #tb-logo     { display: none; }
+
+/* No-transition on initial load */
+body.no-transition * { transition: none !important; }
+
 /* ── TOPBAR ───────────────────────────────────────── */
 .topbar {
   display: flex; align-items: center;
@@ -236,16 +273,28 @@ html, body {
   background: rgba(0,0,0,.7);
   backdrop-filter: blur(20px);
   border-bottom: 0.5px solid var(--border);
-  flex-shrink: 0; position: relative; z-index: 2;
+  flex-shrink: 0; position: relative; z-index: 6;
 }
 .tb-logo {
   font-size: 18px; font-weight: 300;
   letter-spacing: 4px; color: var(--text);
-  min-width: 60px;
+  min-width: 80px;
   -webkit-tap-highlight-color: transparent;
   transition: opacity .15s;
 }
 .tb-logo:active { opacity: .5; }
+.tb-back {
+  display: none;
+  align-items: center; gap: 4px;
+  min-width: 80px;
+  background: none; border: none;
+  color: var(--accent); font-size: 14px;
+  font-family: var(--sans); cursor: pointer;
+  padding: 4px 0;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity .15s;
+}
+.tb-back:active { opacity: .6; }
 .tb-mid {
   flex: 1; display: flex; align-items: center;
   justify-content: center; gap: 7px;
@@ -281,20 +330,12 @@ html, body {
 .lim-fill { height: 100%; background: var(--accent); border-radius: 1px; transition: width .4s; }
 .lim-txt { display: flex; justify-content: space-between; font-size: 10px; font-family: var(--mono); color: var(--text3); }
 
-/* ── TILES OVERLAY ────────────────────────────────── */
-.tiles-overlay {
-  position: absolute;
-  top: calc(60px + var(--safe-top));
-  left: 0; right: 0; bottom: 0;
-  display: flex; flex-direction: column;
-  align-items: center;
-  padding: 20px 20px 16px;
-  z-index: 1;
-  pointer-events: all;
+/* ── HOME SCREEN (tiles) ─────────────────────────── */
+.home-screen {
   background: var(--bg);
-  overflow-y: auto;
-  gap: 0;
 }
+/* alias pentru backward compat cu JS dacă e nevoie */
+#tiles-area { gap: 0; }
 
 .tiles-time {
   font-size: 44px; font-weight: 200;
@@ -332,6 +373,38 @@ html, body {
 .tile-wide { grid-column: span 1; }
 .tile-icon { font-size: 22px; line-height: 1; }
 .tile-label { font-size: 13px; font-weight: 500; color: var(--text); }
+
+/* ── CTA BUTTON (home screen) ─────────────────────── */
+.tiles-cta {
+  width: 100%; max-width: 320px;
+  margin-bottom: 20px;
+  padding: 16px 24px;
+  border-radius: 100px;
+  border: 0.5px solid rgba(45,184,122,.3);
+  background: rgba(45,184,122,.07);
+  color: var(--text);
+  font-size: 16px; font-weight: 500;
+  font-family: var(--sans);
+  cursor: pointer;
+  display: flex; align-items: center;
+  justify-content: space-between;
+  transition: background .15s, transform .1s;
+  -webkit-tap-highlight-color: transparent;
+  box-shadow: 0 0 24px rgba(45,184,122,.06);
+}
+.tiles-cta:active { background: rgba(45,184,122,.13); transform: scale(.98); }
+.tiles-cta-icon {
+  width: 32px; height: 32px;
+  background: var(--accent); color: #000;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; font-weight: 700;
+}
+
+/* ── CHAT SCREEN ──────────────────────────────────── */
+.chat-screen {
+  background: var(--bg);
+}
 
 /* ── CONVERSATION ─────────────────────────────────── */
 .conv {
