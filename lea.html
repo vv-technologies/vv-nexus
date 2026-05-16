@@ -142,8 +142,16 @@
         <div class="tile-icon">⬡</div>
         <div class="tile-label">Misiune</div>
       </div>
+      <div class="tile" onclick="openVVMe()">
+        <div class="tile-icon">🧠</div>
+        <div class="tile-label">Eu</div>
+      </div>
+      <div class="tile tile-wide" onclick="openStudio()">
+        <div class="tile-icon">✦</div>
+        <div class="tile-label">VV Studio</div>
+      </div>
       <div class="tile" onclick="focusTile()">
-        <div class="tile-icon" style="letter-spacing:2px;font-size:18px;">···</div>
+        <div class="tile-icon" style="font-size:18px;letter-spacing:2px;">···</div>
         <div class="tile-label">Altceva</div>
       </div>
     </div>
@@ -192,6 +200,21 @@
     <button class="ss-aer" onclick="closeSett();showCardManual();" style="background:rgba(255,255,255,.03);color:rgba(255,255,255,.4);">⬡ Cardul tău VV</button>
     <button class="ss-close" onclick="closeSett()">Închide</button>
     <button class="ss-out" onclick="logout()">Resetează tot</button>
+  </div>
+</div>
+
+<!-- ── VV ME ─────────────────────────────────────────── -->
+<div id="vvme" onclick="if(event.target===this)closeVVMe()">
+  <div class="vme-sheet">
+    <div class="ss-h"></div>
+    <div class="vme-head">
+      <div class="vme-title">Mintea ta</div>
+      <div class="vme-sub" id="vme-archetype">Explorator · VV Beta</div>
+    </div>
+    <div class="vme-shelves" id="vme-shelves">
+      <!-- populate din JS -->
+    </div>
+    <button class="ss-close" onclick="closeVVMe()">Închide</button>
   </div>
 </div>
 
@@ -252,6 +275,50 @@ function focusTile() {
   hideTiles();
   var ibox = document.getElementById('ibox');
   if(ibox) { ibox.focus(); }
+}
+
+// ── VV ME ─────────────────────────────────────────
+var VV_SHELVES = [
+  { key:'lea_family',  icon:'👨‍👩‍👧', label:'Familie',    hint:'Cine contează pentru tine' },
+  { key:'lea_places',  icon:'📍', label:'Locuri',      hint:'Unde te simți acasă' },
+  { key:'lea_prefs',   icon:'✦',  label:'Preferințe',  hint:'Ce îți place, ce evitați' },
+  { key:'lea_habits',  icon:'⟳',  label:'Obiceiuri',   hint:'Rutina ta zilnică' },
+  { key:'lea_mood',    icon:'◐',  label:'Dispoziție',  hint:'Cum te simți de obicei' }
+];
+
+function openVVMe() {
+  var sheet = document.getElementById('vvme');
+  var shelves = document.getElementById('vme-shelves');
+  if(!sheet || !shelves) return;
+
+  shelves.innerHTML = '';
+  VV_SHELVES.forEach(function(s) {
+    var val = localStorage.getItem(s.key) || '';
+    var div = document.createElement('div');
+    div.className = 'vme-shelf' + (val ? '' : ' vme-empty');
+    div.innerHTML =
+      '<div class="vme-shelf-head">' +
+        '<span class="vme-si">' + s.icon + '</span>' +
+        '<div><div class="vme-sl">' + s.label + '</div>' +
+        '<div class="vme-sh">' + s.hint + '</div></div>' +
+      '</div>' +
+      '<div class="vme-sv">' + (val ? val.slice(0,120) + (val.length>120?'…':'') : 'Lea nu știe încă · vorbește cu ea') + '</div>';
+    shelves.appendChild(div);
+  });
+
+  sheet.style.display = 'flex';
+  setTimeout(function() { sheet.classList.add('on'); }, 10);
+}
+
+function closeVVMe() {
+  var sheet = document.getElementById('vvme');
+  if(!sheet) return;
+  sheet.classList.remove('on');
+  setTimeout(function() { sheet.style.display = 'none'; }, 300);
+}
+
+function openStudio() {
+  window.location.href = 'vv-studios.html';
 }
 </script>
 
