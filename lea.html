@@ -109,7 +109,9 @@
 
   <!-- TOPBAR -->
   <div class="topbar">
-    <div class="tb-logo" onclick="showTiles()" style="cursor:pointer;">Lea</div>
+    <!-- Chat state: back button | Home state: logo -->
+    <button class="tb-back" id="tb-back" onclick="enterHome()">← Înapoi</button>
+    <div class="tb-logo" id="tb-logo">Lea</div>
     <div class="tb-mid">
       <div class="tb-dot"></div>
       <div class="tb-city" id="tb-city">—</div>
@@ -120,16 +122,18 @@
     </div>
   </div>
 
-  <!-- LIMIT BAR (ascuns — funcțional în JS) -->
-  <div class="lim" style="display:none;">
-    <div class="lim-bar"><div class="lim-fill" id="lim-fill" style="width:0%"></div></div>
-    <div class="lim-txt"><span id="lim-lbl">0/20 azi</span><span>Beta</span></div>
-  </div>
-
-  <!-- TILES OVERLAY (vizibil la start, dispare când chat pornește) -->
-  <div class="tiles-overlay" id="tiles-area">
+  <!-- HOME SCREEN (tiles) -->
+  <div class="home-screen" id="tiles-area">
     <div class="tiles-time" id="time-display">—</div>
     <div class="tiles-mood" id="mood-display">Zona ta · VV Beta</div>
+
+    <!-- CTA: intrare în chat -->
+    <button class="tiles-cta" onclick="enterChat()">
+      <span>Vorbește cu Lea</span>
+      <span class="tiles-cta-icon">↑</span>
+    </button>
+
+    <!-- Shortcuts -->
     <div class="tiles-grid">
       <div class="tile" onclick="tileAsk('Unde mănânc ceva bun acum în zona mea?')">
         <div class="tile-icon">🍕</div>
@@ -147,43 +151,49 @@
         <div class="tile-icon">🧠</div>
         <div class="tile-label">Eu</div>
       </div>
-      <div class="tile tile-wide" onclick="openStudio()">
+      <div class="tile" onclick="openStudio()">
         <div class="tile-icon">✦</div>
         <div class="tile-label">VV Studio</div>
       </div>
-      <div class="tile" onclick="focusTile()">
+      <div class="tile" onclick="enterChat()">
         <div class="tile-icon" style="font-size:18px;letter-spacing:2px;">···</div>
         <div class="tile-label">Altceva</div>
       </div>
     </div>
   </div>
 
-  <!-- CONVERSATIE -->
-  <div class="conv" id="conv">
-    <div class="idle" id="idle">
-      <div class="idle-l">L</div>
-      <div class="idle-t" id="idle-t">Sunt Lea.<br>Ce vrei să știi?</div>
-      <div class="idle-c" id="idle-c"></div>
+  <!-- CHAT SCREEN -->
+  <div class="chat-screen" id="chat-screen">
+    <div class="conv" id="conv">
+      <div class="idle" id="idle">
+        <div class="idle-l">L</div>
+        <div class="idle-t" id="idle-t">Sunt Lea.<br>Ce vrei să știi?</div>
+        <div class="idle-c" id="idle-c"></div>
+      </div>
+      <div class="vvis" id="vvis">
+        <div class="vb"></div><div class="vb"></div><div class="vb"></div>
+        <div class="vb"></div><div class="vb"></div><div class="vb"></div><div class="vb"></div>
+      </div>
     </div>
-    <div class="vvis" id="vvis">
-      <div class="vb"></div><div class="vb"></div><div class="vb"></div>
-      <div class="vb"></div><div class="vb"></div><div class="vb"></div><div class="vb"></div>
+    <div class="inp-area">
+      <div class="sugs" id="sugs"></div>
+      <div class="inp-row">
+        <textarea class="ibox" id="ibox" placeholder="Întreabă-o pe Lea..." rows="1"
+          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();send();}"
+          oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px';"></textarea>
+        <button class="mic-b" id="mic-b"
+          onclick="startMic(event)"
+          oncontextmenu="return false;"
+          style="touch-action:manipulation;">🎙</button>
+        <button class="send-b" onclick="send()">↑</button>
+      </div>
     </div>
   </div>
 
-  <!-- INPUT -->
-  <div class="inp-area">
-    <div class="sugs" id="sugs"></div>
-    <div class="inp-row">
-      <textarea class="ibox" id="ibox" placeholder="Întreabă-o pe Lea..." rows="1"
-        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();send();}"
-        oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px';hideTiles();"></textarea>
-      <button class="mic-b" id="mic-b"
-        onclick="startMic(event)"
-        oncontextmenu="return false;"
-        style="touch-action:manipulation;">🎙</button>
-      <button class="send-b" onclick="send()">↑</button>
-    </div>
+  <!-- LIMIT BAR (funcțional în JS) -->
+  <div class="lim" style="display:none;">
+    <div class="lim-bar"><div class="lim-fill" id="lim-fill" style="width:0%"></div></div>
+    <div class="lim-txt"><span id="lim-lbl">0/20 azi</span><span>Beta</span></div>
   </div>
 
 </div>
@@ -250,17 +260,12 @@ var _isMobile = /Android|iPhone|iPod|webOS|BlackBerry|IEMobile|Opera Mini/i.test
 var _deviceType = _isMobile ? 'mobile' : 'desktop';
 document.body.classList.add('dev-' + _deviceType);
 localStorage.setItem('lea_device', _deviceType);
-
-// Badge în topbar
 (function() {
-  var badge = document.getElementById('dev-badge');
-  if(badge) {
-    badge.textContent = _isMobile ? 'Companion' : 'Acasă';
-    badge.style.display = 'inline';
-  }
+  var b = document.getElementById('dev-badge');
+  if(b) { b.textContent = _isMobile ? 'Companion' : 'Acasă'; b.style.display = 'inline'; }
 })();
 
-// Pre-check toate bifele automat
+// Pre-check checkboxes
 setTimeout(function() {
   try { if(typeof ck === 'function') { ck(0); ck(1); ck(2); } } catch(e) {}
 }, 300);
@@ -273,44 +278,39 @@ function updateClock() {
 setInterval(updateClock, 1000);
 updateClock();
 
-// Tiles — ascunde dacă există istoric de mesaje
+// ── APP STATE: home ↔ chat ─────────────────────────
+var _appState = 'home';
+
+function enterChat() {
+  if(_appState === 'chat') return;
+  _appState = 'chat';
+  document.body.classList.add('app-chat');
+  var ibox = document.getElementById('ibox');
+  if(ibox) setTimeout(function(){ ibox.focus(); }, 250);
+}
+
+function enterHome() {
+  _appState = 'home';
+  document.body.classList.remove('app-chat');
+  var ibox = document.getElementById('ibox');
+  if(ibox) { ibox.value = ''; ibox.style.height = 'auto'; ibox.blur(); }
+}
+
+// Dacă există istoric → intră direct în chat fără animație
 setTimeout(function() {
-  var msgs = document.querySelectorAll('#conv .msg');
-  if(msgs.length > 0) {
-    var t = document.getElementById('tiles-area');
-    if(t) { t.style.display = 'none'; t.style.opacity = '0'; t.style.pointerEvents = 'none'; }
+  if(document.querySelectorAll('#conv .msg').length > 0) {
+    _appState = 'chat';
+    document.body.classList.add('app-chat', 'no-transition');
+    setTimeout(function(){ document.body.classList.remove('no-transition'); }, 50);
   }
 }, 900);
 
-function showTiles() {
-  var t = document.getElementById('tiles-area');
-  if(!t) return;
-  t.style.display = 'flex';
-  t.style.pointerEvents = 'all';
-  t.style.opacity = '0';
-  t.style.transition = 'opacity .25s';
-  setTimeout(function() { t.style.opacity = '1'; }, 20);
-}
-
-function hideTiles() {
-  var t = document.getElementById('tiles-area');
-  if(!t || t.style.display === 'none') return;
-  t.style.transition = 'opacity .25s';
-  t.style.opacity = '0';
-  t.style.pointerEvents = 'none';
-  setTimeout(function() { t.style.display = 'none'; }, 260);
-}
-
+// Shortcut tiles → chat + trimite
 function tileAsk(q) {
-  hideTiles();
+  enterChat();
   var ibox = document.getElementById('ibox');
   if(ibox) ibox.value = q;
-  setTimeout(function() { if(typeof send === 'function') send(); }, 60);
-}
-function focusTile() {
-  hideTiles();
-  var ibox = document.getElementById('ibox');
-  if(ibox) { ibox.focus(); }
+  setTimeout(function() { if(typeof send === 'function') send(); }, 200);
 }
 
 // ── VV ME ─────────────────────────────────────────
@@ -326,40 +326,35 @@ function openVVMe() {
   var sheet = document.getElementById('vvme');
   var shelves = document.getElementById('vme-shelves');
   if(!sheet || !shelves) return;
-
   shelves.innerHTML = '';
   VV_SHELVES.forEach(function(s) {
     var val = localStorage.getItem(s.key) || '';
     var div = document.createElement('div');
     div.className = 'vme-shelf' + (val ? '' : ' vme-empty');
     div.innerHTML =
-      '<div class="vme-shelf-head">' +
-        '<span class="vme-si">' + s.icon + '</span>' +
-        '<div><div class="vme-sl">' + s.label + '</div>' +
-        '<div class="vme-sh">' + s.hint + '</div></div>' +
-      '</div>' +
-      '<div class="vme-sv">' + (val ? val.slice(0,120) + (val.length>120?'…':'') : 'Lea nu știe încă · vorbește cu ea') + '</div>';
+      '<div class="vme-shelf-head"><span class="vme-si">' + s.icon + '</span>' +
+      '<div><div class="vme-sl">' + s.label + '</div><div class="vme-sh">' + s.hint + '</div></div></div>' +
+      '<div class="vme-sv">' + (val ? val.slice(0,120)+(val.length>120?'…':'') : 'Lea nu știe încă · vorbește cu ea') + '</div>';
     shelves.appendChild(div);
   });
-
   sheet.style.display = 'flex';
-  setTimeout(function() { sheet.classList.add('on'); }, 10);
+  setTimeout(function(){ sheet.classList.add('on'); }, 10);
 }
-
 function closeVVMe() {
-  var sheet = document.getElementById('vvme');
-  if(!sheet) return;
-  sheet.classList.remove('on');
-  setTimeout(function() { sheet.style.display = 'none'; }, 300);
+  var s = document.getElementById('vvme');
+  if(!s) return;
+  s.classList.remove('on');
+  setTimeout(function(){ s.style.display = 'none'; }, 300);
 }
 
+// ── VV STUDIO ─────────────────────────────────────
 function openStudio() {
   if(_isMobile) {
     var el = document.getElementById('studio-mini');
     if(!el) return;
     buildStudioMini();
     el.style.display = 'flex';
-    setTimeout(function() { el.classList.add('on'); }, 10);
+    setTimeout(function(){ el.classList.add('on'); }, 10);
   } else {
     window.location.href = 'vv-studios.html';
   }
@@ -368,7 +363,7 @@ function closeStudioMini() {
   var el = document.getElementById('studio-mini');
   if(!el) return;
   el.classList.remove('on');
-  setTimeout(function() { el.style.display = 'none'; }, 300);
+  setTimeout(function(){ el.style.display='none'; }, 300);
 }
 function buildStudioMini() {
   var archetype = localStorage.getItem('lea_archetype') || 'Explorer';
@@ -381,7 +376,7 @@ function buildStudioMini() {
     ? notes.slice(-3).reverse().map(function(n){
         return '<div class="studio-note-item">' + n.text.slice(0,80) + '</div>';
       }).join('')
-    : '<div style="color:var(--text3);font-size:13px;font-family:var(--mono);padding:12px 0;">Nicio notă încă · Scrie prima ta idee</div>';
+    : '<div style="color:var(--text3);font-size:13px;font-family:var(--mono);padding:12px 0;">Nicio notă · Scrie prima ta idee</div>';
 }
 function studioNote() {
   var txt = prompt('Notă rapidă:');
@@ -394,10 +389,10 @@ function studioNote() {
 }
 function studioAsk(q) {
   closeStudioMini();
-  hideTiles();
+  enterChat();
   var ibox = document.getElementById('ibox');
   if(ibox) ibox.value = q;
-  setTimeout(function() { if(typeof send === 'function') send(); }, 80);
+  setTimeout(function(){ if(typeof send === 'function') send(); }, 200);
 }
 </script>
 
