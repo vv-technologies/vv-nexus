@@ -5,92 +5,77 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#000">
 <title>Lea</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;1,300;1,400&family=Geist+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="lea.css">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⬡</text></svg>">
 </head>
 <body>
+
 <div id="amb"></div>
 <div id="toast"></div>
 
-<!-- ONBOARDING — NAME FIRST -->
+<!-- ── ONBOARDING ─────────────────────────────────────── -->
 <div class="sc on" id="s-accord">
-  <div class="a-logo">Lea</div>
-  <div class="a-sub">VV · Ecosistemul tău personal</div>
 
   <!-- STEP 1: Numele -->
-  <div id="step-name" style="width:100%;max-width:320px;display:flex;flex-direction:column;align-items:center;">
-    <p class="a-desc">Cum vrei să te știe Lea?<br>Orice nume. Al tău sau unul ales de tine.</p>
-    <div class="name-wrap">
-      <span class="name-label">Numele tău</span>
-      <input class="name-input" id="name-input" type="text"
-        placeholder="ex: Alex, Vulpea, Cosmin..."
-        maxlength="30" autocomplete="off" autocorrect="off"
-        oninput="if(typeof onNameInput==='function')onNameInput(this.value)"
-        onkeydown="if(event.key==='Enter'&&typeof goToTerms==='function')goToTerms()">
-    </div>
-    <button class="a-btn" id="name-btn" onclick="goToTerms()">Continuă →</button>
-    <p class="a-note">Numele rămâne doar pe device-ul tău · Zero server · Zero email</p>
+  <div id="step-name" style="width:100%;max-width:300px;display:flex;flex-direction:column;align-items:center;">
+    <div class="ob-logo">Lea</div>
+    <p class="ob-q">Cum vrei să te știe Lea?</p>
+    <input class="name-input" id="name-input" type="text"
+      placeholder="Numele tău..."
+      maxlength="30" autocomplete="off" autocorrect="off" spellcheck="false"
+      oninput="if(typeof onNameInput==='function')onNameInput(this.value)"
+      onkeydown="if(event.key==='Enter'&&typeof goToTerms==='function')goToTerms()">
+    <button class="btn-primary" id="name-btn" onclick="goToTerms()">Continuă</button>
+    <p class="ob-note">Rămâne doar pe device-ul tău · Zero server · Zero email</p>
   </div>
 
-  <!-- STEP 2: Termeni -->
-  <div id="step-terms" style="width:100%;max-width:320px;display:none;flex-direction:column;align-items:center;">
-    <p class="a-desc" id="terms-greeting">Bine ai venit.</p>
-    <div class="checks">
-      <div class="ck" id="ck0" onclick="ck(0)">
-        <div class="ck-box" id="ckb0">✓</div>
-        <div class="ck-text"><b>Accept VV Charter.</b> Datele mele rămân local. Zero email, zero parolă.</div>
-      </div>
-      <div class="ck" id="ck1" onclick="ck(1)">
-        <div class="ck-box" id="ckb1">✓</div>
-        <div class="ck-text"><b>Confirm că am 18 ani</b> și accesez o platformă Beta.</div>
-      </div>
-      <div class="ck" id="ck2" onclick="ck(2)">
-        <div class="ck-box" id="ckb2">✓</div>
-        <div class="ck-text"><b>Accept că Lea învață din mine</b> — anonim, local, pentru mine.</div>
-      </div>
+  <!-- STEP 2: Acord (checkboxes ascunse, pre-acceptate automat) -->
+  <div id="step-terms" style="width:100%;max-width:300px;display:none;flex-direction:column;align-items:center;">
+    <div class="ob-logo" style="font-size:28px;margin-bottom:12px;">⬡</div>
+    <p class="ob-q" id="terms-greeting" style="margin-bottom:16px;">Bine ai venit.</p>
+    <p class="ob-note" style="margin-bottom:28px;color:rgba(255,255,255,0.35);font-size:12px;line-height:1.7;text-align:center;">
+      Prin continuare accepți VV Charter și confirmi că ai 18 ani.<br>Datele tale rămân local pe device.
+    </p>
+    <!-- Checkboxe ascunse — pre-checked din JS -->
+    <div id="checks-hidden" style="display:none;">
+      <div class="ck" id="ck0" onclick="ck(0)"><div class="ck-box" id="ckb0">✓</div><div class="ck-text">Charter</div></div>
+      <div class="ck" id="ck1" onclick="ck(1)"><div class="ck-box" id="ckb1">✓</div><div class="ck-text">18 ani</div></div>
+      <div class="ck" id="ck2" onclick="ck(2)"><div class="ck-box" id="ckb2">✓</div><div class="ck-text">Învăț</div></div>
     </div>
-    <button class="a-btn" id="a-btn" onclick="acceptAccord()">Intru în Lea →</button>
-    <p class="a-note">VV ID generat automat · Invizibil · Doar pe device-ul tău</p>
+    <button class="btn-primary on" id="a-btn" onclick="acceptAccord()">Intru în Lea</button>
+    <p class="ob-note">VV ID generat automat · Anonim · Invizibil</p>
   </div>
+
 </div>
 
-<!-- RECOGNITION -->
+<!-- ── RECOGNITION ────────────────────────────────────── -->
 <div class="sc" id="s-rec">
-  <div class="r-orb"><div class="r-l">L</div></div>
-  <div class="r-s" id="r-s">Se sincronizează...</div>
-  <div class="r-n" id="r-n"></div>
+  <div class="rec-orb"><div class="rec-l">L</div></div>
+  <div class="rec-status" id="r-s">Se sincronizează...</div>
+  <div class="rec-name" id="r-n"></div>
 </div>
 
-<!-- VV AER -->
-<div class="sc" id="s-aer">
-  <h2 class="aer-t">VV <em>Aer</em></h2>
-  <p class="aer-s">Sincronizează identitatea între device-uri. Fără coduri. Fără scanat.</p>
+<!-- ── VV AER (accesat din setări, nu din onboarding) ── -->
+<div class="sc" id="s-aer" style="display:none;">
+  <div class="ob-logo" style="font-size:24px;letter-spacing:2px;margin-bottom:6px;">◎ VV Aer</div>
+  <p class="ob-note" style="margin-bottom:32px;">Sincronizează identitatea între device-uri</p>
   <div class="aer-orb" id="aer-orb">
     <div class="aer-icon">◎</div>
     <div class="aer-lbl" id="aer-lbl">Apasă</div>
   </div>
   <div class="aer-msg" id="aer-msg"></div>
-  <div class="aer-acts">
-    <button class="aer-send" onclick="aerSend()">Trimite identitatea mea</button>
-    <button class="aer-recv" onclick="aerRecv()">Primesc de pe alt device</button>
+  <div style="display:flex;gap:10px;margin-top:24px;width:100%;max-width:280px;">
+    <button class="btn-secondary" onclick="aerSend()">Trimite</button>
+    <button class="btn-secondary" onclick="aerRecv()">Primesc</button>
   </div>
-  <button onclick="startVoiceSync()" style="
-    margin-top:12px;padding:11px 24px;
-    background:rgba(45,184,122,.1);
-    border:0.5px solid rgba(45,184,122,.3);
-    border-radius:100px;color:rgba(45,184,122,.9);
-    font-family:var(--mono);font-size:12px;cursor:pointer;
-    letter-spacing:1px;display:flex;align-items:center;gap:8px;">
-    🎙 Conectează prin voce <span style="font-size:9px;opacity:.6;">experimental</span>
-  </button>
-  <button class="aer-skip" onclick="skipAer()">Nu acum · Continuu</button>
+  <button class="btn-ghost" onclick="skipAer()">Închide</button>
 </div>
 
-<!-- ONBOARDING -->
-<div class="sc" id="s-ob">
+<!-- ── ONBOARDING SLIDES (bypass direct) ─────────────── -->
+<div class="sc" id="s-ob" style="display:none;">
   <div class="ob-wrap">
     <div class="ob-slides">
       <div class="ob-sl on" id="ob0">
@@ -106,7 +91,7 @@
       <div class="ob-sl" id="ob2">
         <div class="ob-ic">🎙</div>
         <div class="ob-ti">Lea vorbește.</div>
-        <div class="ob-de">Scrie sau vorbește. Lea răspunde cu vocea fondatorului VV.</div>
+        <div class="ob-de">Scrie sau vorbește. Lea răspunde instant.</div>
       </div>
     </div>
     <div class="ob-dots">
@@ -114,25 +99,57 @@
       <div class="ob-d" id="od1"></div>
       <div class="ob-d" id="od2"></div>
     </div>
-    <button class="ob-nx" id="ob-nx" onclick="nextOb()">Continuă →</button>
-    <button class="ob-sk" onclick="finishOb()">Sari · Intru direct</button>
+    <button class="btn-primary on" id="ob-nx" onclick="nextOb()">Continuă</button>
+    <button class="btn-ghost" onclick="finishOb()">Sari · Intru direct</button>
   </div>
 </div>
 
-<!-- APP -->
+<!-- ── APP ────────────────────────────────────────────── -->
 <div id="app">
+
+  <!-- TOPBAR -->
   <div class="topbar">
     <div class="tb-logo">Lea</div>
-    <div class="tb-mid"><div class="tb-dot"></div><div class="tb-city" id="tb-city">—</div></div>
+    <div class="tb-mid">
+      <div class="tb-dot"></div>
+      <div class="tb-city" id="tb-city">—</div>
+    </div>
     <div class="tb-r">
-      <button class="tb-btn" onclick="showAer()" title="VV Aer">◎</button>
       <button class="tb-btn" onclick="openSett()">⚙</button>
     </div>
   </div>
-  <div class="lim">
+
+  <!-- LIMIT BAR (ascuns — funcțional în JS) -->
+  <div class="lim" style="display:none;">
     <div class="lim-bar"><div class="lim-fill" id="lim-fill" style="width:0%"></div></div>
-    <div class="lim-txt"><span id="lim-lbl">0/20 azi</span><span>Beta · VV Lea</span></div>
+    <div class="lim-txt"><span id="lim-lbl">0/20 azi</span><span>Beta</span></div>
   </div>
+
+  <!-- TILES OVERLAY (vizibil la start, dispare când chat pornește) -->
+  <div class="tiles-overlay" id="tiles-area">
+    <div class="tiles-time" id="time-display">—</div>
+    <div class="tiles-mood" id="mood-display">Zona ta · VV Beta</div>
+    <div class="tiles-grid">
+      <div class="tile" onclick="tileAsk('Unde mănânc ceva bun acum în zona mea?')">
+        <div class="tile-icon">🍕</div>
+        <div class="tile-label">Mâncare</div>
+      </div>
+      <div class="tile" onclick="tileAsk('Unde beau o cafea bună acum?')">
+        <div class="tile-icon">☕</div>
+        <div class="tile-label">Cafea</div>
+      </div>
+      <div class="tile" onclick="tileAsk('Ce misiuni VV active sunt în zona mea?')">
+        <div class="tile-icon">⬡</div>
+        <div class="tile-label">Misiune</div>
+      </div>
+      <div class="tile" onclick="focusTile()">
+        <div class="tile-icon" style="letter-spacing:2px;font-size:18px;">···</div>
+        <div class="tile-label">Altceva</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONVERSATIE -->
   <div class="conv" id="conv">
     <div class="idle" id="idle">
       <div class="idle-l">L</div>
@@ -144,12 +161,14 @@
       <div class="vb"></div><div class="vb"></div><div class="vb"></div><div class="vb"></div>
     </div>
   </div>
+
+  <!-- INPUT -->
   <div class="inp-area">
     <div class="sugs" id="sugs"></div>
     <div class="inp-row">
       <textarea class="ibox" id="ibox" placeholder="Întreabă-o pe Lea..." rows="1"
         onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();send();}"
-        oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px'"></textarea>
+        oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px';hideTiles();"></textarea>
       <button class="mic-b" id="mic-b"
         onclick="startMic(event)"
         oncontextmenu="return false;"
@@ -157,28 +176,65 @@
       <button class="send-b" onclick="send()">↑</button>
     </div>
   </div>
+
 </div>
 
-<!-- SETTINGS -->
+<!-- ── SETTINGS ────────────────────────────────────────── -->
 <div id="sett" onclick="if(event.target===this)closeSett()">
   <div class="ss">
     <div class="ss-h"></div>
-    <div class="ss-title">Setări Lea</div>
+    <div class="ss-title">Setări</div>
     <div class="ss-row"><span class="ss-l">VV ID</span><span class="ss-v" id="ss-id">—</span></div>
     <div class="ss-row"><span class="ss-l">Rang</span><span class="ss-v" id="ss-rang">—</span></div>
-    <div class="ss-row"><span class="ss-l">Oraș curent</span><span class="ss-v" id="ss-city">—</span></div>
+    <div class="ss-row"><span class="ss-l">Oraș</span><span class="ss-v" id="ss-city">—</span></div>
     <div class="ss-row"><span class="ss-l">Voce Lea</span><button class="ss-b" onclick="cfgVoice()">Configurează</button></div>
-    <button class="ss-aer" onclick="window.location.href='vv-studios.html'" style="margin-bottom:6px;">📝 VV Studio · Spațiul tău personal</button>
-    <button class="ss-aer" onclick="showAer()">◎ VV Aer · Sync device nou</button>
-    <button class="ss-aer" onclick="closeSett();showCardManual()" style="background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.1);color:rgba(255,255,255,.5);">⬡ Vezi cardul tău VV</button>
+    <button class="ss-aer" onclick="showAer()">◎ VV Aer · Sincronizare device</button>
+    <button class="ss-aer" onclick="closeSett();showCardManual();" style="background:rgba(255,255,255,.03);color:rgba(255,255,255,.4);">⬡ Cardul tău VV</button>
     <button class="ss-close" onclick="closeSett()">Închide</button>
-    <button class="ss-out" onclick="logout()">Deconectare · Resetează</button>
+    <button class="ss-out" onclick="logout()">Resetează tot</button>
   </div>
 </div>
 
-<!-- Firebase (opțional) -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js" onerror="console.log('Firebase offline')"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js" onerror="console.log('Firestore offline')"></script>
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js" onerror="console.log('[Lea] offline')"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js" onerror="console.log('[Lea] offline')"></script>
 <script src="lea.js" defer></script>
+
+<script>
+// Pre-check toate bifele automat (user vede un singur buton curat)
+setTimeout(function() {
+  try { if(typeof ck === 'function') { ck(0); ck(1); ck(2); } } catch(e) {}
+}, 300);
+
+// Ceas live
+function updateClock() {
+  var el = document.getElementById('time-display');
+  if(el) el.textContent = new Date().toLocaleTimeString('ro-RO', {hour:'2-digit',minute:'2-digit'});
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// Tiles
+function tileAsk(q) {
+  hideTiles();
+  var ibox = document.getElementById('ibox');
+  if(ibox) ibox.value = q;
+  setTimeout(function() { if(typeof send === 'function') send(); }, 60);
+}
+function focusTile() {
+  hideTiles();
+  var ibox = document.getElementById('ibox');
+  if(ibox) { ibox.focus(); }
+}
+function hideTiles() {
+  var t = document.getElementById('tiles-area');
+  if(!t || t.style.display === 'none') return;
+  t.style.transition = 'opacity .25s';
+  t.style.opacity = '0';
+  t.style.pointerEvents = 'none';
+  setTimeout(function() { t.style.display = 'none'; }, 260);
+}
+</script>
+
 </body>
 </html>
