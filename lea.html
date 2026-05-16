@@ -113,6 +113,7 @@
     <div class="tb-mid">
       <div class="tb-dot"></div>
       <div class="tb-city" id="tb-city">—</div>
+      <span class="dev-badge" id="dev-badge" style="display:none;"></span>
     </div>
     <div class="tb-r">
       <button class="tb-btn" onclick="openSett()">⚙</button>
@@ -218,12 +219,47 @@
   </div>
 </div>
 
+<!-- ── VV STUDIO MINI (mobile only) ──────────────────── -->
+<div id="studio-mini" onclick="if(event.target===this)closeStudioMini()" style="display:none;">
+  <div class="vme-sheet">
+    <div class="ss-h"></div>
+    <div class="vme-head">
+      <div class="vme-title">✦ VV Studio</div>
+      <div class="vme-sub" id="studio-mini-sub">Explorer · Mobile Studio</div>
+    </div>
+    <div style="display:flex;gap:8px;padding:16px 20px;flex-wrap:wrap;">
+      <button class="studio-act-btn" onclick="studioNote()">📝 Notă rapidă</button>
+      <button class="studio-act-btn" onclick="studioAsk('Cum mă simt azi și ce ar trebui să fac?')">◐ Starea mea</button>
+      <button class="studio-act-btn" onclick="studioAsk('Ce ar trebui să prioritizez azi?')">⬡ Sarcini azi</button>
+    </div>
+    <div style="padding:0 20px 4px;font-size:11px;font-family:var(--mono);color:var(--text3);letter-spacing:.5px;">NOTELE TALE</div>
+    <div id="studio-recent" style="padding:0 20px 8px;"></div>
+    <button class="ss-close" onclick="closeStudioMini()">Închide</button>
+  </div>
+</div>
+
 <!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js" onerror="console.log('[Lea] offline')"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js" onerror="console.log('[Lea] offline')"></script>
 <script src="lea.js" defer></script>
 
 <script>
+// ── DEVICE DETECTION ──────────────────────────────
+var _isMobile = /Android|iPhone|iPod|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+                || (window.innerWidth <= 820 && ('ontouchstart' in window || navigator.maxTouchPoints > 0));
+var _deviceType = _isMobile ? 'mobile' : 'desktop';
+document.body.classList.add('dev-' + _deviceType);
+localStorage.setItem('lea_device', _deviceType);
+
+// Badge în topbar
+(function() {
+  var badge = document.getElementById('dev-badge');
+  if(badge) {
+    badge.textContent = _isMobile ? 'Companion' : 'Acasă';
+    badge.style.display = 'inline';
+  }
+})();
+
 // Pre-check toate bifele automat
 setTimeout(function() {
   try { if(typeof ck === 'function') { ck(0); ck(1); ck(2); } } catch(e) {}
@@ -318,7 +354,50 @@ function closeVVMe() {
 }
 
 function openStudio() {
-  window.location.href = 'vv-studios.html';
+  if(_isMobile) {
+    var el = document.getElementById('studio-mini');
+    if(!el) return;
+    buildStudioMini();
+    el.style.display = 'flex';
+    setTimeout(function() { el.classList.add('on'); }, 10);
+  } else {
+    window.location.href = 'vv-studios.html';
+  }
+}
+function closeStudioMini() {
+  var el = document.getElementById('studio-mini');
+  if(!el) return;
+  el.classList.remove('on');
+  setTimeout(function() { el.style.display = 'none'; }, 300);
+}
+function buildStudioMini() {
+  var archetype = localStorage.getItem('lea_archetype') || 'Explorer';
+  var sub = document.getElementById('studio-mini-sub');
+  if(sub) sub.textContent = archetype + ' · Mobile Studio';
+  var recent = document.getElementById('studio-recent');
+  if(!recent) return;
+  var notes = JSON.parse(localStorage.getItem('lea_studio_notes') || '[]');
+  recent.innerHTML = notes.length
+    ? notes.slice(-3).reverse().map(function(n){
+        return '<div class="studio-note-item">' + n.text.slice(0,80) + '</div>';
+      }).join('')
+    : '<div style="color:var(--text3);font-size:13px;font-family:var(--mono);padding:12px 0;">Nicio notă încă · Scrie prima ta idee</div>';
+}
+function studioNote() {
+  var txt = prompt('Notă rapidă:');
+  if(!txt || !txt.trim()) return;
+  var notes = JSON.parse(localStorage.getItem('lea_studio_notes') || '[]');
+  notes.push({ text: txt.trim(), ts: Date.now() });
+  localStorage.setItem('lea_studio_notes', JSON.stringify(notes));
+  buildStudioMini();
+  if(typeof showToast === 'function') showToast('Notă salvată ✓');
+}
+function studioAsk(q) {
+  closeStudioMini();
+  hideTiles();
+  var ibox = document.getElementById('ibox');
+  if(ibox) ibox.value = q;
+  setTimeout(function() { if(typeof send === 'function') send(); }, 80);
 }
 </script>
 
