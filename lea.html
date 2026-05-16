@@ -109,7 +109,7 @@
 
   <!-- TOPBAR -->
   <div class="topbar">
-    <div class="tb-logo">Lea</div>
+    <div class="tb-logo" onclick="showTiles()" style="cursor:pointer;">Lea</div>
     <div class="tb-mid">
       <div class="tb-dot"></div>
       <div class="tb-city" id="tb-city">—</div>
@@ -201,7 +201,7 @@
 <script src="lea.js" defer></script>
 
 <script>
-// Pre-check toate bifele automat (user vede un singur buton curat)
+// Pre-check toate bifele automat
 setTimeout(function() {
   try { if(typeof ck === 'function') { ck(0); ck(1); ck(2); } } catch(e) {}
 }, 300);
@@ -214,19 +214,34 @@ function updateClock() {
 setInterval(updateClock, 1000);
 updateClock();
 
-// Auto-hide tiles when Lea sends first message into #conv
-(function() {
-  var conv = document.getElementById('conv');
-  if (!conv) return;
-  var obs = new MutationObserver(function(muts) {
-    for (var m of muts) {
-      if (m.addedNodes.length) { hideTiles(); obs.disconnect(); break; }
-    }
-  });
-  obs.observe(conv, { childList: true });
-})();
+// Tiles — ascunde dacă există istoric de mesaje
+setTimeout(function() {
+  var msgs = document.querySelectorAll('#conv .msg');
+  if(msgs.length > 0) {
+    var t = document.getElementById('tiles-area');
+    if(t) { t.style.display = 'none'; t.style.opacity = '0'; t.style.pointerEvents = 'none'; }
+  }
+}, 900);
 
-// Tiles
+function showTiles() {
+  var t = document.getElementById('tiles-area');
+  if(!t) return;
+  t.style.display = 'flex';
+  t.style.pointerEvents = 'all';
+  t.style.opacity = '0';
+  t.style.transition = 'opacity .25s';
+  setTimeout(function() { t.style.opacity = '1'; }, 20);
+}
+
+function hideTiles() {
+  var t = document.getElementById('tiles-area');
+  if(!t || t.style.display === 'none') return;
+  t.style.transition = 'opacity .25s';
+  t.style.opacity = '0';
+  t.style.pointerEvents = 'none';
+  setTimeout(function() { t.style.display = 'none'; }, 260);
+}
+
 function tileAsk(q) {
   hideTiles();
   var ibox = document.getElementById('ibox');
@@ -237,14 +252,6 @@ function focusTile() {
   hideTiles();
   var ibox = document.getElementById('ibox');
   if(ibox) { ibox.focus(); }
-}
-function hideTiles() {
-  var t = document.getElementById('tiles-area');
-  if(!t || t.style.display === 'none') return;
-  t.style.transition = 'opacity .25s';
-  t.style.opacity = '0';
-  t.style.pointerEvents = 'none';
-  setTimeout(function() { t.style.display = 'none'; }, 260);
 }
 </script>
 
