@@ -214,6 +214,18 @@ function updateClock() {
 setInterval(updateClock, 1000);
 updateClock();
 
+// Auto-hide tiles when Lea sends first message into #conv
+(function() {
+  var conv = document.getElementById('conv');
+  if (!conv) return;
+  var obs = new MutationObserver(function(muts) {
+    for (var m of muts) {
+      if (m.addedNodes.length) { hideTiles(); obs.disconnect(); break; }
+    }
+  });
+  obs.observe(conv, { childList: true });
+})();
+
 // Tiles
 function tileAsk(q) {
   hideTiles();
