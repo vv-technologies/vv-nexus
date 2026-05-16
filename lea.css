@@ -230,41 +230,29 @@ html, body {
 }
 
 /* ── HOME / CHAT SCREENS ──────────────────────────── */
-.home-screen {
-  flex: 1;
-  display: flex; flex-direction: column;
-  align-items: center;
-  padding: 20px 20px 16px;
-  overflow-y: auto;
-  opacity: 1;
-  transition: opacity .2s ease, transform .2s ease;
-  transform: translateY(0);
-  pointer-events: all;
-}
-.chat-screen {
-  position: absolute; inset: 0;
+.home-screen, .chat-screen {
+  position: absolute;
   top: calc(56px + var(--safe-top));
+  left: 0; right: 0; bottom: 0;
+  background: var(--bg);
   display: flex; flex-direction: column;
-  opacity: 0;
-  transform: translateY(24px);
-  pointer-events: none;
-  transition: opacity .25s ease, transform .25s ease;
 }
+.home-screen {
+  align-items: center;
+  overflow-y: auto;
+  padding: 20px 20px calc(16px + var(--safe-bot));
+}
+/* Default: home visible, chat hidden */
+.chat-screen { display: none; }
 
-/* HOME state (default) */
-body:not(.app-chat) .home-screen { opacity: 1; transform: none; pointer-events: all; }
-body:not(.app-chat) .chat-screen { opacity: 0; transform: translateY(24px); pointer-events: none; }
-body:not(.app-chat) #tb-back     { display: none !important; }
-body:not(.app-chat) #tb-logo     { display: block; }
+/* HOME → CHAT toggle */
+body.app-chat .home-screen { display: none; }
+body.app-chat .chat-screen { display: flex; }
 
-/* CHAT state */
-body.app-chat .home-screen { opacity: 0; transform: translateY(-16px); pointer-events: none; }
-body.app-chat .chat-screen { opacity: 1; transform: none; pointer-events: all; }
-body.app-chat #tb-back     { display: flex !important; }
-body.app-chat #tb-logo     { display: none; }
-
-/* No-transition on initial load */
-body.no-transition * { transition: none !important; }
+/* Topbar: logo ↔ back button */
+#tb-back { display: none; }
+body.app-chat #tb-back { display: flex; }
+body.app-chat #tb-logo { display: none; }
 
 /* ── TOPBAR ───────────────────────────────────────── */
 .topbar {
@@ -330,12 +318,7 @@ body.no-transition * { transition: none !important; }
 .lim-fill { height: 100%; background: var(--accent); border-radius: 1px; transition: width .4s; }
 .lim-txt { display: flex; justify-content: space-between; font-size: 10px; font-family: var(--mono); color: var(--text3); }
 
-/* ── HOME SCREEN (tiles) ─────────────────────────── */
-.home-screen {
-  background: var(--bg);
-}
-/* alias pentru backward compat cu JS dacă e nevoie */
-#tiles-area { gap: 0; }
+/* ── HOME SCREEN tiles ───────────────────────────── */
 
 .tiles-time {
   font-size: 44px; font-weight: 200;
@@ -399,11 +382,6 @@ body.no-transition * { transition: none !important; }
   border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
   font-size: 16px; font-weight: 700;
-}
-
-/* ── CHAT SCREEN ──────────────────────────────────── */
-.chat-screen {
-  background: var(--bg);
 }
 
 /* ── CONVERSATION ─────────────────────────────────── */
@@ -753,8 +731,7 @@ body.dev-desktop .dev-badge { color: rgba(45,184,122,.6); border-color: rgba(45,
   .tile-icon { font-size: 28px; }
   .tile-label { font-size: 15px; }
   .tiles-grid { max-width: 400px; }
-  #app { max-width: 600px; left: 50%; transform: translateX(-50%); }
-  .tiles-overlay { left: 50%; transform: translateX(-50%); width: 600px; }
+  #app { max-width: 600px; left: 50%; transform: translateX(-50%); right: auto; }
   .msg-b { max-width: 68%; }
   .msg.l .msg-b { max-width: 78%; }
 }
@@ -766,7 +743,7 @@ body.dev-desktop .dev-badge { color: rgba(45,184,122,.6); border-color: rgba(45,
   .tile { padding: 12px 10px; gap: 4px; }
   .tile-icon { font-size: 18px; }
   .tile-label { font-size: 12px; }
-  .tiles-overlay { padding: 12px 16px 10px; }
+  .home-screen { padding: 12px 16px 10px; }
 }
 @media (max-height: 580px) {
   .tiles-time { display: none; }
