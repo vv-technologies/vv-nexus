@@ -285,12 +285,14 @@ html, body {
 .tiles-overlay {
   position: absolute;
   top: calc(60px + var(--safe-top));
-  left: 0; right: 0;
+  left: 0; right: 0; bottom: 0;
   display: flex; flex-direction: column;
   align-items: center;
   padding: 32px 20px 20px;
   z-index: 1;
   pointer-events: all;
+  background: var(--bg);
+  overflow-y: auto;
 }
 
 .tiles-time {
@@ -325,6 +327,7 @@ html, body {
   -webkit-tap-highlight-color: transparent;
 }
 .tile:active { background: var(--surf2); transform: scale(.97); }
+.tile-wide { grid-column: span 1; }
 .tile-icon { font-size: 26px; line-height: 1; }
 .tile-label { font-size: 14px; font-weight: 500; color: var(--text); }
 
@@ -578,6 +581,51 @@ html, body {
   color: var(--red); font-size: 14px;
   cursor: pointer;
 }
+
+/* ── VV ME DRAWER ─────────────────────────────────── */
+#vvme {
+  position: fixed; inset: 0; z-index: 50;
+  display: none;
+  background: rgba(0,0,0,.55);
+  backdrop-filter: blur(8px);
+  align-items: flex-end; justify-content: center;
+  transition: background .3s;
+}
+#vvme.on { display: flex; }
+
+.vme-sheet {
+  width: 100%; max-width: 480px;
+  background: #0d0d0f;
+  border-top: 0.5px solid var(--border2);
+  border-radius: 24px 24px 0 0;
+  padding: 0 0 calc(20px + var(--safe-bot));
+  max-height: 80vh; overflow-y: auto;
+  transform: translateY(100%);
+  transition: transform .3s cubic-bezier(.32,0,.15,1);
+}
+#vvme.on .vme-sheet { transform: translateY(0); }
+
+.vme-head { padding: 0 20px 16px; border-bottom: 0.5px solid var(--border); }
+.vme-title { font-size: 22px; font-weight: 300; letter-spacing: 1px; margin-bottom: 4px; }
+.vme-sub { font-size: 11px; font-family: var(--mono); color: var(--text3); letter-spacing: .5px; }
+
+.vme-shelves { padding: 8px 0; }
+
+.vme-shelf {
+  padding: 14px 20px;
+  border-bottom: 0.5px solid var(--border);
+  transition: background .15s;
+}
+.vme-shelf:active { background: var(--surf); }
+.vme-shelf.vme-empty .vme-sv { color: var(--text3); font-style: italic; }
+
+.vme-shelf-head {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 6px;
+}
+.vme-si { font-size: 20px; width: 32px; text-align: center; }
+.vme-sl { font-size: 14px; font-weight: 500; }
+.vme-sh { font-size: 11px; color: var(--text3); font-family: var(--mono); margin-top: 1px; }
+.vme-sv { font-size: 13px; color: var(--text2); line-height: 1.5; padding-left: 44px; }
 
 /* ── RESPONSIVE ───────────────────────────────────── */
 @media (max-height: 680px) {
