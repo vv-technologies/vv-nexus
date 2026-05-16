@@ -13,6 +13,8 @@
   --accent:   #2db87a;
   --accent2:  rgba(45,184,122,.15);
   --red:      rgba(255,69,58,.9);
+  --gold:     #2db87a;
+  --w:        rgba(255,255,255,.95);
   --mono:     'SF Mono', 'Geist Mono', 'Fira Mono', ui-monospace, monospace;
   --sans:     -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --r:        14px;
@@ -225,10 +227,7 @@ html, body {
 #app {
   position: fixed; inset: 0; z-index: 5;
   display: flex; flex-direction: column;
-  opacity: 0; pointer-events: none;
-  transition: opacity .4s;
 }
-#app.on { opacity: 1; pointer-events: all; }
 
 /* ── TOPBAR ───────────────────────────────────────── */
 .topbar {
@@ -352,6 +351,7 @@ html, body {
 }
 .idle-t { font-size: 15px; color: var(--text2); text-align: center; line-height: 1.6; }
 .idle-c { font-size: 13px; color: var(--text3); font-family: var(--mono); margin-top: 8px; }
+.idle.off { display: none; }
 
 /* chat bubbles */
 .msg { display: flex; margin-bottom: 16px; animation: fadeUp .25s ease; }
