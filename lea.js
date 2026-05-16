@@ -17,6 +17,23 @@ function fbAdd(col, data) {
   try { db.collection(col).add(data); } catch(e) {}
 }
 
+// Telemetrie anonimă — zero text personal, doar pattern-uri agregate
+function sendAnonTelemetry(intent, city, fromCache, ok) {
+  try {
+    if(!db) return;
+    db.collection('lea_telemetry').add({
+      intent: intent || 'general',
+      city: ((city || 'unknown') + '').toLowerCase().slice(0, 24),
+      hour: new Date().getHours(),
+      dow: new Date().getDay(),
+      device: localStorage.getItem('lea_device') || 'mobile',
+      fromCache: !!fromCache,
+      ok: !!ok,
+      ts: Date.now()
+    });
+  } catch(e) {}
+}
+
 // ── STATE ─────────────────────────────────────────────────────
 var _u = null, _city = null, _hist = [], _obs = 0, _aerL = null;
 var _ck = [false, false, false];
@@ -1111,8 +1128,10 @@ async function processLea(q) {
   // Hybrid search
   var vvP=searchVVNodes(q,intent);
   var personalCtx = buildPersonalContext() + ' ' + getVoiceContext();
-var sysP='Ești Lea, asistentul urban VV. Caldă, directă, umană. MAX 3 propoziții. '+
-    'Context: Oraș='+city+', Ora='+h+':00 ('+p+'). '+
+var _dev=localStorage.getItem('lea_device')||'mobile';
+  var sysP='Ești Lea, asistentul urban VV. Caldă, directă, umană. MAX 3 propoziții. '+
+    'Context: Oraș='+city+', Ora='+h+':00 ('+p+'). Device='+_dev+'. '+
+    (_dev==='mobile'?'User e în mișcare — răspunsuri scurte, acționabile. ':'User e la birou/acasă — poți fi mai detaliat. ')+
     (displayName()?'User='+displayName()+'. ':'')+
     personalCtx+
     (h>=22||h<6?'NOAPTEA — majorit. locuri sunt închise. Menționează asta. ':'')+
@@ -1250,6 +1269,7 @@ var sysP='Ești Lea, asistentul urban VV. Caldă, directă, umană. MAX 3 propoz
     ans = await emergencySearch(q, intent, city);
   }
   addMsg('l',ans);_hist.push({r:'u',t:q});_hist.push({r:'l',t:ans});
+  sendAnonTelemetry(intent, city, false, !!ans);
   // Invitatie la Studio dupa intrebari complexe
   checkStudioInvite(q, intent);
   if(ans && intent !== 'urgenta' && intent !== 'salut') saveCache(intent, city, ans);
