@@ -324,19 +324,77 @@ var VV_SHELVES = [
 
 function openVVMe() {
   var sheet = document.getElementById('vvme');
-  var shelves = document.getElementById('vme-shelves');
-  if(!sheet || !shelves) return;
-  shelves.innerHTML = '';
-  VV_SHELVES.forEach(function(s) {
-    var val = localStorage.getItem(s.key) || '';
+  var cont = document.getElementById('vme-shelves');
+  if(!sheet || !cont) return;
+
+  var S = {};
+  try { S = JSON.parse(localStorage.getItem('vv_shelves') || '{}'); } catch(e){}
+
+  // Formatează rafturi din SHELVES real
+  var rows = [
+    {
+      icon:'👨‍👩‍👧', label:'Familie', hint:'Ce știe Lea despre cei dragi',
+      val: (function(){
+        if(!S.family) return '';
+        var p = [];
+        if(S.family.hasKids) p.push('copii');
+        if(S.family.hasCar) p.push('mașină');
+        if(S.family.petFriendly) p.push('animale');
+        return p.join(' · ');
+      })()
+    },
+    {
+      icon:'📍', label:'Locuri', hint:'Unde ai fost, ce ai căutat',
+      val: (function(){
+        if(!S.places || !S.places.favorites || !S.places.favorites.length) return '';
+        return S.places.favorites.slice(0,5).map(function(p){return p.name;}).join(', ');
+      })()
+    },
+    {
+      icon:'✦', label:'Preferințe', hint:'Ce îți place să mănânci, să bei',
+      val: (S.prefs && S.prefs.foodTypes && S.prefs.foodTypes.length)
+            ? S.prefs.foodTypes.join(', ') : ''
+    },
+    {
+      icon:'⟳', label:'Obiceiuri', hint:'Când și ce cauți de obicei',
+      val: (function(){
+        if(!S.habits || !S.habits.peakHours) return '';
+        var parts = [];
+        Object.keys(S.habits.peakHours).forEach(function(period) {
+          var intents = S.habits.peakHours[period];
+          var top = Object.keys(intents).sort(function(a,b){return intents[b]-intents[a];})[0];
+          if(top) parts.push(period + ' → ' + top);
+        });
+        return parts.join(' · ');
+      })()
+    },
+    {
+      icon:'◐', label:'Dispoziție', hint:'Starea ta detectată din conversații',
+      val: (function(){
+        if(!S.mood) return '';
+        var p = [];
+        if(S.mood.lastMood) p.push(S.mood.lastMood);
+        if(S.mood.stressIndicators > 2) p.push('stres detectat (' + S.mood.stressIndicators + ')');
+        return p.join(' · ');
+      })()
+    }
+  ];
+
+  var archetype = localStorage.getItem('lea_archetype') || 'Explorator';
+  var sub = document.getElementById('vme-archetype');
+  if(sub) sub.textContent = archetype + ' · VV Beta';
+
+  cont.innerHTML = '';
+  rows.forEach(function(r) {
     var div = document.createElement('div');
-    div.className = 'vme-shelf' + (val ? '' : ' vme-empty');
+    div.className = 'vme-shelf' + (r.val ? '' : ' vme-empty');
     div.innerHTML =
-      '<div class="vme-shelf-head"><span class="vme-si">' + s.icon + '</span>' +
-      '<div><div class="vme-sl">' + s.label + '</div><div class="vme-sh">' + s.hint + '</div></div></div>' +
-      '<div class="vme-sv">' + (val ? val.slice(0,120)+(val.length>120?'…':'') : 'Lea nu știe încă · vorbește cu ea') + '</div>';
-    shelves.appendChild(div);
+      '<div class="vme-shelf-head"><span class="vme-si">' + r.icon + '</span>' +
+      '<div><div class="vme-sl">' + r.label + '</div><div class="vme-sh">' + r.hint + '</div></div></div>' +
+      '<div class="vme-sv">' + (r.val || 'Lea nu știe încă · vorbește cu ea') + '</div>';
+    cont.appendChild(div);
   });
+
   sheet.style.display = 'flex';
   setTimeout(function(){ sheet.classList.add('on'); }, 10);
 }
