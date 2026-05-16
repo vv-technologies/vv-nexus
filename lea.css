@@ -242,7 +242,10 @@ html, body {
   font-size: 18px; font-weight: 300;
   letter-spacing: 4px; color: var(--text);
   min-width: 60px;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity .15s;
 }
+.tb-logo:active { opacity: .5; }
 .tb-mid {
   flex: 1; display: flex; align-items: center;
   justify-content: center; gap: 7px;
