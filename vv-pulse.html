@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+﻿﻿<!DOCTYPE html>
 <html lang="ro">
 <head>
 <meta charset="UTF-8">
@@ -147,6 +147,33 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fon
 @keyframes mpulse{0%,100%{transform:translate(-50%,-50%) scale(1);opacity:.4}50%{transform:translate(-50%,-50%) scale(2.2);opacity:0}}
 @keyframes insiderPulse{0%,100%{transform:translate(-50%,-50%) scale(1);opacity:.6}50%{transform:translate(-50%,-50%) scale(2.8);opacity:0}}
 @keyframes missionPulse{0%,100%{transform:translate(-50%,-50%) scale(1);opacity:.5}50%{transform:translate(-50%,-50%) scale(3.2);opacity:0}}
+/* ── SIDEBAR (laptop) ── */
+.vv-sidebar{display:none;position:fixed;top:0;left:0;bottom:0;width:220px;background:rgba(4,4,6,.99);border-right:.5px solid rgba(245,240,232,.08);flex-direction:column;padding:max(1.75rem,env(safe-area-inset-top)) 1rem 1.25rem;z-index:800}
+.sb-brand{margin-bottom:2rem;padding:0 .25rem}
+.sb-logo{font-family:var(--mono);font-size:1.125rem;font-weight:700;letter-spacing:4px;color:var(--gold)}
+.sb-sub{font-size:.4375rem;font-family:var(--mono);letter-spacing:.22em;text-transform:uppercase;color:var(--w30);margin-top:4px}
+.sb-nav{display:flex;flex-direction:column;gap:3px;flex:1}
+.sb-item{display:flex;align-items:center;gap:.875rem;padding:.625rem .875rem;border-radius:12px;text-decoration:none;color:var(--w30);font-size:.75rem;font-family:var(--mono);transition:background .15s,color .15s;-webkit-user-select:none}
+.sb-item:hover{background:rgba(245,240,232,.04);color:rgba(245,240,232,.5)}
+.sb-item.active{background:rgba(201,168,76,.1);color:var(--gold);border:.5px solid rgba(201,168,76,.25)}
+.sb-icon{font-size:1.0625rem;width:1.25rem;text-align:center;flex-shrink:0;line-height:1}
+.sb-lbl{letter-spacing:.05em}
+.sb-divider{height:.5px;background:rgba(245,240,232,.08);margin:.75rem 0}
+.sb-stats{display:flex;flex-direction:column;gap:6px;padding:.25rem .875rem}
+.sb-stat{font-size:.5rem;font-family:var(--mono);color:var(--w30);letter-spacing:.05em}
+.sb-stat b{color:var(--w50)}
+.sb-ver{font-size:.375rem;font-family:var(--mono);color:rgba(245,240,232,.15);letter-spacing:.1em;text-align:center;margin-top:.75rem}
+/* ── LAPTOP RESPONSIVE ── */
+@media (min-width:768px){
+  .vv-tabs{display:none!important}
+  .vv-sidebar{display:flex!important}
+  #vv-map{left:220px!important}
+  .vv-nav{left:220px!important}
+  .map-legend{right:1rem;top:max(5.5rem,calc(env(safe-area-inset-top) + 4.5rem))}
+  .zone-badge{left:calc(220px + 50%);transform:translateX(-50%)}
+  .map-stats{left:calc(220px + 50%);transform:translateX(-50%)}
+  .bottom-card{left:220px!important}
+}
 .vv-tabs{position:fixed;bottom:0;left:0;right:0;z-index:1000;display:flex;background:rgba(6,6,8,.97);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-top:.5px solid rgba(245,240,232,.08);padding-bottom:env(safe-area-inset-bottom)}
 .vv-tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 0 9px;text-decoration:none;color:rgba(245,240,232,.3);transition:color .2s;-webkit-user-select:none;user-select:none}
 .vv-tab.active{color:#C9A84C}
@@ -594,6 +621,27 @@ if(!localStorage.getItem('vv_p2_ok'))document.getElementById('wmod').style.displ
 setTimeout(locateMe,800);
 try{const{setDoc:sd,doc:d2,increment:inc}=await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");sd(d2(db,"stats","pulse_v2"),{total:inc(1),[new Date().toISOString().slice(0,10)]:inc(1)},{merge:true});}catch(e){}
 </script>
+<!-- SIDEBAR (visible on laptop) -->
+<aside class="vv-sidebar">
+  <div class="sb-brand">
+    <div class="sb-logo">VV</div>
+    <div class="sb-sub">Pulse · Live</div>
+  </div>
+  <nav class="sb-nav">
+    <a href="lea.html" class="sb-item"><span class="sb-icon">◎</span><span class="sb-lbl">LEA</span></a>
+    <a href="vv-pulse.html" class="sb-item active"><span class="sb-icon">◉</span><span class="sb-lbl">PULSE</span></a>
+    <a href="lea.html?now=1" class="sb-item"><span class="sb-icon">⊡</span><span class="sb-lbl">NOW</span></a>
+    <a href="index.html" class="sb-item"><span class="sb-icon">⊙</span><span class="sb-lbl">EU</span></a>
+  </nav>
+  <div class="sb-divider"></div>
+  <div class="sb-stats">
+    <div class="sb-stat">Insideri live: <b id="sb-insideri">—</b></div>
+    <div class="sb-stat">Locații: <b id="sb-locatii">—</b></div>
+    <div class="sb-stat">Misiuni: <b id="sb-misiuni">—</b></div>
+    <div class="sb-stat">Coins: <b id="sb-coins">⬡ 0</b></div>
+  </div>
+  <div class="sb-ver">VV Pulse v2.0 · Mai 2026</div>
+</aside>
 <nav class="vv-tabs">
   <a href="lea.html" class="vv-tab"><div class="vt-icon">◎</div><div class="vt-lbl">LEA</div></a>
   <a href="vv-pulse.html" class="vv-tab active"><div class="vt-icon">◉</div><div class="vt-lbl">PULSE</div></a>
@@ -601,5 +649,7 @@ try{const{setDoc:sd,doc:d2,increment:inc}=await import("https://www.gstatic.com/
   <a href="index.html" class="vv-tab"><div class="vt-icon">⊙</div><div class="vt-lbl">EU</div></a>
 </nav></body>
 </html>
+
+
 
 
