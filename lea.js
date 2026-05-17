@@ -857,6 +857,56 @@ function learnFromInteraction(q, intent, ans, city) {
 }
 
 // Construieste context personal pentru Gemini
+
+// ── VV ARCHETYPE SYSTEM ───────────────────────────────────────
+var ARCHETYPE_KEY = 'lea_archetype';
+var ARCHETYPE_SIGNALS = {
+  creator:      /studio|creez|construiesc|design|idee|proiect|fac ceva|vreau sa fac|creat|muzica|scriu|scris|art/i,
+  explorator:   /unde|ce e|descopar|nou|recomanda|exploreaza|ce mai|surprinde|necunoscut|prima data|incerc/i,
+  profesionist: /meeting|intalnire|deadline|task|eficient|rapid|business|client|prezentare|job|lucru/i,
+  parinte:      /copil|copii|familie|bebe|scoala|parc copii|activitat|family|kid|fetita|baietel/i
+};
+var ARCHETYPE_LABELS = { creator:'Creator', explorator:'Explorator', profesionist:'Profesionist', parinte:'Parinte' };
+var ARCHETYPE_TONES = {
+  creator:      'Utilizatorul e creativ — valorifica idei originale, propune ceva neconventional.',
+  explorator:   'Utilizatorul exploreaza — recomanda ceva neasteptat, surprinde-l.',
+  profesionist: 'Utilizatorul e orientat pe rezultate — direct, concis, zero divagratii.',
+  parinte:      'Utilizatorul are familie — include optiuni family-friendly automat.'
+};
+function loadArchetype() { try { return JSON.parse(localStorage.getItem(ARCHETYPE_KEY)||'{}'); } catch(e) { return {}; } }
+function saveArchetype(d) { try { localStorage.setItem(ARCHETYPE_KEY,JSON.stringify(d)); } catch(e) {} }
+function updateArchetype(q) {
+  var data=loadArchetype();
+  if(!data.scores) data.scores={creator:0,explorator:0,profesionist:0,parinte:0};
+  if(!data.total) data.total=0;
+  data.total++;
+  Object.keys(ARCHETYPE_SIGNALS).forEach(function(t){if(ARCHETYPE_SIGNALS[t].test(q))data.scores[t]++;});
+  if(data.total>=3){
+    var tot=Object.values(data.scores).reduce(function(a,b){return a+b;},0)||1;
+    data.blend={};
+    Object.keys(data.scores).forEach(function(k){data.blend[k]=Math.round((data.scores[k]/tot)*100);});
+    data.primary=Object.keys(data.scores).reduce(function(a,b){return data.scores[a]>=data.scores[b]?a:b;});
+  }
+  saveArchetype(data);
+  refreshArchetypeDisplay();
+}
+function getArchetypeContext() { var d=loadArchetype(); return d.primary?ARCHETYPE_TONES[d.primary]||'':''; }
+function getArchetypeLabel() {
+  var d=loadArchetype();
+  if(!d.primary) return 'VV Beta';
+  var label=ARCHETYPE_LABELS[d.primary]||'';
+  if(d.blend){
+    var sorted=Object.keys(d.blend).sort(function(a,b){return d.blend[b]-d.blend[a];});
+    if(sorted[1]&&d.blend[sorted[1]]>=20&&sorted[1]!==d.primary) label+=' · '+ARCHETYPE_LABELS[sorted[1]];
+  }
+  return label;
+}
+function refreshArchetypeDisplay() {
+  var el=document.getElementById('vme-archetype');
+  if(!el) return;
+  var d=loadArchetype();
+  el.textContent=d.primary?getArchetypeLabel():'Lea te descopera...';
+}
 function buildPersonalContext() {
   loadShelves();
   var ctx = [];
@@ -888,7 +938,7 @@ function buildPersonalContext() {
     }
   }
 
-  return ctx.length > 0 ? 'Context personal: ' + ctx.join(' ') : '';
+  var arcCtx=getArchetypeContext(); if(arcCtx) ctx.push(arcCtx); return ctx.length>0?'Context personal: '+ctx.join(' '):'';
 }
 
 // ── GHOST PIN SYSTEM ──────────────────────────────────────────
@@ -1291,7 +1341,7 @@ var _dev=localStorage.getItem('lea_device')||'mobile';
   sendAnonTelemetry(intent, city, false, !!ans);
   // Invitatie la Studio dupa intrebari complexe
   checkStudioInvite(q, intent);
-  if(ans && intent !== 'urgenta' && intent !== 'salut') saveCache(intent, city, ans);
+  if(ans && intent !== 'urgenta' && intent !== 'salut') saveCache(intent, city, ans); updateArchetype(q);
   if(_hist.length>40)_hist=_hist.slice(-40);saveHistory();
   if(_ek&&_vi)playVoice(ans,null);
   fbAdd('vvhi_dataset',{action:'LEA_CHAT',context:{city,intent,hasVV:vvNodes.length>0},ts:Date.now()});
