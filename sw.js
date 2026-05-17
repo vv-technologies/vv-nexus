@@ -1,4 +1,4 @@
-const CACHE = 'vv-v2';
+const CACHE = 'vv-v3';
 const SHELL = [
   '/vv-nexus/',
   '/vv-nexus/index.html',
