@@ -203,10 +203,40 @@
   <div class="ss">
     <div class="ss-h"></div>
     <div class="ss-title">Setări</div>
+
+    <!-- PROFIL -->
     <div class="ss-row"><span class="ss-l">VV ID</span><span class="ss-v" id="ss-id">—</span></div>
     <div class="ss-row"><span class="ss-l">Rang</span><span class="ss-v" id="ss-rang">—</span></div>
     <div class="ss-row"><span class="ss-l">Oraș</span><span class="ss-v" id="ss-city">—</span></div>
-    <div class="ss-row"><span class="ss-l">Voce Lea</span><button class="ss-b" onclick="cfgVoice()">Configurează</button></div>
+    <div class="ss-row"><span class="ss-l">Nume</span><input class="ss-input" id="si-name" placeholder="Numele tău" /></div>
+
+    <!-- API -->
+    <div class="ss-sect">Conexiuni API</div>
+    <div class="ss-row">
+      <span class="ss-l">Gemini Key</span>
+      <span class="ss-status" id="si-gk-status">—</span>
+    </div>
+    <div class="ss-row" style="gap:6px">
+      <input class="ss-input" id="si-gk" placeholder="AIza..." type="password" style="flex:1" />
+      <button class="ss-b" onclick="testGemini()" style="white-space:nowrap">Testează</button>
+    </div>
+    <div class="ss-row"><span class="ss-l">Proxy CEO</span><span class="ss-status" id="si-proxy-status">—</span></div>
+    <input class="ss-input" id="si-proxy" placeholder="https://script.google.com/..." style="margin:0 0 10px" />
+    <div class="ss-row"><span class="ss-l">ElevenLabs Key</span></div>
+    <input class="ss-input" id="si-ek" placeholder="API Key voce..." type="password" style="margin:0 0 6px" />
+    <input class="ss-input" id="si-vi" placeholder="Voice ID..." style="margin:0 0 10px" />
+
+    <!-- STATS -->
+    <div class="ss-sect">Stare</div>
+    <div class="ss-row"><span class="ss-l">Mesaje azi</span><span class="ss-v" id="si-usage">—</span></div>
+    <div class="ss-row"><span class="ss-l">Cache</span><span class="ss-v" id="si-cache">—</span></div>
+    <div class="ss-row"><span class="ss-l">Archetype</span><span class="ss-v" id="si-arch">—</span></div>
+    <div class="ss-row" style="gap:6px;margin-top:2px">
+      <button class="ss-b" onclick="clearCacheSettings()" style="flex:1">Golește cache</button>
+      <button class="ss-b" onclick="resetArchSettings()" style="flex:1">Reset archetype</button>
+    </div>
+
+    <button class="ss-b" onclick="saveSettings()" style="width:100%;margin:14px 0 6px;background:rgba(201,168,76,.18);color:#C9A84C;border-color:rgba(201,168,76,.3);font-size:13px;padding:12px">Salvează</button>
     <button class="ss-aer" onclick="showAer()">◎ VV Aer · Sincronizare device</button>
     <button class="ss-aer" onclick="closeSett();showCardManual();" style="background:rgba(255,255,255,.03);color:rgba(255,255,255,.4);">⬡ Cardul tău VV</button>
     <button class="ss-close" onclick="closeSett()">Închide</button>
