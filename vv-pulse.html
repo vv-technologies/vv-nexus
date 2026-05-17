@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ro">
 <head>
 <meta charset="UTF-8">
@@ -22,7 +22,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fon
 .nav-row1{display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem}
 .nav-brand{pointer-events:auto}
 .nav-logo{font-size:.9rem;font-weight:700;letter-spacing:3px;color:var(--gold);font-family:var(--mono)}
-.nav-sub{font-size:.45rem;letter-spacing:.2em;text-transform:uppercase;color:var(--w30);margin-top:2px}
+.nav-sub{font-size:.5625rem;letter-spacing:.2em;text-transform:uppercase;color:var(--w30);margin-top:2px}
 .nav-right{display:flex;align-items:center;gap:7px;pointer-events:auto}
 .coins-pill{display:flex;align-items:center;gap:5px;background:rgba(0,0,0,.75);backdrop-filter:blur(12px);border:.5px solid var(--gold-bd);border-radius:20px;padding:4px 10px;font-size:.5625rem;font-family:var(--mono);color:var(--gold);font-weight:700;cursor:default}
 .coins-dot{width:5px;height:5px;border-radius:50%;background:var(--gold);flex-shrink:0}
@@ -40,7 +40,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fon
 .search-icon{font-size:.75rem;color:var(--w30);flex-shrink:0;font-family:var(--mono)}
 .search-input{flex:1;background:none;border:none;outline:none;color:var(--w);font-size:.8125rem;font-family:var(--font)}
 .search-input::placeholder{color:var(--w30)}
-.search-badge{font-size:.45rem;font-family:var(--mono);color:var(--gold);letter-spacing:.5px;background:var(--gold-dim);border:.5px solid var(--gold-bd);padding:2px 6px;border-radius:4px;flex-shrink:0}
+.search-badge{font-size:.5625rem;font-family:var(--mono);color:var(--gold);letter-spacing:.5px;background:var(--gold-dim);border:.5px solid var(--gold-bd);padding:2px 6px;border-radius:4px;flex-shrink:0}
 
 /* FILTERS */
 .filters-row{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;pointer-events:auto;scrollbar-width:none}
@@ -54,7 +54,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fon
 
 /* LEGEND */
 .map-legend{position:fixed;z-index:400;top:max(6.5rem,calc(env(safe-area-inset-top) + 5.5rem));right:.875rem;background:rgba(0,0,0,.78);backdrop-filter:blur(12px);border:.5px solid var(--border);border-radius:12px;padding:.625rem .75rem;display:flex;flex-direction:column;gap:5px}
-.legend-item{display:flex;align-items:center;gap:6px;font-size:.4375rem;color:var(--w30);letter-spacing:.05em;text-transform:uppercase}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:.5625rem;color:var(--w30);letter-spacing:.05em;text-transform:uppercase}
 .legend-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
 .ld-gold{background:var(--gold);box-shadow:0 0 5px rgba(201,168,76,.8)}
 .ld-silver{background:rgba(255,255,255,.45)}
@@ -64,11 +64,11 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fon
 .ld-green{background:var(--green);box-shadow:0 0 5px rgba(45,184,122,.8)}
 
 /* ZONE BADGE */
-.zone-badge{position:fixed;bottom:calc(3.8rem + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);z-index:400;background:rgba(0,0,0,.82);backdrop-filter:blur(12px);border:.5px solid var(--border2);border-radius:100px;padding:4px 14px;font-size:.5rem;font-family:var(--mono);color:var(--w30);letter-spacing:.5px;white-space:nowrap;transition:opacity .5s;pointer-events:none}
+.zone-badge{position:fixed;bottom:calc(5.75rem + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);z-index:400;background:rgba(0,0,0,.82);backdrop-filter:blur(12px);border:.5px solid var(--border2);border-radius:100px;padding:4px 14px;font-size:.5625rem;font-family:var(--mono);color:var(--w30);letter-spacing:.5px;white-space:nowrap;transition:opacity .5s;pointer-events:none}
 .zone-badge.hidden{opacity:0}
 
 /* STATS */
-.map-stats{position:fixed;bottom:calc(1.125rem + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);z-index:400;display:flex;gap:6px;transition:opacity .3s,transform .3s}
+.map-stats{position:fixed;bottom:calc(3.25rem + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);z-index:400;display:flex;gap:6px;transition:opacity .3s,transform .3s}
 .map-stats.hidden{opacity:0;pointer-events:none;transform:translateX(-50%) translateY(10px)}
 .stat-pill{background:rgba(0,0,0,.78);backdrop-filter:blur(12px);border:.5px solid var(--border);border-radius:20px;padding:4px 10px;display:flex;align-items:center;gap:5px;font-size:.5rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--w30)}
 .stat-pill b{font-size:.625rem;font-weight:800;color:var(--w)}
@@ -90,7 +90,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fon
 .card-info{flex:1;min-width:0}
 .card-name{font-size:.9375rem;font-weight:700;letter-spacing:-.02em;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .card-status{font-size:.5625rem;display:flex;align-items:center;gap:5px;color:var(--w30)}
-.vbadge{padding:1px 6px;border-radius:4px;font-size:.45rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.vbadge{padding:1px 6px;border-radius:4px;font-size:.5625rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
 .vb-green{background:rgba(45,184,122,.12);border:.5px solid rgba(45,184,122,.25);color:var(--green)}
 .vb-blue{background:rgba(41,151,255,.12);border:.5px solid rgba(41,151,255,.25);color:var(--blue)}
 .vb-orange{background:rgba(255,159,10,.12);border:.5px solid rgba(255,159,10,.25);color:var(--orange)}
@@ -147,7 +147,11 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fon
 @keyframes mpulse{0%,100%{transform:translate(-50%,-50%) scale(1);opacity:.4}50%{transform:translate(-50%,-50%) scale(2.2);opacity:0}}
 @keyframes insiderPulse{0%,100%{transform:translate(-50%,-50%) scale(1);opacity:.6}50%{transform:translate(-50%,-50%) scale(2.8);opacity:0}}
 @keyframes missionPulse{0%,100%{transform:translate(-50%,-50%) scale(1);opacity:.5}50%{transform:translate(-50%,-50%) scale(3.2);opacity:0}}
-</style>
+.vv-tabs{position:fixed;bottom:0;left:0;right:0;z-index:1000;display:flex;background:rgba(6,6,8,.97);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-top:.5px solid rgba(245,240,232,.08);padding-bottom:env(safe-area-inset-bottom)}
+.vv-tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 0 9px;text-decoration:none;color:rgba(245,240,232,.3);transition:color .2s;-webkit-user-select:none;user-select:none}
+.vv-tab.active{color:#C9A84C}
+.vt-icon{font-size:1.25rem;line-height:1}
+.vt-lbl{font-size:.375rem;font-family:var(--mono);letter-spacing:.2em;text-transform:uppercase}</style>
 </head>
 <body>
 
@@ -590,5 +594,11 @@ if(!localStorage.getItem('vv_p2_ok'))document.getElementById('wmod').style.displ
 setTimeout(locateMe,800);
 try{const{setDoc:sd,doc:d2,increment:inc}=await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");sd(d2(db,"stats","pulse_v2"),{total:inc(1),[new Date().toISOString().slice(0,10)]:inc(1)},{merge:true});}catch(e){}
 </script>
-</body>
+<nav class="vv-tabs">
+  <a href="lea.html" class="vv-tab"><div class="vt-icon">◎</div><div class="vt-lbl">LEA</div></a>
+  <a href="vv-pulse.html" class="vv-tab active"><div class="vt-icon">◉</div><div class="vt-lbl">PULSE</div></a>
+  <a href="lea.html?now=1" class="vv-tab"><div class="vt-icon">⊡</div><div class="vt-lbl">NOW</div></a>
+  <a href="index.html" class="vv-tab"><div class="vt-icon">⊙</div><div class="vt-lbl">EU</div></a>
+</nav></body>
 </html>
+
