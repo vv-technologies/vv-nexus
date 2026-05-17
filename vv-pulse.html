@@ -75,7 +75,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fon
 .pill-gold b{color:var(--gold)}.pill-green b{color:var(--green)}.pill-blue b{color:var(--blue)}.pill-orange b{color:var(--orange)}
 
 /* BOTTOM CARD */
-.bottom-card{position:fixed;bottom:0;left:0;right:0;z-index:600;padding:0 .875rem calc(1.125rem + env(safe-area-inset-bottom));transform:translateY(100%);transition:transform .35s cubic-bezier(.4,0,.2,1)}
+.bottom-card{position:fixed;bottom:0;left:0;right:0;z-index:1100;padding:0 .875rem calc(1.125rem + env(safe-area-inset-bottom));transform:translateY(100%);transition:transform .35s cubic-bezier(.4,0,.2,1)}
 .bottom-card.open{transform:translateY(0)}
 .card-inner{background:rgba(5,5,7,.96);backdrop-filter:blur(28px);border:.5px solid var(--border2);border-radius:22px;padding:1rem 1.125rem;position:relative;overflow:hidden}
 .card-inner::before{content:'';position:absolute;top:0;left:15%;right:15%;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:.4}
@@ -601,4 +601,5 @@ try{const{setDoc:sd,doc:d2,increment:inc}=await import("https://www.gstatic.com/
   <a href="index.html" class="vv-tab"><div class="vt-icon">⊙</div><div class="vt-lbl">EU</div></a>
 </nav></body>
 </html>
+
 
