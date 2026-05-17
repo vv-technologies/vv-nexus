@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+﻿﻿<!DOCTYPE html>
 <html lang="ro">
 <head>
 <meta charset="UTF-8">
@@ -20,11 +20,51 @@
 .vt-icon{font-size:1.25rem;line-height:1}
 .vt-lbl{font-size:.375rem;font-family:var(--mono);letter-spacing:.2em;text-transform:uppercase}
 .inp-area{padding-bottom:calc(4.75rem + env(safe-area-inset-bottom))!important}
+/* ── SIDEBAR (laptop) ── */
+.vv-sidebar{display:none;position:fixed;top:0;left:0;bottom:0;width:220px;background:rgba(0,0,0,.99);border-right:.5px solid var(--border);flex-direction:column;padding:max(1.75rem,var(--safe-top)) 1rem 1.25rem;z-index:800}
+.sb-brand{margin-bottom:2rem;padding:0 .25rem}
+.sb-logo{font-family:var(--mono);font-size:1.125rem;font-weight:700;letter-spacing:4px;color:var(--accent)}
+.sb-sub{font-size:.4375rem;font-family:var(--mono);letter-spacing:.22em;text-transform:uppercase;color:var(--text3);margin-top:4px}
+.sb-nav{display:flex;flex-direction:column;gap:3px;flex:1}
+.sb-item{display:flex;align-items:center;gap:.875rem;padding:.625rem .875rem;border-radius:var(--r);text-decoration:none;color:var(--text3);font-size:.75rem;font-family:var(--mono);transition:background .15s,color .15s;-webkit-user-select:none}
+.sb-item:hover{background:rgba(255,255,255,.04);color:rgba(255,255,255,.5)}
+.sb-item.active{background:rgba(201,168,76,.1);color:var(--accent)}
+.sb-icon{font-size:1.0625rem;width:1.25rem;text-align:center;flex-shrink:0;line-height:1}
+.sb-lbl{letter-spacing:.05em}
+.sb-divider{height:.5px;background:var(--border);margin:.75rem 0}
+.sb-name{font-size:.625rem;font-family:var(--mono);color:var(--text2);padding:.5rem .875rem;letter-spacing:.05em}
+.sb-ver{font-size:.375rem;font-family:var(--mono);color:var(--text3);letter-spacing:.1em;text-align:center;margin-top:.75rem}
+/* ── LAPTOP RESPONSIVE ── */
+@media (min-width:768px){
+  .vv-tabs{display:none!important}
+  .vv-sidebar{display:flex!important}
+  .sc{margin-left:220px}
+  .inp-area{padding-bottom:calc(1.5rem + env(safe-area-inset-bottom))!important}
+  .chat-screen{max-width:none}
+  .msg-list{padding:1rem 2rem 1rem}
+  .inp-row{max-width:720px;margin:0 auto}
+}
 </style>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⬡</text></svg>">
 </head>
 <body>
 
+<!-- SIDEBAR (visible on laptop) -->
+<aside class="vv-sidebar">
+  <div class="sb-brand">
+    <div class="sb-logo">VV</div>
+    <div class="sb-sub">Hybrid Universe</div>
+  </div>
+  <nav class="sb-nav">
+    <a href="lea.html" class="sb-item active"><span class="sb-icon">◎</span><span class="sb-lbl">LEA</span></a>
+    <a href="vv-pulse.html" class="sb-item"><span class="sb-icon">◉</span><span class="sb-lbl">PULSE</span></a>
+    <a href="lea.html?now=1" class="sb-item"><span class="sb-icon">⊡</span><span class="sb-lbl">NOW</span></a>
+    <a href="index.html" class="sb-item"><span class="sb-icon">⊙</span><span class="sb-lbl">EU</span></a>
+  </nav>
+  <div class="sb-divider"></div>
+  <div class="sb-name" id="sb-name">—</div>
+  <div class="sb-ver">v2.0 · Mai 2026</div>
+</aside>
 <div id="amb"></div>
 <div id="toast"></div>
 
@@ -313,6 +353,12 @@ setTimeout(function() {
 }, 300);
 
 // Ceas live
+  // Sidebar name sync
+  (function(){
+    var n=localStorage.getItem('lea_name')||'';
+    var el=document.getElementById('sb-name');
+    if(el && n) el.textContent=n;
+  })();
 function updateClock() {
   var el = document.getElementById('time-display');
   if(el) el.textContent = new Date().toLocaleTimeString('ro-RO', {hour:'2-digit',minute:'2-digit'});
@@ -508,5 +554,7 @@ function studioAsk(q) {
   <a href="index.html" class="vv-tab"><div class="vt-icon">⊙</div><div class="vt-lbl">EU</div></a>
 </nav></body>
 </html>
+
+
 
 
