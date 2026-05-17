@@ -603,6 +603,45 @@ body.app-chat #tb-logo { display: none; }
   cursor: pointer;
 }
 
+.ss-input {
+  display: block;
+  width: calc(100% - 40px);
+  box-sizing: border-box;
+  margin: 0 20px 8px;
+  padding: 11px 14px;
+  background: var(--surf);
+  border: 0.5px solid var(--border2);
+  border-radius: var(--r);
+  color: var(--text);
+  font-size: 13px;
+  font-family: var(--mono);
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.ss-input:focus { border-color: var(--accent); }
+.ss-input::placeholder { color: var(--text3); }
+
+.ss-sect {
+  font-size: 10px;
+  font-family: var(--mono);
+  color: var(--text3);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 16px 20px 8px;
+}
+
+.ss-status {
+  font-size: 11px;
+  font-family: var(--mono);
+  padding: 3px 8px;
+  border-radius: 100px;
+  background: transparent;
+}
+.ss-status.ok  { color: var(--green); }
+.ss-status.err { color: var(--red); }
+.ss-status.dim { color: var(--text3); }
+
 .ss-aer {
   display: block; width: calc(100% - 40px);
   margin: 10px 20px 0;
@@ -749,3 +788,4 @@ body.dev-desktop .dev-badge { color: rgba(45,184,122,.6); border-color: rgba(45,
   .tiles-time { display: none; }
   .tiles-mood { margin-bottom: 8px; }
 }
+
