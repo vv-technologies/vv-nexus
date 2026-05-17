@@ -1,7 +1,11 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ro">
 <head>
 <meta charset="UTF-8">
+<link rel="manifest" href="manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="VV">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -9,6 +13,14 @@
 <meta name="theme-color" content="#000">
 <title>Lea</title>
 <link rel="stylesheet" href="lea.css">
+<style>
+.vv-tabs{position:fixed;bottom:0;left:0;right:0;z-index:999;display:flex;background:rgba(0,0,0,.96);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-top:.5px solid var(--border);padding-bottom:env(safe-area-inset-bottom)}
+.vv-tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 0 9px;text-decoration:none;color:var(--text3);transition:color .2s;-webkit-user-select:none;user-select:none}
+.vv-tab.active{color:var(--accent)}
+.vt-icon{font-size:1.25rem;line-height:1}
+.vt-lbl{font-size:.375rem;font-family:var(--mono);letter-spacing:.2em;text-transform:uppercase}
+.inp-area{padding-bottom:calc(4.75rem + env(safe-area-inset-bottom))!important}
+</style>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⬡</text></svg>">
 </head>
 <body>
@@ -489,6 +501,12 @@ function studioAsk(q) {
 }
 </script>
 
-</body>
+<nav class="vv-tabs">
+  <a href="lea.html" class="vv-tab active"><div class="vt-icon">◎</div><div class="vt-lbl">LEA</div></a>
+  <a href="vv-pulse.html" class="vv-tab"><div class="vt-icon">◉</div><div class="vt-lbl">PULSE</div></a>
+  <a href="lea.html?now=1" class="vv-tab"><div class="vt-icon">⊡</div><div class="vt-lbl">NOW</div></a>
+  <a href="index.html" class="vv-tab"><div class="vt-icon">⊙</div><div class="vt-lbl">EU</div></a>
+</nav></body>
 </html>
+
 
