@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+﻿﻿<!DOCTYPE html>
 <html lang="ro">
 <head>
 <meta charset="UTF-8">
@@ -110,6 +110,37 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 /* ── TOAST */
 .toast-pill{position:fixed;top:max(1rem,calc(env(safe-area-inset-top) + .5rem));left:50%;transform:translateX(-50%) translateY(-70px);z-index:2000;background:rgba(10,10,12,.96);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:.5px solid var(--border2);border-radius:100px;padding:.5rem 1.375rem;font-size:.5625rem;font-family:var(--mono);color:var(--w50);white-space:nowrap;transition:transform .35s cubic-bezier(.4,0,.2,1);pointer-events:none}
 .toast-pill.show{transform:translateX(-50%) translateY(0)}
+.sb-sect{font-size:.375rem;font-family:var(--mono);letter-spacing:.22em;text-transform:uppercase;color:var(--w30);padding:.375rem .875rem .25rem;opacity:.6}
+.sb-pro-price{font-size:.3125rem;letter-spacing:.1em;color:var(--gold);margin-left:4px;font-family:var(--mono)}
+.sb-locked{opacity:.4;cursor:pointer;position:relative}
+.sb-locked:hover{opacity:.65;background:rgba(245,240,232,.03)!important}
+.sb-lock{margin-left:auto;font-size:.625rem;flex-shrink:0}
+/* Plan tile on EU hub */
+.plan-card{margin:0 1.125rem 1.125rem;background:rgba(201,168,76,.05);border:.5px solid rgba(201,168,76,.18);border-radius:var(--r);padding:1rem 1.125rem;display:flex;align-items:center;justify-content:space-between;position:relative;z-index:1}
+.plan-left{}
+.plan-tier{font-size:.4375rem;font-family:var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--gold);opacity:.6;margin-bottom:4px}
+.plan-name{font-size:.875rem;font-weight:700;font-family:var(--mono);color:var(--w);margin-bottom:.25rem}
+.plan-desc{font-size:.5rem;font-family:var(--mono);color:var(--w30)}
+.plan-btn{padding:.5rem 1rem;background:var(--gold-dim);border:.5px solid var(--gold-bd);border-radius:100px;font-size:.5rem;font-family:var(--mono);color:var(--gold);cursor:pointer;font-weight:700;letter-spacing:.06em;transition:background .2s;white-space:nowrap}
+.plan-btn:hover{background:rgba(201,168,76,.2)}
+/* upgrade modal */
+.upg-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:1900;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.upg-overlay.open{display:block}
+.upg-modal{display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-54%);z-index:2000;background:rgba(6,6,8,.99);border:.5px solid rgba(201,168,76,.3);border-radius:20px;padding:2rem 1.75rem;max-width:360px;width:calc(100% - 2rem);text-align:center;transition:transform .3s,opacity .3s;opacity:0}
+.upg-modal.open{display:block;transform:translate(-50%,-50%);opacity:1}
+.upg-modal::before{content:'';position:absolute;top:0;left:20%;right:20%;height:1px;background:linear-gradient(90deg,transparent,rgba(201,168,76,.5),transparent)}
+.upg-hex{font-size:2.25rem;margin-bottom:.5rem;line-height:1}
+.upg-lbl{font-size:.4375rem;font-family:var(--mono);letter-spacing:.3em;text-transform:uppercase;color:rgba(201,168,76,.6);margin-bottom:4px}
+.upg-tier{font-size:2.25rem;font-weight:900;font-family:var(--mono);color:rgba(201,168,76,1);letter-spacing:.05em;margin-bottom:.25rem}
+.upg-feat{font-size:.5625rem;color:rgba(245,240,232,.4);font-family:var(--mono);margin-bottom:1.25rem}
+.upg-price{font-size:1.375rem;font-weight:700;color:rgba(245,240,232,.9);margin-bottom:1.25rem}
+.upg-list{text-align:left;margin-bottom:1.5rem;background:rgba(255,255,255,.02);border-radius:var(--r);padding:.75rem}
+.upg-row{font-size:.5rem;font-family:var(--mono);color:rgba(245,240,232,.55);padding:3px 0;display:flex;align-items:center;gap:6px}
+.upg-row::before{content:'✓';color:rgba(201,168,76,.7);flex-shrink:0}
+.upg-btns{display:flex;gap:.625rem;margin-bottom:.875rem}
+.upg-free{flex:1;padding:.625rem;border-radius:var(--r);background:transparent;border:.5px solid rgba(255,255,255,.1);color:rgba(255,255,255,.3);font-family:var(--mono);font-size:.5rem;cursor:pointer}
+.upg-pro{flex:1.4;padding:.625rem;border-radius:var(--r);background:rgba(201,168,76,1);border:none;color:#000;font-family:var(--mono);font-size:.5rem;font-weight:700;cursor:pointer;letter-spacing:.06em}
+.upg-note{font-size:.375rem;font-family:var(--mono);color:rgba(255,255,255,.15);letter-spacing:.08em}
 /* ── SIDEBAR (laptop only) ── */
 .vv-sidebar{display:none;position:fixed;top:0;left:0;bottom:0;width:220px;background:rgba(4,4,6,.99);border-right:.5px solid var(--border);flex-direction:column;padding:max(1.75rem,env(safe-area-inset-top)) 1rem 1.25rem;z-index:800}
 .sb-brand{margin-bottom:2rem;padding:0 .25rem}
@@ -153,6 +184,12 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
     <a href="lea.html?now=1" class="sb-item"><span class="sb-icon">⊡</span><span class="sb-lbl">NOW</span></a>
     <a href="index.html" class="sb-item active"><span class="sb-icon">⊙</span><span class="sb-lbl">EU</span></a>
   </nav>
+  <div class="sb-divider"></div>
+  <div class="sb-divider"></div>
+  <div class="sb-sect">HOMME PRO <span class="sb-pro-price">9€/lună</span></div>
+  <div class="sb-item sb-locked" onclick="showUpgrade()"><span class="sb-icon">🎨</span><span class="sb-lbl">Studio</span><span class="sb-lock">🔒</span></div>
+  <div class="sb-item sb-locked" onclick="showUpgrade()"><span class="sb-icon">⚡</span><span class="sb-lbl">Moduri Pro</span><span class="sb-lock">🔒</span></div>
+  <div class="sb-item sb-locked" onclick="showUpgrade()"><span class="sb-icon">↗</span><span class="sb-lbl">Export</span><span class="sb-lock">🔒</span></div>
   <div class="sb-divider"></div>
   <div class="sb-coins"><div class="sb-cdot"></div><span id="sb-coins">⬡ 0</span></div>
   <div class="sb-ghost-btn" id="sb-ghost" onclick="toggleGhost()"><span>👻</span><span id="sb-ghost-lbl">Ghost Mode</span></div>
@@ -254,7 +291,15 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
     </div>
   </div>
 
-  <!-- APP INFO -->
+  <!-- PLAN CARD -->
+  <div class="plan-card">
+    <div class="plan-left">
+      <div class="plan-tier">Plan curent</div>
+      <div class="plan-name">Free</div>
+      <div class="plan-desc">Personal · Local · Nelimitat</div>
+    </div>
+    <div class="plan-btn" onclick="showUpgrade()">Upgrade PRO →</div>
+  </div>  <!-- APP INFO -->
   <div class="app-info">
     <div class="info-row">Versiune <span>v2.0 · Mai 2026</span></div>
     <div class="info-row">Mod stocare <span>Local · Privat</span></div>
@@ -404,9 +449,33 @@ function showToast(msg,ms=2400){
 }
 
 window.toggleGhost=()=>setGhost(!ghostActive);
+window.showUpgrade=function(){ document.getElementById('upg-overlay').classList.add('open'); document.getElementById('upg-modal').classList.add('open'); };
+window.closeUpgrade=function(){ document.getElementById('upg-overlay').classList.remove('open'); document.getElementById('upg-modal').classList.remove('open'); };
 boot();
 </script>
-</body>
+<div class="upg-overlay" id="upg-overlay" onclick="closeUpgrade()"></div>
+<div class="upg-modal" id="upg-modal">
+  <div class="upg-hex">⬡</div>
+  <div class="upg-lbl">LEA HOMME</div>
+  <div class="upg-tier">PRO</div>
+  <div class="upg-feat">Deblocheaza tot potentialul LEA pe laptop</div>
+  <div class="upg-price">9€ / lună</div>
+  <div class="upg-list">
+    <div class="upg-row">Moduri Profesionale — Artist, Creator, Business</div>
+    <div class="upg-row">VV Studio — workspace creativ AI-powered</div>
+    <div class="upg-row">Export conversatii PDF si Markdown</div>
+    <div class="upg-row">Analytics personal — patterns si statistici</div>
+    <div class="upg-row">Prioritate AI — model si viteza superioare</div>
+    <div class="upg-row">Procesare locala offline — fara internet</div>
+  </div>
+  <div class="upg-btns">
+    <button class="upg-free" onclick="closeUpgrade()">Raman pe Free</button>
+    <button class="upg-pro" onclick="closeUpgrade()">Activeaza PRO</button>
+  </div>
+  <div class="upg-note">Local-first · GDPR-ready · Constitutia VV ART-6</div>
+</div></body>
 </html>
+
+
 
 
