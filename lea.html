@@ -34,13 +34,20 @@
 .sb-ver{font-size:.375rem;font-family:var(--mono);color:var(--text3);letter-spacing:.1em;text-align:center;margin-top:.75rem}
 /* ── LAPTOP RESPONSIVE ── */
 @media (min-width:768px){
+  html{font-size:17px}
   .vv-tabs{display:none!important}
   .vv-sidebar{display:flex!important}
-  .sc:not(#s-accord){margin-left:220px}
+  /* Override lea.css desktop centering (#app{left:50%;transform:...}) */
+  #app{left:220px!important;right:0!important;max-width:none!important;transform:none!important}
+  /* Screens outside #app also need offset */
+  .sc:not(#s-accord){left:220px!important}
+  #sett,#vvme,#studio-mini{left:220px!important}
   .inp-area{padding-bottom:calc(1.5rem + env(safe-area-inset-bottom))!important}
-  .chat-screen{max-width:none}
-  .msg-list{padding:1rem 2rem 1rem}
-  .inp-row{max-width:720px;margin:0 auto}
+  .msg-list{padding:1.25rem 2.5rem 1.25rem}
+  .inp-row{max-width:760px;margin:0 auto}
+  .home-screen{padding-left:2.5rem;padding-right:2.5rem}
+  .tile{min-height:5rem}
+  .tiles-cta{font-size:1rem}
 }
 .sb-sect{font-size:.375rem;font-family:var(--mono);letter-spacing:.22em;text-transform:uppercase;color:var(--text3);padding:.375rem .875rem .25rem;opacity:.6}
 .sb-shelf{font-size:.5rem;font-family:var(--mono);color:var(--text2);padding:3px .875rem;line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:.8}
