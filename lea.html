@@ -1,4 +1,4 @@
-﻿﻿<!DOCTYPE html>
+﻿﻿﻿<!DOCTYPE html>
 <html lang="ro">
 <head>
 <meta charset="UTF-8">
@@ -8,8 +8,6 @@
 <meta name="apple-mobile-web-app-title" content="VV">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#000">
 <title>Lea</title>
 <link rel="stylesheet" href="lea.css">
@@ -38,13 +36,40 @@
 @media (min-width:768px){
   .vv-tabs{display:none!important}
   .vv-sidebar{display:flex!important}
-  .sc{margin-left:220px}
+  .sc:not(#s-accord){margin-left:220px}
   .inp-area{padding-bottom:calc(1.5rem + env(safe-area-inset-bottom))!important}
   .chat-screen{max-width:none}
   .msg-list{padding:1rem 2rem 1rem}
   .inp-row{max-width:720px;margin:0 auto}
 }
-</style>
+.sb-sect{font-size:.375rem;font-family:var(--mono);letter-spacing:.22em;text-transform:uppercase;color:var(--text3);padding:.375rem .875rem .25rem;opacity:.6}
+.sb-shelf{font-size:.5rem;font-family:var(--mono);color:var(--text2);padding:3px .875rem;line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:.8}
+.sb-locked{opacity:.45;cursor:pointer;position:relative}
+.sb-locked:hover{opacity:.7;background:rgba(255,255,255,.03)!important}
+.sb-lock{margin-left:auto;font-size:.625rem;flex-shrink:0}
+.sb-pro-price{font-size:.3125rem;letter-spacing:.1em;color:var(--accent);margin-left:4px;vertical-align:middle;font-family:var(--mono)}
+.sb-upgrade-btn{display:flex;align-items:center;justify-content:center;gap:6px;margin:.75rem .5rem .25rem;padding:.5rem;background:rgba(201,168,76,.1);border:.5px solid rgba(201,168,76,.25);border-radius:var(--r);font-size:.5rem;font-family:var(--mono);color:var(--accent);cursor:pointer;letter-spacing:.08em;transition:background .2s}
+.sb-upgrade-btn:hover{background:rgba(201,168,76,.18)}
+/* upgrade modal */
+.upg-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:1900;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.upg-overlay.open{display:block}
+.upg-modal{display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-54%);z-index:2000;background:rgba(6,6,8,.99);border:.5px solid rgba(201,168,76,.3);border-radius:20px;padding:2rem 1.75rem;max-width:360px;width:calc(100% - 2rem);text-align:center;transition:transform .3s cubic-bezier(.4,0,.2,1),opacity .3s;opacity:0}
+.upg-modal.open{display:block;transform:translate(-50%,-50%);opacity:1}
+.upg-modal::before{content:'';position:absolute;top:0;left:20%;right:20%;height:1px;background:linear-gradient(90deg,transparent,rgba(201,168,76,.5),transparent)}
+.upg-hex{font-size:2.25rem;margin-bottom:.5rem;line-height:1}
+.upg-lbl{font-size:.4375rem;font-family:var(--mono);letter-spacing:.3em;text-transform:uppercase;color:rgba(201,168,76,.6);margin-bottom:4px}
+.upg-tier{font-size:2.25rem;font-weight:900;font-family:var(--mono);color:rgba(201,168,76,1);letter-spacing:.05em;margin-bottom:.25rem}
+.upg-feat{font-size:.5625rem;color:rgba(245,240,232,.4);font-family:var(--mono);margin-bottom:1.25rem;letter-spacing:.02em}
+.upg-price{font-size:1.375rem;font-weight:700;color:rgba(245,240,232,.9);margin-bottom:1.25rem}
+.upg-list{text-align:left;margin-bottom:1.5rem;background:rgba(255,255,255,.02);border-radius:var(--r);padding:.75rem}
+.upg-row{font-size:.5rem;font-family:var(--mono);color:rgba(245,240,232,.55);padding:3px 0;display:flex;align-items:center;gap:6px}
+.upg-row::before{content:'✓';color:rgba(201,168,76,.7);flex-shrink:0}
+.upg-btns{display:flex;gap:.625rem;margin-bottom:.875rem}
+.upg-free{flex:1;padding:.625rem;border-radius:var(--r);background:transparent;border:.5px solid rgba(255,255,255,.1);color:rgba(255,255,255,.3);font-family:var(--mono);font-size:.5rem;cursor:pointer;transition:background .2s}
+.upg-free:hover{background:rgba(255,255,255,.04)}
+.upg-pro{flex:1.4;padding:.625rem;border-radius:var(--r);background:rgba(201,168,76,1);border:none;color:#000;font-family:var(--mono);font-size:.5rem;font-weight:700;cursor:pointer;letter-spacing:.06em;transition:opacity .2s}
+.upg-pro:hover{opacity:.85}
+.upg-note{font-size:.375rem;font-family:var(--mono);color:rgba(255,255,255,.15);letter-spacing:.08em}</style>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⬡</text></svg>">
 </head>
 <body>
@@ -61,7 +86,20 @@
     <a href="lea.html?now=1" class="sb-item"><span class="sb-icon">⊡</span><span class="sb-lbl">NOW</span></a>
     <a href="index.html" class="sb-item"><span class="sb-icon">⊙</span><span class="sb-lbl">EU</span></a>
   </nav>
+  <!-- Shelves preview (free) -->
   <div class="sb-divider"></div>
+  <div class="sb-sect">RAFTURI</div>
+  <div class="sb-shelf" id="sb-mood">Dispoziție: —</div>
+  <div class="sb-shelf" id="sb-prefs">Preferințe: —</div>
+  <div class="sb-shelf" id="sb-wishes">Dorințe: —</div>
+  <!-- PRO locked features -->
+  <div class="sb-divider"></div>
+  <div class="sb-sect">HOMME PRO <span class="sb-pro-price">9€/lună</span></div>
+  <div class="sb-item sb-locked" onclick="showUpgrade('studio')"><span class="sb-icon">🎨</span><span class="sb-lbl">Studio</span><span class="sb-lock">🔒</span></div>
+  <div class="sb-item sb-locked" onclick="showUpgrade('moduri')"><span class="sb-icon">⚡</span><span class="sb-lbl">Moduri Pro</span><span class="sb-lock">🔒</span></div>
+  <div class="sb-item sb-locked" onclick="showUpgrade('export')"><span class="sb-icon">↗</span><span class="sb-lbl">Export</span><span class="sb-lock">🔒</span></div>
+  <div class="sb-item sb-locked" onclick="showUpgrade('analytics')"><span class="sb-icon">◈</span><span class="sb-lbl">Analytics</span><span class="sb-lock">🔒</span></div>
+  <!-- Footer -->
   <div class="sb-name" id="sb-name">—</div>
   <div class="sb-ver">v2.0 · Mai 2026</div>
 </aside>
@@ -543,7 +581,33 @@ function studioAsk(q) {
   enterChat();
   var ibox = document.getElementById('ibox');
   if(ibox) ibox.value = q;
-  setTimeout(function(){ if(typeof send === 'function') send(); }, 200);
+  setTimeout(function(){ if(typeof send === 'function') send(); }
+// ── SHELVES SIDEBAR SYNC
+function syncSidebarShelves(){
+  try{
+    var s=JSON.parse(localStorage.getItem('lea_shelves')||'{}');
+    var prefs=s.preferences&&s.preferences.items&&s.preferences.items.length?s.preferences.items.slice(-2).map(function(i){return i.text||i;}).join(' · '):'—';
+    var mood=s.moods&&s.moods.items&&s.moods.items.length?s.moods.items.slice(-1)[0].text||s.moods.items.slice(-1)[0]:'—';
+    var wish=s.wishes&&s.wishes.items&&s.wishes.items.length?s.wishes.items.slice(-1)[0].text||s.wishes.items.slice(-1)[0]:'—';
+    var ep=document.getElementById('sb-prefs'); if(ep) ep.textContent='Prefs: '+prefs;
+    var em=document.getElementById('sb-mood'); if(em) em.textContent='Mood: '+mood;
+    var ew=document.getElementById('sb-wishes'); if(ew) ew.textContent='Doresc: '+wish;
+  }catch(e){}
+}
+setInterval(syncSidebarShelves,4000);
+setTimeout(syncSidebarShelves,800);
+
+// ── UPGRADE MODAL
+var _upgFeats={'studio':'VV Studio — workspace creativ avansat','moduri':'Moduri Pro — Artist, Creator, Business','export':'Export — PDF și Markdown','analytics':'Analytics — patterns și statistici'};
+function showUpgrade(f){
+  var el=document.getElementById('upg-feat'); if(el) el.textContent=_upgFeats[f]||f;
+  document.getElementById('upg-overlay').classList.add('open');
+  document.getElementById('upg-modal').classList.add('open');
+}
+function closeUpgrade(){
+  document.getElementById('upg-overlay').classList.remove('open');
+  document.getElementById('upg-modal').classList.remove('open');
+}, 200);
 }
 </script>
 
@@ -552,8 +616,31 @@ function studioAsk(q) {
   <a href="vv-pulse.html" class="vv-tab"><div class="vt-icon">◉</div><div class="vt-lbl">PULSE</div></a>
   <a href="lea.html?now=1" class="vv-tab"><div class="vt-icon">⊡</div><div class="vt-lbl">NOW</div></a>
   <a href="index.html" class="vv-tab"><div class="vt-icon">⊙</div><div class="vt-lbl">EU</div></a>
-</nav></body>
+</nav><!-- UPGRADE MODAL -->
+<div class="upg-overlay" id="upg-overlay" onclick="closeUpgrade()"></div>
+<div class="upg-modal" id="upg-modal">
+  <div class="upg-hex">⬡</div>
+  <div class="upg-lbl">LEA HOMME</div>
+  <div class="upg-tier">PRO</div>
+  <div class="upg-feat" id="upg-feat">Funcție avansată</div>
+  <div class="upg-price">9€ / lună</div>
+  <div class="upg-list">
+    <div class="upg-row">Moduri Profesionale — Artist, Creator, Business</div>
+    <div class="upg-row">VV Studio — workspace creativ AI-powered</div>
+    <div class="upg-row">Export conversații în PDF și Markdown</div>
+    <div class="upg-row">Analytics personal — patterns și statistici</div>
+    <div class="upg-row">Prioritate AI — model și viteză superioare</div>
+    <div class="upg-row">Procesare locală offline — fără internet</div>
+  </div>
+  <div class="upg-btns">
+    <button class="upg-free" onclick="closeUpgrade()">Rămân pe Free</button>
+    <button class="upg-pro" onclick="closeUpgrade()">Activează PRO →</button>
+  </div>
+  <div class="upg-note">Local-first · GDPR-ready · Constituția VV ART-6</div>
+</div></body>
 </html>
+
+
 
 
 
