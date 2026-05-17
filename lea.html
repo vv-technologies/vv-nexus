@@ -406,14 +406,18 @@ function openVVMe() {
         var p = [];
         if(S.mood.lastMood) p.push(S.mood.lastMood);
         if(S.mood.stressIndicators > 2) p.push('stres detectat (' + S.mood.stressIndicators + ')');
+        if(S.wishes && S.wishes.financialCtx === 'tight') p.push('buget limitat');
         return p.join(' · ');
+      })()
+    },
+    {
+      icon:'✨', label:'Dorințe', hint:'Ce vrei să faci, să guști, să trăiești',
+      val: (function(){
+        if(!S.wishes || !S.wishes.items || !S.wishes.items.length) return '';
+        return S.wishes.items.slice(-5).map(function(w){return w.text;}).join(' · ');
       })()
     }
   ];
-
-  var archetype = localStorage.getItem('lea_archetype') || 'Explorator';
-  var sub = document.getElementById('vme-archetype');
-  if(sub) sub.textContent = archetype + ' · VV Beta';
 
   cont.innerHTML = '';
   rows.forEach(function(r) {
@@ -487,3 +491,4 @@ function studioAsk(q) {
 
 </body>
 </html>
+
