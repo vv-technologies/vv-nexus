@@ -450,7 +450,18 @@ function setGhost(on,save=true){
 
 function registerSW(){
   if('serviceWorker' in navigator){
-    navigator.serviceWorker.register('/vv-nexus/sw.js',{scope:'/vv-nexus/'}).catch(()=>{});
+    navigator.serviceWorker.register('/vv-nexus/sw.js',{scope:'/vv-nexus/',updateViaCache:'none'})
+      .then(reg=>{
+        reg.addEventListener('updatefound',()=>{
+          const newSW=reg.installing;
+          newSW.addEventListener('statechange',()=>{
+            if(newSW.state==='activated') window.location.reload();
+          });
+        });
+      }).catch(()=>{});
+    navigator.serviceWorker.addEventListener('message',e=>{
+      if(e.data&&e.data.type==='SW_UPDATED') window.location.reload();
+    });
   }
 }
 
