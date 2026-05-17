@@ -34,7 +34,7 @@
 .sb-ver{font-size:.375rem;font-family:var(--mono);color:var(--text3);letter-spacing:.1em;text-align:center;margin-top:.75rem}
 /* ── LAPTOP RESPONSIVE ── */
 @media (min-width:768px){
-  html{font-size:17px}
+  html{font-size:20px}
   .vv-tabs{display:none!important}
   .vv-sidebar{display:flex!important}
   /* Override lea.css desktop centering (#app{left:50%;transform:...}) */
@@ -43,11 +43,30 @@
   .sc:not(#s-accord){left:220px!important}
   #sett,#vvme,#studio-mini{left:220px!important}
   .inp-area{padding-bottom:calc(1.5rem + env(safe-area-inset-bottom))!important}
-  .msg-list{padding:1.25rem 2.5rem 1.25rem}
-  .inp-row{max-width:760px;margin:0 auto}
-  .home-screen{padding-left:2.5rem;padding-right:2.5rem}
-  .tile{min-height:5rem}
-  .tiles-cta{font-size:1rem}
+  /* Chat layout */
+  .msg-list{padding:2rem 3rem}
+  .inp-row{max-width:780px;margin:0 auto}
+  .ibox{font-size:1rem!important}
+  /* Home screen — premium laptop layout */
+  .home-screen{padding:2rem 3rem!important;display:flex;flex-direction:column;gap:1.5rem}
+  .tiles-time{font-size:3.5rem!important;font-weight:700!important;letter-spacing:-.03em!important;line-height:1!important}
+  .tiles-mood{font-size:1rem!important;opacity:.5!important}
+  .tiles-cta{font-size:1.05rem!important;padding:1.1rem 2.5rem!important;border-radius:16px!important;letter-spacing:.01em!important}
+  .tiles-grid{display:grid!important;grid-template-columns:repeat(3,1fr)!important;gap:1rem!important;margin-top:.5rem!important}
+  .tile{padding:1.75rem 1.5rem!important;border-radius:16px!important;min-height:6rem!important;flex-direction:column!important;align-items:flex-start!important}
+  .tile-icon{font-size:1.75rem!important;margin-bottom:.5rem!important}
+  .tile-label{font-size:.85rem!important;font-weight:500!important;opacity:.8!important}
+  /* Sidebar laptop scale */
+  .sb-logo{font-size:1.3rem!important;letter-spacing:5px!important}
+  .sb-sub{font-size:.5rem!important}
+  .sb-item{font-size:.8rem!important;padding:.7rem 1rem!important}
+  .sb-icon{font-size:1rem!important}
+  .sb-sect{font-size:.45rem!important;letter-spacing:.25em!important}
+  .sb-shelf{font-size:.55rem!important}
+  .sb-ver{font-size:.4rem!important}
+  /* Topbar */
+  .topbar{padding:1.5rem 2rem 1rem!important}
+  .tb-logo{font-size:1.5rem!important}
 }
 .sb-sect{font-size:.375rem;font-family:var(--mono);letter-spacing:.22em;text-transform:uppercase;color:var(--text3);padding:.375rem .875rem .25rem;opacity:.6}
 .sb-shelf{font-size:.5rem;font-family:var(--mono);color:var(--text2);padding:3px .875rem;line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:.8}
@@ -601,7 +620,8 @@ function studioAsk(q) {
   enterChat();
   var ibox = document.getElementById('ibox');
   if(ibox) ibox.value = q;
-  setTimeout(function(){ if(typeof send === 'function') send(); }
+  setTimeout(function(){ if(typeof send === 'function') send(); }, 200);
+}
 // ── SHELVES SIDEBAR SYNC
 function syncSidebarShelves(){
   try{
@@ -627,7 +647,6 @@ function showUpgrade(f){
 function closeUpgrade(){
   document.getElementById('upg-overlay').classList.remove('open');
   document.getElementById('upg-modal').classList.remove('open');
-}, 200);
 }
 </script>
 
