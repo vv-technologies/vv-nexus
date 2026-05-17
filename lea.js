@@ -1042,7 +1042,10 @@ async function searchVVNodes(q, intent) {
 // Dimineata si seara = cache-uri diferite (contextul se schimba)
 
 var CACHE_KEY = 'vv_smart_cache';
-var CACHE_TTL = 48 * 3600000; // 48 ore
+var CACHE_TTL_LOC = 2 * 3600000;
+var CACHE_TTL_GEN = 24 * 3600000;
+var CACHE_TTL_INTENTS_LOC = ['mancare','cafea','sanatate','transport','divertisment','cumparaturi','vreme'];
+function getCacheTTL(intent) { return CACHE_TTL_INTENTS_LOC.indexOf(intent) >= 0 ? CACHE_TTL_LOC : CACHE_TTL_GEN; }
 
 function getCacheBucket(intent, city) {
   // Bucket = intentie + oras + perioada zilei
@@ -1081,7 +1084,7 @@ function getCache(intent, city) {
     var entry = cache[bucket];
     if(!entry) return null;
     var age = Date.now() - entry.t;
-    if(age > CACHE_TTL) { delete cache[bucket]; localStorage.setItem(CACHE_KEY, JSON.stringify(cache)); return null; }
+    var ttl = getCacheTTL(intent); if(age > ttl) { delete cache[bucket]; localStorage.setItem(CACHE_KEY, JSON.stringify(cache)); return null; }
     if(entry.city && city && entry.city.toLowerCase() !== city.toLowerCase()) return null;
     return {response: entry.r, ageMs: age};
   } catch(e) { return null; }
@@ -1106,6 +1109,22 @@ async function processLea(q) {
   var activeKey = localStorage.getItem('lea_gk') || '';
   _gk = activeKey;
   var intent=detectIntent(q);
+
+  // ── CACHE CHECK — inainte de orice API ──────────────────────
+  if(intent !== 'urgenta' && intent !== 'salut' && intent !== 'ceas') {
+    var cachedHit = getCache(intent, _city||'');
+    if(cachedHit) {
+      addMsg('l', cachedHit.response);
+      var cacheBadge = document.createElement('div');
+      cacheBadge.style.cssText='align-self:flex-start;font-size:9px;color:rgba(255,255,255,.22);padding:2px 8px;margin-top:-6px;';
+      cacheBadge.textContent='📦 din cache · ' + formatCacheAge(cachedHit.ageMs);
+      document.getElementById('conv').appendChild(cacheBadge);
+      _hist.push({r:'u',t:q});_hist.push({r:'l',t:cachedHit.response});saveHistory();
+      sendAnonTelemetry(intent, _city||'', true, true);
+      return;
+    }
+  }
+
   // Raspunde direct la intrebari despre ceas - zero API
   if(intent==='ceas') {
     var now = new Date();
