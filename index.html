@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ro">
 <head>
 <meta charset="UTF-8">
@@ -110,9 +110,54 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 /* ── TOAST */
 .toast-pill{position:fixed;top:max(1rem,calc(env(safe-area-inset-top) + .5rem));left:50%;transform:translateX(-50%) translateY(-70px);z-index:2000;background:rgba(10,10,12,.96);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:.5px solid var(--border2);border-radius:100px;padding:.5rem 1.375rem;font-size:.5625rem;font-family:var(--mono);color:var(--w50);white-space:nowrap;transition:transform .35s cubic-bezier(.4,0,.2,1);pointer-events:none}
 .toast-pill.show{transform:translateX(-50%) translateY(0)}
+/* ── SIDEBAR (laptop only) ── */
+.vv-sidebar{display:none;position:fixed;top:0;left:0;bottom:0;width:220px;background:rgba(4,4,6,.99);border-right:.5px solid var(--border);flex-direction:column;padding:max(1.75rem,env(safe-area-inset-top)) 1rem 1.25rem;z-index:800}
+.sb-brand{margin-bottom:2rem;padding:0 .25rem}
+.sb-logo{font-family:var(--mono);font-size:1.125rem;font-weight:700;letter-spacing:4px;color:var(--gold)}
+.sb-sub{font-size:.4375rem;font-family:var(--mono);letter-spacing:.22em;text-transform:uppercase;color:var(--w30);margin-top:4px}
+.sb-nav{display:flex;flex-direction:column;gap:3px;flex:1}
+.sb-item{display:flex;align-items:center;gap:.875rem;padding:.625rem .875rem;border-radius:var(--r-sm);text-decoration:none;color:var(--w30);font-size:.75rem;font-family:var(--mono);transition:background .15s,color .15s;-webkit-user-select:none;user-select:none}
+.sb-item:hover{background:var(--surf);color:var(--w50)}
+.sb-item.active{background:var(--gold-dim);color:var(--gold);border:.5px solid var(--gold-bd)}
+.sb-icon{font-size:1.0625rem;width:1.25rem;text-align:center;flex-shrink:0;line-height:1}
+.sb-lbl{letter-spacing:.05em}
+.sb-divider{height:.5px;background:var(--border);margin:.75rem 0}
+.sb-coins{display:flex;align-items:center;gap:6px;padding:.5rem .875rem;font-size:.5625rem;font-family:var(--mono);color:var(--gold);letter-spacing:.05em}
+.sb-cdot{width:5px;height:5px;border-radius:50%;background:var(--gold);flex-shrink:0}
+.sb-ghost-btn{display:flex;align-items:center;gap:.75rem;padding:.5rem .875rem;border-radius:var(--r-sm);cursor:pointer;font-size:.6875rem;font-family:var(--mono);color:var(--w30);transition:background .15s;-webkit-user-select:none}
+.sb-ghost-btn:hover{background:var(--surf)}
+.sb-ghost-btn.ghost-on{color:var(--green)}
+.sb-ver{font-size:.375rem;font-family:var(--mono);color:var(--w15);letter-spacing:.1em;text-align:center;margin-top:.75rem}
+/* ── LAPTOP RESPONSIVE ── */
+@media (min-width:768px){
+  .vv-tabs{display:none!important}
+  .vv-sidebar{display:flex!important}
+  .page{margin-left:220px;max-width:none;padding-left:2rem;padding-right:2rem;padding-bottom:2rem}
+  .top-bar{padding-top:1.5rem}
+  .tiles{grid-template-columns:repeat(4,1fr)}
+  .vvid-card,.resume-banner,.sect-label,.ghost-wrap,.app-info,.app-footer{max-width:800px}
+  .activate-btn{max-width:800px}
+}
 </style>
 </head>
 <body>
+<!-- SIDEBAR (visible on laptop) -->
+<aside class="vv-sidebar">
+  <div class="sb-brand">
+    <div class="sb-logo">VV</div>
+    <div class="sb-sub">Hybrid Universe</div>
+  </div>
+  <nav class="sb-nav">
+    <a href="lea.html" class="sb-item"><span class="sb-icon">◎</span><span class="sb-lbl">LEA</span></a>
+    <a href="vv-pulse.html" class="sb-item"><span class="sb-icon">◉</span><span class="sb-lbl">PULSE</span></a>
+    <a href="lea.html?now=1" class="sb-item"><span class="sb-icon">⊡</span><span class="sb-lbl">NOW</span></a>
+    <a href="index.html" class="sb-item active"><span class="sb-icon">⊙</span><span class="sb-lbl">EU</span></a>
+  </nav>
+  <div class="sb-divider"></div>
+  <div class="sb-coins"><div class="sb-cdot"></div><span id="sb-coins">⬡ 0</span></div>
+  <div class="sb-ghost-btn" id="sb-ghost" onclick="toggleGhost()"><span>👻</span><span id="sb-ghost-lbl">Ghost Mode</span></div>
+  <div class="sb-ver">v2.0 · Mai 2026</div>
+</aside>
 <div class="page">
 
   <!-- TOP NAV -->
@@ -293,6 +338,7 @@ async function loadCoins(){
 }
 
 function setCoins(n){
+  var sbc=document.getElementById('sb-coins'); if(sbc) sbc.textContent='⬡ '+n;
   document.getElementById('coins-display').textContent='⬡ '+n;
   document.getElementById('chip-coins').textContent='⬡ '+n;
 }
@@ -326,6 +372,8 @@ function checkGhost(){
 function setGhost(on,save=true){
   ghostActive=on;
   document.getElementById('g-toggle').classList.toggle('on',on);
+  var sbg=document.getElementById('sb-ghost'); if(sbg){ sbg.classList.toggle('ghost-on',on); }
+  var sbgl=document.getElementById('sb-ghost-lbl'); if(sbgl){ sbgl.textContent=on?'Ghost activ':'Ghost Mode'; }
   document.getElementById('ghost-status').textContent=on?'activ 30 min':'inactiv';
   document.getElementById('ghost-ico').textContent=on?'🕵️':'👻';
   if(save){
@@ -360,3 +408,5 @@ boot();
 </script>
 </body>
 </html>
+
+
