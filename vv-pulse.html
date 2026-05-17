@@ -1,4 +1,4 @@
-﻿﻿<!DOCTYPE html>
+﻿﻿﻿<!DOCTYPE html>
 <html lang="ro">
 <head>
 <meta charset="UTF-8">
@@ -620,7 +620,16 @@ loadCoins();
 if(!localStorage.getItem('vv_p2_ok'))document.getElementById('wmod').style.display='flex';
 setTimeout(locateMe,800);
 try{const{setDoc:sd,doc:d2,increment:inc}=await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");sd(d2(db,"stats","pulse_v2"),{total:inc(1),[new Date().toISOString().slice(0,10)]:inc(1)},{merge:true});}catch(e){}
-</script>
+
+// ── SIDEBAR STATS (laptop)
+function syncSidebarStats(){
+  var si=document.getElementById('sb-insideri'); if(si) si.textContent=Object.keys(insiderMarkers||{}).length;
+  var sl=document.getElementById('sb-locatii'); if(sl) sl.textContent=(fbLocs||[]).length;
+  var sm=document.getElementById('sb-misiuni'); if(sm) sm.textContent=(fbMissions||[]).filter(function(m){return m.status==='open';}).length;
+  var sc=document.getElementById('sb-coins'); if(sc) sc.textContent='⬡ '+(userCoins||0);
+}
+setInterval(syncSidebarStats,3000);
+setTimeout(syncSidebarStats,2000);</script>
 <!-- SIDEBAR (visible on laptop) -->
 <aside class="vv-sidebar">
   <div class="sb-brand">
@@ -649,6 +658,8 @@ try{const{setDoc:sd,doc:d2,increment:inc}=await import("https://www.gstatic.com/
   <a href="index.html" class="vv-tab"><div class="vt-icon">⊙</div><div class="vt-lbl">EU</div></a>
 </nav></body>
 </html>
+
+
 
 
 
