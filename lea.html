@@ -694,6 +694,12 @@ function openNow(){ document.getElementById('now-ov').classList.add('open'); set
 function closeNow(){ document.getElementById('now-ov').classList.remove('open'); }
 function submitNowLea(){ var q=document.getElementById('now-inp').value.trim(); if(!q) return; closeNow(); var ibox=document.getElementById('ibox'); if(ibox){ibox.value=q; if(typeof enterChat==='function')enterChat(); if(typeof send==='function')setTimeout(send,200);} }
 function submitNowPulse(){ var q=document.getElementById('now-inp').value.trim(); if(!q) return; window.location.href='vv-pulse.html?search='+encodeURIComponent(q); }
+// Auto-update SW
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.addEventListener('message',function(e){
+    if(e.data&&e.data.type==='SW_UPDATED') window.location.reload();
+  });
+}
 </script></body>
 </html>
 
