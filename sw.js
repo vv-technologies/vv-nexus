@@ -1,65 +1,44 @@
-// VV NOW · Service Worker · v1.0
-var CACHE = 'vvnow-v1';
-var ASSETS = [
-  './vv-now.html',
-  'https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=DM+Sans:wght@300;400;500&display=swap'
+const CACHE = 'vv-v2';
+const SHELL = [
+  '/vv-nexus/',
+  '/vv-nexus/index.html',
+  '/vv-nexus/lea.html',
+  '/vv-nexus/lea.css',
+  '/vv-nexus/lea.js',
+  '/vv-nexus/vv-pulse.html',
+  '/vv-nexus/manifest.json',
+  '/vv-nexus/icons/icon.svg',
 ];
 
-self.addEventListener('install', function(e) {
+self.addEventListener('install', e => {
   e.waitUntil(
-    caches.open(CACHE).then(function(cache) {
-      return cache.addAll(ASSETS);
-    })
+    caches.open(CACHE)
+      .then(c => c.addAll(SHELL.map(u => new Request(u, {cache: 'reload'}))))
+      .then(() => self.skipWaiting())
   );
-  self.skipWaiting();
 });
 
-self.addEventListener('activate', function(e) {
+self.addEventListener('activate', e => {
   e.waitUntil(
-    caches.keys().then(function(keys) {
-      return Promise.all(
-        keys.filter(function(k) { return k !== CACHE; })
-            .map(function(k) { return caches.delete(k); })
-      );
-    })
+    caches.keys()
+      .then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k))))
+      .then(() => self.clients.claim())
   );
-  self.clients.claim();
 });
 
-self.addEventListener('fetch', function(e) {
-  // Cache-first pentru assets statice
-  if (e.request.url.includes('vv-now.html') ||
-      e.request.url.includes('fonts.googleapis')) {
-    e.respondWith(
-      caches.match(e.request).then(function(cached) {
-        return cached || fetch(e.request).then(function(res) {
-          var copy = res.clone();
-          caches.open(CACHE).then(function(c) { c.put(e.request, copy); });
-          return res;
-        });
-      })
-    );
-    return;
-  }
-
-  // Network-first pentru Firebase si API
-  if (e.request.url.includes('firebase') ||
-      e.request.url.includes('anthropic') ||
-      e.request.url.includes('nominatim')) {
-    e.respondWith(
-      fetch(e.request).catch(function() {
-        return new Response(JSON.stringify({offline: true}), {
-          headers: {'Content-Type': 'application/json'}
-        });
-      })
-    );
-    return;
-  }
-
-  // Default: network cu fallback cache
+self.addEventListener('fetch', e => {
+  const url = e.request.url;
+  if (/firestore|googleapis|anthropic|nominatim|openstreetmap|gstatic/.test(url)) return;
   e.respondWith(
-    fetch(e.request).catch(function() {
-      return caches.match(e.request);
+    caches.match(e.request).then(cached => {
+      if (cached) return cached;
+      return fetch(e.request).then(res => {
+        if (res && res.ok) {
+          const clone = res.clone();
+          caches.open(CACHE).then(c => c.put(e.request, clone));
+        }
+        return res;
+      }).catch(() => caches.match('/vv-nexus/index.html'));
     })
   );
 });
