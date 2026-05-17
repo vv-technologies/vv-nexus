@@ -220,7 +220,7 @@
     <div class="ss-h"></div>
     <div class="vme-head">
       <div class="vme-title">Mintea ta</div>
-      <div class="vme-sub" id="vme-archetype">Explorator · VV Beta</div>
+      <div class="vme-sub" id="vme-archetype">Lea te descopera...</div>
     </div>
     <div class="vme-shelves" id="vme-shelves">
       <!-- populate din JS -->
@@ -323,6 +323,7 @@ var VV_SHELVES = [
 ];
 
 function openVVMe() {
+  refreshArchetypeDisplay();
   var sheet = document.getElementById('vvme');
   var cont = document.getElementById('vme-shelves');
   if(!sheet || !cont) return;
