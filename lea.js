@@ -1508,6 +1508,7 @@ function updateClock(){var n=new Date(),e=document.getElementById('idle-c');if(e
 
 // ── SETTINGS ──────────────────────────────────────────────────
 function openSett(){
+  populateSettings();
   if(_u){
     var i=document.getElementById('ss-id'),r=document.getElementById('ss-rang'),c=document.getElementById('ss-city');
     if(i)i.textContent=_u.vvid||'—';
@@ -1518,29 +1519,77 @@ function openSett(){
   document.getElementById('sett').classList.add('on');
 }
 function closeSett(){document.getElementById('sett').classList.remove('on');}
-function cfgVoice(){
-  closeSett();
-  // Schimbare nume
-  var currentName = localStorage.getItem('lea_name') || '';
-  var newName = prompt('Numele tău în Lea:\n(actual: ' + (currentName||'Anonim') + ')', currentName);
-  if(newName && newName.trim().length >= 2) {
-    var trimmed = newName.trim();
-    localStorage.setItem('lea_name', trimmed);
-    _userName = trimmed;
-    if(_u) { _u.name = trimmed; localStorage.setItem('lea_u', JSON.stringify(_u)); }
-    showToast('Numele actualizat: ' + trimmed);
+function cfgVoice(){ openSett(); }
+
+function saveSettings() {
+  var name = (document.getElementById('si-name')||{}).value||'';
+  if(name.trim().length >= 2) {
+    localStorage.setItem('lea_name', name.trim());
+    _userName = name.trim();
   }
-  // Proxy URL
-  var p=prompt('URL Google Apps Script · opțional\n(lasă gol dacă nu ai):');
-  if(p&&p.includes('script.google.com')){localStorage.setItem('vv_proxy_url',p);showToast('Proxy activat ✓');}
-  // Cheia personala
-  var g=prompt('Gemini API Key personală · opțional:');
-  if(g&&g.startsWith('AIza')){localStorage.setItem('lea_gk',g);_gk=g;}
-  var e=prompt('ElevenLabs API Key · opțional:');
-  if(e&&e.length>10){localStorage.setItem('lea_ek',e);_ek=e;}
-  var v=prompt('ElevenLabs Voice ID · opțional:');
-  if(v&&v.length>5){localStorage.setItem('lea_vi',v);_vi=v;}
+  var gk = (document.getElementById('si-gk')||{}).value||'';
+  if(gk.trim()) { localStorage.setItem('lea_gk', gk.trim()); _gk = gk.trim(); }
+  var proxy = (document.getElementById('si-proxy')||{}).value||'';
+  if(proxy.includes('script.google.com')) { localStorage.setItem('vv_proxy_url', proxy.trim()); VV_PROXY = proxy.trim(); }
+  var ek = (document.getElementById('si-ek')||{}).value||'';
+  if(ek.trim().length > 10) { localStorage.setItem('lea_ek', ek.trim()); _ek = ek.trim(); }
+  var vi = (document.getElementById('si-vi')||{}).value||'';
+  if(vi.trim().length > 5) { localStorage.setItem('lea_vi', vi.trim()); _vi = vi.trim(); }
   showToast('Salvat ✓');
+  closeSett();
+}
+
+async function testGemini() {
+  var key = (document.getElementById('si-gk')||{}).value || localStorage.getItem('lea_gk') || '';
+  var status = document.getElementById('si-gk-status');
+  if(!key) { if(status){status.textContent='Lipsește';status.className='ss-status err';} return; }
+  if(status){status.textContent='Testez...';status.className='ss-status dim';}
+  try {
+    var r = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key='+key,{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({contents:[{parts:[{text:'Salut'}]}],generationConfig:{maxOutputTokens:10}})
+    });
+    if(r.ok){if(status){status.textContent='✓ Activ';status.className='ss-status ok';}}
+    else {if(status){status.textContent='✗ Invalid';status.className='ss-status err';}}
+  } catch(e){if(status){status.textContent='✗ Eroare';status.className='ss-status err';}}
+}
+
+function clearCacheSettings() {
+  localStorage.removeItem('vv_smart_cache');
+  showToast('Cache golit ✓');
+  populateSettings();
+}
+
+function resetArchSettings() {
+  localStorage.removeItem('lea_archetype');
+  refreshArchetypeDisplay();
+  showToast('Archetype resetat ✓');
+  populateSettings();
+}
+
+function populateSettings() {
+  var setEl = function(id, val) { var e=document.getElementById(id); if(e) e.value=val||''; };
+  var setTxt = function(id, val) { var e=document.getElementById(id); if(e) e.textContent=val||'—'; };
+  setEl('si-name', localStorage.getItem('lea_name')||'');
+  setEl('si-gk', localStorage.getItem('lea_gk')||'');
+  setEl('si-proxy', localStorage.getItem('vv_proxy_url')||'');
+  setEl('si-ek', localStorage.getItem('lea_ek')||'');
+  setEl('si-vi', localStorage.getItem('lea_vi')||'');
+  // Status Gemini
+  var gk = localStorage.getItem('lea_gk')||'';
+  var gkStatus = document.getElementById('si-gk-status');
+  if(gkStatus) { gkStatus.textContent=gk?'Cheie setată':'Lipsește'; gkStatus.className='ss-status '+(gk?'ok':'dim'); }
+  // Status proxy
+  var px = localStorage.getItem('vv_proxy_url')||'';
+  var pxStatus = document.getElementById('si-proxy-status');
+  if(pxStatus) { pxStatus.textContent=px?'Activ':'Nesetat'; pxStatus.className='ss-status '+(px?'ok':'dim'); }
+  // Usage
+  var usage = JSON.parse(localStorage.getItem('lea_daily')||'{"count":0}');
+  setTxt('si-usage', (usage.count||0) + ' / ' + DAILY_LIMIT);
+  // Cache
+  setTxt('si-cache', getCacheSize() + ' răspunsuri salvate');
+  // Archetype
+  setTxt('si-arch', getArchetypeLabel());
 }
 function logout(){
   if(!confirm('Resetezi identitatea VV pe acest device?'))return;
