@@ -526,6 +526,8 @@ function finishOb() { localStorage.setItem('lea_ob_done','1'); hideAll(); enterA
 function enterApp() {
   hideAll();
   init();
+  // Pe desktop: preia silent rafturile de pe telefon via VV Aer
+  if(localStorage.getItem('lea_device') === 'desktop') setTimeout(pullShelvesFromAer, 2000);
   // Card VV nu mai apare automat — user il vede din setari
   // Prima data: salut simplu
   setTimeout(function(){
@@ -793,6 +795,11 @@ var SHELVES = {
     ghostPins: [],         // pini temporari activi
     homeZone: null,        // zona de acasa
     workZone: null         // zona de munca
+  },
+  // Raft 6 — Dorinte & Context Financiar
+  wishes: {
+    items: [],             // dorinte detectate: "vacanta", "inghetata de capsuni" etc
+    financialCtx: null     // 'tight' / 'normal' / 'comfortable'
   }
 };
 
@@ -805,6 +812,90 @@ function loadShelves() {
 
 function saveShelves() {
   try { localStorage.setItem('vv_shelves', JSON.stringify(SHELVES)); } catch(e) {}
+}
+
+// Extrage preferinte si dorinte din conversatie si le salveaza in rafturi
+function extractAndSavePreferences(q, ans) {
+  var l = q.toLowerCase();
+  if(!SHELVES.wishes) SHELVES.wishes = {items:[], financialCtx:null};
+
+  // Context financiar
+  if(/nu am bani|fara bani|fără bani|ieftin|economic|buget mic|nu imi permit|nu-mi permit|nu îmi permit/i.test(l)) {
+    SHELVES.wishes.financialCtx = 'tight';
+    SHELVES.prefs.budget = 'economic';
+  } else if(/premium|luxury|cel mai bun|nu conteaza pretul|nu contează prețul|calitate maxima/i.test(l)) {
+    SHELVES.wishes.financialCtx = 'comfortable';
+    SHELVES.prefs.budget = 'premium';
+  }
+
+  // Dorinte si vise detectate din mesajul userului
+  var wishPats = [
+    {p:/(?:vreau|vreu)\s+(?:sa\s+)?(?:merg la\s+|vizitez\s+|incerc\s+|gust\s+)?(.{4,35})/i, s:1},
+    {p:/(?:imi|îmi|mi-?ar?)\s+(?:ar\s+)?plac(?:ea|e)\s+(.{4,35})/i, s:1},
+    {p:/(?:visez|visez la|imi doresc|îmi doresc)\s+(.{4,35})/i, s:1},
+    {p:/(?:as|aș)\s+vrea\s+(?:sa\s+)?(.{4,35})/i, s:1}
+  ];
+  wishPats.forEach(function(wp) {
+    var m = l.match(wp.p);
+    if(m && m[wp.s]) {
+      var wish = m[wp.s].trim().replace(/\s+/g,' ').slice(0,40);
+      if(wish.length >= 4 && !SHELVES.wishes.items.find(function(w){return w.text===wish;})) {
+        SHELVES.wishes.items.push({text:wish, ts:Date.now()});
+        if(SHELVES.wishes.items.length > 12) SHELVES.wishes.items.shift();
+      }
+    }
+  });
+
+  saveShelves();
+  refreshVVMeIfOpen();
+  if(localStorage.getItem('lea_device') === 'mobile') syncShelvesToAer();
+}
+
+// Rebuild VV Me display daca e deja deschis
+function refreshVVMeIfOpen() {
+  var sheet = document.getElementById('vvme');
+  if(sheet && sheet.classList.contains('on')) {
+    if(typeof openVVMe === 'function') openVVMe();
+  }
+}
+
+// Sync rafturi pe Firebase cand suntem pe telefon
+async function syncShelvesToAer() {
+  if(!db) return;
+  var id = localStorage.getItem('lea_id');
+  if(!id) return;
+  try {
+    var docId = id.replace(/[^a-zA-Z0-9]/g,'_');
+    db.collection('vv_aer_shelves').doc(docId).set({
+      vvid: id,
+      shelves: JSON.stringify(SHELVES),
+      device: 'mobile',
+      ts: Date.now()
+    });
+  } catch(e) {}
+}
+
+// Pe desktop: preia rafturile de pe telefon via Firebase
+async function pullShelvesFromAer() {
+  if(!db) return;
+  if(localStorage.getItem('lea_device') !== 'desktop') return;
+  var id = localStorage.getItem('lea_id');
+  if(!id) return;
+  try {
+    var docId = id.replace(/[^a-zA-Z0-9]/g,'_');
+    var doc = await db.collection('vv_aer_shelves').doc(docId).get();
+    if(!doc.exists) return;
+    var data = doc.data();
+    if(data.device !== 'mobile') return;
+    if(Date.now() - data.ts > 24*3600000) return; // mai vechi de 24h — ignora
+    var mobileShelves = JSON.parse(data.shelves || '{}');
+    // Merge: datele de pe telefon vin in local, fara sa suprascrie pinii locali
+    var localPins = (SHELVES.places && SHELVES.places.ghostPins) ? SHELVES.places.ghostPins : [];
+    SHELVES = Object.assign({}, SHELVES, mobileShelves);
+    if(localPins.length) SHELVES.places.ghostPins = localPins;
+    saveShelves();
+    showToast('◎ VV Aer · Rafturi sincronizate de pe telefon');
+  } catch(e) {}
 }
 
 // Invata din fiecare interactiune
@@ -909,36 +1000,60 @@ function refreshArchetypeDisplay() {
 }
 function buildPersonalContext() {
   loadShelves();
+  var isMobile = localStorage.getItem('lea_device') === 'mobile';
   var ctx = [];
 
+  // Familie — intotdeauna relevant
   if(SHELVES.family.hasKids) ctx.push('Are copii — filtrează locuri cu facilități pentru copii.');
-  if(SHELVES.family.hasCar) ctx.push('Merge cu mașina — menționează disponibilitatea parcării când e relevant.');
-  if(SHELVES.family.petFriendly) ctx.push('Are animale — preferă locuri pet-friendly.');
+  if(!isMobile && SHELVES.family.hasCar) ctx.push('Merge cu mașina — menționează parcarea.');
+  if(!isMobile && SHELVES.family.petFriendly) ctx.push('Are animale — preferă pet-friendly.');
 
+  // Preferinte culinare — max 2 pe telefon
   if(SHELVES.prefs.foodTypes.length > 0) {
-    ctx.push('Preferințe culinare: ' + SHELVES.prefs.foodTypes.join(', ') + '.');
+    var foods = isMobile ? SHELVES.prefs.foodTypes.slice(0,2) : SHELVES.prefs.foodTypes;
+    ctx.push('Mâncare preferată: ' + foods.join(', ') + '.');
   }
 
+  // Context financiar — important pe orice device
+  if(SHELVES.wishes && SHELVES.wishes.financialCtx === 'tight') {
+    ctx.push('Buget limitat — recomandă opțiuni accesibile, evită premium.');
+  } else if(SHELVES.wishes && SHELVES.wishes.financialCtx === 'comfortable') {
+    ctx.push('Preferă calitate, nu neapărat cel mai ieftin.');
+  } else if(SHELVES.prefs.budget) {
+    ctx.push('Buget: ' + SHELVES.prefs.budget + '.');
+  }
+
+  // Stare emotionala
   if(SHELVES.mood.lastMood === 'obosit') {
-    ctx.push('Utilizatorul pare obosit — sugerează opțiuni liniștite, fără cozi.');
+    ctx.push(isMobile ? 'Obosit — scurt și concis.' : 'Utilizatorul pare obosit — opțiuni liniștite, fără cozi.');
   }
 
-  var h = new Date().getHours();
-  var period = h<6?'noapte':h<12?'dimineata':h<17?'pranz':h<21?'seara':'noapte_tarziu';
-  var topIntent = null, topCount = 0;
-  if(SHELVES.habits.peakHours[period]) {
-    Object.keys(SHELVES.habits.peakHours[period]).forEach(function(k) {
-      if(SHELVES.habits.peakHours[period][k] > topCount) {
-        topCount = SHELVES.habits.peakHours[period][k];
-        topIntent = k;
-      }
-    });
-    if(topCount >= 2 && topIntent) {
-      ctx.push('La această oră de obicei caută ' + topIntent + ' — anticipează nevoia.');
+  // Peak hours — doar pe desktop (prea mult context pentru mobile)
+  if(!isMobile) {
+    var h = new Date().getHours();
+    var period = h<6?'noapte':h<12?'dimineata':h<17?'pranz':h<21?'seara':'noapte_tarziu';
+    var topIntent = null, topCount = 0;
+    if(SHELVES.habits.peakHours[period]) {
+      Object.keys(SHELVES.habits.peakHours[period]).forEach(function(k) {
+        if(SHELVES.habits.peakHours[period][k] > topCount) {
+          topCount = SHELVES.habits.peakHours[period][k];
+          topIntent = k;
+        }
+      });
+      if(topCount >= 2 && topIntent) ctx.push('La această oră caută de obicei ' + topIntent + '.');
     }
   }
 
-  var arcCtx=getArchetypeContext(); if(arcCtx) ctx.push(arcCtx); return ctx.length>0?'Context personal: '+ctx.join(' '):'';
+  // Dorinte recente — context util
+  if(SHELVES.wishes && SHELVES.wishes.items && SHELVES.wishes.items.length > 0) {
+    var recentWish = SHELVES.wishes.items[SHELVES.wishes.items.length-1];
+    if(recentWish && Date.now() - recentWish.ts < 7*24*3600000) {
+      ctx.push('A menționat recent că vrea: ' + recentWish.text + '.');
+    }
+  }
+
+  var arcCtx=getArchetypeContext(); if(arcCtx) ctx.push(arcCtx);
+  return ctx.length>0?'Context personal: '+ctx.join(' '):'';
 }
 
 // ── GHOST PIN SYSTEM ──────────────────────────────────────────
@@ -1342,6 +1457,7 @@ var _dev=localStorage.getItem('lea_device')||'mobile';
   // Invitatie la Studio dupa intrebari complexe
   checkStudioInvite(q, intent);
   if(ans && intent !== 'urgenta' && intent !== 'salut') saveCache(intent, city, ans); updateArchetype(q);
+  if(ans) extractAndSavePreferences(q, ans);
   if(_hist.length>40)_hist=_hist.slice(-40);saveHistory();
   if(_ek&&_vi)playVoice(ans,null);
   fbAdd('vvhi_dataset',{action:'LEA_CHAT',context:{city,intent,hasVV:vvNodes.length>0},ts:Date.now()});
@@ -1635,3 +1751,4 @@ function showCardManual() {
 }
 
 function showToast(m){var t=document.getElementById('toast');t.textContent=m;t.classList.add('on');clearTimeout(t._t);t._t=setTimeout(function(){t.classList.remove('on');},3000);}
+
