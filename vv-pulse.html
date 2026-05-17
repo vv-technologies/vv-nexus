@@ -1,4 +1,4 @@
-﻿﻿﻿<!DOCTYPE html>
+﻿﻿﻿﻿<!DOCTYPE html>
 <html lang="ro">
 <head>
 <meta charset="UTF-8">
@@ -178,7 +178,26 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fon
 .vv-tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 0 9px;text-decoration:none;color:rgba(245,240,232,.3);transition:color .2s;-webkit-user-select:none;user-select:none}
 .vv-tab.active{color:#C9A84C}
 .vt-icon{font-size:1.25rem;line-height:1}
-.vt-lbl{font-size:.375rem;font-family:var(--mono);letter-spacing:.2em;text-transform:uppercase}</style>
+.vt-lbl{font-size:.375rem;font-family:var(--mono);letter-spacing:.2em;text-transform:uppercase}
+@media (min-width:768px){
+  .mission-actions{display:none}
+  .mission-phone-note{display:flex!important}
+  .check-btn{display:none}
+}
+.mission-phone-note{display:none;align-items:center;gap:6px;padding:.625rem .875rem;background:rgba(245,240,232,.03);border:.5px solid rgba(245,240,232,.08);border-radius:var(--r-sm,10px);font-size:.5rem;font-family:var(--mono);color:rgba(245,240,232,.35);letter-spacing:.05em;margin-top:.5rem}
+.now-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:1800;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);align-items:center;justify-content:center}
+.now-ov.open{display:flex}
+.now-card{background:rgba(6,6,8,.99);border:.5px solid rgba(245,240,232,.14);border-radius:20px;padding:1.75rem;width:min(480px,90vw);position:relative}
+.now-card::before{content:'';position:absolute;top:0;left:20%;right:20%;height:1px;background:linear-gradient(90deg,transparent,rgba(201,168,76,.5),transparent)}
+.now-ttl{font-size:.4375rem;font-family:var(--mono);letter-spacing:.3em;text-transform:uppercase;color:rgba(201,168,76,.6);margin-bottom:.5rem}
+.now-h{font-size:1.5rem;font-weight:700;font-family:var(--mono);color:rgba(245,240,232,.9);margin-bottom:1.25rem;letter-spacing:-.02em}
+.now-inp{width:100%;background:rgba(245,240,232,.04);border:.5px solid rgba(245,240,232,.14);border-radius:12px;padding:.875rem 1rem;color:rgba(245,240,232,.9);font-size:.875rem;font-family:var(--mono);outline:none;box-sizing:border-box;transition:border-color .2s}
+.now-inp:focus{border-color:rgba(201,168,76,.4)}
+.now-inp::placeholder{color:rgba(245,240,232,.25)}
+.now-btns{display:flex;gap:.625rem;margin-top:.875rem}
+.now-b-pulse{flex:1;padding:.625rem;background:rgba(201,168,76,.1);border:.5px solid rgba(201,168,76,.25);border-radius:10px;color:rgba(201,168,76,.9);font-family:var(--mono);font-size:.5625rem;cursor:pointer;transition:background .2s;letter-spacing:.05em}
+.now-b-pulse:hover{background:rgba(201,168,76,.18)}
+.now-b-close{padding:.625rem 1rem;background:transparent;border:.5px solid rgba(245,240,232,.1);border-radius:10px;color:rgba(245,240,232,.3);font-family:var(--mono);font-size:.5rem;cursor:pointer}</style>
 </head>
 <body>
 
@@ -238,12 +257,9 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fon
 
 <!-- LEGEND -->
 <div class="map-legend">
-  <div class="legend-item"><div class="legend-dot ld-blue"></div><span>Insider activ</span></div>
-  <div class="legend-item"><div class="legend-dot ld-orange"></div><span>Misiune Lea</span></div>
-  <div class="legend-item"><div class="legend-dot ld-green"></div><span>Validat acum</span></div>
-  <div class="legend-item"><div class="legend-dot ld-gold"></div><span>&lt; 24h</span></div>
-  <div class="legend-item"><div class="legend-dot ld-silver"></div><span>&lt; 7 zile</span></div>
-  <div class="legend-item"><div class="legend-dot ld-grey"></div><span>&gt; 30 zile</span></div>
+<div class="legend-item"><div class="legend-dot ld-gold"></div>RECENT</div>
+<div class="legend-item"><div class="legend-dot ld-orange"></div>MISIUNE</div>
+<div class="legend-item"><div class="legend-dot ld-grey"></div>INACTIV</div>
 </div>
 
 <!-- ZONE BADGE -->
@@ -541,8 +557,10 @@ window.doSearch=function(q){
     setTimeout(()=>{selLoc=found[0];openCard(found[0]);},1500);
     toast('◎ '+found.length+' rezultate VV · '+q);
   }else{
-    toast('◎ Trimit la Lea...');
-    setTimeout(()=>{window.location.href='lea.html?q='+encodeURIComponent(q);},600);
+    const t=document.getElementById('toast');
+    if(t){t.textContent='Negasit pe Pulse. Intreaba LEA →';t.style.cursor='pointer';
+    t.onclick=function(){window.location.href='lea.html?q='+encodeURIComponent(q);};
+    t.classList.add('show');setTimeout(function(){t.classList.remove('show');t.onclick=null;t.style.cursor='';},4500);}
   }
   document.getElementById('search-input').blur();
   document.getElementById('search-input').value='';
@@ -629,7 +647,10 @@ function syncSidebarStats(){
   var sc=document.getElementById('sb-coins'); if(sc) sc.textContent='⬡ '+(userCoins||0);
 }
 setInterval(syncSidebarStats,3000);
-setTimeout(syncSidebarStats,2000);</script>
+setTimeout(syncSidebarStats,2000);
+function openNow(){ document.getElementById('now-ov').classList.add('open'); setTimeout(function(){var i=document.getElementById('now-inp');if(i)i.focus();},150); }
+function closeNow(){ document.getElementById('now-ov').classList.remove('open'); }
+function submitNow(){ var q=document.getElementById('now-inp').value.trim(); if(!q) return; closeNow(); doSearch(q); }</script>
 <!-- SIDEBAR (visible on laptop) -->
 <aside class="vv-sidebar">
   <div class="sb-brand">
@@ -639,11 +660,11 @@ setTimeout(syncSidebarStats,2000);</script>
   <nav class="sb-nav">
     <a href="lea.html" class="sb-item"><span class="sb-icon">◎</span><span class="sb-lbl">LEA</span></a>
     <a href="vv-pulse.html" class="sb-item active"><span class="sb-icon">◉</span><span class="sb-lbl">PULSE</span></a>
-    <a href="lea.html?now=1" class="sb-item"><span class="sb-icon">⊡</span><span class="sb-lbl">NOW</span></a>
+    <a href="#" onclick="openNow();return false;" class="sb-item"><span class="sb-icon">⊡</span><span class="sb-lbl">NOW</span></a>
     <a href="index.html" class="sb-item"><span class="sb-icon">⊙</span><span class="sb-lbl">EU</span></a>
   </nav>
   <div class="sb-divider"></div>
-  <div class="sb-stats">
+  <div class="sb-stats"><div style="font-size:.375rem;font-family:var(--mono);letter-spacing:.2em;text-transform:uppercase;color:rgba(245,240,232,.3);padding:0 0 .5rem;opacity:.7">BIBLIOTECA ZILEI</div>
     <div class="sb-stat">Insideri live: <b id="sb-insideri">—</b></div>
     <div class="sb-stat">Locații: <b id="sb-locatii">—</b></div>
     <div class="sb-stat">Misiuni: <b id="sb-misiuni">—</b></div>
@@ -651,13 +672,26 @@ setTimeout(syncSidebarStats,2000);</script>
   </div>
   <div class="sb-ver">VV Pulse v2.0 · Mai 2026</div>
 </aside>
-<nav class="vv-tabs">
+<div class="now-ov" id="now-ov" onclick="if(event.target===this)closeNow()">
+  <div class="now-card">
+    <div class="now-ttl">VV NOW</div>
+    <div class="now-h">Caută inteligent</div>
+    <input class="now-inp" id="now-inp" placeholder="Cafenea, parc, eveniment, rută..." onkeydown="if(event.key==='Enter')submitNow()">
+    <div class="now-btns">
+      <button class="now-b-pulse" onclick="submitNow()">◉ Caută pe Pulse</button>
+      <button class="now-b-close" onclick="closeNow()">✕ Închide</button>
+    </div>
+  </div>
+</div><nav class="vv-tabs">
   <a href="lea.html" class="vv-tab"><div class="vt-icon">◎</div><div class="vt-lbl">LEA</div></a>
   <a href="vv-pulse.html" class="vv-tab active"><div class="vt-icon">◉</div><div class="vt-lbl">PULSE</div></a>
-  <a href="lea.html?now=1" class="vv-tab"><div class="vt-icon">⊡</div><div class="vt-lbl">NOW</div></a>
+  <a href="#" onclick="openNow();return false;" class="vv-tab"><div class="vt-icon">⊡</div><div class="vt-lbl">NOW</div></a>
   <a href="index.html" class="vv-tab"><div class="vt-icon">⊙</div><div class="vt-lbl">EU</div></a>
 </nav></body>
 </html>
+
+
+
 
 
 
