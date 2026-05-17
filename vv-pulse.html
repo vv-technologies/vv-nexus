@@ -4,169 +4,229 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#000000">
-<title>VV Pulse · The Presence Layer</title>
+<title>VV Pulse · Prezența Reală</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <style>
+:root{--bg:#000;--gold:#C9A84C;--gold-dim:rgba(201,168,76,.12);--gold-bd:rgba(201,168,76,.28);--green:#2db87a;--blue:#2997FF;--red:#FF453A;--orange:#FF9F0A;--w:rgba(245,240,232,1);--w30:rgba(245,240,232,.3);--w15:rgba(245,240,232,.15);--w06:rgba(245,240,232,.06);--border:rgba(245,240,232,.08);--border2:rgba(245,240,232,.14);--surf:rgba(245,240,232,.04);--mono:'SF Mono','Fira Mono','Consolas',monospace;--font:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-:root{--bg:#000;--gold:#D4AF37;--gold-dim:rgba(212,175,55,0.12);--gold-bd:rgba(212,175,55,0.28);--green:#34c759;--blue:#0A84FF;--purple:#a78bfa;--t1:#fff;--t2:rgba(255,255,255,0.55);--t3:rgba(255,255,255,0.28);--line:rgba(255,255,255,0.08);--font:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--font);color:var(--t1);-webkit-font-smoothing:antialiased}
-.vv-nav{position:fixed;top:0;left:0;right:0;z-index:500;padding:max(.875rem,env(safe-area-inset-top)) 1rem .75rem;background:linear-gradient(to bottom,rgba(0,0,0,.97),rgba(0,0,0,.7),transparent);pointer-events:none}
+html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--font);color:var(--w);-webkit-font-smoothing:antialiased}
+#vv-map{position:fixed;inset:0;width:100%;height:100%}
+.leaflet-tile{filter:brightness(.42) saturate(.25)}
+.leaflet-container{background:#000!important}
+.leaflet-control-zoom,.leaflet-control-attribution{display:none!important}
+.vignette{position:fixed;inset:0;pointer-events:none;z-index:100;background:radial-gradient(ellipse at center,transparent 20%,rgba(0,0,0,.7) 100%)}
+
+/* NAV */
+.vv-nav{position:fixed;top:0;left:0;right:0;z-index:500;padding:max(.875rem,env(safe-area-inset-top)) 1rem .5rem;background:linear-gradient(to bottom,rgba(0,0,0,.96),rgba(0,0,0,.6),transparent);pointer-events:none}
 .nav-row1{display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem}
 .nav-brand{pointer-events:auto}
-.nav-logo{font-size:.9375rem;font-weight:700;letter-spacing:.5px;color:var(--gold)}
-.nav-sub{font-size:.45rem;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--t3);margin-top:1px}
-.nav-controls{display:flex;align-items:center;gap:6px;pointer-events:auto}
-.lang-toggle{display:flex;background:rgba(0,0,0,.7);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:.5px solid rgba(255,255,255,.12);border-radius:20px;overflow:hidden}
-.lang-btn{padding:4px 10px;font-size:.5625rem;font-weight:700;letter-spacing:.08em;color:var(--t3);cursor:pointer;transition:all .2s;border:none;background:none;font-family:var(--font)}
-.lang-btn.active{background:var(--gold);color:#000;border-radius:20px}
-.nav-badge{display:flex;align-items:center;gap:5px;background:rgba(0,0,0,.7);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:.5px solid rgba(255,255,255,.1);border-radius:20px;padding:4px 10px;font-size:.5625rem;color:var(--t3)}
-.pulse-dot-nav{width:5px;height:5px;border-radius:50%;background:var(--green);box-shadow:0 0 6px rgba(52,199,89,.8);animation:blink 2s ease-in-out infinite}
+.nav-logo{font-size:.9rem;font-weight:700;letter-spacing:3px;color:var(--gold);font-family:var(--mono)}
+.nav-sub{font-size:.45rem;letter-spacing:.2em;text-transform:uppercase;color:var(--w30);margin-top:2px}
+.nav-right{display:flex;align-items:center;gap:7px;pointer-events:auto}
+.coins-pill{display:flex;align-items:center;gap:5px;background:rgba(0,0,0,.75);backdrop-filter:blur(12px);border:.5px solid var(--gold-bd);border-radius:20px;padding:4px 10px;font-size:.5625rem;font-family:var(--mono);color:var(--gold);font-weight:700;cursor:default}
+.coins-dot{width:5px;height:5px;border-radius:50%;background:var(--gold);flex-shrink:0}
+.lea-pill{display:flex;align-items:center;gap:5px;background:rgba(0,0,0,.75);backdrop-filter:blur(12px);border:.5px solid var(--border2);border-radius:20px;padding:4px 10px;font-size:.5625rem;color:var(--w30);cursor:pointer;pointer-events:auto;transition:border-color .2s}
+.lea-pill:active{border-color:var(--green)}
+.lea-dot{width:5px;height:5px;border-radius:50%;background:var(--green);box-shadow:0 0 6px rgba(45,184,122,.8);animation:blink 2s ease-in-out infinite;flex-shrink:0}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
-.btn-locate{background:rgba(0,0,0,.7);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:.5px solid rgba(255,255,255,.12);border-radius:20px;color:var(--t2);font-family:var(--font);font-size:.5625rem;font-weight:600;padding:4px 10px;cursor:pointer;min-height:28px;pointer-events:auto;transition:all .2s}
+.btn-locate{background:rgba(0,0,0,.75);backdrop-filter:blur(12px);border:.5px solid var(--border2);border-radius:20px;color:var(--w30);font-size:.625rem;padding:5px 10px;cursor:pointer;min-height:28px;pointer-events:auto;transition:all .2s}
 .btn-locate:active{color:var(--gold);border-color:var(--gold-bd)}
-.filters-row{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;pointer-events:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+
+/* SEARCH VV NOW */
+.search-wrap{pointer-events:auto;margin-bottom:8px}
+.search-bar{display:flex;align-items:center;gap:8px;background:rgba(0,0,0,.82);backdrop-filter:blur(16px);border:.5px solid var(--border2);border-radius:14px;padding:9px 14px;transition:border-color .2s}
+.search-bar:focus-within{border-color:var(--gold-bd)}
+.search-icon{font-size:.75rem;color:var(--w30);flex-shrink:0;font-family:var(--mono)}
+.search-input{flex:1;background:none;border:none;outline:none;color:var(--w);font-size:.8125rem;font-family:var(--font)}
+.search-input::placeholder{color:var(--w30)}
+.search-badge{font-size:.45rem;font-family:var(--mono);color:var(--gold);letter-spacing:.5px;background:var(--gold-dim);border:.5px solid var(--gold-bd);padding:2px 6px;border-radius:4px;flex-shrink:0}
+
+/* FILTERS */
+.filters-row{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;pointer-events:auto;scrollbar-width:none}
 .filters-row::-webkit-scrollbar{display:none}
-.filter-btn{flex-shrink:0;background:rgba(0,0,0,.7);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:.5px solid rgba(255,255,255,.1);border-radius:20px;color:var(--t3);font-family:var(--font);font-size:.5625rem;font-weight:600;padding:4px 12px;cursor:pointer;transition:all .2s;white-space:nowrap;min-height:26px}
-.filter-btn.active{background:rgba(212,175,55,.15);border-color:rgba(212,175,55,.4);color:var(--gold)}
-.filter-btn.active.is-green{background:rgba(52,199,89,.15);border-color:rgba(52,199,89,.4);color:var(--green)}
-.filter-btn.active.is-blue{background:rgba(10,132,255,.15);border-color:rgba(10,132,255,.4);color:var(--blue)}
-.filter-btn.active.is-purple{background:rgba(167,139,250,.15);border-color:rgba(167,139,250,.4);color:var(--purple)}
-#vv-map{position:fixed;inset:0;width:100%;height:100%}
-.leaflet-tile{filter:brightness(.45) saturate(.3)}
-.leaflet-container{background:#000 !important}
-.leaflet-control-zoom,.leaflet-control-attribution{display:none!important}
-.leaflet-tile-pane{opacity:.75}
-.vignette{position:fixed;inset:0;pointer-events:none;z-index:100;background:radial-gradient(ellipse at center,transparent 25%,rgba(0,0,0,.65) 100%)}
-.map-legend{position:fixed;z-index:400;top:max(5.5rem,calc(env(safe-area-inset-top) + 4.5rem));right:.875rem;background:rgba(0,0,0,.75);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:.5px solid rgba(255,255,255,.08);border-radius:12px;padding:.625rem .75rem;display:flex;flex-direction:column;gap:5px}
-.legend-item{display:flex;align-items:center;gap:6px;font-size:.4375rem;color:var(--t3);letter-spacing:.05em;text-transform:uppercase}
+.filter-btn{flex-shrink:0;background:rgba(0,0,0,.75);backdrop-filter:blur(10px);border:.5px solid var(--border);border-radius:20px;color:var(--w30);font-family:var(--font);font-size:.5625rem;font-weight:600;padding:4px 12px;cursor:pointer;transition:all .2s;white-space:nowrap;min-height:26px}
+.filter-btn.active{background:var(--gold-dim);border-color:var(--gold-bd);color:var(--gold)}
+.filter-btn.f-orange.active{background:rgba(255,159,10,.15);border-color:rgba(255,159,10,.4);color:var(--orange)}
+.filter-btn.f-blue.active{background:rgba(41,151,255,.15);border-color:rgba(41,151,255,.4);color:var(--blue)}
+.filter-btn.f-green.active{background:rgba(45,184,122,.15);border-color:rgba(45,184,122,.4);color:var(--green)}
+.filter-btn.f-purple.active{background:rgba(167,139,250,.15);border-color:rgba(167,139,250,.4);color:#a78bfa}
+
+/* LEGEND */
+.map-legend{position:fixed;z-index:400;top:max(6.5rem,calc(env(safe-area-inset-top) + 5.5rem));right:.875rem;background:rgba(0,0,0,.78);backdrop-filter:blur(12px);border:.5px solid var(--border);border-radius:12px;padding:.625rem .75rem;display:flex;flex-direction:column;gap:5px}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:.4375rem;color:var(--w30);letter-spacing:.05em;text-transform:uppercase}
 .legend-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
-.ld-gold{background:var(--gold);box-shadow:0 0 5px rgba(212,175,55,.8)}
+.ld-gold{background:var(--gold);box-shadow:0 0 5px rgba(201,168,76,.8)}
 .ld-silver{background:rgba(255,255,255,.45)}
 .ld-grey{background:rgba(255,255,255,.15)}
-.ld-blue{background:var(--blue);box-shadow:0 0 5px rgba(10,132,255,.8)}
-.legend-icon{font-size:.5625rem}
+.ld-blue{background:var(--blue);box-shadow:0 0 5px rgba(41,151,255,.8)}
+.ld-orange{background:var(--orange);box-shadow:0 0 5px rgba(255,159,10,.8)}
+.ld-green{background:var(--green);box-shadow:0 0 5px rgba(45,184,122,.8)}
+
+/* ZONE BADGE */
+.zone-badge{position:fixed;bottom:calc(3.8rem + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);z-index:400;background:rgba(0,0,0,.82);backdrop-filter:blur(12px);border:.5px solid var(--border2);border-radius:100px;padding:4px 14px;font-size:.5rem;font-family:var(--mono);color:var(--w30);letter-spacing:.5px;white-space:nowrap;transition:opacity .5s;pointer-events:none}
+.zone-badge.hidden{opacity:0}
+
+/* STATS */
 .map-stats{position:fixed;bottom:calc(1.125rem + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);z-index:400;display:flex;gap:6px;transition:opacity .3s,transform .3s}
 .map-stats.hidden{opacity:0;pointer-events:none;transform:translateX(-50%) translateY(10px)}
-.stat-pill{background:rgba(0,0,0,.75);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:.5px solid rgba(255,255,255,.1);border-radius:20px;padding:4px 10px;display:flex;align-items:center;gap:5px;font-size:.5rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--t3)}
-.stat-pill b{font-size:.625rem;font-weight:800;color:var(--t1)}
-.pill-gold b{color:var(--gold)}.pill-green b{color:var(--green)}.pill-blue b{color:var(--blue)}
+.stat-pill{background:rgba(0,0,0,.78);backdrop-filter:blur(12px);border:.5px solid var(--border);border-radius:20px;padding:4px 10px;display:flex;align-items:center;gap:5px;font-size:.5rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--w30)}
+.stat-pill b{font-size:.625rem;font-weight:800;color:var(--w)}
+.pill-gold b{color:var(--gold)}.pill-green b{color:var(--green)}.pill-blue b{color:var(--blue)}.pill-orange b{color:var(--orange)}
+
+/* BOTTOM CARD */
 .bottom-card{position:fixed;bottom:0;left:0;right:0;z-index:600;padding:0 .875rem calc(1.125rem + env(safe-area-inset-bottom));transform:translateY(100%);transition:transform .35s cubic-bezier(.4,0,.2,1)}
 .bottom-card.open{transform:translateY(0)}
-.card-inner{background:rgba(6,6,8,.93);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);border:.5px solid rgba(255,255,255,.1);border-radius:22px;padding:1rem 1.125rem;position:relative;overflow:hidden}
+.card-inner{background:rgba(5,5,7,.96);backdrop-filter:blur(28px);border:.5px solid var(--border2);border-radius:22px;padding:1rem 1.125rem;position:relative;overflow:hidden}
 .card-inner::before{content:'';position:absolute;top:0;left:15%;right:15%;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:.4}
-.card-handle{width:32px;height:3px;background:rgba(255,255,255,.15);border-radius:2px;margin:0 auto .75rem}
+.card-handle{width:32px;height:3px;background:var(--border2);border-radius:2px;margin:0 auto .75rem}
 .card-header{display:flex;align-items:center;gap:.75rem;margin-bottom:.625rem}
 .card-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.125rem;flex-shrink:0}
-.icon-premium{background:rgba(212,175,55,.12);border:.5px solid rgba(212,175,55,.25)}
+.icon-premium{background:var(--gold-dim);border:.5px solid var(--gold-bd)}
 .icon-hidden{background:rgba(167,139,250,.12);border:.5px solid rgba(167,139,250,.25)}
-.icon-standard{background:rgba(255,255,255,.06);border:.5px solid rgba(255,255,255,.1)}
-.icon-pulse{background:rgba(10,132,255,.12);border:.5px solid rgba(10,132,255,.25)}
+.icon-standard{background:var(--surf);border:.5px solid var(--border2)}
+.icon-pulse{background:rgba(41,151,255,.12);border:.5px solid rgba(41,151,255,.25)}
+.icon-mission{background:rgba(255,159,10,.12);border:.5px solid rgba(255,159,10,.25)}
 .card-info{flex:1;min-width:0}
 .card-name{font-size:.9375rem;font-weight:700;letter-spacing:-.02em;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.card-status{font-size:.5625rem;display:flex;align-items:center;gap:5px;color:var(--t3)}
-.verified-badge{background:rgba(52,199,89,.12);border:.5px solid rgba(52,199,89,.25);color:var(--green);padding:1px 6px;border-radius:4px;font-size:.45rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
-.insider-badge{background:rgba(10,132,255,.12);border:.5px solid rgba(10,132,255,.25);color:var(--blue);padding:1px 6px;border-radius:4px;font-size:.45rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.card-status{font-size:.5625rem;display:flex;align-items:center;gap:5px;color:var(--w30)}
+.vbadge{padding:1px 6px;border-radius:4px;font-size:.45rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.vb-green{background:rgba(45,184,122,.12);border:.5px solid rgba(45,184,122,.25);color:var(--green)}
+.vb-blue{background:rgba(41,151,255,.12);border:.5px solid rgba(41,151,255,.25);color:var(--blue)}
+.vb-orange{background:rgba(255,159,10,.12);border:.5px solid rgba(255,159,10,.25);color:var(--orange)}
 .card-vibe{flex-shrink:0;font-size:.5rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:6px}
-.vibe-hot{background:rgba(212,175,55,.12);color:var(--gold);border:.5px solid rgba(212,175,55,.25)}
-.vibe-warm{background:rgba(255,255,255,.05);color:var(--t2);border:.5px solid rgba(255,255,255,.1)}
-.vibe-cold{background:rgba(255,255,255,.03);color:var(--t3);border:.5px solid rgba(255,255,255,.06)}
-.vibe-live{background:rgba(10,132,255,.12);color:var(--blue);border:.5px solid rgba(10,132,255,.25)}
-.card-divider{height:.5px;background:rgba(255,255,255,.06);margin:.625rem 0}
-.card-stats{display:flex;gap:1.25rem}
-.btn-nav{width:100%;min-height:50px;border-radius:14px;background:var(--gold);color:#000;font-family:var(--font);font-size:.9375rem;font-weight:800;border:none;cursor:pointer;margin-top:.875rem;display:flex;align-items:center;justify-content:center;gap:.5rem;letter-spacing:-.01em;transition:opacity .15s}
-.btn-nav:active{opacity:.85}
-.btn-nav-maps{width:100%;min-height:44px;border-radius:14px;background:rgba(255,255,255,.05);border:.5px solid rgba(255,255,255,.1);color:var(--t2);font-family:var(--font);font-size:.8125rem;font-weight:600;cursor:pointer;margin-top:.5rem;display:flex;align-items:center;justify-content:center;gap:.5rem;transition:all .2s}
-.btn-nav-maps:active{background:rgba(255,255,255,.1)}
+.vibe-hot{background:var(--gold-dim);color:var(--gold);border:.5px solid var(--gold-bd)}
+.vibe-warm{background:var(--surf);color:var(--w30);border:.5px solid var(--border2)}
+.vibe-cold{background:rgba(255,255,255,.02);color:var(--w15);border:.5px solid var(--border)}
+.vibe-live{background:rgba(41,151,255,.12);color:var(--blue);border:.5px solid rgba(41,151,255,.25)}
+.vibe-mission{background:rgba(255,159,10,.12);color:var(--orange);border:.5px solid rgba(255,159,10,.25)}
+.card-divider{height:.5px;background:var(--border);margin:.625rem 0}
+.card-stats{display:flex;gap:1.25rem;margin-bottom:.5rem}
 .s-val{font-size:.875rem;font-weight:700}
-.s-lbl{font-size:.5rem;color:var(--t3);letter-spacing:.05em;text-transform:uppercase;margin-top:1px}
-.card-close{position:absolute;top:.875rem;right:.875rem;width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,.06);border:.5px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;color:var(--t3);font-size:.6875rem;cursor:pointer}
-.card-desc{font-size:.6875rem;color:var(--t3);line-height:1.6;margin-top:.5rem;font-style:italic}
-.welcome-overlay{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:800;display:flex;align-items:flex-end;justify-content:center}
-.welcome-sheet{background:rgba(6,6,8,.98);backdrop-filter:blur(32px);-webkit-backdrop-filter:blur(32px);border:.5px solid rgba(255,255,255,.1);border-radius:28px 28px 0 0;padding:1.5rem 1.5rem calc(2rem + env(safe-area-inset-bottom));width:100%;max-width:480px;animation:slideUp .4s cubic-bezier(.4,0,.2,1)}
-@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
-.welcome-handle{width:36px;height:3px;background:rgba(255,255,255,.15);border-radius:2px;margin:0 auto 1.25rem}
-.welcome-logo{font-size:1.75rem;font-weight:800;color:var(--gold);letter-spacing:2px;text-align:center;margin-bottom:.25rem}
-.welcome-tag{font-size:.5rem;font-weight:600;letter-spacing:.25em;text-transform:uppercase;color:var(--t3);text-align:center;margin-bottom:1.25rem}
-.welcome-title{font-size:1.25rem;font-weight:800;letter-spacing:-.03em;text-align:center;margin-bottom:.625rem}
-.welcome-desc{font-size:.8125rem;color:var(--t2);text-align:center;line-height:1.7;margin-bottom:1.25rem}
-.welcome-feats{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:1.25rem}
-.wfeat{background:rgba(255,255,255,.04);border:.5px solid rgba(255,255,255,.08);border-radius:12px;padding:.75rem;text-align:center}
-.wfeat .wfi{font-size:1.25rem;margin-bottom:.375rem}
-.wfeat .wft{font-size:.6875rem;font-weight:700;color:var(--t1);margin-bottom:2px}
-.wfeat .wfd{font-size:.5625rem;color:var(--t3);line-height:1.5}
-.btn-welcome{width:100%;min-height:52px;border-radius:16px;background:var(--gold);color:#000;font-family:var(--font);font-size:.9375rem;font-weight:800;border:none;cursor:pointer;letter-spacing:-.01em}
-.wl-row{display:flex;gap:.5rem;margin-bottom:1rem;justify-content:center}
-.wl-btn{flex:1;max-width:120px;min-height:40px;border-radius:10px;font-family:var(--font);font-size:.75rem;font-weight:700;cursor:pointer;transition:all .2s;border:.5px solid rgba(255,255,255,.15);background:rgba(255,255,255,.05);color:var(--t2)}
-.wl-btn.active{background:var(--gold);color:#000;border-color:var(--gold)}
-.toast{position:fixed;top:calc(5.5rem + env(safe-area-inset-top));left:50%;transform:translateX(-50%) translateY(-8px);background:rgba(18,18,20,.96);border:.5px solid rgba(255,255,255,.12);border-radius:12px;padding:.5rem 1rem;font-size:.75rem;color:var(--t1);white-space:nowrap;opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;z-index:700}
+.s-lbl{font-size:.5rem;color:var(--w30);letter-spacing:.05em;text-transform:uppercase;margin-top:1px}
+.card-desc{font-size:.6875rem;color:var(--w30);line-height:1.6;margin:.5rem 0;font-style:italic}
+.card-close{position:absolute;top:.875rem;right:.875rem;width:26px;height:26px;border-radius:50%;background:var(--surf);border:.5px solid var(--border2);display:flex;align-items:center;justify-content:center;color:var(--w30);font-size:.6875rem;cursor:pointer}
+
+/* BUTTONS */
+.btn-primary{width:100%;min-height:50px;border-radius:14px;background:var(--gold);color:#000;font-family:var(--font);font-size:.9375rem;font-weight:800;border:none;cursor:pointer;margin-top:.75rem;display:flex;align-items:center;justify-content:center;gap:.5rem;transition:opacity .15s}
+.btn-primary:active{opacity:.85}
+.btn-checkin{width:100%;min-height:50px;border-radius:14px;background:rgba(45,184,122,.15);border:.5px solid rgba(45,184,122,.35);color:var(--green);font-family:var(--font);font-size:.875rem;font-weight:800;cursor:pointer;margin-top:.75rem;display:flex;align-items:center;justify-content:center;gap:.5rem;transition:all .2s}
+.btn-checkin:active{background:rgba(45,184,122,.25)}
+.btn-checkin.done{background:rgba(255,255,255,.03);border-color:var(--border);color:var(--w30);cursor:default}
+.btn-mission{width:100%;min-height:50px;border-radius:14px;background:rgba(255,159,10,.15);border:.5px solid rgba(255,159,10,.35);color:var(--orange);font-family:var(--font);font-size:.875rem;font-weight:800;cursor:pointer;margin-top:.75rem;display:flex;align-items:center;justify-content:center;gap:.5rem;transition:all .2s}
+.btn-mission:active{background:rgba(255,159,10,.25)}
+.btn-sec{width:100%;min-height:44px;border-radius:14px;background:var(--surf);border:.5px solid var(--border2);color:var(--w30);font-family:var(--font);font-size:.8125rem;font-weight:600;cursor:pointer;margin-top:.5rem;display:flex;align-items:center;justify-content:center;gap:.5rem;transition:all .2s}
+.btn-sec:active{background:rgba(255,255,255,.07)}
+
+/* COINS ANIMATION */
+.coins-pop{position:fixed;top:40%;left:50%;transform:translate(-50%,-50%);z-index:900;pointer-events:none;text-align:center;animation:coinsPop .9s ease both}
+@keyframes coinsPop{0%{opacity:0;transform:translate(-50%,-20%)}30%{opacity:1}100%{opacity:0;transform:translate(-50%,-90%)}}
+.coins-pop-val{font-size:2.2rem;font-weight:900;color:var(--gold);font-family:var(--mono);text-shadow:0 0 20px rgba(201,168,76,.5)}
+.coins-pop-lbl{font-size:.625rem;color:var(--gold);font-family:var(--mono);letter-spacing:3px;opacity:.7}
+
+/* TOAST */
+.toast{position:fixed;top:calc(5.5rem + env(safe-area-inset-top));left:50%;transform:translateX(-50%) translateY(-8px);background:rgba(14,14,16,.97);border:.5px solid var(--border2);border-radius:12px;padding:.5rem 1rem;font-size:.75rem;color:var(--w);white-space:nowrap;opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;z-index:700}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* WELCOME */
+.welcome-overlay{position:fixed;inset:0;background:rgba(0,0,0,.93);z-index:800;display:flex;align-items:flex-end;justify-content:center}
+.welcome-sheet{background:rgba(5,5,7,.99);backdrop-filter:blur(32px);border:.5px solid var(--border2);border-radius:28px 28px 0 0;padding:1.5rem 1.5rem calc(2rem + env(safe-area-inset-bottom));width:100%;max-width:480px;animation:slideUp .4s cubic-bezier(.4,0,.2,1)}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.w-handle{width:36px;height:3px;background:var(--border2);border-radius:2px;margin:0 auto 1.25rem}
+.w-logo{font-size:1.75rem;font-weight:800;color:var(--gold);letter-spacing:4px;text-align:center;margin-bottom:.25rem;font-family:var(--mono)}
+.w-tag{font-size:.5rem;letter-spacing:.25em;text-transform:uppercase;color:var(--w30);text-align:center;margin-bottom:1.25rem}
+.w-title{font-size:1.2rem;font-weight:800;letter-spacing:-.03em;text-align:center;margin-bottom:.625rem}
+.w-desc{font-size:.8125rem;color:var(--w30);text-align:center;line-height:1.7;margin-bottom:1.25rem}
+.w-feats{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:1.25rem}
+.wf{background:var(--surf);border:.5px solid var(--border);border-radius:12px;padding:.75rem;text-align:center}
+.wf-i{font-size:1.25rem;margin-bottom:.375rem}
+.wf-t{font-size:.6875rem;font-weight:700;margin-bottom:2px}
+.wf-d{font-size:.5625rem;color:var(--w30);line-height:1.5}
+.btn-welcome{width:100%;min-height:52px;border-radius:16px;background:var(--gold);color:#000;font-family:var(--font);font-size:.9375rem;font-weight:800;border:none;cursor:pointer}
+
 @keyframes mpulse{0%,100%{transform:translate(-50%,-50%) scale(1);opacity:.4}50%{transform:translate(-50%,-50%) scale(2.2);opacity:0}}
 @keyframes insiderPulse{0%,100%{transform:translate(-50%,-50%) scale(1);opacity:.6}50%{transform:translate(-50%,-50%) scale(2.8);opacity:0}}
+@keyframes missionPulse{0%,100%{transform:translate(-50%,-50%) scale(1);opacity:.5}50%{transform:translate(-50%,-50%) scale(3.2);opacity:0}}
 </style>
 </head>
 <body>
 
-<div class="welcome-overlay" id="wmod">
+<!-- WELCOME -->
+<div class="welcome-overlay" id="wmod" style="display:none">
   <div class="welcome-sheet">
-    <div class="welcome-handle"></div>
-    <div class="wl-row">
-      <button class="wl-btn active" id="wl-ro" onclick="wLang('ro')">🇷🇴 Română</button>
-      <button class="wl-btn" id="wl-en" onclick="wLang('en')">🇬🇧 English</button>
+    <div class="w-handle"></div>
+    <div class="w-logo">VV</div>
+    <div class="w-tag">Pulse · Prezența Reală</div>
+    <div class="w-title">Harta vie a orașului tău</div>
+    <div class="w-desc">Fiecare punct e validat fizic de un om real. Lea coordonează. Tu confirmi și câștigi VV Coins.</div>
+    <div class="w-feats">
+      <div class="wf"><div class="wf-i">⬡</div><div class="wf-t">Insideri Live</div><div class="wf-d">Prezențe reale acum în oraș</div></div>
+      <div class="wf"><div class="wf-i">⚡</div><div class="wf-t">Misiuni Lea</div><div class="wf-d">Validează fizic, câștigă coins</div></div>
+      <div class="wf"><div class="wf-i">◎</div><div class="wf-t">VV NOW</div><div class="wf-d">Caută filtrat, nu tot internetul</div></div>
+      <div class="wf"><div class="wf-i">🌿</div><div class="wf-t">Geo-adaptiv</div><div class="wf-d">Urban · Rural · Munte · Litoral</div></div>
     </div>
-    <div class="welcome-logo">VV</div>
-    <div class="welcome-tag">Pulse · The Presence Layer</div>
-    <div class="welcome-title" id="wt">Bun venit în București</div>
-    <div class="welcome-desc" id="wd">VV Pulse este harta vie a orașului. Fiecare punct auriu este o locație validată de comunitate. Punctele albastre sunt Insideri activi în timp real.</div>
-    <div class="welcome-feats">
-      <div class="wfeat"><div class="wfi">⭐</div><div class="wft">Premium</div><div class="wfd" id="wfd1">Cele mai valoroase locații</div></div>
-      <div class="wfeat"><div class="wfi">⬡</div><div class="wft">Insideri Live</div><div class="wfd" id="wfd2">Prezențe active în oraș</div></div>
-      <div class="wfeat"><div class="wfi">🔥</div><div class="wft">Vibe Score</div><div class="wfd" id="wfd3">Energia locației validată live</div></div>
-      <div class="wfeat"><div class="wfi">📍</div><div class="wft">Live</div><div class="wfd" id="wfd4">Date în timp real</div></div>
-    </div>
-    <button class="btn-welcome" id="wbtn" onclick="closeW()">Explorează harta →</button>
+    <button class="btn-welcome" onclick="closeWelcome()">Intru în ecosistem →</button>
   </div>
 </div>
 
+<!-- NAV -->
 <nav class="vv-nav">
   <div class="nav-row1">
-    <div class="nav-brand"><div class="nav-logo">VV</div><div class="nav-sub">Pulse · The Presence Layer</div></div>
-    <div class="nav-controls">
-      <div class="lang-toggle">
-        <button class="lang-btn active" id="lb-ro" onclick="setLang('ro')">RO</button>
-        <button class="lang-btn" id="lb-en" onclick="setLang('en')">EN</button>
-      </div>
-      <div class="nav-badge"><span class="pulse-dot-nav"></span><span id="act-count">—</span></div>
-      <button class="btn-locate" onclick="locateMe()">📍 <span id="loc-txt">Locația mea</span></button>
+    <div class="nav-brand">
+      <div class="nav-logo">VV Pulse</div>
+      <div class="nav-sub">Prezența Reală · <span id="zone-label">detectez zona...</span></div>
+    </div>
+    <div class="nav-right">
+      <div class="coins-pill"><div class="coins-dot"></div><span id="coins-val">⬡ 0</span></div>
+      <div class="lea-pill" onclick="goToLea()"><div class="lea-dot"></div><span id="lea-status">Lea</span></div>
+      <button class="btn-locate" onclick="locateMe()">📍</button>
+    </div>
+  </div>
+  <div class="search-wrap">
+    <div class="search-bar">
+      <span class="search-icon">◎</span>
+      <input class="search-input" id="search-input" placeholder="Caută în VV NOW..."
+        onkeydown="if(event.key==='Enter')doSearch(this.value)"
+        onfocus="this.placeholder='Cafenea, pensiune, traseu...'"
+        onblur="this.placeholder='Caută în VV NOW...'"/>
+      <span class="search-badge">NOW</span>
     </div>
   </div>
   <div class="filters-row">
     <button class="filter-btn active" id="f-all" onclick="setFilter('all')">⬡ Toate</button>
-    <button class="filter-btn" id="f-insideri" onclick="setFilter('insideri')">⬡ Insideri Live</button>
+    <button class="filter-btn f-orange" id="f-misiuni" onclick="setFilter('misiuni')">⚡ Misiuni</button>
+    <button class="filter-btn f-blue" id="f-insideri" onclick="setFilter('insideri')">◎ Live</button>
     <button class="filter-btn" id="f-premium" onclick="setFilter('premium')">⭐ Premium</button>
-    <button class="filter-btn" id="f-hidden" onclick="setFilter('hidden')">👁 Hidden Gems</button>
-    <button class="filter-btn" id="f-fresh" onclick="setFilter('fresh')">🔥 Live 24h</button>
+    <button class="filter-btn f-purple" id="f-hidden" onclick="setFilter('hidden')">👁 Hidden</button>
+    <button class="filter-btn f-green" id="f-fresh" onclick="setFilter('fresh')">🔥 24h</button>
   </div>
 </nav>
 
 <div id="vv-map"></div>
 <div class="vignette"></div>
 
+<!-- LEGEND -->
 <div class="map-legend">
   <div class="legend-item"><div class="legend-dot ld-blue"></div><span>Insider activ</span></div>
-  <div class="legend-item"><div class="legend-dot ld-gold"></div><span id="lg1">&lt; 24h</span></div>
-  <div class="legend-item"><div class="legend-dot ld-silver"></div><span id="lg2">&lt; 7 zile</span></div>
-  <div class="legend-item"><div class="legend-dot ld-grey"></div><span id="lg3">&gt; 30 zile</span></div>
-  <div class="legend-item"><span class="legend-icon">⭐</span><span id="lg4">Premium</span></div>
-  <div class="legend-item"><span class="legend-icon">👁</span><span id="lg5">Hidden</span></div>
+  <div class="legend-item"><div class="legend-dot ld-orange"></div><span>Misiune Lea</span></div>
+  <div class="legend-item"><div class="legend-dot ld-green"></div><span>Validat acum</span></div>
+  <div class="legend-item"><div class="legend-dot ld-gold"></div><span>&lt; 24h</span></div>
+  <div class="legend-item"><div class="legend-dot ld-silver"></div><span>&lt; 7 zile</span></div>
+  <div class="legend-item"><div class="legend-dot ld-grey"></div><span>&gt; 30 zile</span></div>
 </div>
 
+<!-- ZONE BADGE -->
+<div class="zone-badge hidden" id="zone-badge">◎ Urban</div>
+
+<!-- STATS -->
 <div class="map-stats" id="mstats">
-  <div class="stat-pill pill-blue"><b id="si">0</b> insideri</div>
-  <div class="stat-pill pill-gold"><b id="sh">—</b> <span id="sg">auriu</span></div>
-  <div class="stat-pill pill-green"><b id="st">—</b> <span id="sl">locații</span></div>
+  <div class="stat-pill pill-blue"><b id="si">0</b>&nbsp;live</div>
+  <div class="stat-pill pill-orange"><b id="sm">0</b>&nbsp;misiuni</div>
+  <div class="stat-pill pill-gold"><b id="sh">0</b>&nbsp;auriu</div>
+  <div class="stat-pill pill-green"><b id="st">0</b>&nbsp;locații</div>
 </div>
 
+<!-- CARD LOCATIE -->
 <div class="bottom-card" id="bcard">
   <div class="card-inner">
     <div class="card-handle"></div>
@@ -174,7 +234,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fon
       <div class="card-icon icon-premium" id="ci">📍</div>
       <div class="card-info">
         <div class="card-name" id="cn">—</div>
-        <div class="card-status"><span class="verified-badge" id="cv">VERIFICAT</span><span id="ctm">—</span></div>
+        <div class="card-status"><span class="vbadge vb-green" id="cv">VERIFICAT</span><span id="ctm">—</span></div>
       </div>
       <div class="card-vibe vibe-hot" id="cvb">—</div>
       <div class="card-close" onclick="closeCard()">✕</div>
@@ -182,12 +242,38 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fon
     <div class="card-desc" id="cdesc"></div>
     <div class="card-divider"></div>
     <div class="card-stats">
-      <div><div class="s-val" id="csc">—</div><div class="s-lbl" id="lv">Vibe Score</div></div>
-      <div><div class="s-val" id="cfr">—</div><div class="s-lbl" id="lf">Prospețime</div></div>
-      <div><div class="s-val" id="cva">—</div><div class="s-lbl" id="ll">Validări</div></div>
+      <div><div class="s-val" id="csc">—</div><div class="s-lbl">Vibe</div></div>
+      <div><div class="s-val" id="cfr">—</div><div class="s-lbl">Prospețime</div></div>
+      <div><div class="s-val" id="cva">—</div><div class="s-lbl">Validări</div></div>
+      <div><div class="s-val" id="ccoin" style="color:var(--gold)">+5 ⬡</div><div class="s-lbl">Câștig</div></div>
     </div>
-    <button class="btn-nav" id="btn-nav-main" onclick="navigateTo()">🧭 <span id="nav-txt">Navighează</span></button>
-    <button class="btn-nav-maps" id="btn-gmaps" onclick="openGMaps()">🗺 <span id="gmaps-txt">Deschide în Google Maps</span></button>
+    <button class="btn-checkin" id="btn-checkin" onclick="doCheckin()">✓ Confirmă că ești aici · +5 ⬡</button>
+    <button class="btn-sec" onclick="navigateTo()">🧭 Navighează</button>
+  </div>
+</div>
+
+<!-- CARD MISIUNE -->
+<div class="bottom-card" id="mcard">
+  <div class="card-inner">
+    <div class="card-handle"></div>
+    <div class="card-header">
+      <div class="card-icon icon-mission">⚡</div>
+      <div class="card-info">
+        <div class="card-name" id="mn">—</div>
+        <div class="card-status"><span class="vbadge vb-orange">MISIUNE LEA</span><span id="mt">—</span></div>
+      </div>
+      <div class="card-vibe vibe-mission" id="mreward">—</div>
+      <div class="card-close" onclick="closeMission()">✕</div>
+    </div>
+    <div class="card-desc" id="mdesc" style="display:block"></div>
+    <div class="card-divider"></div>
+    <div class="card-stats">
+      <div><div class="s-val" style="color:var(--orange)" id="mtype">VERIFY</div><div class="s-lbl">Tip</div></div>
+      <div><div class="s-val" style="color:var(--gold)" id="mcoins">+15 ⬡</div><div class="s-lbl">Reward</div></div>
+      <div><div class="s-val" id="mdist">—</div><div class="s-lbl">Distanță</div></div>
+    </div>
+    <button class="btn-mission" onclick="acceptMission()">⚡ Accept misiunea · <span id="m-coins-btn">+15 ⬡</span></button>
+    <button class="btn-sec" onclick="closeMission()">Nu acum</button>
   </div>
 </div>
 
@@ -195,380 +281,314 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fon
 
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import{getFirestore,collection,onSnapshot,doc,setDoc,increment,query,where,Timestamp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import{getFirestore,collection,onSnapshot,doc,setDoc,getDoc,addDoc,increment,query,where,orderBy,limit,Timestamp,serverTimestamp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-const app=initializeApp({
-  apiKey:"AIzaSyDGv4kEClO0RHCLvXVLOT-vyPHw6bsxYVc",
-  authDomain:"vv-ep-beta.firebaseapp.com",
-  projectId:"vv-ep-beta",
-  storageBucket:"vv-ep-beta.firebasestorage.app",
-  messagingSenderId:"641117018598",
-  appId:"1:641117018598:web:7cd522ef48db46ad58de27"
-});
+const app=initializeApp({apiKey:"AIzaSyDGv4kEClO0RHCLvXVLOT-vyPHw6bsxYVc",authDomain:"vv-ep-beta.firebaseapp.com",projectId:"vv-ep-beta",storageBucket:"vv-ep-beta.firebasestorage.app",messagingSenderId:"641117018598",appId:"1:641117018598:web:7cd522ef48db46ad58de27"});
 const db=getFirestore(app);
 
-const T={
-ro:{locate:'Locația mea',fall:'⬡ Toate',fins:'⬡ Insideri Live',fprem:'⭐ Premium',fhid:'👁 Hidden Gems',ffr:'🔥 Live 24h',l1:'< 24h',l2:'< 7 zile',l3:'> 30 zile',l4:'Premium',l5:'Hidden',sg:'auriu',sl:'locații',lv:'Vibe Score',lf:'Prospețime',ll:'Validări',cv:'VERIFICAT',vhot:'FIERBINTE',vwarm:'ACTIV',vcold:'RECE',vlive:'LIVE',now:'Acum',min:'min',h:'h',d:'z',tloc:'Localizat',tdeny:'Localizare refuzată',wt:'Bun venit în București',wd:'VV Pulse este harta vie a orașului. Fiecare punct auriu este o locație validată de comunitate. Punctele albastre sunt Insideri activi în timp real.',wb:'Explorează harta →',d1:'Cele mai valoroase locații',d2:'Prezențe active în oraș',d3:'Energia locației validată live',d4:'Date în timp real'},
-en:{locate:'My Location',fall:'⬡ All',fins:'⬡ Live Insiders',fprem:'⭐ Premium',fhid:'👁 Hidden Gems',ffr:'🔥 Live 24h',l1:'< 24h',l2:'< 7 days',l3:'> 30 days',l4:'Premium',l5:'Hidden',sg:'golden',sl:'locations',lv:'Vibe Score',lf:'Freshness',ll:'Validations',cv:'VERIFIED',vhot:'HOT',vwarm:'ACTIVE',vcold:'COLD',vlive:'LIVE',now:'Now',min:'min',h:'h',d:'d',tloc:'Located',tdeny:'Location denied',wt:'Welcome to Bucharest',wd:"VV Pulse is the city's living map. Golden dots are community-validated locations. Blue dots are active Insiders in real time.",wb:'Explore the map →',d1:'The most valuable city spots',d2:'Active presences in the city',d3:'Live-validated energy of each spot',d4:'Real-time community data'}
-};
+// ── STATE
+let userLat=null,userLng=null,filter='all',fbLocs=[],fbMissions=[],selLoc=null,selMission=null;
+let insiderMarkers={},missionMarkers={},locMarkers=[];
+let userCoins=0,zoneType='urban';
+const myVvid=localStorage.getItem('lea_id')||localStorage.getItem('vv_citizen_code')||null;
+const today=new Date().toDateString();
+if(localStorage.getItem('vv_ci_date')!==today){localStorage.setItem('vv_checkins_today','[]');localStorage.setItem('vv_ci_date',today);}
+let checkedIn=JSON.parse(localStorage.getItem('vv_checkins_today')||'[]');
 
-let lang=localStorage.getItem('vv_lang')||'ro';
-let filter='all';
-let fbLocs=[];
-let selLoc=null;
-let insiderMarkers={};
-const now=Date.now();
-const h=(n)=>({toMillis:()=>now-n*3600000});
-const dys=(n)=>({toMillis:()=>now-n*86400000});
-
-// ── LOCATII STATICE ──────────────────────────────────────────
-const LOCS=[
-{id:'p1',lat:44.4413,lng:26.0973,name:'Ateneul Român',nameEn:'Romanian Athenaeum',type:'premium',vibeScore:98,validations:12,descRo:'Bijuteria arhitecturală a Bucureștiului. Concerte live și evenimente culturale de top.',descEn:"Bucharest's architectural gem. Live concerts and top cultural events.",lastUpdate:h(2)},
-{id:'p2',lat:44.4275,lng:26.0872,name:'Palatul Parlamentului',nameEn:'Palace of Parliament',type:'premium',vibeScore:90,validations:18,descRo:'Cea mai mare clădire administrativă din lume. Vizite ghidate disponibile.',descEn:"The world's largest administrative building. Guided tours available.",lastUpdate:h(5)},
-{id:'p3',lat:44.4673,lng:26.0784,name:'Arcul de Triumf',nameEn:'Triumphal Arch',type:'premium',vibeScore:92,validations:8,descRo:'Replica Arcului de Triumf din Paris. Vedere panoramică din vârf.',descEn:"Replica of Paris' Arc de Triomphe. Panoramic view from the top.",lastUpdate:dys(2)},
-{id:'p4',lat:44.4410,lng:26.0950,name:'Calea Victoriei',nameEn:'Calea Victoriei',type:'premium',vibeScore:95,validations:22,descRo:'Cea mai elegantă stradă din București. Buticuri, muzee și arhitectură superbă.',descEn:"Bucharest's most elegant street. Boutiques, museums and stunning architecture.",lastUpdate:h(1)},
-{id:'p5',lat:44.4710,lng:26.0820,name:'Parcul Herăstrău',nameEn:'Herăstrău Park',type:'premium',vibeScore:94,validations:15,descRo:'Cel mai mare parc din București. Lac, restaurante și atmosferă premium.',descEn:"Bucharest's largest park. Lake, restaurants and premium atmosphere.",lastUpdate:h(3)},
-{id:'p6',lat:44.4355,lng:26.1025,name:'Piața Universității',nameEn:'University Square',type:'premium',vibeScore:88,validations:9,descRo:'Inima culturală a Bucureștiului. Teatre, librării și energie de campus.',descEn:"Bucharest's cultural heart. Theatres, bookshops and campus energy.",lastUpdate:h(4)},
-{id:'p7',lat:44.4293,lng:26.1023,name:'Hanul lui Manuc',nameEn:"Manuc's Inn",type:'premium',vibeScore:91,validations:7,descRo:'Cel mai vechi han din București, din 1808. Restaurant tradițional autentic.',descEn:"Bucharest's oldest inn, from 1808. Authentic traditional restaurant.",lastUpdate:dys(1)},
-{id:'p8',lat:44.4715,lng:26.0760,name:'Muzeul Satului',nameEn:'Village Museum',type:'premium',vibeScore:85,validations:11,descRo:'Peste 300 de construcții tradiționale românești aduse din toată țara.',descEn:'Over 300 traditional Romanian structures from across the country.',lastUpdate:dys(3)},
-{id:'p9',lat:44.4318,lng:26.0998,name:'Biserica Stavropoleos',nameEn:'Stavropoleos Church',type:'premium',vibeScore:96,validations:14,descRo:'Capodoperă a arhitecturii brâncovenești din 1724. Liniște în mijlocul orașului.',descEn:'A masterpiece of Brâncovenesc architecture from 1724. Tranquility in the city.',lastUpdate:h(6)},
-{id:'p10',lat:44.4331,lng:26.0988,name:'Pasajul Macca-Vilacrosse',nameEn:'Macca-Vilacrosse Passage',type:'premium',vibeScore:89,validations:6,descRo:'Pasaj acoperit cu sticlă galbenă din 1891. Cafenele și vibe parizian.',descEn:'Yellow glass-covered passage from 1891. Cafés and authentic Parisian vibes.',lastUpdate:h(8)},
-{id:'p11',lat:44.4390,lng:26.0970,name:'Piața Revoluției',nameEn:'Revolution Square',type:'premium',vibeScore:87,validations:10,descRo:'Locul istoriei recente a României. Muzeu Național de Artă în apropiere.',descEn:"Site of Romania's recent history. National Art Museum nearby.",lastUpdate:dys(1)},
-{id:'p12',lat:44.4370,lng:26.0910,name:'Grădina Cișmigiu',nameEn:'Cișmigiu Garden',type:'premium',vibeScore:82,validations:13,descRo:'Cel mai vechi parc public din București, din 1847. Lac cu bărci.',descEn:"Bucharest's oldest public park, since 1847. Rowing lake and cafés.",lastUpdate:h(2)},
-{id:'p13',lat:44.4323,lng:26.0965,name:'Palatul CEC',nameEn:'CEC Palace',type:'premium',vibeScore:93,validations:5,descRo:'Cea mai frumoasă clădire bancară din România. Arhitectură monumentală.',descEn:"Romania's most beautiful bank building. Monumental eclectic architecture.",lastUpdate:dys(2)},
-{id:'p14',lat:44.4265,lng:26.1020,name:'Fântânile Unirii',nameEn:'Unirii Fountains',type:'premium',vibeScore:88,validations:16,descRo:'Cel mai mare ansamblu de fântâni din Europa de Est. Spectacol de lumini noaptea.',descEn:'Largest artesian fountain complex in Eastern Europe. Light show at night.',lastUpdate:h(1)},
-{id:'p15',lat:44.4110,lng:26.0950,name:'Parcul Carol',nameEn:'Carol Park',type:'premium',vibeScore:84,validations:8,descRo:'Parc istoric din 1906 cu mausoleu și alei superbe.',descEn:'Historic park from 1906 with mausoleum and beautiful alleys.',lastUpdate:dys(4)},
-{id:'p16',lat:44.4395,lng:26.0960,name:'Muzeul Național de Artă',nameEn:'National Art Museum',type:'premium',vibeScore:91,validations:9,descRo:'Colecția națională de artă în fosta reședință regală.',descEn:'National art collection in the former royal residence.',lastUpdate:dys(1)},
-{id:'p17',lat:44.4520,lng:26.0860,name:'Piața Victoriei',nameEn:'Victory Square',type:'premium',vibeScore:80,validations:11,descRo:'Centrul administrativ al României. Muzeu Grigore Antipa în apropiere.',descEn:"Romania's administrative center. Grigore Antipa Museum nearby.",lastUpdate:h(3)},
-{id:'p18',lat:44.4650,lng:26.1050,name:'Zona Floreasca',nameEn:'Floreasca Area',type:'premium',vibeScore:97,validations:20,descRo:'Cel mai lifestyle neighborhood din București. Restaurante premium.',descEn:"Bucharest's most lifestyle neighborhood. Premium restaurants.",lastUpdate:h(1)},
-{id:'p19',lat:44.4580,lng:26.0920,name:'Zona Dorobanți',nameEn:'Dorobanți Area',type:'premium',vibeScore:96,validations:17,descRo:'Cartierul rezidențial de elită. Ambasade și restaurante fine dining.',descEn:'The elite residential district. Embassies and fine dining.',lastUpdate:h(2)},
-{id:'p20',lat:44.4650,lng:26.0780,name:'Parcul Regele Mihai I',nameEn:'King Mihai I Park',type:'premium',vibeScore:89,validations:14,descRo:'Vederi la lac și concerte în aer liber. Relaxare premium.',descEn:'Lake views and open-air concerts. Premium relaxation.',lastUpdate:h(4)},
-{id:'h1',lat:44.4305,lng:26.0945,name:'Strada Xenofon',nameEn:'Xenofon Street',type:'hidden',vibeScore:88,validations:4,descRo:'Singura stradă în trepte din București. Pictată superb de artiști locali.',descEn:"Bucharest's only staircase street. Beautifully painted by local artists.",lastUpdate:h(6)},
-{id:'h2',lat:44.4335,lng:26.0980,name:'Pasajul Englez',nameEn:'English Passage',type:'hidden',vibeScore:85,validations:3,descRo:'Vibe de Londra veche în mijlocul Bucureștiului. Cafenele cu personalitate.',descEn:'Old London vibes in the heart of Bucharest. Unique cafés and antiques.',lastUpdate:dys(2)},
-{id:'h3',lat:44.4290,lng:26.1005,name:'Casa Melik',nameEn:'Melik House',type:'hidden',vibeScore:92,validations:2,descRo:'Cea mai veche casă din București (sec. XVIII). Muzeu viu al istoriei.',descEn:'The oldest house in Bucharest (18th century). A living city museum.',lastUpdate:dys(5)},
-{id:'h4',lat:44.4360,lng:26.1015,name:'Strada Arthur Verona',nameEn:'Arthur Verona Street',type:'hidden',vibeScore:90,validations:5,descRo:'Epicentrul street art și graffiti din București. Galerie urbană în aer liber.',descEn:"Bucharest's street art epicenter. An open-air urban gallery.",lastUpdate:h(12)},
-{id:'h5',lat:44.4355,lng:26.1000,name:'Grădina Verona',nameEn:'Verona Garden',type:'hidden',vibeScore:87,validations:3,descRo:'Oază secretă în spatele librăriei Cărturești. Cafea și cărți.',descEn:'A secret oasis behind Cărturești bookshop. Coffee and books.',lastUpdate:dys(1)},
-{id:'h6',lat:44.4458,lng:26.0372,name:'Insula Îngerilor',nameEn:'Angels Island',type:'hidden',vibeScore:94,validations:6,descRo:'Cel mai bun apus la Lacul Morii. Mai puțin turistic, mai autentic.',descEn:"Bucharest's best sunset at Morii Lake. Less touristy, more authentic.",lastUpdate:dys(3)},
-{id:'h7',lat:44.4048,lng:26.1197,name:'Parcul Văcărești',nameEn:'Văcărești Natural Park',type:'hidden',vibeScore:96,validations:8,descRo:'Delta dintre blocuri — unic în Europa. Natură sălbatică în inima orașului.',descEn:'The delta between apartment blocks — unique in Europe. Wild nature in the city.',lastUpdate:h(8)}
-];
-
-function t(k){return(T[lang]||T.ro)[k]||k}
-
-function applyLang(){
-  document.getElementById('lb-ro').classList.toggle('active',lang==='ro');
-  document.getElementById('lb-en').classList.toggle('active',lang==='en');
-  document.getElementById('loc-txt').textContent=t('locate');
-  document.getElementById('f-all').textContent=t('fall');
-  document.getElementById('f-insideri').textContent=t('fins');
-  document.getElementById('f-premium').textContent=t('fprem');
-  document.getElementById('f-hidden').textContent=t('fhid');
-  document.getElementById('f-fresh').textContent=t('ffr');
-  document.getElementById('lg1').textContent=t('l1');
-  document.getElementById('lg2').textContent=t('l2');
-  document.getElementById('lg3').textContent=t('l3');
-  document.getElementById('lg4').textContent=t('l4');
-  document.getElementById('lg5').textContent=t('l5');
-  document.getElementById('sg').textContent=t('sg');
-  document.getElementById('sl').textContent=t('sl');
-  document.getElementById('lv').textContent=t('lv');
-  document.getElementById('lf').textContent=t('lf');
-  document.getElementById('ll').textContent=t('ll');
-  document.getElementById('cv').textContent=t('cv');
+// ── ZONE DETECTION
+function detectZone(lat,lng,name){
+  const n=(name||'').toLowerCase();
+  if(/munte|cabana|sinaia|predeal|busteni|azuga|bran|poiana|paltinis|balea|transfagarasan|bicaz|apuseni|retezat|bucegi|ranca/i.test(n))return'mountain';
+  if(/constanta|mamaia|eforie|neptun|olimp|mangalia|vama|litoral|plaja|navodari/i.test(n))return'coastal';
+  if(/sat |comuna |village|rural/i.test(n))return'rural';
+  return'urban';
+}
+const zoneIcons={urban:'◎',rural:'🌿',mountain:'⛰',coastal:'🌊'};
+const zoneNames={urban:'Urban',rural:'Rural',mountain:'Munte',coastal:'Litoral'};
+function applyZone(zone,city){
+  zoneType=zone;
+  document.getElementById('zone-label').textContent=city||(zoneNames[zone]||'Urban');
+  const zb=document.getElementById('zone-badge');
+  zb.textContent=(zoneIcons[zone]||'◎')+' '+(zoneNames[zone]||'Urban')+(city?' · '+city:'');
+  zb.classList.remove('hidden');
+  setTimeout(()=>zb.classList.add('hidden'),4000);
 }
 
-window.setLang=function(l){lang=l;localStorage.setItem('vv_lang',l);applyLang();if(selLoc)openCard(selLoc)};
+// ── COINS
+async function loadCoins(){
+  if(!myVvid)return;
+  try{
+    const snap=await getDoc(doc(db,'vv_coins',myVvid.replace(/[^a-zA-Z0-9]/g,'_')));
+    userCoins=snap.exists()?(snap.data().balance||0):0;
+    updateCoinsUI();
+    if(!snap.exists())await setDoc(doc(db,'vv_coins',myVvid.replace(/[^a-zA-Z0-9]/g,'_')),{balance:0,vvid:myVvid,ts:Date.now()});
+  }catch(e){}
+}
+async function addCoins(n,reason){
+  userCoins+=n;updateCoinsUI();showCoinsPop(n);
+  if(!myVvid)return;
+  try{await setDoc(doc(db,'vv_coins',myVvid.replace(/[^a-zA-Z0-9]/g,'_')),{balance:increment(n),lastEarned:{n,reason,ts:Date.now()}},{merge:true});}catch(e){}
+}
+function updateCoinsUI(){document.getElementById('coins-val').textContent='⬡ '+userCoins;}
+function showCoinsPop(n){
+  const el=document.createElement('div');el.className='coins-pop';
+  el.innerHTML='<div class="coins-pop-val">+'+n+' ⬡</div><div class="coins-pop-lbl">VV COINS</div>';
+  document.body.appendChild(el);setTimeout(()=>el.remove(),950);
+}
 
-window.wLang=function(l){
-  document.getElementById('wl-ro').classList.toggle('active',l==='ro');
-  document.getElementById('wl-en').classList.toggle('active',l==='en');
-  const tx=T[l];
-  document.getElementById('wt').textContent=tx.wt;
-  document.getElementById('wd').textContent=tx.wd;
-  document.getElementById('wbtn').textContent=tx.wb;
-  document.getElementById('wfd1').textContent=tx.d1;
-  document.getElementById('wfd2').textContent=tx.d2;
-  document.getElementById('wfd3').textContent=tx.d3;
-  document.getElementById('wfd4').textContent=tx.d4;
-  lang=l;
-};
-
-window.closeW=function(){
-  localStorage.setItem('vv_welcomed','1');
-  localStorage.setItem('vv_lang',lang);
-  document.getElementById('wmod').style.display='none';
-  applyLang();
-};
-
-function toast(msg,d=2500){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),d)}
-
+// ── MAP
 const map=L.map('vv-map',{center:[44.4368,26.0975],zoom:13,zoomControl:false,attributionControl:false,preferCanvas:true});
 L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png',{maxZoom:19,subdomains:'abcd',crossOrigin:true}).addTo(map);
 
-function fresh(ts){if(!ts)return'grey';const d=(Date.now()-ts.toMillis())/3600000;return d<24?'gold':d<168?'silver':'grey'}
-function ago(ts){if(!ts)return'—';const s=Math.floor((Date.now()-ts.toMillis())/1000);if(s<60)return t('now');if(s<3600)return Math.floor(s/60)+' '+t('min');if(s<86400)return Math.floor(s/3600)+t('h');return Math.floor(s/86400)+t('d')}
-
-let markers=[];
-
-function mkMarker(loc){
+// ── MARKERS
+function mkLocMarker(loc){
   const fr=fresh(loc.lastUpdate);
-  const isPrem=loc.type==='premium';
-  const isHid=loc.type==='hidden';
+  const isPrem=loc.type==='premium',isHid=loc.type==='hidden';
   const sz=isPrem?16:isHid?14:11;
-  const col=fr==='gold'?(isHid?'#a78bfa':isPrem?'#D4AF37':'#34c759'):fr==='silver'?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.18)';
-  const ring=fr==='gold'?(isHid?'rgba(167,139,250,0.35)':isPrem?'rgba(212,175,55,0.35)':'rgba(52,199,89,0.35)'):fr==='silver'?'rgba(255,255,255,0.18)':'rgba(255,255,255,0.05)';
-  const glow=fr==='gold'?'box-shadow:0 0 8px '+col+';':'';
+  const col=fr==='gold'?(isHid?'#a78bfa':isPrem?'#C9A84C':'#2db87a'):fr==='silver'?'rgba(255,255,255,.5)':'rgba(255,255,255,.18)';
+  const ring=fr==='gold'?(isHid?'rgba(167,139,250,.3)':isPrem?'rgba(201,168,76,.3)':'rgba(45,184,122,.3)'):fr==='silver'?'rgba(255,255,255,.15)':'rgba(255,255,255,.05)';
+  const glow=fr==='gold'?`box-shadow:0 0 8px ${col};`:'';
   const ic=isHid?'👁':isPrem?'⭐':'';
-  const html=`<div style="width:${sz*3.5}px;height:${sz*3.5}px;position:relative;cursor:pointer">
-    <div style="position:absolute;border-radius:50%;top:50%;left:50%;width:${sz*2.8}px;height:${sz*2.8}px;background:${ring};${fr!=='grey'?'animation:mpulse 2.5s ease-in-out infinite':''}"></div>
-    <div style="position:absolute;border-radius:50%;top:50%;left:50%;transform:translate(-50%,-50%);width:${sz}px;height:${sz}px;background:${col};${glow}"></div>
-    ${ic&&fr!=='grey'?`<div style="position:absolute;top:-9px;left:50%;transform:translateX(-50%);font-size:8px">${ic}</div>`:''}
-  </div>`;
-  const icon=L.divIcon({html,className:'',iconSize:[sz*3.5,sz*3.5],iconAnchor:[sz*1.75,sz*1.75]});
-  const mk=L.marker([loc.lat,loc.lng],{icon}).addTo(map);
-  mk.on('click',()=>{selLoc=loc;openCard(loc)});
+  const html=`<div style="width:${sz*3.5}px;height:${sz*3.5}px;position:relative;cursor:pointer"><div style="position:absolute;border-radius:50%;top:50%;left:50%;width:${sz*2.8}px;height:${sz*2.8}px;background:${ring};${fr!=='grey'?'animation:mpulse 2.5s ease-in-out infinite':''}"></div><div style="position:absolute;border-radius:50%;top:50%;left:50%;transform:translate(-50%,-50%);width:${sz}px;height:${sz}px;background:${col};${glow}"></div>${ic&&fr!=='grey'?`<div style="position:absolute;top:-9px;left:50%;transform:translateX(-50%);font-size:8px">${ic}</div>`:''}</div>`;
+  const mk=L.marker([loc.lat,loc.lng],{icon:L.divIcon({html,className:'',iconSize:[sz*3.5,sz*3.5],iconAnchor:[sz*1.75,sz*1.75]})}).addTo(map);
+  mk.on('click',()=>{closeMission();selLoc=loc;openCard(loc);});
   return mk;
 }
-
-// ── MARKER INSIDER LIVE ──────────────────────────────────────
-function mkInsiderMarker(uid, lat, lng, alias){
-  // Sterge marker vechi daca exista
-  if(insiderMarkers[uid]){
-    try{map.removeLayer(insiderMarkers[uid]);}catch(e){}
-  }
-  const html=`<div style="width:48px;height:48px;position:relative;cursor:pointer">
-    <div style="position:absolute;border-radius:50%;top:50%;left:50%;width:40px;height:40px;background:rgba(10,132,255,0.2);animation:insiderPulse 1.8s ease-in-out infinite;"></div>
-    <div style="position:absolute;border-radius:50%;top:50%;left:50%;transform:translate(-50%,-50%);width:12px;height:12px;background:#0A84FF;box-shadow:0 0 10px rgba(10,132,255,0.9);"></div>
-    <div style="position:absolute;bottom:-14px;left:50%;transform:translateX(-50%);font-size:7px;color:rgba(10,132,255,0.7);font-weight:700;white-space:nowrap;letter-spacing:0.5px;">⬡</div>
-  </div>`;
-  const icon=L.divIcon({html,className:'',iconSize:[48,48],iconAnchor:[24,24]});
-  const mk=L.marker([lat,lng],{icon,zIndexOffset:2000}).addTo(map);
-  mk.on('click',()=>{
-    openInsiderCard(alias);
-  });
+function mkInsiderMarker(uid,lat,lng,alias){
+  if(insiderMarkers[uid])try{map.removeLayer(insiderMarkers[uid]);}catch(e){}
+  const html=`<div style="width:48px;height:48px;position:relative;cursor:pointer"><div style="position:absolute;border-radius:50%;top:50%;left:50%;width:40px;height:40px;background:rgba(41,151,255,.2);animation:insiderPulse 1.8s ease-in-out infinite;"></div><div style="position:absolute;border-radius:50%;top:50%;left:50%;transform:translate(-50%,-50%);width:12px;height:12px;background:#2997FF;box-shadow:0 0 10px rgba(41,151,255,.9);"></div><div style="position:absolute;bottom:-14px;left:50%;transform:translateX(-50%);font-size:7px;color:rgba(41,151,255,.7);font-weight:700;white-space:nowrap;">⬡</div></div>`;
+  const mk=L.marker([lat,lng],{icon:L.divIcon({html,className:'',iconSize:[48,48],iconAnchor:[24,24]}),zIndexOffset:2000}).addTo(map);
+  mk.on('click',()=>openInsiderCard(alias));
   insiderMarkers[uid]=mk;
-  return mk;
+}
+function mkMissionMarker(id,lat,lng,mdata){
+  if(missionMarkers[id])try{map.removeLayer(missionMarkers[id]);}catch(e){}
+  const sz=14;
+  const html=`<div style="width:${sz*4}px;height:${sz*4}px;position:relative;cursor:pointer"><div style="position:absolute;border-radius:50%;top:50%;left:50%;width:${sz*3.5}px;height:${sz*3.5}px;background:rgba(255,159,10,.18);animation:missionPulse 1.5s ease-in-out infinite;"></div><div style="position:absolute;border-radius:50%;top:50%;left:50%;transform:translate(-50%,-50%);width:${sz}px;height:${sz}px;background:#FF9F0A;box-shadow:0 0 10px rgba(255,159,10,.9);"></div><div style="position:absolute;top:-12px;left:50%;transform:translateX(-50%);font-size:9px;font-weight:800;color:rgba(255,159,10,.9);">⚡</div></div>`;
+  const mk=L.marker([lat,lng],{icon:L.divIcon({html,className:'',iconSize:[sz*4,sz*4],iconAnchor:[sz*2,sz*2]}),zIndexOffset:1500}).addTo(map);
+  mk.on('click',()=>openMissionCard({id,lat,lng,...mdata}));
+  missionMarkers[id]=mk;
 }
 
-function removeInsiderMarker(uid){
-  if(insiderMarkers[uid]){
-    try{map.removeLayer(insiderMarkers[uid]);}catch(e){}
-    delete insiderMarkers[uid];
-  }
-}
-
-function openInsiderCard(alias){
-  document.getElementById('ci').textContent='⬡';
-  document.getElementById('ci').className='card-icon icon-pulse';
-  document.getElementById('cn').textContent=alias||'Insider VV';
-  document.getElementById('cv').textContent='INSIDER';
-  document.getElementById('cv').className='insider-badge';
-  document.getElementById('ctm').textContent='acum';
-  document.getElementById('cvb').textContent=t('vlive');
-  document.getElementById('cvb').className='card-vibe vibe-live';
-  document.getElementById('csc').textContent='⬡';
-  document.getElementById('cfr').textContent='🔵';
-  document.getElementById('cva').textContent='—';
-  document.getElementById('cdesc').textContent='Insider VV activ în proximitate. Prezență verificată prin VV Pulse.';
-  document.getElementById('cdesc').style.display='block';
-  document.getElementById('btn-nav-main').style.display='none';
-  document.getElementById('btn-gmaps').style.display='none';
-  document.getElementById('mstats').classList.add('hidden');
-  document.getElementById('bcard').classList.add('open');
-}
-
-function renderMarkers(){
-  markers.forEach(m=>map.removeLayer(m));
-  markers=[];
+// ── RENDER
+function renderAll(){
+  locMarkers.forEach(m=>{try{map.removeLayer(m);}catch(e){}});locMarkers=[];
   let hot=0,tot=0;
-  const combined=[...fbLocs];
-  LOCS.forEach(l=>{if(!fbLocs.find(f=>f.id===l.id))combined.push(l)});
-  combined.forEach(loc=>{
-    if(filter==='insideri')return; // la filtrul insideri nu aratam locatii
+  fbLocs.forEach(loc=>{
+    if(filter==='insideri'||filter==='misiuni')return;
     if(filter==='premium'&&loc.type!=='premium')return;
     if(filter==='hidden'&&loc.type!=='hidden')return;
     if(filter==='fresh'&&fresh(loc.lastUpdate)!=='gold')return;
-    markers.push(mkMarker(loc));
-    tot++;
-    if(fresh(loc.lastUpdate)==='gold')hot++;
+    if(userLat&&userLng&&getDistance(userLat,userLng,loc.lat,loc.lng)>60)return;
+    locMarkers.push(mkLocMarker(loc));
+    tot++;if(fresh(loc.lastUpdate)==='gold')hot++;
   });
-  document.getElementById('act-count').textContent=tot;
+  Object.keys(missionMarkers).forEach(id=>{try{map.removeLayer(missionMarkers[id]);}catch(e){}});
+  missionMarkers={};let mc=0;
+  if(filter==='all'||filter==='misiuni'){
+    fbMissions.forEach(m=>{
+      if(m.lat&&m.lng&&m.status==='open'){mkMissionMarker(m.id,m.lat,m.lng,m);mc++;}
+    });
+  }
   document.getElementById('sh').textContent=hot;
   document.getElementById('st').textContent=tot;
+  document.getElementById('sm').textContent=mc;
 }
 
-window.setFilter=function(f){
-  filter=f;
-  ['all','insideri','premium','hidden','fresh'].forEach(k=>{
-    const el=document.getElementById('f-'+k);
-    if(!el)return;
-    el.classList.toggle('active',k===f);
-    el.classList.remove('is-green','is-purple','is-blue');
-  });
-  if(f==='fresh')document.getElementById('f-fresh').classList.add('is-green');
-  if(f==='hidden')document.getElementById('f-hidden').classList.add('is-purple');
-  if(f==='insideri')document.getElementById('f-insideri').classList.add('is-blue');
-  renderMarkers();
-};
-
+// ── CARDS
 function openCard(loc){
-  const fr=fresh(loc.lastUpdate);
+  closeMission();
+  const fr=fresh(loc.lastUpdate),isPrem=loc.type==='premium',isHid=loc.type==='hidden';
   const vibe=loc.vibeScore>=80?'hot':loc.vibeScore>=50?'warm':'cold';
-  const isPrem=loc.type==='premium';
-  const isHid=loc.type==='hidden';
   document.getElementById('ci').textContent=isHid?'👁':isPrem?'⭐':'📍';
   document.getElementById('ci').className='card-icon '+(isHid?'icon-hidden':isPrem?'icon-premium':'icon-standard');
-  document.getElementById('cn').textContent=lang==='en'&&loc.nameEn?loc.nameEn:loc.name;
-  document.getElementById('cv').textContent=t('cv');
-  document.getElementById('cv').className='verified-badge';
+  document.getElementById('cn').textContent=loc.name||'Locație VV';
+  document.getElementById('cv').textContent='VERIFICAT';document.getElementById('cv').className='vbadge vb-green';
   document.getElementById('ctm').textContent=ago(loc.lastUpdate);
-  document.getElementById('cvb').textContent=t('v'+vibe);
+  document.getElementById('cvb').textContent=vibe==='hot'?'FIERBINTE':vibe==='warm'?'ACTIV':'RECE';
   document.getElementById('cvb').className='card-vibe vibe-'+vibe;
   document.getElementById('csc').textContent=(loc.vibeScore||50)+'/100';
   document.getElementById('cfr').textContent=fr==='gold'?'🔥':fr==='silver'?'🕐':'❄️';
-  document.getElementById('cva').textContent=(loc.validations||1)+'x';
-  const desc=lang==='en'&&loc.descEn?loc.descEn:(loc.descRo||loc.description||'');
-  document.getElementById('cdesc').textContent=desc;
-  document.getElementById('cdesc').style.display=desc?'block':'none';
-  document.getElementById('btn-nav-main').style.display='flex';
-  document.getElementById('btn-gmaps').style.display='flex';
-  const navTxt=lang==='en'?'Navigate':'Navighează';
-  const gmapsTxt=lang==='en'?'Open in Google Maps':'Deschide în Google Maps';
-  document.getElementById('nav-txt').textContent=navTxt;
-  document.getElementById('gmaps-txt').textContent=gmapsTxt;
+  document.getElementById('cva').textContent=(loc.validations||0)+'x';
+  const desc=loc.descRo||loc.description||'';
+  const cdesc=document.getElementById('cdesc');cdesc.textContent=desc;cdesc.style.display=desc?'block':'none';
+  const lid=loc.id||loc.name;
+  const done=checkedIn.includes(lid);
+  const btn=document.getElementById('btn-checkin');
+  if(done){btn.textContent='✓ Ai confirmat azi';btn.className='btn-checkin done';document.getElementById('ccoin').textContent='✓';}
+  else{btn.textContent='✓ Confirmă că ești aici · +5 ⬡';btn.className='btn-checkin';document.getElementById('ccoin').textContent='+5 ⬡';}
   document.getElementById('mstats').classList.add('hidden');
   document.getElementById('bcard').classList.add('open');
 }
-
+function openInsiderCard(alias){
+  closeCard();
+  document.getElementById('ci').textContent='⬡';document.getElementById('ci').className='card-icon icon-pulse';
+  document.getElementById('cn').textContent=alias||'Insider VV';
+  document.getElementById('cv').textContent='INSIDER LIVE';document.getElementById('cv').className='vbadge vb-blue';
+  document.getElementById('ctm').textContent='acum';
+  document.getElementById('cvb').textContent='LIVE';document.getElementById('cvb').className='card-vibe vibe-live';
+  document.getElementById('csc').textContent='⬡';document.getElementById('cfr').textContent='🔵';document.getElementById('cva').textContent='—';
+  document.getElementById('ccoin').textContent='—';
+  document.getElementById('cdesc').textContent='Insider VV activ în proximitate. Prezență verificată prin VV Pulse.';
+  document.getElementById('cdesc').style.display='block';
+  document.getElementById('btn-checkin').style.display='none';
+  document.getElementById('mstats').classList.add('hidden');
+  document.getElementById('bcard').classList.add('open');
+}
+function openMissionCard(m){
+  selMission=m;
+  document.getElementById('mn').textContent=m.title||'Misiune VV';
+  document.getElementById('mt').textContent=ago({toMillis:()=>m.ts||Date.now()});
+  document.getElementById('mreward').textContent='+'+(m.reward||15)+' ⬡';
+  document.getElementById('mdesc').textContent=m.description||'Lea a lansat această misiune. Du-te la locație și confirmă.';
+  document.getElementById('mtype').textContent=m.type||'VERIFY';
+  document.getElementById('mcoins').textContent='+'+(m.reward||15)+' ⬡';
+  document.getElementById('m-coins-btn').textContent='+'+(m.reward||15)+' ⬡';
+  if(userLat&&userLng&&m.lat&&m.lng){const d=getDistance(userLat,userLng,m.lat,m.lng);document.getElementById('mdist').textContent=d<1?(Math.round(d*1000)+'m'):(d.toFixed(1)+'km');}
+  else document.getElementById('mdist').textContent='—';
+  document.getElementById('mstats').classList.add('hidden');
+  document.getElementById('mcard').classList.add('open');
+}
 window.closeCard=function(){
   document.getElementById('bcard').classList.remove('open');
-  document.getElementById('mstats').classList.remove('hidden');
-  selLoc=null;
+  document.getElementById('btn-checkin').style.display='';
+  document.getElementById('mstats').classList.remove('hidden');selLoc=null;
+};
+window.closeMission=function(){
+  document.getElementById('mcard').classList.remove('open');
+  document.getElementById('mstats').classList.remove('hidden');selMission=null;
 };
 
+// ── CHECK-IN
+window.doCheckin=async function(){
+  if(!selLoc)return;
+  const lid=selLoc.id||selLoc.name||'loc';
+  if(checkedIn.includes(lid)){toast('Ai confirmat deja azi');return;}
+  if(userLat&&userLng&&selLoc.lat&&selLoc.lng){
+    const d=getDistance(userLat,userLng,selLoc.lat,selLoc.lng);
+    if(d>0.5){toast('Trebuie să fii la locație · Ești la '+Math.round(d*1000)+'m distanță');return;}
+  }
+  const btn=document.getElementById('btn-checkin');
+  btn.textContent='Se salvează...';btn.style.opacity='.5';
+  try{
+    await addDoc(collection(db,'vv_checkins'),{locId:lid,locName:selLoc.name,lat:selLoc.lat,lng:selLoc.lng,vvid:myVvid||'anon',zone:zoneType,hour:new Date().getHours(),dow:new Date().getDay(),ts:Date.now()});
+    if(selLoc.id){
+      await setDoc(doc(db,'locations',selLoc.id),{validations:increment(1),lastUpdate:serverTimestamp(),vibeScore:Math.min(100,(selLoc.vibeScore||50)+2)},{merge:true});
+    }
+    await addCoins(5,'checkin');
+    checkedIn.push(lid);localStorage.setItem('vv_checkins_today',JSON.stringify(checkedIn));
+    btn.textContent='✓ Confirmat · +5 ⬡';btn.className='btn-checkin done';btn.style.opacity='1';
+    document.getElementById('ccoin').textContent='✓';
+    toast('✓ Validat fizic · +5 ⬡ câștigate');
+  }catch(e){btn.textContent='✓ Confirmă că ești aici · +5 ⬡';btn.style.opacity='1';toast('Eroare · Mai încearcă');}
+};
+
+// ── MISSION ACCEPT
+window.acceptMission=function(){
+  if(!selMission)return;
+  if(selMission.lat&&selMission.lng)map.flyTo([selMission.lat,selMission.lng],16,{duration:1.2});
+  localStorage.setItem('vv_active_mission',JSON.stringify({...selMission,acceptedAt:Date.now()}));
+  closeMission();
+  toast('⚡ Misiune acceptată · Navighează la locație');
+};
+
+// ── NAVIGATE
 window.navigateTo=function(){
   if(!selLoc)return;
-  const lat=selLoc.lat,lng=selLoc.lng;
   const isIOS=/iPhone|iPad|iPod/i.test(navigator.userAgent);
-  if(isIOS){
-    window.location.href='maps://maps.apple.com/?daddr='+lat+','+lng+'&dirflg=w&t=m';
-    setTimeout(()=>window.open('https://maps.apple.com/?daddr='+lat+','+lng+'&dirflg=w','_blank'),1500);
+  if(isIOS)window.location.href='maps://maps.apple.com/?daddr='+selLoc.lat+','+selLoc.lng+'&dirflg=w';
+  else window.open('https://www.google.com/maps/dir/?api=1&destination='+selLoc.lat+','+selLoc.lng+'&travelmode=walking','_blank');
+};
+
+// ── SEARCH VV NOW
+window.doSearch=function(q){
+  if(!q||!q.trim())return;
+  const ql=q.toLowerCase();
+  const found=fbLocs.filter(l=>(l.name||'').toLowerCase().includes(ql)||(l.descRo||'').toLowerCase().includes(ql)||(l.keywords||'').toLowerCase().includes(ql));
+  if(found.length>0){
+    map.flyTo([found[0].lat,found[0].lng],15,{duration:1.2});
+    setTimeout(()=>{selLoc=found[0];openCard(found[0]);},1500);
+    toast('◎ '+found.length+' rezultate VV · '+q);
   }else{
-    window.open('https://www.openstreetmap.org/directions?to='+lat+'%2C'+lng+'&from=&type=foot','_blank');
+    toast('◎ Trimit la Lea...');
+    setTimeout(()=>{window.location.href='lea.html?q='+encodeURIComponent(q);},600);
   }
+  document.getElementById('search-input').blur();
+  document.getElementById('search-input').value='';
 };
 
-window.openGMaps=function(){
-  if(!selLoc)return;
-  window.open('https://www.google.com/maps/dir/?api=1&destination='+selLoc.lat+','+selLoc.lng+'&travelmode=walking','_blank');
-};
-
-map.on('click',()=>{if(document.getElementById('bcard').classList.contains('open'))window.closeCard()});
-
+// ── LOCATE
 window.locateMe=function(){
-  if(!navigator.geolocation){toast(t('tdeny'));return}
-  toast('📡...');
-  navigator.geolocation.getCurrentPosition(
-    p=>{
-      const{latitude:la,longitude:lo}=p.coords;
-      map.flyTo([la,lo],15,{duration:1.2});
-      L.marker([la,lo],{icon:L.divIcon({html:`<div style="width:24px;height:24px;position:relative"><div style="position:absolute;inset:0;border-radius:50%;background:rgba(10,132,255,.2);animation:mpulse 2s ease-in-out infinite"></div><div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:10px;height:10px;border-radius:50%;background:#0A84FF;box-shadow:0 0 8px rgba(10,132,255,.9)"></div></div>`,className:'',iconSize:[24,24],iconAnchor:[12,12]}),zIndexOffset:1000}).addTo(map);
-      toast(t('tloc')+' · '+la.toFixed(4)+', '+lo.toFixed(4));
-    },
-    ()=>toast(t('tdeny')),{enableHighAccuracy:true,timeout:8000}
-  );
+  if(!navigator.geolocation){toast('Localizarea nu e disponibilă');return;}
+  toast('📡 Detectez locația...');
+  navigator.geolocation.getCurrentPosition(p=>{
+    userLat=p.coords.latitude;userLng=p.coords.longitude;
+    map.flyTo([userLat,userLng],14,{duration:1.2});
+    L.marker([userLat,userLng],{icon:L.divIcon({html:`<div style="width:20px;height:20px;position:relative"><div style="position:absolute;inset:0;border-radius:50%;background:rgba(41,151,255,.2);animation:mpulse 2s infinite"></div><div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:8px;height:8px;border-radius:50%;background:#2997FF;box-shadow:0 0 8px rgba(41,151,255,.9)"></div></div>`,className:'',iconSize:[20,20],iconAnchor:[10,10]}),zIndexOffset:3000}).addTo(map);
+    fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat='+userLat+'&lon='+userLng+'&accept-language=ro')
+      .then(r=>r.json()).then(d=>{
+        const city=d.address?.city||d.address?.town||d.address?.village||d.address?.county||'';
+        const zone=detectZone(userLat,userLng,city+' '+(d.address?.state||''));
+        applyZone(zone,city);renderAll();
+      }).catch(()=>renderAll());
+    toast('✓ Localizat');
+  },()=>toast('Localizare refuzată'),{enableHighAccuracy:true,timeout:8000});
 };
 
-// ── LISTEN LOCATII DIN FIREBASE ──────────────────────────────
+// ── FILTER
+window.setFilter=function(f){
+  filter=f;
+  ['all','misiuni','insideri','premium','hidden','fresh'].forEach(k=>{const el=document.getElementById('f-'+k);if(el)el.classList.toggle('active',k===f);});
+  renderAll();
+};
+
+// ── FIREBASE LISTENERS
+try{onSnapshot(collection(db,'locations'),snap=>{fbLocs=snap.docs.map(d=>({id:d.id,...d.data()}));renderAll();});}catch(e){}
 try{
-  onSnapshot(collection(db,'locations'),snap=>{
-    fbLocs=snap.docs.map(d=>({id:d.id,...d.data()}));
-    renderMarkers();
+  onSnapshot(query(collection(db,'vv_pulse'),where('expiresAt','>',Timestamp.now())),snap=>{
+    const active=new Set();
+    snap.forEach(d=>{const data=d.data(),uid=d.id;active.add(uid);if(data.lat&&data.lng)mkInsiderMarker(uid,data.lat,data.lng,data.alias||'Insider');});
+    Object.keys(insiderMarkers).forEach(uid=>{if(!active.has(uid)){try{map.removeLayer(insiderMarkers[uid]);}catch(e){}delete insiderMarkers[uid];}});
+    document.getElementById('si').textContent=active.size;
   });
-}catch(e){renderMarkers();}
-
-// ── LISTEN INSIDERI ACTIVI DIN VV PULSE ─────────────────────
-// Citeste colectia vv_pulse si afiseaza insiderii cu pulse activ
+}catch(e){}
 try{
-  const nowTs=Timestamp.now();
-  onSnapshot(
-    query(collection(db,'vv_pulse'),where('expiresAt','>',nowTs)),
-    snap=>{
-      // Marcheaza toti ca potential sterse
-      const activeUids=new Set();
+  onSnapshot(query(collection(db,'missions'),where('status','==','open'),limit(30)),snap=>{
+    fbMissions=snap.docs.map(d=>({id:d.id,...d.data()}));
+    renderAll();
+    const mc=fbMissions.length;
+    document.getElementById('lea-status').textContent='Lea'+(mc>0?' · '+mc+' misiuni':'');
+  });
+}catch(e){}
 
-      snap.forEach(docSnap=>{
-        const d=docSnap.data();
-        const uid=docSnap.id;
-        activeUids.add(uid);
+// ── HELPERS
+function fresh(ts){if(!ts)return'grey';const h=(Date.now()-(ts.toMillis?ts.toMillis():Number(ts)))/3600000;return h<24?'gold':h<168?'silver':'grey';}
+function ago(ts){if(!ts)return'—';const ms=Date.now()-(ts.toMillis?ts.toMillis():Number(ts));const s=Math.floor(ms/1000);if(s<60)return'acum';if(s<3600)return Math.floor(s/60)+' min';if(s<86400)return Math.floor(s/3600)+'h';return Math.floor(s/86400)+'z';}
+function getDistance(la1,lo1,la2,lo2){const R=6371,dL=(la2-la1)*Math.PI/180,dl=(lo2-lo1)*Math.PI/180,a=Math.sin(dL/2)**2+Math.cos(la1*Math.PI/180)*Math.cos(la2*Math.PI/180)*Math.sin(dl/2)**2;return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));}
+function toast(msg,d=2500){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('show'),d);}
 
-        // Adauga sau actualizeaza marker
-        if(d.lat && d.lng){
-          mkInsiderMarker(uid, d.lat, d.lng, d.alias||'Insider');
-        }
-      });
+// ── INIT
+window.goToLea=()=>{window.location.href='lea.html';};
+window.closeWelcome=()=>{localStorage.setItem('vv_p2_ok','1');document.getElementById('wmod').style.display='none';};
+map.on('click',()=>{if(document.getElementById('bcard').classList.contains('open'))closeCard();if(document.getElementById('mcard').classList.contains('open'))closeMission();});
 
-      // Sterge markerii insiderilor care nu mai sunt activi
-      Object.keys(insiderMarkers).forEach(uid=>{
-        if(!activeUids.has(uid)){
-          removeInsiderMarker(uid);
-        }
-      });
-
-      // Actualizeaza counter
-      const count=activeUids.size;
-      document.getElementById('si').textContent=count;
-      document.getElementById('act-count').textContent=
-        document.getElementById('st').textContent!=='—'
-          ? parseInt(document.getElementById('st').textContent||'0')+count
-          : count;
-    }
-  );
-}catch(e){console.warn('[VV Pulse live]',e);}
-
-// ── WELCOME ──────────────────────────────────────────────────
-if(!localStorage.getItem('vv_welcomed')){
-  wLang(lang);
-}else{
-  document.getElementById('wmod').style.display='none';
-}
-
-applyLang();
-renderMarkers();
-
-// Fly-to daca vine din VV Search
-const urlParams=new URLSearchParams(window.location.search);
-const flyLat=parseFloat(urlParams.get('lat'));
-const flyLng=parseFloat(urlParams.get('lng'));
-const flyName=urlParams.get('name');
+// Fly-to din URL (Lea trimite user direct la locatie)
+const up=new URLSearchParams(window.location.search);
+const flyLat=parseFloat(up.get('lat')),flyLng=parseFloat(up.get('lng')),flyName=up.get('name');
 if(flyLat&&flyLng){
   setTimeout(()=>{
     map.flyTo([flyLat,flyLng],16,{duration:1.5});
     setTimeout(()=>{
-      const loc=[...LOCS,...fbLocs].find(l=>Math.abs(l.lat-flyLat)<0.001&&Math.abs(l.lng-flyLng)<0.001);
+      const loc=fbLocs.find(l=>Math.abs(l.lat-flyLat)<0.001&&Math.abs(l.lng-flyLng)<0.001);
       if(loc){selLoc=loc;openCard(loc);}
-      else if(flyName){
-        document.getElementById('cn').textContent=decodeURIComponent(flyName);
-        document.getElementById('cv').textContent='VERIFICAT';
-        document.getElementById('cv').className='verified-badge';
-        document.getElementById('ctm').textContent='acum';
-        document.getElementById('cvb').textContent='ACTIV';
-        document.getElementById('cvb').className='card-vibe vibe-warm';
-        document.getElementById('csc').textContent='—';
-        document.getElementById('cfr').textContent='🔥';
-        document.getElementById('cva').textContent='—';
-        document.getElementById('cdesc').style.display='none';
-        document.getElementById('btn-nav-main').style.display='flex';
-        document.getElementById('btn-gmaps').style.display='flex';
-        document.getElementById('mstats').classList.add('hidden');
-        document.getElementById('bcard').classList.add('open');
-      }
-    },1600);
-  },500);
+    },1800);
+  },600);
 }
 
-try{
-  await setDoc(doc(db,"stats","map_visits"),{total:increment(1),[new Date().toISOString().slice(0,10)]:increment(1)},{merge:true});
-}catch(e){}
+loadCoins();
+if(!localStorage.getItem('vv_p2_ok'))document.getElementById('wmod').style.display='flex';
+setTimeout(locateMe,800);
+try{const{setDoc:sd,doc:d2,increment:inc}=await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");sd(d2(db,"stats","pulse_v2"),{total:inc(1),[new Date().toISOString().slice(0,10)]:inc(1)},{merge:true});}catch(e){}
 </script>
 </body>
 </html>
