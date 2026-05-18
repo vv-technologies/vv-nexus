@@ -9,6 +9,12 @@ function initFirebase() {
         projectId:"vv-ep-beta"
       });
       db = firebase.firestore();
+      // Anonymous auth — satisface isAuth() in reguli fara email/parola
+      if(typeof firebase.auth === 'function') {
+        firebase.auth().onAuthStateChanged(function(user) {
+          if(!user) firebase.auth().signInAnonymously().catch(function(){});
+        });
+      }
     }
   } catch(e) { db = null; }
 }
