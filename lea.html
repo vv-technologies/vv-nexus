@@ -319,30 +319,36 @@ window.addEventListener('load', function() {
     var ctx = vvhiCtx();
     var tokens = VVhiRaft.load().tokens || {};
 
+    function setPro(key, label) {
+      localStorage.setItem('vvhi_pro_ctx', JSON.stringify({key:key, ts:Date.now(), label:label}));
+    }
+
     // Sport azi? — HABIT:sport:sala:zi:joi
     var sportAzi = Object.keys(tokens).filter(function(k) {
       return k.indexOf('HABIT:sport:') === 0 && k.indexOf(':zi:' + ctx.zi) !== -1 && tokens[k].strength > 0.35;
     });
     if(sportAzi.length > 0) {
       var sp = sportAzi[0].split(':')[2];
+      setPro(sportAzi[0], sp);
       return 'Ai ' + sp + ' azi, nu?';
     }
 
     // Pranz — e 13-14
     if(ctx.h >= 13 && ctx.h < 15) {
       var pr = tokens['HABIT:eat:pranz:MED:AFT'];
-      if(pr && pr.strength > 0.4) return 'Mananci ceva la pranz?';
+      if(pr && pr.strength > 0.4) { setPro('HABIT:eat:pranz:MED:AFT','pranz'); return 'Mananci ceva la pranz?'; }
     }
 
     // Mama — vineri seara
     if(ctx.zi === 'vineri' && ctx.period === 'seara' && tokens['PERS:familie:mama:HI:ALWAYS']) {
+      setPro('PERS:familie:mama:HI:ALWAYS','mama');
       return 'Suni-o pe mama diseara?';
     }
 
     // Cafea dimineata
     if(ctx.period === 'dimineata' && ctx.h >= 7 && ctx.h < 10) {
       var cf = tokens['HABIT:eat:cafea:HI:MORN'] || tokens['TIME:routine:cafea:HI:MORN'];
-      if(cf && cf.strength > 0.5) return 'Ai cafeaua?';
+      if(cf && cf.strength > 0.5) { setPro('HABIT:eat:cafea:HI:MORN','cafea'); return 'Ai cafeaua?'; }
     }
 
     // Somnolenta dupa pranz — dar numai daca nu a mai zis azi
@@ -355,6 +361,41 @@ window.addEventListener('load', function() {
     }
 
     return null;
+  }
+
+  // ── Daily Brief — rezumatul zilei din Raft ────────────────
+  function vvhiDailyBrief() {
+    var ctx = vvhiCtx();
+    var tokens = VVhiRaft.load().tokens || {};
+    var name = localStorage.getItem('lea_name') || '', N = name ? ', ' + name : '';
+    var parts = [];
+    var ZI = {luni:'Luni',marti:'Marti',miercuri:'Miercuri',joi:'Joi',vineri:'Vineri',sambata:'Sambata',duminica:'Duminica'};
+
+    parts.push(ZI[ctx.zi] + '.');
+
+    // Sport azi
+    var sportAzi = Object.keys(tokens).filter(function(k) {
+      return k.indexOf('HABIT:sport:') === 0 && k.indexOf(':zi:' + ctx.zi) !== -1 && tokens[k].strength > 0.3;
+    });
+    if(sportAzi.length > 0) parts.push('Ai ' + sportAzi[0].split(':')[2] + ' azi.');
+
+    // Energie — factory sau personal
+    if(tokens['BLOCK:energy:dupa_pranz:LO:AFT'] || ctx.lowEnergy) {
+      parts.push('Munca serioasa dimineata — la 14 te lasa.');
+    }
+
+    // Pranz
+    var pr2 = tokens['HABIT:eat:pranz:MED:AFT'];
+    if(pr2 && pr2.strength > 0.35) parts.push('Pranz pe la 13.');
+
+    // Familie context
+    if(ctx.zi === 'vineri' && tokens['PERS:familie:mama:HI:ALWAYS']) parts.push('Suni-o pe mama diseara?');
+    if((ctx.zi === 'sambata' || ctx.zi === 'duminica') && tokens['HABIT:social:familie:HI:WEEK']) {
+      parts.push('Weekend — familie sau reincarca.');
+    }
+
+    if(parts.length <= 2) return 'Inca invat' + N + '. Spune-mi ceva despre ziua ta.';
+    return parts.join(' ');
   }
 
   // ── Motor local — citeste Raftul, raspunde uman ──────────
@@ -419,6 +460,31 @@ window.addEventListener('load', function() {
     if(/cat e ceasul|ce ora|cat e ora/.test(l)) {
       var now2 = new Date();
       return 'E ' + now2.getHours().toString().padStart(2,'0') + ':' + now2.getMinutes().toString().padStart(2,'0') + '.';
+    }
+
+    // Daily Brief — ce fac azi, cum e ziua
+    if(/ce fac azi|cum e azi|ziua mea|programul meu|ce am azi|cum imi organizez|brief/.test(l)) {
+      return vvhiDailyBrief();
+    }
+
+    // Reinforcement — da/nu dupa intrebare proactiva (fereastra 5 min)
+    if(/^(da|nu|aha|yep|exact|nu mai|ba da|ba nu)\b/.test(l)) {
+      try {
+        var pctx = JSON.parse(localStorage.getItem('vvhi_pro_ctx') || 'null');
+        if(pctx && (Date.now() - pctx.ts) < 5 * 60 * 1000) {
+          var raft2 = VVhiRaft.load();
+          var tk2 = raft2.tokens[pctx.key];
+          if(tk2) {
+            var isYes = /^(da|aha|yep|ba da|exact)/.test(l);
+            tk2.strength = Math.max(0, Math.min(1, (tk2.strength||0.5) + (isYes ? 0.15 : -0.25)));
+            tk2.count = (tk2.count||1) + 1;
+            tk2.lastSeen = Date.now();
+            localStorage.setItem('vvhi_raft', JSON.stringify(raft2));
+            localStorage.removeItem('vvhi_pro_ctx');
+            return isYes ? 'Notat' + N + '.' : 'Ok' + N + '. Uit.';
+          }
+        }
+      } catch(e) {}
     }
 
     // Multumesc
