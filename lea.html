@@ -248,6 +248,71 @@ window.addEventListener('load', function() {
     isCEO: function() { return localStorage.getItem('vvhi_role')==='CEO'; }
   };
 
+  // ── Memory — amintiri reale indexate pe zi/stare ─────────
+  var VVhiMemory = {
+    KEY: 'vvhi_memories',
+    MAX: 500,
+    add: function(mo) {
+      var mem = this._load(), d = new Date();
+      var h = d.getHours();
+      mem.push({
+        id:     d.getTime(),
+        data:   d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'),
+        zi:     ['duminica','luni','marti','miercuri','joi','vineri','sambata'][d.getDay()],
+        period: h<6?'noapte':h<12?'dimineata':h<17?'dupa_pranz':h<21?'seara':'noapte',
+        ce:     mo.ce||'', stare: mo.stare||'neutru', tag: mo.tag||''
+      });
+      if(mem.length > this.MAX) mem = mem.slice(-this.MAX);
+      this._save(mem);
+    },
+    byDay: function(zi) { return this._load().filter(function(m){ return m.zi===zi; }); },
+    byDate: function(data) { return this._load().filter(function(m){ return m.data===data; }); },
+    recent: function(n) { return this._load().slice(-(n||5)); },
+    moodFor: function(zi) {
+      var mem = this.byDay(zi);
+      if(!mem.length) return null;
+      var c={};
+      mem.forEach(function(m){ c[m.stare]=(c[m.stare]||0)+1; });
+      var top=Object.keys(c).sort(function(a,b){return c[b]-c[a];});
+      return {stare:top[0], count:c[top[0]], total:mem.length};
+    },
+    briefFor: function(zi) {
+      var mem = this.byDay(zi);
+      if(mem.length < 2) return null;
+      var mood = this.moodFor(zi), act=[];
+      mem.forEach(function(m){ if(m.ce && act.indexOf(m.ce)===-1) act.push(m.ce); });
+      return {zi:zi, stare:mood?mood.stare:'neutru', activitati:act.slice(0,3), nr:mem.length};
+    },
+    toText: function(zi) {
+      var b = this.briefFor(zi);
+      if(!b) return null;
+      var t='De obicei '+zi;
+      if(b.stare!=='neutru') t+=' esti '+b.stare;
+      if(b.activitati.length) t+=' si faci '+b.activitati[0];
+      return t+'. ('+b.nr+' amintiri)';
+    },
+    extractFromMsg: function(msg) {
+      var l=msg.toLowerCase(), stare='neutru', ce='', tag='';
+      if(/obosit|epuizat/.test(l))              { stare='obosit'; }
+      else if(/stresat|nervos|suparat/.test(l)) { stare='stres'; }
+      else if(/bine|super|fain|misto/.test(l))  { stare='bine'; }
+      else if(/trist|rau|nasol/.test(l))        { stare='trist'; }
+      else if(/fericit|bucuros/.test(l))        { stare='fericit'; }
+      if(/sala|alergat|fotbal|inot|yoga/.test(l))   { ce='sport';   tag='HABIT:sport'; }
+      else if(/lucrat|munca|proiect/.test(l))        { ce='munca';   tag='HABIT:work'; }
+      else if(/mancat|pranz|cina|restaurant/.test(l)){ ce='mancat';  tag='HABIT:eat'; }
+      else if(/mama|tata|familie|copii/.test(l))     { ce='familie'; tag='PERS:familie'; }
+      else if(/iesit|prieteni|bar/.test(l))          { ce='social';  tag='HABIT:social'; }
+      if(ce || stare!=='neutru') this.add({ce:ce, stare:stare, tag:tag});
+    },
+    todayStr: function() {
+      var d=new Date();
+      return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+    },
+    _load: function() { try{return JSON.parse(localStorage.getItem(this.KEY)||'[]');}catch(e){return[];} },
+    _save: function(m) { localStorage.setItem(this.KEY,JSON.stringify(m)); }
+  };
+
   // ── CEO auto-recognition ──────────────────────────────────
   var savedUid = localStorage.getItem('vvhi_id') || localStorage.getItem('vvhi_ceo_uid') || '';
   if(savedUid === 'VV_CEO_ELENA_2026') {
@@ -394,6 +459,12 @@ window.addEventListener('load', function() {
       parts.push('Weekend — familie sau reincarca.');
     }
 
+    // Memorie — ce s-a intamplat de obicei in ziua asta
+    var memBrief = VVhiMemory.briefFor(ctx.zi);
+    if(memBrief && memBrief.stare !== 'neutru') {
+      parts.push('De obicei esti ' + memBrief.stare + ' in ' + ctx.zi + '.');
+    }
+
     if(parts.length <= 2) return 'Inca invat' + N + '. Spune-mi ceva despre ziua ta.';
     return parts.join(' ');
   }
@@ -467,6 +538,35 @@ window.addEventListener('load', function() {
       return vvhiDailyBrief();
     }
 
+    // Memorie — cum eram intr-o zi a saptamanii
+    var ziMatch = l.match(/cum eram (luni|marti|miercuri|joi|vineri|sambata|duminica)/);
+    if(ziMatch) {
+      var ziCautata = ziMatch[1];
+      var txt = VVhiMemory.toText(ziCautata);
+      if(txt) return txt;
+      return 'Nu am amintiri despre ' + ziCautata + ' inca' + N + '. Spune-mi cum a fost.';
+    }
+
+    // Memorie — cum m-am simtit azi / cum a fost azi
+    if(/cum m-?am simtit azi|cum a fost azi|ce am facut azi/.test(l)) {
+      var azi = VVhiMemory.byDate(VVhiMemory.todayStr());
+      if(!azi.length) return 'Azi nu am inregistrat nimic inca' + N + '. Povesteste-mi.';
+      var stariAzi = azi.map(function(m){ return m.stare; }).filter(function(s){ return s!=='neutru'; });
+      var actAzi   = azi.map(function(m){ return m.ce; }).filter(function(c){ return c; });
+      var r = 'Azi';
+      if(stariAzi.length) r += ' ai fost ' + stariAzi[stariAzi.length-1];
+      if(actAzi.length)   r += (stariAzi.length?' si ':' ') + 'ai facut ' + actAzi[actAzi.length-1];
+      return r + '. (' + azi.length + ' momente salvate)';
+    }
+
+    // Memorie — cum ma simt de obicei [zi]
+    var tipMatch = l.match(/cum (?:ma simt|sunt) de obicei (luni|marti|miercuri|joi|vineri|sambata|duminica)/);
+    if(tipMatch) {
+      var mood2 = VVhiMemory.moodFor(tipMatch[1]);
+      if(!mood2) return 'Nu stiu inca' + N + '. Mai vorbim si aflu.';
+      return 'De obicei ' + tipMatch[1] + ' esti ' + mood2.stare + ' — am ' + mood2.total + ' amintiri de acolo.';
+    }
+
     // Reinforcement — da/nu dupa intrebare proactiva (fereastra 5 min)
     if(/^(da|nu|aha|yep|exact|nu mai|ba da|ba nu)\b/.test(l)) {
       try {
@@ -507,6 +607,7 @@ window.addEventListener('load', function() {
 
   processLea = async function(q) {
     vvhiExtract(q);
+    VVhiMemory.extractFromMsg(q);
 
     if(q.trim() === 'VV_CEO_ELENA_2026') {
       localStorage.setItem('vvhi_id','VV_CEO_ELENA_2026');
@@ -538,7 +639,7 @@ window.addEventListener('load', function() {
     return _orig(q);
   };
 
-  console.log('%cVVhi LEA v2 — Raft activ', 'color:#10b981;font-weight:600');
+  console.log('%cVVhi LEA v3 — Raft + Memory activ', 'color:#10b981;font-weight:600');
 });
 </script>
 </body>
