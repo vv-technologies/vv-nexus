@@ -17,23 +17,6 @@ function fbAdd(col, data) {
   try { db.collection(col).add(data); } catch(e) {}
 }
 
-// Telemetrie anonimă — zero text personal, doar pattern-uri agregate
-function sendAnonTelemetry(intent, city, fromCache, ok) {
-  try {
-    if(!db) return;
-    db.collection('lea_telemetry').add({
-      intent: intent || 'general',
-      city: ((city || 'unknown') + '').toLowerCase().slice(0, 24),
-      hour: new Date().getHours(),
-      dow: new Date().getDay(),
-      device: localStorage.getItem('lea_device') || 'mobile',
-      fromCache: !!fromCache,
-      ok: !!ok,
-      ts: Date.now()
-    });
-  } catch(e) {}
-}
-
 // ── STATE ─────────────────────────────────────────────────────
 var _u = null, _city = null, _hist = [], _obs = 0, _aerL = null;
 var _ck = [false, false, false];
@@ -101,7 +84,18 @@ function goToTerms() {
   setTimeout(function() {
     if(stepName) stepName.style.display='none';
     if(stepTerms) { stepTerms.style.display='flex'; stepTerms.style.opacity='0'; stepTerms.style.transform='translateX(16px)'; stepTerms.style.transition='all .3s'; }
-    setTimeout(function() { if(stepTerms){ stepTerms.style.opacity='1'; stepTerms.style.transform='translateX(0)'; } }, 50);
+    setTimeout(function() {
+      if(stepTerms){ stepTerms.style.opacity='1'; stepTerms.style.transform='translateX(0)'; }
+      // Pre-bifeaza toate 3 — userul a ales deja sa intre
+      _ck = [true, true, true];
+      [0,1,2].forEach(function(i) {
+        var el = document.getElementById('ck'+i), box = document.getElementById('ckb'+i);
+        if(el) el.classList.add('on');
+        if(box) { box.style.background='var(--gold)'; box.style.borderColor='var(--gold)'; box.style.color='#000'; }
+      });
+      var btn = document.getElementById('a-btn');
+      if(btn) { btn.classList.add('on'); btn.style.opacity='1'; btn.style.cursor='pointer'; }
+    }, 50);
   }, 300);
 }
 
@@ -526,8 +520,6 @@ function finishOb() { localStorage.setItem('lea_ob_done','1'); hideAll(); enterA
 function enterApp() {
   hideAll();
   init();
-  // Pe desktop: preia silent rafturile de pe telefon via VV Aer
-  if(localStorage.getItem('lea_device') === 'desktop') setTimeout(pullShelvesFromAer, 2000);
   // Card VV nu mai apare automat — user il vede din setari
   // Prima data: salut simplu
   setTimeout(function(){
@@ -795,11 +787,6 @@ var SHELVES = {
     ghostPins: [],         // pini temporari activi
     homeZone: null,        // zona de acasa
     workZone: null         // zona de munca
-  },
-  // Raft 6 — Dorinte & Context Financiar
-  wishes: {
-    items: [],             // dorinte detectate: "vacanta", "inghetata de capsuni" etc
-    financialCtx: null     // 'tight' / 'normal' / 'comfortable'
   }
 };
 
@@ -812,90 +799,6 @@ function loadShelves() {
 
 function saveShelves() {
   try { localStorage.setItem('vv_shelves', JSON.stringify(SHELVES)); } catch(e) {}
-}
-
-// Extrage preferinte si dorinte din conversatie si le salveaza in rafturi
-function extractAndSavePreferences(q, ans) {
-  var l = q.toLowerCase();
-  if(!SHELVES.wishes) SHELVES.wishes = {items:[], financialCtx:null};
-
-  // Context financiar
-  if(/nu am bani|fara bani|fără bani|ieftin|economic|buget mic|nu imi permit|nu-mi permit|nu îmi permit/i.test(l)) {
-    SHELVES.wishes.financialCtx = 'tight';
-    SHELVES.prefs.budget = 'economic';
-  } else if(/premium|luxury|cel mai bun|nu conteaza pretul|nu contează prețul|calitate maxima/i.test(l)) {
-    SHELVES.wishes.financialCtx = 'comfortable';
-    SHELVES.prefs.budget = 'premium';
-  }
-
-  // Dorinte si vise detectate din mesajul userului
-  var wishPats = [
-    {p:/(?:vreau|vreu)\s+(?:sa\s+)?(?:merg la\s+|vizitez\s+|incerc\s+|gust\s+)?(.{4,35})/i, s:1},
-    {p:/(?:imi|îmi|mi-?ar?)\s+(?:ar\s+)?plac(?:ea|e)\s+(.{4,35})/i, s:1},
-    {p:/(?:visez|visez la|imi doresc|îmi doresc)\s+(.{4,35})/i, s:1},
-    {p:/(?:as|aș)\s+vrea\s+(?:sa\s+)?(.{4,35})/i, s:1}
-  ];
-  wishPats.forEach(function(wp) {
-    var m = l.match(wp.p);
-    if(m && m[wp.s]) {
-      var wish = m[wp.s].trim().replace(/\s+/g,' ').slice(0,40);
-      if(wish.length >= 4 && !SHELVES.wishes.items.find(function(w){return w.text===wish;})) {
-        SHELVES.wishes.items.push({text:wish, ts:Date.now()});
-        if(SHELVES.wishes.items.length > 12) SHELVES.wishes.items.shift();
-      }
-    }
-  });
-
-  saveShelves();
-  refreshVVMeIfOpen();
-  if(localStorage.getItem('lea_device') === 'mobile') syncShelvesToAer();
-}
-
-// Rebuild VV Me display daca e deja deschis
-function refreshVVMeIfOpen() {
-  var sheet = document.getElementById('vvme');
-  if(sheet && sheet.classList.contains('on')) {
-    if(typeof openVVMe === 'function') openVVMe();
-  }
-}
-
-// Sync rafturi pe Firebase cand suntem pe telefon
-async function syncShelvesToAer() {
-  if(!db) return;
-  var id = localStorage.getItem('lea_id');
-  if(!id) return;
-  try {
-    var docId = id.replace(/[^a-zA-Z0-9]/g,'_');
-    db.collection('vv_aer_shelves').doc(docId).set({
-      vvid: id,
-      shelves: JSON.stringify(SHELVES),
-      device: 'mobile',
-      ts: Date.now()
-    });
-  } catch(e) {}
-}
-
-// Pe desktop: preia rafturile de pe telefon via Firebase
-async function pullShelvesFromAer() {
-  if(!db) return;
-  if(localStorage.getItem('lea_device') !== 'desktop') return;
-  var id = localStorage.getItem('lea_id');
-  if(!id) return;
-  try {
-    var docId = id.replace(/[^a-zA-Z0-9]/g,'_');
-    var doc = await db.collection('vv_aer_shelves').doc(docId).get();
-    if(!doc.exists) return;
-    var data = doc.data();
-    if(data.device !== 'mobile') return;
-    if(Date.now() - data.ts > 24*3600000) return; // mai vechi de 24h — ignora
-    var mobileShelves = JSON.parse(data.shelves || '{}');
-    // Merge: datele de pe telefon vin in local, fara sa suprascrie pinii locali
-    var localPins = (SHELVES.places && SHELVES.places.ghostPins) ? SHELVES.places.ghostPins : [];
-    SHELVES = Object.assign({}, SHELVES, mobileShelves);
-    if(localPins.length) SHELVES.places.ghostPins = localPins;
-    saveShelves();
-    showToast('◎ VV Aer · Rafturi sincronizate de pe telefon');
-  } catch(e) {}
 }
 
 // Invata din fiecare interactiune
@@ -948,112 +851,38 @@ function learnFromInteraction(q, intent, ans, city) {
 }
 
 // Construieste context personal pentru Gemini
-
-// ── VV ARCHETYPE SYSTEM ───────────────────────────────────────
-var ARCHETYPE_KEY = 'lea_archetype';
-var ARCHETYPE_SIGNALS = {
-  creator:      /studio|creez|construiesc|design|idee|proiect|fac ceva|vreau sa fac|creat|muzica|scriu|scris|art/i,
-  explorator:   /unde|ce e|descopar|nou|recomanda|exploreaza|ce mai|surprinde|necunoscut|prima data|incerc/i,
-  profesionist: /meeting|intalnire|deadline|task|eficient|rapid|business|client|prezentare|job|lucru/i,
-  parinte:      /copil|copii|familie|bebe|scoala|parc copii|activitat|family|kid|fetita|baietel/i
-};
-var ARCHETYPE_LABELS = { creator:'Creator', explorator:'Explorator', profesionist:'Profesionist', parinte:'Parinte' };
-var ARCHETYPE_TONES = {
-  creator:      'Utilizatorul e creativ — valorifica idei originale, propune ceva neconventional.',
-  explorator:   'Utilizatorul exploreaza — recomanda ceva neasteptat, surprinde-l.',
-  profesionist: 'Utilizatorul e orientat pe rezultate — direct, concis, zero divagratii.',
-  parinte:      'Utilizatorul are familie — include optiuni family-friendly automat.'
-};
-function loadArchetype() { try { return JSON.parse(localStorage.getItem(ARCHETYPE_KEY)||'{}'); } catch(e) { return {}; } }
-function saveArchetype(d) { try { localStorage.setItem(ARCHETYPE_KEY,JSON.stringify(d)); } catch(e) {} }
-function updateArchetype(q) {
-  var data=loadArchetype();
-  if(!data.scores) data.scores={creator:0,explorator:0,profesionist:0,parinte:0};
-  if(!data.total) data.total=0;
-  data.total++;
-  Object.keys(ARCHETYPE_SIGNALS).forEach(function(t){if(ARCHETYPE_SIGNALS[t].test(q))data.scores[t]++;});
-  if(data.total>=3){
-    var tot=Object.values(data.scores).reduce(function(a,b){return a+b;},0)||1;
-    data.blend={};
-    Object.keys(data.scores).forEach(function(k){data.blend[k]=Math.round((data.scores[k]/tot)*100);});
-    data.primary=Object.keys(data.scores).reduce(function(a,b){return data.scores[a]>=data.scores[b]?a:b;});
-  }
-  saveArchetype(data);
-  refreshArchetypeDisplay();
-}
-function getArchetypeContext() { var d=loadArchetype(); return d.primary?ARCHETYPE_TONES[d.primary]||'':''; }
-function getArchetypeLabel() {
-  var d=loadArchetype();
-  if(!d.primary) return 'VV Beta';
-  var label=ARCHETYPE_LABELS[d.primary]||'';
-  if(d.blend){
-    var sorted=Object.keys(d.blend).sort(function(a,b){return d.blend[b]-d.blend[a];});
-    if(sorted[1]&&d.blend[sorted[1]]>=20&&sorted[1]!==d.primary) label+=' · '+ARCHETYPE_LABELS[sorted[1]];
-  }
-  return label;
-}
-function refreshArchetypeDisplay() {
-  var el=document.getElementById('vme-archetype');
-  if(!el) return;
-  var d=loadArchetype();
-  el.textContent=d.primary?getArchetypeLabel():'Lea te descopera...';
-}
 function buildPersonalContext() {
   loadShelves();
-  var isMobile = localStorage.getItem('lea_device') === 'mobile';
   var ctx = [];
 
-  // Familie — intotdeauna relevant
   if(SHELVES.family.hasKids) ctx.push('Are copii — filtrează locuri cu facilități pentru copii.');
-  if(!isMobile && SHELVES.family.hasCar) ctx.push('Merge cu mașina — menționează parcarea.');
-  if(!isMobile && SHELVES.family.petFriendly) ctx.push('Are animale — preferă pet-friendly.');
+  if(SHELVES.family.hasCar) ctx.push('Merge cu mașina — menționează disponibilitatea parcării când e relevant.');
+  if(SHELVES.family.petFriendly) ctx.push('Are animale — preferă locuri pet-friendly.');
 
-  // Preferinte culinare — max 2 pe telefon
   if(SHELVES.prefs.foodTypes.length > 0) {
-    var foods = isMobile ? SHELVES.prefs.foodTypes.slice(0,2) : SHELVES.prefs.foodTypes;
-    ctx.push('Mâncare preferată: ' + foods.join(', ') + '.');
+    ctx.push('Preferințe culinare: ' + SHELVES.prefs.foodTypes.join(', ') + '.');
   }
 
-  // Context financiar — important pe orice device
-  if(SHELVES.wishes && SHELVES.wishes.financialCtx === 'tight') {
-    ctx.push('Buget limitat — recomandă opțiuni accesibile, evită premium.');
-  } else if(SHELVES.wishes && SHELVES.wishes.financialCtx === 'comfortable') {
-    ctx.push('Preferă calitate, nu neapărat cel mai ieftin.');
-  } else if(SHELVES.prefs.budget) {
-    ctx.push('Buget: ' + SHELVES.prefs.budget + '.');
-  }
-
-  // Stare emotionala
   if(SHELVES.mood.lastMood === 'obosit') {
-    ctx.push(isMobile ? 'Obosit — scurt și concis.' : 'Utilizatorul pare obosit — opțiuni liniștite, fără cozi.');
+    ctx.push('Utilizatorul pare obosit — sugerează opțiuni liniștite, fără cozi.');
   }
 
-  // Peak hours — doar pe desktop (prea mult context pentru mobile)
-  if(!isMobile) {
-    var h = new Date().getHours();
-    var period = h<6?'noapte':h<12?'dimineata':h<17?'pranz':h<21?'seara':'noapte_tarziu';
-    var topIntent = null, topCount = 0;
-    if(SHELVES.habits.peakHours[period]) {
-      Object.keys(SHELVES.habits.peakHours[period]).forEach(function(k) {
-        if(SHELVES.habits.peakHours[period][k] > topCount) {
-          topCount = SHELVES.habits.peakHours[period][k];
-          topIntent = k;
-        }
-      });
-      if(topCount >= 2 && topIntent) ctx.push('La această oră caută de obicei ' + topIntent + '.');
+  var h = new Date().getHours();
+  var period = h<6?'noapte':h<12?'dimineata':h<17?'pranz':h<21?'seara':'noapte_tarziu';
+  var topIntent = null, topCount = 0;
+  if(SHELVES.habits.peakHours[period]) {
+    Object.keys(SHELVES.habits.peakHours[period]).forEach(function(k) {
+      if(SHELVES.habits.peakHours[period][k] > topCount) {
+        topCount = SHELVES.habits.peakHours[period][k];
+        topIntent = k;
+      }
+    });
+    if(topCount >= 2 && topIntent) {
+      ctx.push('La această oră de obicei caută ' + topIntent + ' — anticipează nevoia.');
     }
   }
 
-  // Dorinte recente — context util
-  if(SHELVES.wishes && SHELVES.wishes.items && SHELVES.wishes.items.length > 0) {
-    var recentWish = SHELVES.wishes.items[SHELVES.wishes.items.length-1];
-    if(recentWish && Date.now() - recentWish.ts < 7*24*3600000) {
-      ctx.push('A menționat recent că vrea: ' + recentWish.text + '.');
-    }
-  }
-
-  var arcCtx=getArchetypeContext(); if(arcCtx) ctx.push(arcCtx);
-  return ctx.length>0?'Context personal: '+ctx.join(' '):'';
+  return ctx.length > 0 ? 'Context personal: ' + ctx.join(' ') : '';
 }
 
 // ── GHOST PIN SYSTEM ──────────────────────────────────────────
@@ -1207,10 +1036,7 @@ async function searchVVNodes(q, intent) {
 // Dimineata si seara = cache-uri diferite (contextul se schimba)
 
 var CACHE_KEY = 'vv_smart_cache';
-var CACHE_TTL_LOC = 2 * 3600000;
-var CACHE_TTL_GEN = 24 * 3600000;
-var CACHE_TTL_INTENTS_LOC = ['mancare','cafea','sanatate','transport','divertisment','cumparaturi','vreme'];
-function getCacheTTL(intent) { return CACHE_TTL_INTENTS_LOC.indexOf(intent) >= 0 ? CACHE_TTL_LOC : CACHE_TTL_GEN; }
+var CACHE_TTL = 48 * 3600000; // 48 ore
 
 function getCacheBucket(intent, city) {
   // Bucket = intentie + oras + perioada zilei
@@ -1249,7 +1075,7 @@ function getCache(intent, city) {
     var entry = cache[bucket];
     if(!entry) return null;
     var age = Date.now() - entry.t;
-    var ttl = getCacheTTL(intent); if(age > ttl) { delete cache[bucket]; localStorage.setItem(CACHE_KEY, JSON.stringify(cache)); return null; }
+    if(age > CACHE_TTL) { delete cache[bucket]; localStorage.setItem(CACHE_KEY, JSON.stringify(cache)); return null; }
     if(entry.city && city && entry.city.toLowerCase() !== city.toLowerCase()) return null;
     return {response: entry.r, ageMs: age};
   } catch(e) { return null; }
@@ -1274,22 +1100,6 @@ async function processLea(q) {
   var activeKey = localStorage.getItem('lea_gk') || '';
   _gk = activeKey;
   var intent=detectIntent(q);
-
-  // ── CACHE CHECK — inainte de orice API ──────────────────────
-  if(intent !== 'urgenta' && intent !== 'salut' && intent !== 'ceas') {
-    var cachedHit = getCache(intent, _city||'');
-    if(cachedHit) {
-      addMsg('l', cachedHit.response);
-      var cacheBadge = document.createElement('div');
-      cacheBadge.style.cssText='align-self:flex-start;font-size:9px;color:rgba(255,255,255,.22);padding:2px 8px;margin-top:-6px;';
-      cacheBadge.textContent='📦 din cache · ' + formatCacheAge(cachedHit.ageMs);
-      document.getElementById('conv').appendChild(cacheBadge);
-      _hist.push({r:'u',t:q});_hist.push({r:'l',t:cachedHit.response});saveHistory();
-      sendAnonTelemetry(intent, _city||'', true, true);
-      return;
-    }
-  }
-
   // Raspunde direct la intrebari despre ceas - zero API
   if(intent==='ceas') {
     var now = new Date();
@@ -1312,10 +1122,8 @@ async function processLea(q) {
   // Hybrid search
   var vvP=searchVVNodes(q,intent);
   var personalCtx = buildPersonalContext() + ' ' + getVoiceContext();
-var _dev=localStorage.getItem('lea_device')||'mobile';
-  var sysP='Ești Lea, asistentul urban VV. Caldă, directă, umană. MAX 3 propoziții. '+
-    'Context: Oraș='+city+', Ora='+h+':00 ('+p+'). Device='+_dev+'. '+
-    (_dev==='mobile'?'User e în mișcare — răspunsuri scurte, acționabile. ':'User e la birou/acasă — poți fi mai detaliat. ')+
+var sysP='Ești Lea, asistentul urban VV. Caldă, directă, umană. MAX 3 propoziții. '+
+    'Context: Oraș='+city+', Ora='+h+':00 ('+p+'). '+
     (displayName()?'User='+displayName()+'. ':'')+
     personalCtx+
     (h>=22||h<6?'NOAPTEA — majorit. locuri sunt închise. Menționează asta. ':'')+
@@ -1453,11 +1261,9 @@ var _dev=localStorage.getItem('lea_device')||'mobile';
     ans = await emergencySearch(q, intent, city);
   }
   addMsg('l',ans);_hist.push({r:'u',t:q});_hist.push({r:'l',t:ans});
-  sendAnonTelemetry(intent, city, false, !!ans);
   // Invitatie la Studio dupa intrebari complexe
   checkStudioInvite(q, intent);
-  if(ans && intent !== 'urgenta' && intent !== 'salut') saveCache(intent, city, ans); updateArchetype(q);
-  if(ans) extractAndSavePreferences(q, ans);
+  if(ans && intent !== 'urgenta' && intent !== 'salut') saveCache(intent, city, ans);
   if(_hist.length>40)_hist=_hist.slice(-40);saveHistory();
   if(_ek&&_vi)playVoice(ans,null);
   fbAdd('vvhi_dataset',{action:'LEA_CHAT',context:{city,intent,hasVV:vvNodes.length>0},ts:Date.now()});
@@ -1624,7 +1430,6 @@ function updateClock(){var n=new Date(),e=document.getElementById('idle-c');if(e
 
 // ── SETTINGS ──────────────────────────────────────────────────
 function openSett(){
-  populateSettings();
   if(_u){
     var i=document.getElementById('ss-id'),r=document.getElementById('ss-rang'),c=document.getElementById('ss-city');
     if(i)i.textContent=_u.vvid||'—';
@@ -1635,77 +1440,29 @@ function openSett(){
   document.getElementById('sett').classList.add('on');
 }
 function closeSett(){document.getElementById('sett').classList.remove('on');}
-function cfgVoice(){ openSett(); }
-
-function saveSettings() {
-  var name = (document.getElementById('si-name')||{}).value||'';
-  if(name.trim().length >= 2) {
-    localStorage.setItem('lea_name', name.trim());
-    _userName = name.trim();
-  }
-  var gk = (document.getElementById('si-gk')||{}).value||'';
-  if(gk.trim()) { localStorage.setItem('lea_gk', gk.trim()); _gk = gk.trim(); }
-  var proxy = (document.getElementById('si-proxy')||{}).value||'';
-  if(proxy.includes('script.google.com')) { localStorage.setItem('vv_proxy_url', proxy.trim()); VV_PROXY = proxy.trim(); }
-  var ek = (document.getElementById('si-ek')||{}).value||'';
-  if(ek.trim().length > 10) { localStorage.setItem('lea_ek', ek.trim()); _ek = ek.trim(); }
-  var vi = (document.getElementById('si-vi')||{}).value||'';
-  if(vi.trim().length > 5) { localStorage.setItem('lea_vi', vi.trim()); _vi = vi.trim(); }
-  showToast('Salvat ✓');
+function cfgVoice(){
   closeSett();
-}
-
-async function testGemini() {
-  var key = (document.getElementById('si-gk')||{}).value || localStorage.getItem('lea_gk') || '';
-  var status = document.getElementById('si-gk-status');
-  if(!key) { if(status){status.textContent='Lipsește';status.className='ss-status err';} return; }
-  if(status){status.textContent='Testez...';status.className='ss-status dim';}
-  try {
-    var r = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key='+key,{
-      method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({contents:[{parts:[{text:'Salut'}]}],generationConfig:{maxOutputTokens:10}})
-    });
-    if(r.ok){if(status){status.textContent='✓ Activ';status.className='ss-status ok';}}
-    else {if(status){status.textContent='✗ Invalid';status.className='ss-status err';}}
-  } catch(e){if(status){status.textContent='✗ Eroare';status.className='ss-status err';}}
-}
-
-function clearCacheSettings() {
-  localStorage.removeItem('vv_smart_cache');
-  showToast('Cache golit ✓');
-  populateSettings();
-}
-
-function resetArchSettings() {
-  localStorage.removeItem('lea_archetype');
-  refreshArchetypeDisplay();
-  showToast('Archetype resetat ✓');
-  populateSettings();
-}
-
-function populateSettings() {
-  var setEl = function(id, val) { var e=document.getElementById(id); if(e) e.value=val||''; };
-  var setTxt = function(id, val) { var e=document.getElementById(id); if(e) e.textContent=val||'—'; };
-  setEl('si-name', localStorage.getItem('lea_name')||'');
-  setEl('si-gk', localStorage.getItem('lea_gk')||'');
-  setEl('si-proxy', localStorage.getItem('vv_proxy_url')||'');
-  setEl('si-ek', localStorage.getItem('lea_ek')||'');
-  setEl('si-vi', localStorage.getItem('lea_vi')||'');
-  // Status Gemini
-  var gk = localStorage.getItem('lea_gk')||'';
-  var gkStatus = document.getElementById('si-gk-status');
-  if(gkStatus) { gkStatus.textContent=gk?'Cheie setată':'Lipsește'; gkStatus.className='ss-status '+(gk?'ok':'dim'); }
-  // Status proxy
-  var px = localStorage.getItem('vv_proxy_url')||'';
-  var pxStatus = document.getElementById('si-proxy-status');
-  if(pxStatus) { pxStatus.textContent=px?'Activ':'Nesetat'; pxStatus.className='ss-status '+(px?'ok':'dim'); }
-  // Usage
-  var usage = JSON.parse(localStorage.getItem('lea_daily')||'{"count":0}');
-  setTxt('si-usage', (usage.count||0) + ' / ' + DAILY_LIMIT);
-  // Cache
-  setTxt('si-cache', getCacheSize() + ' răspunsuri salvate');
-  // Archetype
-  setTxt('si-arch', getArchetypeLabel());
+  // Schimbare nume
+  var currentName = localStorage.getItem('lea_name') || '';
+  var newName = prompt('Numele tău în Lea:\n(actual: ' + (currentName||'Anonim') + ')', currentName);
+  if(newName && newName.trim().length >= 2) {
+    var trimmed = newName.trim();
+    localStorage.setItem('lea_name', trimmed);
+    _userName = trimmed;
+    if(_u) { _u.name = trimmed; localStorage.setItem('lea_u', JSON.stringify(_u)); }
+    showToast('Numele actualizat: ' + trimmed);
+  }
+  // Proxy URL
+  var p=prompt('URL Google Apps Script · opțional\n(lasă gol dacă nu ai):');
+  if(p&&p.includes('script.google.com')){localStorage.setItem('vv_proxy_url',p);showToast('Proxy activat ✓');}
+  // Cheia personala
+  var g=prompt('Gemini API Key personală · opțional:');
+  if(g&&g.startsWith('AIza')){localStorage.setItem('lea_gk',g);_gk=g;}
+  var e=prompt('ElevenLabs API Key · opțional:');
+  if(e&&e.length>10){localStorage.setItem('lea_ek',e);_ek=e;}
+  var v=prompt('ElevenLabs Voice ID · opțional:');
+  if(v&&v.length>5){localStorage.setItem('lea_vi',v);_vi=v;}
+  showToast('Salvat ✓');
 }
 function logout(){
   if(!confirm('Resetezi identitatea VV pe acest device?'))return;
