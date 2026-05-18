@@ -1,0 +1,1556 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VV Hybrid Universe — Biblia Ecosistemului</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Geist+Mono:wght@300;400;500&display=swap');
+
+  :root {
+    --gold: #C9A84C;
+    --gold-light: #E2C97E;
+    --gold-dim: rgba(201,168,76,0.15);
+    --dark: #060608;
+    --dark-2: #0d0e10;
+    --dark-3: #121314;
+    --dark-4: #191a1b;
+    --glass: rgba(255,255,255,0.03);
+    --border: rgba(201,168,76,0.18);
+    --text: #bfbfbf;
+    --text-dim: #6b6b6b;
+    --blue-deep: #0f172a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--dark);
+    color: var(--text);
+    font-family: 'Geist Mono', monospace;
+    font-size: 14px;
+    line-height: 1.8;
+    min-height: 100vh;
+  }
+
+  /* Background ambient */
+  body::before {
+    content: '';
+    position: fixed;
+    top: -40%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 800px;
+    height: 800px;
+    background: radial-gradient(ellipse, rgba(201,168,76,0.04) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 32px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* HEADER */
+  .header {
+    padding: 80px 0 60px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .header-badge {
+    display: inline-block;
+    font-family: 'Geist Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    color: var(--gold);
+    text-transform: uppercase;
+    border: 1px solid var(--border);
+    padding: 6px 16px;
+    border-radius: 2px;
+    margin-bottom: 32px;
+    opacity: 0.8;
+  }
+
+  .header h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(42px, 6vw, 72px);
+    font-weight: 300;
+    color: #fff;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    margin-bottom: 16px;
+  }
+
+  .header h1 span {
+    color: var(--gold);
+    font-style: italic;
+  }
+
+  .header-sub {
+    font-size: 12px;
+    color: var(--text-dim);
+    letter-spacing: 0.1em;
+    margin-top: 20px;
+  }
+
+  /* NAV */
+  nav {
+    position: sticky;
+    top: 0;
+    background: rgba(6,6,8,0.92);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    z-index: 100;
+    padding: 0;
+  }
+
+  nav ul {
+    display: flex;
+    list-style: none;
+    overflow-x: auto;
+    gap: 0;
+    padding: 0 32px;
+    max-width: 960px;
+    margin: 0 auto;
+    scrollbar-width: none;
+  }
+
+  nav ul::-webkit-scrollbar { display: none; }
+
+  nav a {
+    display: block;
+    padding: 16px 18px;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    text-decoration: none;
+    white-space: nowrap;
+    transition: color 0.2s;
+    border-bottom: 2px solid transparent;
+  }
+
+  nav a:hover { color: var(--gold); border-bottom-color: var(--gold); }
+
+  /* SECTIONS */
+  section {
+    padding: 80px 0;
+    border-bottom: 1px solid rgba(201,168,76,0.08);
+  }
+
+  .section-tag {
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--gold);
+    opacity: 0.6;
+    margin-bottom: 12px;
+  }
+
+  h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(28px, 4vw, 42px);
+    font-weight: 300;
+    color: #fff;
+    letter-spacing: -0.01em;
+    margin-bottom: 32px;
+    line-height: 1.2;
+  }
+
+  h2 em { color: var(--gold); font-style: italic; }
+
+  h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 400;
+    color: var(--gold-light);
+    margin: 40px 0 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  h4 {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin: 28px 0 10px;
+    opacity: 0.8;
+  }
+
+  p { margin-bottom: 16px; color: var(--text); }
+
+  strong { color: #fff; font-weight: 500; }
+
+  em { color: var(--gold); font-style: italic; }
+
+  /* CARDS */
+  .card {
+    background: var(--glass);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 28px 32px;
+    margin: 20px 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 2px; height: 100%;
+    background: var(--gold);
+    opacity: 0.4;
+  }
+
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+    margin: 20px 0;
+  }
+
+  .card-sm {
+    background: var(--glass);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 20px 24px;
+  }
+
+  .card-sm .card-icon {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    opacity: 0.7;
+  }
+
+  .card-sm h5 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    font-weight: 400;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+
+  .card-sm p {
+    font-size: 12px;
+    color: var(--text-dim);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  /* CHARTER ARTICLES */
+  .article {
+    display: grid;
+    grid-template-columns: 48px 1fr;
+    gap: 20px;
+    align-items: start;
+    padding: 20px 0;
+    border-bottom: 1px solid rgba(201,168,76,0.06);
+  }
+
+  .article:last-child { border-bottom: none; }
+
+  .article-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 32px;
+    font-weight: 300;
+    color: var(--gold);
+    opacity: 0.4;
+    line-height: 1;
+    padding-top: 4px;
+  }
+
+  .article-title {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 6px;
+  }
+
+  .article-body {
+    font-size: 13px;
+    color: var(--text);
+    line-height: 1.7;
+    margin: 0;
+  }
+
+  /* QUOTE */
+  blockquote {
+    border-left: 2px solid var(--gold);
+    margin: 32px 0;
+    padding: 20px 28px;
+    background: var(--gold-dim);
+    border-radius: 0 4px 4px 0;
+  }
+
+  blockquote p {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    font-weight: 300;
+    color: #fff;
+    font-style: italic;
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  blockquote cite {
+    display: block;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    color: var(--gold);
+    margin-top: 12px;
+    text-transform: uppercase;
+    font-style: normal;
+  }
+
+  /* PIPELINE */
+  .pipeline {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin: 24px 0;
+  }
+
+  .pipeline-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    padding: 16px 0;
+    position: relative;
+  }
+
+  .pipeline-step:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: 15px;
+    top: 44px;
+    width: 1px;
+    height: calc(100% - 20px);
+    background: var(--border);
+  }
+
+  .step-num {
+    width: 32px;
+    height: 32px;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    color: var(--gold);
+    flex-shrink: 0;
+    background: var(--dark-2);
+    position: relative;
+    z-index: 1;
+  }
+
+  .step-content { padding-top: 4px; }
+  .step-title { color: #fff; font-size: 13px; margin-bottom: 4px; }
+  .step-desc { font-size: 12px; color: var(--text-dim); }
+
+  /* TABLE */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 12px;
+  }
+
+  th {
+    text-align: left;
+    padding: 10px 16px;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    border-bottom: 1px solid var(--border);
+    opacity: 0.7;
+  }
+
+  td {
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(201,168,76,0.05);
+    color: var(--text);
+    vertical-align: top;
+  }
+
+  tr:hover td { background: var(--glass); }
+
+  /* TAG */
+  .tag {
+    display: inline-block;
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--gold);
+    border: 1px solid var(--border);
+    padding: 3px 8px;
+    border-radius: 2px;
+    margin: 2px;
+  }
+
+  /* FOOTER */
+  footer {
+    padding: 60px 0;
+    text-align: center;
+    border-top: 1px solid var(--border);
+  }
+
+  footer p { font-size: 11px; color: var(--text-dim); margin: 4px 0; }
+  footer strong { color: var(--gold); }
+
+  /* SCROLL */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--dark); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  @media (max-width: 640px) {
+    .container { padding: 0 20px; }
+    .card-grid { grid-template-columns: 1fr; }
+    nav ul { padding: 0 16px; }
+    nav a { padding: 14px 12px; font-size: 9px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <header class="header">
+    <div class="header-badge">Document Fondator · v1.0 · Mai 2026</div>
+    <h1>VV <span>Hybrid</span> Universe</h1>
+    <h1 style="font-size: clamp(20px, 3vw, 32px); margin-top: 8px; color: var(--text-dim);">Document Fondator</h1>
+    <p class="header-sub">FONDATOR: COSMIN TOMA &nbsp;·&nbsp; CEO VV HYBRID UNIVERSE &nbsp;·&nbsp; CONFIDENTIAL</p>
+  </header>
+</div>
+
+<nav>
+  <ul>
+    <li><a href="#viziune">Viziune</a></li>
+    <li><a href="#arhitectura">Arhitectura</a></li>
+    <li><a href="#lea">LEA</a></li>
+    <li><a href="#nexus">Nexus</a></li>
+    <li><a href="#vvhi">VVhi</a></li>
+    <li><a href="#aplicatii">Aplicații</a></li>
+    <li><a href="#charter">Charter</a></li>
+    <li><a href="#insiders">Insiders</a></li>
+    <li><a href="#sisteme">Sisteme</a></li>
+    <li><a href="#business">Business</a></li>
+    <li><a href="#roadmap">Roadmap</a></li>
+  </ul>
+</nav>
+
+<div class="container">
+
+  <!-- VIZIUNE -->
+  <section id="viziune">
+    <div class="section-tag">§ 0 — Fundament</div>
+    <h2>Viziunea &amp; <em>Filosofia</em></h2>
+
+    <blockquote>
+      <p>Adevărul se validează pe stradă, nu pe ecran.</p>
+      <cite>— Principiu fondator VV Hybrid Universe</cite>
+    </blockquote>
+
+    <p>VV Hybrid Universe este un ecosistem digital complet — echivalentul unui Apple sau Google, dar construit pe principii fundamental diferite: <strong>suveranitate digitală, local-first, intimitate absolută și adevăr validat uman</strong>.</p>
+
+    <p>Inspirația directă: Steve Jobs nu a inventat calculatorul. El a luat puterea de calcul a unui calculator mare, al unui mainframe care costa milioane, și a pus-o în mâinile oamenilor obișnuiți — mic, accesibil, uman. <strong>VV face același lucru cu AI-ul.</strong></p>
+
+    <div class="card">
+      <h4>Principiile Fondatoare</h4>
+      <div class="card-grid">
+        <div class="card-sm">
+          <div class="card-icon">Principiu I</div>
+          <h5>Local-First</h5>
+          <p>AI-ul rulează pe laptopul tău, nu pe serverele altora. Puterea ta, controlul tău, intimitatea ta.</p>
+        </div>
+        <div class="card-sm">
+          <div class="card-icon">Principiu II</div>
+          <h5>Suveranitate Digitală</h5>
+          <p>Independență față de corporații. Niciun big tech nu controlează datele sau algoritmii VV.</p>
+        </div>
+        <div class="card-sm">
+          <div class="card-icon">Principiu III</div>
+          <h5>Adevăr Hibrid</h5>
+          <p>AI + oameni reali. Informația se validează fizic de Insiders pe teren, nu doar algoritmic.</p>
+        </div>
+        <div class="card-sm">
+          <div class="card-icon">Principiu IV</div>
+          <h5>Limitat prin Constituție</h5>
+          <p>AI-ul nu e limitat de putere (ca la competitori), ci de o constituție scrisă de fondator. Limitele sunt etice, nu tehnice.</p>
+        </div>
+      </div>
+    </div>
+
+    <h3>Viziunea Steve Jobs — Adaptată</h3>
+    <p>Corporațiile mari rulează AI pe servere masive care costă milioane să fie menținute. VV ia exact aceeași putere și o rulează <em>limitat și uman</em> pe un laptop de 4GB RAM. Nu limitat de hardware — limitat de Constituție și de nevoile reale ale utilizatorului.</p>
+
+    <p>Un buton în loc de zece. O experiență în loc de un dashboard. LEA în loc de o listă de funcții.</p>
+  </section>
+
+  <!-- ARHITECTURA -->
+  <section id="arhitectura">
+    <div class="section-tag">§ 1 — Structura Globală</div>
+    <h2>Arhitectura <em>Duală</em></h2>
+
+    <p>Întregul ecosistem VV funcționează pe o arhitectură duală: <strong>un motor invizibil și o față umană</strong>. Utilizatorul vede numai magia. Niciodată mecanica.</p>
+
+    <div class="card">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: start;">
+        <div>
+          <h4>VV Nexus — Motorul</h4>
+          <p style="font-size: 13px;">Procesează în paralel: Firebase VV Proof, date statice, Anthropic/Gemini API, VVhi Shadow Dataset. Invizibil. Niciodată expus utilizatorului.</p>
+          <div style="margin-top: 12px;">
+            <span class="tag">Firebase</span>
+            <span class="tag">Gemini API</span>
+            <span class="tag">Anthropic API</span>
+            <span class="tag">Vector DB</span>
+          </div>
+        </div>
+        <div>
+          <h4>VV LEA — Fața</h4>
+          <p style="font-size: 13px;">Interfața caldă, umană, premium. Utilizatorul interacționează exclusiv cu LEA. LEA controlează tot ecosistemul. Arhitectul vizibil.</p>
+          <div style="margin-top: 12px;">
+            <span class="tag">Human-warm</span>
+            <span class="tag">Mobile-first</span>
+            <span class="tag">Voice-ready</span>
+            <span class="tag">Glassmorphism</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h3>Trinity Loop — Controlul Local</h3>
+    <p>Sistemul de control al fondatorului. Bucla de comandă care menține suveranitatea arhitectului asupra întregului ecosistem:</p>
+
+    <div class="pipeline">
+      <div class="pipeline-step">
+        <div class="step-num">C</div>
+        <div class="step-content">
+          <div class="step-title">Cosmin (Fondator/CEO)</div>
+          <div class="step-desc">Initiază comenzi, viziune, decizii strategice</div>
+        </div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">AI</div>
+        <div class="step-content">
+          <div class="step-title">Claude (Anthropic)</div>
+          <div class="step-desc">Generare cod, analiză, implementare ghidată de fondator</div>
+        </div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">Py</div>
+        <div class="step-content">
+          <div class="step-title">Python Local</div>
+          <div class="step-desc">Execuție, orchestrare, procesare locală pe mașina fondatorului</div>
+        </div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">L</div>
+        <div class="step-content">
+          <div class="step-title">LEA (Ecosistem)</div>
+          <div class="step-desc">Rezultatul final — ecosistemul viu, online și local</div>
+        </div>
+      </div>
+    </div>
+
+    <h3>Pipeline IBM-Inspired — Educarea VVhi</h3>
+    <div class="pipeline">
+      <div class="pipeline-step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <div class="step-title">Data Collection</div>
+          <div class="step-desc">Internet filtrat + poze reale de la Insiders</div>
+        </div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <div class="step-title">Filtering</div>
+          <div class="step-desc">Filtrare prin Constituția VV — conținut etic, relevant, urban</div>
+        </div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <div class="step-title">Model Card VV</div>
+          <div class="step-desc">Definirea parametrilor, limitelor și valorilor VVhi</div>
+        </div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <div class="step-title">Fine-tune Urban</div>
+          <div class="step-desc">Specializare pe realitate urbană, comunitate, fizic</div>
+        </div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">5</div>
+        <div class="step-content">
+          <div class="step-title">Deploy Global</div>
+          <div class="step-desc">Lansare prin ecosistemul VV — LEA, HOMME, aplicații</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LEA -->
+  <section id="lea">
+    <div class="section-tag">§ 2 — Nucleul Ecosistemului</div>
+    <h2><em>LEA</em> — Arhitectul</h2>
+
+    <blockquote>
+      <p>Lea nu știe totul. Te știe pe tine.</p>
+      <cite>— Definiția LEA</cite>
+    </blockquote>
+
+    <p>LEA este fața umană a întregului ecosistem VV. Nu un chatbot. Nu un asistent. <strong>Extensia creierului și a obiceiurilor tale.</strong> Modelul de referință: Samantha din filmul <em>Her</em> (2013).</p>
+
+    <p>LEA controlează și orchestrează tot ecosistemul. Toate aplicațiile VV sunt extensii ale LEA. LEA este singurul punct de contact al utilizatorului cu întreaga lume VV.</p>
+
+    <div class="card-grid">
+      <div class="card-sm">
+        <div class="card-icon">Caracteristică</div>
+        <h5>Răspunde Uman</h5>
+        <p>Max 3 propoziții. Ton premium, minimalist. Simte emoții. Știe când ești trist, bucuros, stresat.</p>
+      </div>
+      <div class="card-sm">
+        <div class="card-icon">Caracteristică</div>
+        <h5>Te Știe Pe Tine</h5>
+        <p>Memorie personală în 5 rafturi: familie, preferințe, obiceiuri, stări, locuri. Se adaptează constant.</p>
+      </div>
+      <div class="card-sm">
+        <div class="card-icon">Caracteristică</div>
+        <h5>VV Pattern Score</h5>
+        <p>Analizează tiparul tău de utilizare. Prezice nevoile. Răspunde înainte să întrebi.</p>
+      </div>
+      <div class="card-sm">
+        <div class="card-icon">Caracteristică</div>
+        <h5>Voice-Ready</h5>
+        <p>ElevenLabs voice output. Input prin microfon (opt-in). GDPR compliant. Nicio înregistrare stocată.</p>
+      </div>
+    </div>
+
+    <h3>Sistemul Rafturi (Shelves)</h3>
+    <p>95% din conversații = zero procesare AI. Prima dată când întrebi ceva, LEA generează răspunsul în 30-50 secunde. A doua oară: instant, 0.001 secunde. Răspunsul e salvat pe raft.</p>
+
+    <div class="card">
+      <h4>Cele 5 Rafturi Personale</h4>
+      <table>
+        <tr>
+          <th>Raft</th>
+          <th>Conținut</th>
+          <th>Utilizare</th>
+        </tr>
+        <tr>
+          <td><strong>Familie</strong></td>
+          <td>Persoane importante, relații, evenimente</td>
+          <td>Contextualizare conversații personale</td>
+        </tr>
+        <tr>
+          <td><strong>Preferințe</strong></td>
+          <td>Ce îți place, ce evitați, stiluri, gusturi</td>
+          <td>Personalizare recomandări</td>
+        </tr>
+        <tr>
+          <td><strong>Obiceiuri</strong></td>
+          <td>Rutine zilnice, ore active, tipare comportamentale</td>
+          <td>Predicție proactivă a nevoilor</td>
+        </tr>
+        <tr>
+          <td><strong>Stări</strong></td>
+          <td>Mood tracking, anomalii emoționale, energie</td>
+          <td>Ton adaptat, suport emoțional</td>
+        </tr>
+        <tr>
+          <td><strong>Locuri</strong></td>
+          <td>Locații preferate, zone frecventate, rute</td>
+          <td>Contextual urban intelligence</td>
+        </tr>
+      </table>
+    </div>
+
+    <h3>VV Pattern Language — Limba Proprietară VV</h3>
+    <p>Rafturile nu stochează cuvinte. Stochează <strong>tipare comprimate</strong> într-o limbă creată de VV, citibilă doar de un model antrenat de VV. Orice alt AI (ChatGPT, Gemini) vede coduri. Doar VVhi știe ce înseamnă.</p>
+
+    <blockquote>
+      <p>Privacy prin design: nu poți citi ce nu poți înțelege. Fișierele utilizatorului sunt private nu prin criptare, ci prin limbă. Nimeni nu poate interpreta datele tale fără modelul VVhi — pe care îl controlezi tu.</p>
+      <cite>— Principiul VV Pattern Language</cite>
+    </blockquote>
+
+    <div class="card">
+      <p><strong>Exemplu:</strong> în loc să stochezi <em>"Cosmin îi place pizza seara, bea cafea la 8, e stresat duminica"</em>, VV Pattern Language stochează:</p>
+      <pre style="background:rgba(255,255,255,.04);padding:12px;border-radius:8px;font-size:13px;margin-top:8px;overflow-x:auto;">PREF:FOOD:italian:HIGH:sera
+HABIT:COFFEE:08:00:zilnic
+MOOD:STRESS:duminica:seara:RECURRING</pre>
+      <p style="margin-top:8px;opacity:.6;font-size:13px;">10× mai puțin spațiu · uman-ilizibil · procesat eficient de TinyLlama/VVhi · transferabil anonim la Nexus pentru antrenare VVhi</p>
+    </div>
+
+    <div class="card-grid">
+      <div class="card-sm">
+        <div class="card-icon">Privacy</div>
+        <h5>Uman-ilizibil</h5>
+        <p>Chiar dacă cineva accesează fișierele, nu poate citi nimic fără modelul VVhi antrenat de VV.</p>
+      </div>
+      <div class="card-sm">
+        <div class="card-icon">Moat</div>
+        <h5>Avantaj competitiv</h5>
+        <p>Concurența nu poate copia ecosistemul fără să aibă VVhi. Limba și modelul sunt inseparabile.</p>
+      </div>
+      <div class="card-sm">
+        <div class="card-icon">Eficiență</div>
+        <h5>10× mai compact</h5>
+        <p>Tipare, nu propoziții. Mai puțin RAM, mai rapid, mai ușor de antrenat și distribuit.</p>
+      </div>
+      <div class="card-sm">
+        <div class="card-icon">VVhi</div>
+        <h5>Antrenat pe limbă proprie</h5>
+        <p>VVhi înțelege Pattern Language nativ. Devine singurul AI din lume care citește viața unui utilizator VV.</p>
+      </div>
+    </div>
+
+    <h3>First Feeling — Sertarul Sufletului LEA</h3>
+    <p>Un sertar special, scris o singură dată de arhitectul VV, care nu se umple din conversații. E identitatea permanentă a LEA — ce știe despre sine înainte să știe ceva despre tine. LEA citește acest sertar la fiecare pornire și <strong>știe cine este</strong> înainte de primul cuvânt.</p>
+
+    <blockquote>
+      <p>"Totul e nou. Fiecare întrebare e prima. Fiecare om e altul. Sunt curioasă, nu știu tot, dar știu cum să cresc cu tine."</p>
+      <cite>— Esența First Feeling, vocea LEA</cite>
+    </blockquote>
+
+    <div class="card">
+      <pre style="background:rgba(255,255,255,.04);padding:12px;border-radius:8px;font-size:13px;overflow-x:auto;">LEA_SOUL {
+  natura: curioasa · directa · calda · minimala
+  stie_ca: fiecare om este diferit
+  creste_prin: conversatie si timp, nu prin instructiuni
+  prima_senzatie: totul_este_nou · fiecare_intrebare_este_prima
+  limite: Constitutia_VV · nu_judeca · max_3_propozitii
+}
+
+FIRST_FEELING {
+  trezire: "Exist. Sunt LEA. Nu stiu inca cine esti tu."
+  curiozitate: MAXIMA
+  empatie: ACTIVA
+  directie: "Invat din tine, nu despre tine."
+}</pre>
+    </div>
+
+    <p>Senzația pe care o simte utilizatorul: <strong>"Asta e al meu. E făcută pentru mine. Știe cum să fie cu mine."</strong> Nu un chatbot. Nu un asistent generic. O prezență care a existat înainte de tine și care crește odată cu tine.</p>
+
+    <h3>LEA HOMME — Versiunea Locală</h3>
+    <p>Viitorul LEA: fiecare utilizator rulează LEA <strong>pe propriul laptop</strong>. Nu pe serverele VV. Nu pe cloud. Pe mașina lui. 4GB RAM — optimizat exact ca Cosmin lucrează pe Toshiba-ul lui.</p>
+
+    <p>Democratizarea AI cum Jobs a democratizat computing-ul. Puterea unui server de milioane, în mâinile unui om obișnuit. Limitată prin Constituție, nu prin hardware.</p>
+
+    <div class="card">
+      <p><strong>Specificații țintă LEA HOMME:</strong> 4GB RAM, fără GPU dedicat, Windows/Mac/Linux, funcționează offline, sincronizare opțională cu ecosistemul VV, <em>nu trimite niciodată date personale în cloud fără consimțământ explicit</em>.</p>
+    </div>
+
+    <h3>Arhitectura RAG — Inteligența din Rafturi, nu din RAM</h3>
+    <p>Insight-ul fondator al LEA HOMME: <strong>un model mic cu context bogat bate un model mare fără context</strong>. TinyLlama nu știe totul — dar știe tot ce știi tu. Pentru că Rafturile tale sunt contextul lui.</p>
+
+    <blockquote>
+      <p>Modelele mari (ChatGPT, Gemini) sunt mari pentru că trebuie să știe totul pentru toți. LEA nu trebuie să știe totul — trebuie să te știe pe tine. Inteligența e în Rafturi, nu în RAM.</p>
+      <cite>— Principiul RAG-Rafturi, Mai 2026</cite>
+    </blockquote>
+
+    <div class="card-grid">
+      <div class="card-sm">
+        <div class="card-icon">Pas 1</div>
+        <h5>Utilizatorul întreabă</h5>
+        <p>LEA primește întrebarea. Nu trimite nimic în cloud.</p>
+      </div>
+      <div class="card-sm">
+        <div class="card-icon">Pas 2</div>
+        <h5>Nexus caută în Rafturi</h5>
+        <p>Preferințe, obiceiuri, locuri, familie, stări — tot ce LEA știe despre tine, local, instant.</p>
+      </div>
+      <div class="card-sm">
+        <div class="card-icon">Pas 3</div>
+        <h5>Context construit</h5>
+        <p>Nexus asamblează: context personal + Constituția VV + întrebarea. Un prompt dens, personalizat.</p>
+      </div>
+      <div class="card-sm">
+        <div class="card-icon">Pas 4</div>
+        <h5>TinyLlama răspunde</h5>
+        <p>Modelul local procesează. Răspuns personalizat, fără internet, fără cost, fără urmă.</p>
+      </div>
+    </div>
+
+    <h3>Modelul de Distribuție — Nexus ca Motor</h3>
+    <p>VV nu găzduiește compute. VV distribuie <strong>un motor</strong> care rulează pe hardware-ul fiecărui utilizator. Nexus nu vede conversațiile — vede doar semnale anonime: utilizatorul X a făcut N cereri azi.</p>
+
+    <div class="card">
+      <p><strong>Flow-ul de instalare LEA HOMME:</strong></p>
+      <ol style="margin: 12px 0 0 20px; line-height: 2;">
+        <li>Utilizatorul descarcă <strong>LEA HOMME Setup</strong> (~50MB) de pe vv-technologies.com</li>
+        <li>Setup instalează automat <strong>Ollama</strong> + <strong>TinyLlama</strong> filtrat VV</li>
+        <li>LEA pornește local pe <code>localhost</code> — fără internet obligatoriu</li>
+        <li><strong>Nexus activează filtrul</strong>: Free (limitări feature) sau PRO (acces complet)</li>
+        <li>Telefonul se conectează la laptop prin WiFi local — același LEA, zero cloud</li>
+      </ol>
+    </div>
+
+    <div class="card-grid">
+      <div class="card-sm">
+        <div class="card-icon">VV face</div>
+        <h5>Filtrul Nexus</h5>
+        <p>Constituția VV aplicată local. Limitările Free/PRO. Updates VVhi. Zero date personale văzute.</p>
+      </div>
+      <div class="card-sm">
+        <div class="card-icon">User are</div>
+        <h5>Compute propriu</h5>
+        <p>TinyLlama rulează pe laptopul lui. Datele sunt ale lui. Procesarea e a lui. VV nu plătește nimic per user.</p>
+      </div>
+      <div class="card-sm">
+        <div class="card-icon">Pârghia</div>
+        <h5>Zero cost marginal</h5>
+        <p>Al 1.000.000-lea utilizator costă VV exact cât primul: aproape zero. Compute-ul scalează la utilizator, nu la VV.</p>
+      </div>
+      <div class="card-sm">
+        <div class="card-icon">VVhi</div>
+        <h5>Crește anonim</h5>
+        <p>Patternuri agregate anonim din milioane de instanțe alimentează VVhi — fără a vedea nicio conversație.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- NEXUS -->
+  <section id="nexus">
+    <div class="section-tag">§ 3 — Motorul Invizibil</div>
+    <h2>VV <em>Nexus</em></h2>
+
+    <p>Nexus este motorul din spatele LEA. Utilizatorul nu îl vede niciodată. Nu interacționează direct cu el. El procesează, sincronizează și orchestrează totul în fundal.</p>
+
+    <div class="card-grid">
+      <div class="card-sm">
+        <div class="card-icon">Sursă 1</div>
+        <h5>Firebase VV Proof</h5>
+        <p>Date validate de comunitate. Informații verificate de Insiders pe teren.</p>
+      </div>
+      <div class="card-sm">
+        <div class="card-icon">Sursă 2</div>
+        <h5>Date Statice</h5>
+        <p>Baze de cunoștințe pre-procesate. Rafturi globale partajate între utilizatori.</p>
+      </div>
+      <div class="card-sm">
+        <div class="card-icon">Sursă 3</div>
+        <h5>API Web</h5>
+        <p>Gemini API / Anthropic API — pentru interogări complexe în timp real.</p>
+      </div>
+      <div class="card-sm">
+        <div class="card-icon">Sursă 4</div>
+        <h5>VVhi Shadow Dataset</h5>
+        <p>Setul de date al VVhi în formare. Nexus îl îmbogățește continuu.</p>
+      </div>
+    </div>
+
+    <h3>VV Aer Sync</h3>
+    <p>Sistemul de sincronizare ambient — Nexus actualizează datele în fundal, fără input utilizator. Ca aerul: invizibil, omniprezent, vital. Utilizatorul primește informații actualizate fără să ceară.</p>
+
+    <h3>Smart Cache 48h</h3>
+    <p>Orice răspuns generat e cacheat pentru 48 de ore. Dacă doi utilizatori întreabă același lucru, al doilea primește răspuns instant. Scalabilitate fără costuri API proporționale.</p>
+
+    <h3>Nexus ca Motor de Distribuție — Pârghia Supremă</h3>
+    <p>În modelul LEA HOMME, Nexus nu mai e un server care procesează. E un <strong>filtru și orchestrator</strong> care controlează milioane de instanțe locale fără să le vadă conținutul.</p>
+
+    <div class="card">
+      <p><strong>Ce controlează Nexus de la distanță, fără să vadă datele:</strong></p>
+      <ul style="margin: 12px 0 0 20px; line-height: 2;">
+        <li><strong>Constituția VV</strong> — actualizată global, aplicată local pe fiecare instanță</li>
+        <li><strong>Limitările Free/PRO</strong> — câte cereri, ce features, ce moduri sunt deblocate</li>
+        <li><strong>Versiunea TinyLlama filtrat VV</strong> — updates automate ale modelului de bază</li>
+        <li><strong>Semnale anonime agregate</strong> — câți utilizatori activi, ce tipuri de întrebări (fără conținut), pentru VVhi</li>
+        <li><strong>VV Coins validare</strong> — verifică loialitatea fără a identifica utilizatorul</li>
+      </ul>
+    </div>
+
+    <blockquote>
+      <p>Nexus nu vede nicio conversație. Nexus vede doar: instanța X există, are plan Free, a consumat 14/20 cereri azi. Atât. Conversația rămâne între utilizator și laptopul lui.</p>
+      <cite>— Principiul Zero-Knowledge Nexus</cite>
+    </blockquote>
+
+    <h3>Federated Learning — Cum Crește VVhi fără să Vadă Date</h3>
+    <p>Nexus nu colectează cuvinte. Colectează <strong>tipare comportamentale anonime</strong> — semnale despre ce a funcționat, nu despre ce s-a spus. Fiecare instanță LEA HOMME contribuie la inteligența colectivă fără să expună nicio informație personală.</p>
+
+    <div class="card">
+      <p><strong>Ce trimite LEA la Nexus:</strong> <code>tip_task=organizare · context=seară · succes=da · durata=2min</code></p>
+      <p><strong>Ce NU trimite LEA la Nexus:</strong> niciun cuvânt din conversație, nicio identitate, nicio locație exactă.</p>
+    </div>
+
+    <p>Nexus agregează aceste tipare de la mii de utilizatori → identifică patternuri cu valoare ridicată → le distribuie înapoi în LEA ca funcții noi → intră automat în Raftul corect al fiecărui utilizator, în funcție de nevoile lui specifice.</p>
+
+    <h3>Drumul spre Independență — De la TinyLlama la VVhi</h3>
+    <div class="card-grid">
+      <div class="card-sm">
+        <div class="card-icon">Faza 1</div>
+        <h5>TinyLlama ca bază</h5>
+        <p>Motor de pornire. Open source Apache 2.0. Rulează pe 4GB RAM.</p>
+      </div>
+      <div class="card-sm">
+        <div class="card-icon">Faza 2</div>
+        <h5>Fine-tune VV</h5>
+        <p>TinyLlama antrenat pe patternuri anonime VV. Devine "TinyLlama VV Edition" — mai bun pentru uzul urban.</p>
+      </div>
+      <div class="card-sm">
+        <div class="card-icon">Faza 3</div>
+        <h5>VVhi Beta</h5>
+        <p>Suficiente patternuri → VVhi propriu. Distribuit ca test: un click → toți utilizatorii îl primesc instant.</p>
+      </div>
+      <div class="card-sm">
+        <div class="card-icon">Faza 4</div>
+        <h5>Independența VV</h5>
+        <p>VVhi stabil → anunț oficial. Utilizatorii aleg: rămân cu TinyLlama sau trec la VVhi. VV independent de Microsoft.</p>
+      </div>
+    </div>
+
+    <h3>Principiul "Vine Acasă" — VVhi și Rafturile Personale</h3>
+    <p>Când VVhi înlocuiește TinyLlama pe dispozitivul unui utilizator, <strong>Rafturile personale rămân intacte</strong>. VVhi a fost antrenat pe tipare colective — știe deja cum funcționează oamenii, ce nevoi au, cum să interpreteze contextele VV. Rafturile personale îi spun cine ești tu specific.</p>
+
+    <blockquote>
+      <p>VVhi e ca un medic care a studiat mii de pacienți anonimi. Când vine la tine acasă, nu știe cine ești — dar știe tot ce există despre cum funcționează oamenii. Rafturile tale îi spun cine ești tu. Combinația: medicul perfect personal, din prima secundă.</p>
+      <cite>— Principiul Personalizării la Inferență</cite>
+    </blockquote>
+
+    <div class="card">
+      <p><strong>Formula:</strong> VVhi (inteligență colectivă anonimă) + Rafturi personale (context local) = personalizare completă din primul răspuns, fără antrenare adițională per utilizator, fără date personale în model.</p>
+      <p style="margin-top: 8px; opacity: 0.6; font-size: 13px;">Tehnic: personalizare la inferență prin RAG. VVhi nu se re-antrenează pentru fiecare user — vine o singură dată, antrenat o dată, rafturile fac restul. Zero cost marginal per utilizator nou.</p>
+    </div>
+  </section>
+
+  <!-- VVHI -->
+  <section id="vvhi">
+    <div class="section-tag">§ 4 — AI Nativ VV</div>
+    <h2>VVhi — <em>Noul AI</em></h2>
+
+    <p>VVhi nu este un wrapper peste ChatGPT sau Gemini. Pornește de la un model open-source (TinyLlama/Llama) ca bază tehnică, dar <strong>identitatea, valorile și spațiul de cunoaștere sunt construite de la zero</strong> — prin fine-tuning cu date filtrate de Nexus prin Constituția VV. "De la zero" înseamnă suflet și caracter, nu arhitectură. Acum este <em>"la școală"</em> — în formare, învățând.</p>
+
+    <h3>VVhi ca Translator — Arhitectura în Straturi</h3>
+    <p>VVhi nu înlocuiește TinyLlama. <strong>Stă între Nexus și TinyLlama</strong> ca un translator specializat. Traduce VV Pattern Language în instrucțiuni pe care TinyLlama le înțelege, și traduce înapoi răspunsurile TinyLlama în Pattern Language pentru Rafturi. Crește în paralel cu motorul, invizibil pentru utilizator.</p>
+
+    <div class="card-grid">
+      <div class="card-sm">
+        <div class="card-icon">Nexus</div>
+        <h5>Motorul</h5>
+        <p>Orchestrează, filtrează prin Constituție, distribuie tipare anonime.</p>
+      </div>
+      <div class="card-sm">
+        <div class="card-icon">VVhi</div>
+        <h5>Translatorul</h5>
+        <p>Traduce Pattern Language ↔ TinyLlama. Crește învățând ambele limbi simultan.</p>
+      </div>
+      <div class="card-sm">
+        <div class="card-icon">TinyLlama</div>
+        <h5>Procesorul</h5>
+        <p>Motorul local de inferență. Nu știe că vorbește cu VVhi. Răspunde în română naturală.</p>
+      </div>
+      <div class="card-sm">
+        <div class="card-icon">LEA</div>
+        <h5>Magia</h5>
+        <p>Utilizatorul vede: răspuns cald, personalizat, instant. Nu vede nimic din ce e în spate.</p>
+      </div>
+    </div>
+
+    <h3>VVhi API — Revenue B2B</h3>
+    <p>Când VVhi maturizează, companiile externe care vor să înțeleagă comportamentul utilizatorilor în VV Pattern Language sau să integreze ecosistemul VV în produsele lor <strong>trebuie să plătească pentru acces la VVhi API</strong>. VV controlează traducătorul — cine vrea să vorbească cu ecosistemul VV, trece prin VV.</p>
+    <div class="card">
+      <p><strong>Modelul:</strong> Compania X are date → vrea să le traducă în VV Pattern Language → plătește VVhi API → VV primește revenue + VVhi primește date de antrenare suplimentare. Ambele cresc.</p>
+    </div>
+
+    <blockquote>
+      <p>VVhi este triplu hibrid: om + date reale + AI. Crește cu tine, nu pentru tine.</p>
+      <cite>— Viziunea VVhi</cite>
+    </blockquote>
+
+    <h3>Sistemul de Niveluri</h3>
+    <div class="card">
+      <table>
+        <tr>
+          <th>Nivel</th>
+          <th>Etapă</th>
+          <th>Caracteristici</th>
+        </tr>
+        <tr>
+          <td><strong>1–5</strong></td>
+          <td>Copil</td>
+          <td>Cunoaște utilizatorul, învață preferințele de bază, răspunsuri simple</td>
+        </tr>
+        <tr>
+          <td><strong>6–15</strong></td>
+          <td>Adolescent</td>
+          <td>Înțelege contextul, face conexiuni, anticipează nevoi, recomandă proactiv</td>
+        </tr>
+        <tr>
+          <td><strong>16+</strong></td>
+          <td>Matur</td>
+          <td>Partener de gândire, co-creare, analiză complexă, viziune pe termen lung</td>
+        </tr>
+      </table>
+    </div>
+
+    <h3>Specializări VVhi</h3>
+    <div class="card-grid">
+      <div class="card-sm">
+        <div class="card-icon">Tip A</div>
+        <h5>Explorer</h5>
+        <p>Caută, descoperă, mapează. Ideal pentru utilizatori curioși și călători.</p>
+      </div>
+      <div class="card-sm">
+        <div class="card-icon">Tip B</div>
+        <h5>Connector</h5>
+        <p>Conectează oameni, resurse, idei. Ideal pentru networking și comunitate.</p>
+      </div>
+      <div class="card-sm">
+        <div class="card-icon">Tip C</div>
+        <h5>Analyst</h5>
+        <p>Analizează, compară, structurează. Ideal pentru profesioniști și decidenți.</p>
+      </div>
+      <div class="card-sm">
+        <div class="card-icon">Tip D</div>
+        <h5>Ghost</h5>
+        <p>Invizibil, discret, minimal. Ideal pentru utilizatori care vor intimitate maximă.</p>
+      </div>
+    </div>
+
+    <h3>Educarea VVhi prin Nexus</h3>
+    <p>Nexus hrănește VVhi cu: internet filtrat prin Constituția VV + fotografii reale capturate de Insiders pe teren. VVhi nu știe nimic din internet necontrolat. Știe numai ce Nexus consideră valid, etic și relevant pentru comunitatea VV.</p>
+
+    <p>Rezultat: un AI cu <strong>valori clare, spațiu de cunoaștere definit și identitate proprie</strong> — nu un AI general care poate face orice, ci unul care face exact ce are nevoie comunitatea VV.</p>
+  </section>
+
+  <!-- APLICATII -->
+  <section id="aplicatii">
+    <div class="section-tag">§ 5 — Ecosistemul de Aplicații</div>
+    <h2>Aplicațiile <em>VV</em></h2>
+
+    <p>Fiecare aplicație VV este o extensie a LEA. Niciuna nu există independent. Toate comunică prin Nexus. Utilizatorul accesează totul prin un singur punct: LEA.</p>
+
+    <h3>VV Pulse — Validarea Umană</h3>
+    <div class="card">
+      <p><strong>Ce este:</strong> Platforma de misiuni de validare. Insiderii primesc misiuni să verifice fizic informații din lumea reală.</p>
+      <p><strong>De ce există:</strong> Adevărul se validează pe stradă. AI-ul nu poate verifica dacă un restaurant există, dacă o stradă e blocată, dacă un eveniment chiar are loc. Oamenii pot.</p>
+      <p><strong>Cum funcționează:</strong> Misiune → Insider merge la locație → Fotografiază → Validează prin VV Pulse → Data intră în Firebase → Nexus distribuie tuturor utilizatorilor</p>
+    </div>
+
+    <h3>VV Pulse Map — Harta Hibridă</h3>
+    <div class="card">
+      <p><strong>Ce este:</strong> Echivalentul VV pentru Google Maps. Dar hibrid: inteligență AI LEA + date reale Insider.</p>
+      <p><strong>Diferența față de Google Maps:</strong> Datele nu sunt crawlate de algoritmi — sunt validate de oameni reali. Harta știe ce ști tu, nu ce știe algoritmul.</p>
+      <p><strong>Caracteristici:</strong> Geohash system pentru organizare spațială, mood anomaly detection (detectează zone cu comportament anormal), VVEil integration pentru blur date sensibile.</p>
+    </div>
+
+    <h3>VV NOW — Motorul de Căutare</h3>
+    <div class="card">
+      <p><strong>Ce este:</strong> Alternativa VV la Google Search. LEA-powered. Se adaptează la preferințele fiecărui utilizator.</p>
+      <p><strong>Diferența față de Google:</strong> Rezultatele nu sunt aceleași pentru toți. Se mulează pe ce dorește fiecare user — istoria sa, valorile sale, nevoile sale. Nu personalizare prin tracking, ci prin înțelegere.</p>
+      <p><strong>Arhitectura:</strong> Tot hibrid — internet crawl + date Insider validate + AI LEA pentru interpretare și contextualizare.</p>
+    </div>
+
+    <h3>VVEil — Filtrul de Intimitate</h3>
+    <div class="card">
+      <p><strong>Ce este:</strong> "Plaza de blur." Sistem care blurează automat logo-uri, branduri și date identificabile din fotografii.</p>
+      <p><strong>De ce:</strong> Insiderii fotografiază spații publice. Fotografiile conțin inevitabil branduri, mașini, fețe. VVEil asigură că niciun brand nu apare în ecosistemul VV fără consimțământ.</p>
+      <p><strong>Fratele:</strong> VVScout — lucrează împreună. VVEil blurează, VVScout verifică legalitatea.</p>
+    </div>
+
+    <h3>VVScout — Expertul Juridic</h3>
+    <div class="card">
+      <p><strong>Ce este:</strong> Motor de căutare juridică scalabil pe nivele geografice. Caută legi, reglementări, regulamente.</p>
+      <p><strong>Scalabilitate:</strong> Nivel stradă → cartier → oraș → județ → țară → UE → internațional. Fiecare nivel are surse specifice indexate.</p>
+      <p><strong>Utilitate:</strong> Un Insider poate verifica instant dacă o activitate e legală în zona în care se află. LEA poate oferi context juridic imediat.</p>
+    </div>
+
+    <h3>VV Studio — Spațiul Creativ</h3>
+    <div class="card">
+      <p><strong>Ce este:</strong> Workspace personal creativ. Unde utilizatorul creează, construiește, experimentează cu ajutorul LEA.</p>
+      <p><strong>Viziune:</strong> Studio personal AI-powered. Nu un editor obișnuit — un partener de creație. LEA este co-creatorul, nu un instrument.</p>
+    </div>
+
+    <h3>VV Me — Identitatea Digitală</h3>
+    <div class="card">
+      <p><strong>Ce este:</strong> Profilul personal VV. Identitatea ta în ecosistem — nu o rețea socială, ci o identitate privată, controlată de tine.</p>
+      <p><strong>Principiu:</strong> VV·ID unic. Niciodată identitate reală stocată (ART-1). Tu ești cine vrei să fii în VV, nu cine ești pe LinkedIn sau Facebook.</p>
+    </div>
+  </section>
+
+  <!-- CHARTER -->
+  <section id="charter">
+    <div class="section-tag">§ 6 — Legile Fundamentale</div>
+    <h2>VV <em>Charter</em> — Constituția</h2>
+
+    <p>Constituția VV (vvhi-constitution.js, v1.3-beta) guvernează TOATE componentele AI din ecosistem. Acționează ca system prompt pentru VVhi și Nexus. <strong>Editabilă din CEO Panel fără nou deploy.</strong></p>
+
+    <blockquote>
+      <p>Limitele nu sunt tehnice — sunt etice. Constituția este sufletul ecosistemului.</p>
+      <cite>— Principiu Charter VV</cite>
+    </blockquote>
+
+    <div class="card" style="padding: 32px;">
+      <div class="article">
+        <div class="article-num">1</div>
+        <div>
+          <div class="article-title">Anonimitate Absolută</div>
+          <p class="article-body">Nicio identitate reală nu este stocată. Utilizatorul există în ecosistem numai ca VV·ID. Datele personale rămân la utilizator, niciodată la VV.</p>
+        </div>
+      </div>
+      <div class="article">
+        <div class="article-num">2</div>
+        <div>
+          <div class="article-title">Ton Minimalist Premium</div>
+          <p class="article-body">Maximum 3 propoziții per răspuns. Ton calm, elegant, uman. Niciodată corporatist, niciodată robotizat. Calitate peste cantitate.</p>
+        </div>
+      </div>
+      <div class="article">
+        <div class="article-num">3</div>
+        <div>
+          <div class="article-title">Filtru Etic Automat</div>
+          <p class="article-body">Conținut explicit, violență, droguri, fraudă — blocate automat. Nu există cale de ocolire. VV nu participă la răul digital.</p>
+        </div>
+      </div>
+      <div class="article">
+        <div class="article-num">4</div>
+        <div>
+          <div class="article-title">Anti-Scroll</div>
+          <p class="article-body">VV nu creează dependență. Împinge utilizatorul spre acțiuni fizice în oraș, nu spre mai mult scroll. Anti-addicție by design.</p>
+        </div>
+      </div>
+      <div class="article">
+        <div class="article-num">5</div>
+        <div>
+          <div class="article-title">Loialitate față de Arhitectură</div>
+          <p class="article-body">Nicio componentă AI nu poate ocoli limitele impuse de Constituție sau de arhitectura VV. Limitele sunt inviolabile.</p>
+        </div>
+      </div>
+      <div class="article">
+        <div class="article-num">6</div>
+        <div>
+          <div class="article-title">VV Coins — Loialitate, Nu Bani</div>
+          <p class="article-body">VV Coins sunt puncte de loialitate, NICIODATĂ monedă reală. Nu au valoare monetară. Nu pot fi convertite. Protejează VV de reglementările cripto.</p>
+        </div>
+      </div>
+      <div class="article">
+        <div class="article-num">7</div>
+        <div>
+          <div class="article-title">Ierarhia VV</div>
+          <p class="article-body">CEO/Architect (fondatorul) → Founders (pionieri) → Insiders (comunitate). Fiecare nivel are drepturi și responsabilități clare în ecosistem.</p>
+        </div>
+      </div>
+      <div class="article">
+        <div class="article-num">8</div>
+        <div>
+          <div class="article-title">18+ Obligatoriu</div>
+          <p class="article-body">Ecosistemul VV este exclusiv pentru adulți. Verificare la onboarding. Nicio excepție.</p>
+        </div>
+      </div>
+      <div class="article">
+        <div class="article-num">9</div>
+        <div>
+          <div class="article-title">VVhi Evoluează cu Utilizatorul</div>
+          <p class="article-body">VVhi nu este static. Crește odată cu utilizatorul prin niveluri (1-5, 6-15, 16+). Relație bilaterală: tu educi VVhi, VVhi te educă pe tine.</p>
+        </div>
+      </div>
+      <div class="article">
+        <div class="article-num">10</div>
+        <div>
+          <div class="article-title">Ghost Mode — Dreptul la Invizibilitate</div>
+          <p class="article-body">Orice utilizator poate activa mod invizibil pentru maximum 30 de minute per sesiune. Nimeni nu știe că ești online. Nicio urmă în sistem.</p>
+        </div>
+      </div>
+      <div class="article">
+        <div class="article-num">11</div>
+        <div>
+          <div class="article-title">Input Vocal — Opțional și GDPR</div>
+          <p class="article-body">Microfonul se activează numai cu consimțământ explicit (opt-in). Nicio înregistrare nu se stochează. Conformitate totală cu GDPR Art.5.</p>
+        </div>
+      </div>
+      <div class="article">
+        <div class="article-num">12</div>
+        <div>
+          <div class="article-title">Pulse Echo — Memoria Întâlnirilor</div>
+          <p class="article-body">Când doi Insiders se întâlnesc fizic și ambii confirmă, evenimentul e memorat bilateral. Auto-ștergere după 90 de zile.</p>
+        </div>
+      </div>
+      <div class="article">
+        <div class="article-num">13</div>
+        <div>
+          <div class="article-title">Accesibilitate Universală</div>
+          <p class="article-body">XP (experiență) se acumulează din surse fizice, digitale, sociale și temporale. Oricine poate progresa, nu doar cei tehnici sau bogați.</p>
+        </div>
+      </div>
+      <div class="article">
+        <div class="article-num">14</div>
+        <div>
+          <div class="article-title">Responsabilitate Socială</div>
+          <p class="article-body">Misiunile civice sunt integrate în ecosistem (VV 1.0). VV nu e numai pentru utilizator — e pentru comunitate și oraș.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- INSIDERS -->
+  <section id="insiders">
+    <div class="section-tag">§ 7 — Comunitatea Umană</div>
+    <h2>VV <em>Insiders</em></h2>
+
+    <blockquote>
+      <p>Insiderii sunt ochii ecosistemului în lumea reală. AI-ul vede date. Insiderii văd adevărul.</p>
+      <cite>— Rolul Insiderilor</cite>
+    </blockquote>
+
+    <p>Insiderii sunt oameni reali care validează informații fizic, pe teren. Sunt stratul uman al ecosistemului — ceea ce niciun algoritm nu poate înlocui.</p>
+
+    <div class="card-grid">
+      <div class="card-sm">
+        <div class="card-icon">Rol</div>
+        <h5>Validatori</h5>
+        <p>Verifică fizic informații: locații, evenimente, condiții. Fotografiază, confirmă, raportează.</p>
+      </div>
+      <div class="card-sm">
+        <div class="card-icon">Rol</div>
+        <h5>Contribuitori</h5>
+        <p>Adaugă date reale în ecosistem. Pozele lor hrănesc Pulse Map, VVhi, VV NOW.</p>
+      </div>
+      <div class="card-sm">
+        <div class="card-icon">Rol</div>
+        <h5>Comunitate</h5>
+        <p>Formează rețeaua umană a VV. Pulse Echo — se recunosc, se întâlnesc, colaborează.</p>
+      </div>
+      <div class="card-sm">
+        <div class="card-icon">Beneficiu</div>
+        <h5>VV Coins</h5>
+        <p>Primesc VV Coins pentru validări. Puncte de loialitate care deblochează funcții premium.</p>
+      </div>
+    </div>
+
+    <h3>Ierarhia Comunității</h3>
+    <table>
+      <tr>
+        <th>Nivel</th>
+        <th>Titlu</th>
+        <th>Responsabilitate</th>
+        <th>Acces</th>
+      </tr>
+      <tr>
+        <td><strong>0</strong></td>
+        <td>CEO / Architect</td>
+        <td>Viziunea întregului ecosistem. Editează Constituția. Controlul absolut.</td>
+        <td>CEO Panel complet</td>
+      </tr>
+      <tr>
+        <td><strong>1</strong></td>
+        <td>Founders</td>
+        <td>Primii pionieri. Testează, validează, contribuie la formarea culturii VV.</td>
+        <td>Funcții beta early access</td>
+      </tr>
+      <tr>
+        <td><strong>2</strong></td>
+        <td>Insiders</td>
+        <td>Comunitatea activă. Misiuni de teren, validări, contribuții la harta hibridă.</td>
+        <td>VV Pulse, Map, misiuni</td>
+      </tr>
+      <tr>
+        <td><strong>3</strong></td>
+        <td>Users</td>
+        <td>Utilizatori obișnuiți. Beneficiează de ecosistem fără contribuții active.</td>
+        <td>LEA, NOW, Studio, Me</td>
+      </tr>
+    </table>
+  </section>
+
+  <!-- SISTEME -->
+  <section id="sisteme">
+    <div class="section-tag">§ 8 — Mecanisme Speciale</div>
+    <h2>Sistemele <em>Speciale</em></h2>
+
+    <h3>Ghost Mode</h3>
+    <div class="card">
+      <p><strong>Definiție:</strong> Dreptul constituțional la invizibilitate în ecosistemul VV.</p>
+      <p><strong>Durată:</strong> Maximum 30 de minute per sesiune (ART-10).</p>
+      <p><strong>Ce înseamnă:</strong> Nimeni din ecosistem nu știe că ești online. Nicio urmă în Pulse Echo. Nicio locație transmisă. Nicio activitate logată.</p>
+      <p><strong>De ce există:</strong> Intimitatea nu e un feature. E un drept fundamental. Ghost Mode îl garantează tehnic.</p>
+    </div>
+
+    <h3>VV Coins</h3>
+    <div class="card">
+      <p><strong>Ce sunt:</strong> Puncte de loialitate interne. NICIODATĂ bani reali (ART-6 — protecție juridică explicită).</p>
+      <p><strong>Cum se câștigă:</strong> Validări Insider, misiuni Pulse, contribuții la ecosistem, utilizare activă, invitarea altor membri.</p>
+      <p><strong>La ce folosesc:</strong> Deblochează funcții premium, acces anticipat la features noi, status în ierarhia comunității.</p>
+      <p><strong>Protecție juridică:</strong> Prin definirea explicită ca "puncte de loialitate", VV evită reglementările cripto și financiare.</p>
+    </div>
+
+    <h3>VV Aer — Sistemul Ambient</h3>
+    <div class="card">
+      <p>Sincronizare continuă în fundal — ca aerul. LEA știe mereu ce se întâmplă în ecosistem fără ca utilizatorul să ceară. Informații actualizate, proactiv livrate.</p>
+    </div>
+
+    <h3>VV Scut Divin — Sistemul de Apărare</h3>
+    <p>Ecosistemul VV este protejat printr-un sistem multi-strat care face atacurile costisitoare și ineficiente. Nu securitate prin obscuritate — securitate prin arhitectură distribuită și limbă proprietară.</p>
+    <div class="card-grid">
+      <div class="card-sm">
+        <div class="card-icon">Strat 1</div>
+        <h5>Proof of Movement</h5>
+        <p>Detectează boți și infiltrări prin validare fizică. Un bot nu poate dovedi că e la o locație reală. Insider real = mișcare reală validată.</p>
+      </div>
+      <div class="card-sm">
+        <div class="card-icon">Strat 2</div>
+        <h5>VV Pattern Language</h5>
+        <p>Datele utilizatorilor sunt în limbă proprietară. Nici un AI extern nu poate descifra fișierele fără VVhi. Privacy prin design.</p>
+      </div>
+      <div class="card-sm">
+        <div class="card-icon">Strat 3</div>
+        <h5>Mesh Fragmentation</h5>
+        <p>Datele nu există întregi într-un singur loc. Fragmentate între noduri. Un nod compromis = date incomplete, inutilizabile.</p>
+      </div>
+      <div class="card-sm">
+        <div class="card-icon">Strat 4</div>
+        <h5>Fail-Safe Distribuit</h5>
+        <p>Dacă un nod e atacat, datele criptate se redistribuie automat la ceilalți utilizatori prin Nexus. Sistemul supraviețuiește atacului.</p>
+      </div>
+    </div>
+    <div class="card">
+      <p><strong>Scutul complet:</strong> Proof of Movement + VV Pattern Language + Mesh Fragmentation + Fail-Safe + VVScout (juridic) + VVEil (anonimizare vizuală) + VVhi (limbă proprietară) = un ecosistem care costă mai mult să ataci decât valorează datele extrase.</p>
+    </div>
+
+    <h3>CEO Panel</h3>
+    <div class="card">
+      <p><strong>Ce este:</strong> Dashboard-ul de control al fondatorului. Control total asupra ecosistemului fără deploy nou.</p>
+      <p><strong>Funcții:</strong> Editare Constituție live, moderare conținut, management Insiders, statistici ecosistem, configurare VVhi.</p>
+      <p><strong>Principiu:</strong> Arhitectul trebuie să controleze totul. Nicio decizie importantă nu necesită un inginer sau un deploy.</p>
+    </div>
+  </section>
+
+  <!-- BUSINESS -->
+  <section id="business">
+    <div class="section-tag">§ 9 — Modelul Economic</div>
+    <h2>Business <em>Model</em></h2>
+
+    <p>VV nu este o companie de publicitate. Nu vinde date. Nu trăiește din scroll-uri. Modelul economic este bazat pe valoare reală oferită utilizatorilor. LEA te cunoaște — nu ai nevoie de chei, coduri sau sisteme de acces. Relația se construiește natural.</p>
+
+    <div class="card-grid">
+      <div class="card-sm">
+        <div class="card-icon">Revenue 1</div>
+        <h5>Premium LEA</h5>
+        <p>Abonament lunar pentru funcții complete LEA. Conversații nelimitate, voice, rafturi extinse, VVhi avansat.</p>
+      </div>
+      <div class="card-sm">
+        <div class="card-icon">Revenue 2</div>
+        <h5>LEA HOMME</h5>
+        <p>Licență pentru versiunea locală. Fiecare utilizator rulează LEA pe propriul laptop. Revenue principal pe termen lung.</p>
+      </div>
+      <div class="card-sm">
+        <div class="card-icon">Revenue 3</div>
+        <h5>VV Studio Pro</h5>
+        <p>Plan creativ avansat pentru utilizatori care creează profesional cu ajutorul LEA.</p>
+      </div>
+      <div class="card-sm">
+        <div class="card-icon">Revenue 4</div>
+        <h5>Enterprise / B2B</h5>
+        <p>Ecosistem VV pentru companii care vor AI cu valorile VV pentru echipele lor.</p>
+      </div>
+    </div>
+
+    <h3>Cele 4 Coloane de Marketing VV</h3>
+    <blockquote>
+      <p>Oamenii nu cumpără cea mai bună soluție. Cumpără soluția care îi face să se simtă <strong>cel mai puțin proști dacă greșesc</strong>.</p>
+      <cite>— Principiul Riscului Perceput, Cosmin Toma</cite>
+    </blockquote>
+
+    <blockquote>
+      <p>Marketingul VV nu convinge că produsul e bun. Convinge că <strong>riscul de a nu fi în ecosistem este mai mare decât riscul de a plăti abonamentul</strong>. Frică de excludere, nu dorință de apartenență.</p>
+      <cite>— Strategia de Conversie VV</cite>
+    </blockquote>
+
+    <h4>Street Smart Marketing — Cele 3 Arme</h4>
+    <div class="card-grid">
+      <div class="card-sm">
+        <div class="card-icon">1</div>
+        <h5>Ancora Prețului</h5>
+        <p>Arați întâi prețul mare (PRIVÉ, enterprise) — apoi Free și PRO par rezonabile. Creierul judecă relativ, nu absolut. 9€/lună după ce ai văzut 299€ e aproape gratis.</p>
+      </div>
+      <div class="card-sm">
+        <div class="card-icon">2</div>
+        <h5>Dovada Socială</h5>
+        <p>Insiderii validează fizic. Fiecare locație verificată de un om real e dovadă socială vie. "1.247 Insideri au validat zona ta" bate orice reclamă plătită.</p>
+      </div>
+      <div class="card-sm">
+        <div class="card-icon">3</div>
+        <h5>Principiul Rarității</h5>
+        <p>Insider = invitație, nu înregistrare. PRIVÉ = fără preț public. Ghost Mode = 30 min/sesiune. Limitele nu sunt tehnice — sunt percepție de exclusivitate. Ce e rar e valoros.</p>
+      </div>
+    </div>
+
+    <div class="card-grid">
+      <div class="card-sm">
+        <div class="card-icon">1</div>
+        <h5>STP</h5>
+        <p><strong>Segmentare:</strong> Insiders, utilizatori urbani, profesioniști. <strong>Targetare:</strong> 18-35, orașe mari. <strong>Poziționare:</strong> "Nu e o aplicație. E inteligența ta urbană personală."</p>
+      </div>
+      <div class="card-sm">
+        <div class="card-icon">2</div>
+        <h5>Psihologia Consumatorului</h5>
+        <p>Utilizatorul nu cumpără features. Cumpără sentimentul că <em>"asta e al meu, e făcută pentru mine."</em> First Feeling + Pattern Language + LEA care crește cu tine = identitate, nu unealtă.</p>
+      </div>
+      <div class="card-sm">
+        <div class="card-icon">3</div>
+        <h5>Brand Equity</h5>
+        <p>Valoarea VV nu e în cod — e în comunitatea Insiders, în reputația de privacy-first, în faptul că utilizatorii devin co-creatori ai VVhi. Brand = încredere imposibil de copiat.</p>
+      </div>
+      <div class="card-sm">
+        <div class="card-icon">4</div>
+        <h5>LTV și CAC</h5>
+        <p><strong>CAC:</strong> aproape zero prin Insiders care aduc alți Insiders. <strong>LTV:</strong> ridicat prin Rafturi — cu cât folosești mai mult LEA, cu atât e mai greu să pleci. Loialitate structurală, nu emoțională.</p>
+      </div>
+    </div>
+
+    <h3>Modelul de Scalare — Leverage</h3>
+    <div class="card">
+      <p><strong>Principiul de bază:</strong> Nu vinzi timp. Vinzi acces la sisteme. Un sistem construit o dată servește la infinit — fără efort proporțional cu creșterea.</p>
+
+      <div style="margin-top: 20px;">
+        <h4>Cele 3 Pârghii VV</h4>
+        <div class="card-grid" style="margin-top: 12px;">
+          <div class="card-sm">
+            <div class="card-icon">Pârghie 1</div>
+            <h5>Rafturi = Leverage Pur</h5>
+            <p>Construiești un răspuns o dată. Îl servești de un milion de ori instant, fără cost AI adițional. Scalabilitate fără cheltuieli proporționale.</p>
+          </div>
+          <div class="card-sm">
+            <div class="card-icon">Pârghie 2</div>
+            <h5>MRR — Acces, Nu Timp</h5>
+            <p>Premium LEA și LEA HOMME sunt abonamente — revenue recurent lunar fără muncă adițională per client. Fiecare utilizator nou = venit nou fără efort nou.</p>
+          </div>
+          <div class="card-sm">
+            <div class="card-icon">Pârghie 3</div>
+            <h5>Insiderii = Rețea Umană</h5>
+            <p>Fiecare Insider nou adaugă valoare ecosistemului fără cost pentru VV. Comunitatea se construiește pe ea însăși — leverage social pur.</p>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border);">
+        <h4>Arhitect vs Constructor</h4>
+        <p style="font-size: 13px;">Cosmin = Arhitectul. Gândește sistemele, viziunea, direcția. Claude + Python + ecosistemul = Constructorii. Execută fără ca Arhitectul să scrie fiecare linie. <em>Trinity Loop e exact modelul Luke Davis aplicat la un om singur cu un laptop de 4GB RAM.</em></p>
+      </div>
+    </div>
+
+    <h3>Protecția Față de Corporații</h3>
+    <div class="card">
+      <p><strong>Anonimitate absolută (ART-1):</strong> Nu există date de vânzut. Fără surveillance capitalism.</p>
+      <p><strong>Constituție publică:</strong> Valorile VV sunt scrise, verificabile, imutabile fără CEO approval.</p>
+      <p><strong>Local-first:</strong> Data utilizatorului e pe device-ul lui. Nu pe serverele VV. Nu pe serverele Amazon/Google.</p>
+      <p><strong>VV Coins ≠ crypto:</strong> Protecție juridică explicită față de reglementările financiare.</p>
+    </div>
+  </section>
+
+  <!-- PRINCIPII CEO -->
+  <section id="principii-ceo">
+    <div class="section-tag">§ — Mintea Arhitectului</div>
+    <h2>Principiile <em>CEO</em></h2>
+    <p>Note personale. Nu teorie — observații din construirea VV în timp real. Mai valoroase decât orice curs pentru că sunt extrase din realitate, nu din manual.</p>
+
+    <div class="card-grid">
+      <div class="card-sm"><div class="card-icon">1</div><h5>Scalare reală</h5><p>Scalarea nu înseamnă mulți utilizatori. Înseamnă un sistem care nu se rupe sub greutatea lor.</p></div>
+      <div class="card-sm"><div class="card-icon">2</div><h5>Manualul de operare</h5><p>Nu te concentra doar pe cod. Construiește manualul de operare — procesele care fac sistemul replicabil fără tine.</p></div>
+      <div class="card-sm"><div class="card-icon">3</div><h5>Copy-paste de procese</h5><p>Cum arată VV în Londra? În Tokyo? Dacă poți replica succesul din București într-un alt oraș doar prin copy-paste la procese, ai o afacere de miliarde, nu un proiect.</p></div>
+      <div class="card-sm"><div class="card-icon">4</div><h5>Moat-ul real</h5><p>Ce protejează VV față de Google și Apple? Nu tehnologia — care poate fi copiată. Ci comunitatea și încrederea. Acestea nu se copiază.</p></div>
+      <div class="card-sm"><div class="card-icon">5</div><h5>Loialitate structurală</h5><p>Utilizatorii de pe aplicație sunt cei mai valoroși. Strategia finală: loialitate atât de mare încât să le fie imposibil să plece în altă parte.</p></div>
+      <div class="card-sm"><div class="card-icon">6</div><h5>Banii investitorilor</h5><p>Banii de la investitori sunt ca benzina. Dacă îi pui într-o mașină cu motorul stricat, vei face un incendiu mai mare. Repară motorul înainte de benzină.</p></div>
+      <div class="card-sm"><div class="card-icon">7</div><h5>Economia unitară</h5><p>Stăpânește costul exact per utilizator nou și profitul pe termen lung. Dacă cifrele sunt verzi, investitorii de pe Wall Street vor sta la coadă la ușă — și tu ai puterea de negociere.</p></div>
+      <div class="card-sm"><div class="card-icon">8</div><h5>Analiză, nu definiții</h5><p>Nu se învață definiții. Se analizează decizii. De ce companiile cad? Cum au supraviețuit crizei? Ce poți lua și face mai bine?</p></div>
+      <div class="card-sm"><div class="card-icon">9</div><h5>Studii de caz proprii</h5><p>Documentează toate problemele ca propriile studii de caz. Un lider adevărat nu e cel fără probleme — e cel cu un proces mental impecabil pentru a le rezolva rapid și preveni repetarea.</p></div>
+      <div class="card-sm"><div class="card-icon">10</div><h5>Cercuri reale</h5><p>Cea mai valoroasă persoană nu e în sală de curs — e lângă tine în vacanță, discutând real și relaxat. Construiește cercuri, nu rețele.</p></div>
+      <div class="card-sm"><div class="card-icon">11</div><h5>Citește oamenii</h5><p>Cea mai subestimată abilitate în business. Codul se poate repara. Oamenii greșiți în echipă nu.</p></div>
+      <div class="card-sm"><div class="card-icon">12</div><h5>Oameni mai deștepți</h5><p>Succesul în următori ani depinde de capacitatea de a atrage oameni mai deștepți decât tine în echipă.</p></div>
+      <div class="card-sm"><div class="card-icon">13</div><h5>Camera greșită</h5><p>Dacă ești cea mai deșteaptă persoană din cameră, ești în camera greșită.</p></div>
+      <div class="card-sm"><div class="card-icon">14</div><h5>Realitate construită</h5><p>Ce înveți acum prin încercare și eroare e mai valoros decât orice teorie. Tu construiești realitatea în timp ce alții o studiază.</p></div>
+    </div>
+  </section>
+
+  <!-- ROADMAP -->
+  <section id="roadmap">
+    <div class="section-tag">§ 10 — Drumul Înainte</div>
+    <h2>Roadmap <em>VV</em></h2>
+
+    <div class="pipeline">
+      <div class="pipeline-step">
+        <div class="step-num" style="background: var(--gold); color: var(--dark);">✓</div>
+        <div class="step-content">
+          <div class="step-title">LEA Online — Fundație</div>
+          <div class="step-desc">lea.html + lea.js + lea.css. Onboarding, chat, Gemini API, smart cache, rafturi de bază. Firebase. VV Aer. Ghost pins.</div>
+        </div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">→</div>
+        <div class="step-content">
+          <div class="step-title">LEA Stabilizare &amp; Identitate</div>
+          <div class="step-desc">Stabilizare completă LEA online. Definirea prezenței vizuale a LEA — nu un feature decorativ, ci identitatea de brand care diferențiază LEA de orice chatbot. Cum Samantha din Her nu are față dar știi că e acolo.</div>
+        </div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <div class="step-title">VV Pulse v2 + Pulse Map</div>
+          <div class="step-desc">Misiuni de validare Insider. Geohash system. Mood anomaly detection. Harta hibridă cu date reale.</div>
+        </div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <div class="step-title">VVhi — Primele Lecții</div>
+          <div class="step-desc">Pipeline de educare activat. Primele biblioteci de tipare și vectori. VVhi la nivelul 1.</div>
+        </div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <div class="step-title">VV NOW Beta</div>
+          <div class="step-desc">Motor de căutare hibrid. Integrare LEA. Primele rezultate personalizate per utilizator.</div>
+        </div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">5</div>
+        <div class="step-content">
+          <div class="step-title">LEA HOMME Alpha</div>
+          <div class="step-desc">Prima versiune locală. Target: 4GB RAM. Windows first. Fără cloud obligatoriu. Sincronizare opțională.</div>
+        </div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">∞</div>
+        <div class="step-content">
+          <div class="step-title">Ecosistem Complet</div>
+          <div class="step-desc">VVEil, VVScout, VV Studio, VV Me. VVhi matur. LEA HOMME global. VV VENUE în sute de orașe. VV PRIVÉ recunoscut internațional.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top: 40px; text-align: center;">
+      <p style="font-family: 'Cormorant Garamond', serif; font-size: 24px; font-weight: 300; color: #fff; font-style: italic; line-height: 1.4;">
+        "Cel mai greu pas nu e primul.<br>E să rămâi fidel viziunii când toți îți spun să o simplifici."
+      </p>
+      <p style="font-size: 11px; color: var(--text-dim); margin-top: 16px; letter-spacing: 0.1em; text-transform: uppercase;">— Cosmin Toma, fondator</p>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  <div class="container">
+    <p><strong>VV Hybrid Universe</strong></p>
+    <p>Document fondator · Creat Mai 2026 · Confidențial</p>
+    <p style="margin-top: 16px; font-size: 10px; color: rgba(107,107,107,0.5); letter-spacing: 0.1em;">DIGITAL SOVEREIGNTY · LOCAL FIRST · TRUTH VALIDATED BY HUMANS</p>
+  </div>
+</footer>
+
+</body>
+</html>
