@@ -1,4 +1,4 @@
-const CACHE = 'vv-v4';
+const CACHE = 'vv-v5';
 const SHELL = [
   '/vv-nexus/',
   '/vv-nexus/index.html',
@@ -32,13 +32,18 @@ self.addEventListener('fetch', e => {
   const url = e.request.url;
   if (/firestore|googleapis|anthropic|nominatim|openstreetmap|gstatic/.test(url)) return;
 
-  // Network-first pentru HTML — mereu versiunea nouă
-  if (e.request.mode === 'navigate' || /\/(lea|index|vv-pulse)\.html/.test(url) || url.endsWith('/vv-nexus/')) {
+  // Network-first pentru HTML — mereu versiunea noua
+  if (e.request.mode === 'navigate' || /\/(lea|index|vv-pulse|nexus)\.html/.test(url) || url.endsWith('/vv-nexus/')) {
     e.respondWith(
-      fetch(e.request, {cache:'no-store'}).then(res => {
-        if (res && res.ok) caches.open(CACHE).then(c => c.put(e.request, res.clone()));
-        return res;
-      }).catch(() => caches.match(e.request).then(r => r || caches.match('/vv-nexus/index.html')))
+      fetch(e.request, {cache:'no-store'})
+        .then(res => {
+          if (res && res.ok) {
+            const cl = res.clone();
+            caches.open(CACHE).then(c => c.put(e.request, cl));
+          }
+          return res;
+        })
+        .catch(() => caches.match(e.request).then(r => r || caches.match('/vv-nexus/index.html')))
     );
     return;
   }
@@ -47,10 +52,15 @@ self.addEventListener('fetch', e => {
   e.respondWith(
     caches.match(e.request).then(cached => {
       if (cached) return cached;
-      return fetch(e.request).then(res => {
-        if (res && res.ok) caches.open(CACHE).then(c => c.put(e.request, res.clone()));
-        return res;
-      }).catch(() => caches.match('/vv-nexus/index.html'));
+      return fetch(e.request)
+        .then(res => {
+          if (res && res.ok) {
+            const cl = res.clone();
+            caches.open(CACHE).then(c => c.put(e.request, cl));
+          }
+          return res;
+        })
+        .catch(() => caches.match('/vv-nexus/index.html'));
     })
   );
 });
