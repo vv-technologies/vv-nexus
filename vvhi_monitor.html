@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VVhi Monitor</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: #050507;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+    color: #fff;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Fundal ambient */
+  body::before {
+    content: '';
+    position: fixed;
+    top: -200px; left: -200px;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(99,102,241,0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  body::after {
+    content: '';
+    position: fixed;
+    bottom: -100px; right: -100px;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(16,185,129,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  /* Glass card */
+  .glass {
+    background: rgba(255,255,255,0.04);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 20px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06);
+  }
+
+  .header {
+    padding: 48px 40px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    color: #fff;
+  }
+
+  .header h1 span {
+    color: rgba(255,255,255,0.4);
+    font-weight: 300;
+  }
+
+  .status-pill {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 100px;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+  }
+
+  .status-pill.active {
+    background: rgba(16,185,129,0.12);
+    border: 1px solid rgba(16,185,129,0.2);
+    color: #10b981;
+  }
+
+  .status-pill.frozen {
+    background: rgba(239,68,68,0.12);
+    border: 1px solid rgba(239,68,68,0.2);
+    color: #ef4444;
+  }
+
+  .status-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+    animation: pulse-dot 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  /* Grid */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    padding: 0 40px;
+  }
+
+  .card {
+    padding: 24px;
+  }
+
+  .card-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.3);
+    margin-bottom: 12px;
+  }
+
+  .card-value {
+    font-size: 36px;
+    font-weight: 700;
+    letter-spacing: -1px;
+    color: #fff;
+    line-height: 1;
+  }
+
+  .card-sub {
+    font-size: 13px;
+    color: rgba(255,255,255,0.35);
+    margin-top: 6px;
+  }
+
+  /* EKG */
+  .ekg-section {
+    padding: 32px 40px;
+  }
+
+  .ekg-header {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.3);
+    margin-bottom: 16px;
+  }
+
+  .ekg-card {
+    padding: 24px;
+  }
+
+  canvas#ekg {
+    width: 100%;
+    height: 60px;
+    display: block;
+  }
+
+  /* Log */
+  .log-section {
+    padding: 0 40px 40px;
+  }
+
+  .log-card {
+    padding: 20px 24px;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+
+  .log-card::-webkit-scrollbar { width: 4px; }
+  .log-card::-webkit-scrollbar-track { background: transparent; }
+  .log-card::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+
+  .log-entry {
+    display: flex;
+    gap: 16px;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    font-size: 12px;
+  }
+
+  .log-entry:last-child { border-bottom: none; }
+
+  .log-time {
+    color: rgba(255,255,255,0.25);
+    font-variant-numeric: tabular-nums;
+    min-width: 60px;
+  }
+
+  .log-msg { color: rgba(255,255,255,0.6); }
+  .log-msg.ceo { color: rgba(255,255,255,0.9); }
+
+  /* Raft bars */
+  .raft-section {
+    padding: 0 40px 32px;
+  }
+
+  .raft-card { padding: 24px; }
+
+  .raft-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+
+  .raft-item:last-child { margin-bottom: 0; }
+
+  .raft-token {
+    font-size: 12px;
+    color: rgba(255,255,255,0.5);
+    min-width: 180px;
+    font-family: 'SF Mono', monospace;
+  }
+
+  .raft-bar-wrap {
+    flex: 1;
+    height: 4px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .raft-bar {
+    height: 100%;
+    border-radius: 2px;
+    background: rgba(255,255,255,0.3);
+    transition: width 0.6s ease;
+  }
+
+  .raft-pct {
+    font-size: 11px;
+    color: rgba(255,255,255,0.25);
+    min-width: 32px;
+    text-align: right;
+  }
+
+  /* Decizii */
+  .decision-chip {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 100px;
+    font-size: 11px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.45);
+    margin: 4px;
+  }
+
+  .section-title {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.3);
+    margin-bottom: 16px;
+    padding: 0 40px;
+  }
+
+  .decisions-wrap {
+    padding: 0 36px 40px;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>VVhi <span>Monitor</span></h1>
+  <div class="status-pill active" id="status-pill">
+    <div class="status-dot"></div>
+    <span id="status-text">Activ</span>
+  </div>
+</div>
+
+<div class="grid" id="stats-grid">
+  <div class="card glass">
+    <div class="card-label">Tokens Raft</div>
+    <div class="card-value" id="stat-total">0</div>
+    <div class="card-sub">patternuri invatate</div>
+  </div>
+  <div class="card glass">
+    <div class="card-label">Activi</div>
+    <div class="card-value" id="stat-active">0</div>
+    <div class="card-sub">putere > 50%</div>
+  </div>
+  <div class="card glass">
+    <div class="card-label">Decizii Blocate</div>
+    <div class="card-value" id="stat-locked">0</div>
+    <div class="card-sub">nu se rediscuta</div>
+  </div>
+  <div class="card glass">
+    <div class="card-label">Motor</div>
+    <div class="card-value" style="font-size:18px;padding-top:6px;" id="stat-mode">—</div>
+    <div class="card-sub" id="stat-version">v1.1</div>
+  </div>
+</div>
+
+<div class="ekg-section">
+  <div class="ekg-header">Puls VVhi</div>
+  <div class="ekg-card glass">
+    <canvas id="ekg" height="60"></canvas>
+  </div>
+</div>
+
+<div class="raft-section">
+  <div class="ekg-header">Top Patternuri Raft</div>
+  <div class="raft-card glass" id="raft-list">
+    <div style="color:rgba(255,255,255,0.2);font-size:13px;">Niciun pattern înca. Interactioneaza cu VVhi.</div>
+  </div>
+</div>
+
+<div class="section-title">Decizii Blocate</div>
+<div class="decisions-wrap" id="decisions-wrap">
+  <div style="color:rgba(255,255,255,0.2);font-size:13px;padding:0 4px;">Nicio decizie blocata.</div>
+</div>
+
+<div class="log-section">
+  <div class="ekg-header">Log Live</div>
+  <div class="log-card glass" id="log-list">
+    <div class="log-entry">
+      <span class="log-time">--:--</span>
+      <span class="log-msg">VVhi Monitor pornit.</span>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Citeste Raftul din localStorage ──────────────────────────────
+function loadRaft() {
+  try { return JSON.parse(localStorage.getItem('vvhi_raft') || '{"tokens":{},"decisions_locked":[]}'); }
+  catch(e) { return {tokens:{}, decisions_locked:[]}; }
+}
+
+function getStats() {
+  var r = loadRaft();
+  var t = Object.values(r.tokens || {});
+  return {
+    total: t.length,
+    active: t.filter(function(x){ return x.strength > 0.5; }).length,
+    locked: (r.decisions_locked || []).length,
+    tokens: r.tokens || {},
+    decisions: r.decisions_locked || []
+  };
+}
+
+function getTop(n) {
+  var r = loadRaft();
+  return Object.keys(r.tokens || {})
+    .map(function(t){ return Object.assign({token:t}, r.tokens[t]); })
+    .filter(function(x){ return x.strength > 0.1; })
+    .sort(function(a,b){ return b.strength - a.strength; })
+    .slice(0, n || 8);
+}
+
+// ── Render stats ──────────────────────────────────────────────────
+function renderStats() {
+  var s = getStats();
+  document.getElementById('stat-total').textContent = s.total;
+  document.getElementById('stat-active').textContent = s.active;
+  document.getElementById('stat-locked').textContent = s.locked;
+
+  var role = localStorage.getItem('vvhi_role') || 'user';
+  var isCEO = role === 'CEO';
+  document.getElementById('stat-mode').textContent = isCEO ? 'CEO' : 'User';
+  document.getElementById('stat-version').textContent = 'VVhi v1.1';
+
+  // Raft list
+  var top = getTop(8);
+  var raftEl = document.getElementById('raft-list');
+  if (top.length === 0) {
+    raftEl.innerHTML = '<div style="color:rgba(255,255,255,0.2);font-size:13px;">Niciun pattern înca.</div>';
+  } else {
+    raftEl.innerHTML = top.map(function(p) {
+      var pct = Math.round(p.strength * 100);
+      return '<div class="raft-item">'
+        + '<div class="raft-token">' + p.token + '</div>'
+        + '<div class="raft-bar-wrap"><div class="raft-bar" style="width:' + pct + '%"></div></div>'
+        + '<div class="raft-pct">' + pct + '%</div>'
+        + '</div>';
+    }).join('');
+  }
+
+  // Decizii
+  var dEl = document.getElementById('decisions-wrap');
+  if (s.decisions.length === 0) {
+    dEl.innerHTML = '<div style="color:rgba(255,255,255,0.2);font-size:13px;padding:0 4px;">Nicio decizie blocata.</div>';
+  } else {
+    dEl.innerHTML = s.decisions.map(function(d) {
+      return '<span class="decision-chip">' + d + '</span>';
+    }).join('');
+  }
+}
+
+// ── EKG ───────────────────────────────────────────────────────────
+var ekgCanvas = document.getElementById('ekg');
+var ekgCtx = ekgCanvas.getContext('2d');
+var ekgData = [];
+var ekgFrame = 0;
+
+function resizeEkg() {
+  ekgCanvas.width = ekgCanvas.offsetWidth;
+  ekgCanvas.height = 60;
+}
+
+function drawEkg() {
+  resizeEkg();
+  var w = ekgCanvas.width, h = ekgCanvas.height;
+  ekgCtx.clearRect(0, 0, w, h);
+
+  ekgFrame++;
+  var val = 0.5;
+  var mod = ekgFrame % 60;
+  if (mod === 0) val = 0.1;
+  else if (mod === 5) val = 0.9;
+  else if (mod === 8) val = 0.2;
+  else if (mod === 10) val = 0.85;
+  else if (mod === 13) val = 0.5;
+  else val = 0.5 + (Math.random() - 0.5) * 0.04;
+
+  ekgData.push(val);
+  if (ekgData.length > w) ekgData.shift();
+
+  ekgCtx.beginPath();
+  ekgCtx.strokeStyle = 'rgba(255,255,255,0.5)';
+  ekgCtx.lineWidth = 1.5;
+  ekgCtx.shadowColor = 'rgba(255,255,255,0.2)';
+  ekgCtx.shadowBlur = 4;
+
+  for (var i = 0; i < ekgData.length; i++) {
+    var x = i;
+    var y = h - (ekgData[i] * h * 0.8) - h * 0.1;
+    if (i === 0) ekgCtx.moveTo(x, y);
+    else ekgCtx.lineTo(x, y);
+  }
+  ekgCtx.stroke();
+
+  requestAnimationFrame(drawEkg);
+}
+
+// ── Log ───────────────────────────────────────────────────────────
+function addLog(msg, isCEO) {
+  var logEl = document.getElementById('log-list');
+  var now = new Date();
+  var time = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+  var entry = document.createElement('div');
+  entry.className = 'log-entry';
+  entry.innerHTML = '<span class="log-time">' + time + '</span>'
+    + '<span class="log-msg' + (isCEO ? ' ceo' : '') + '">' + msg + '</span>';
+  logEl.insertBefore(entry, logEl.firstChild);
+  if (logEl.children.length > 30) logEl.removeChild(logEl.lastChild);
+}
+
+// ── Init ──────────────────────────────────────────────────────────
+renderStats();
+drawEkg();
+
+var role = localStorage.getItem('vvhi_role') || 'user';
+addLog('Monitor pornit. Role: ' + role, role === 'CEO');
+
+// Refresh la fiecare 3 secunde
+setInterval(function() {
+  renderStats();
+}, 3000);
+</script>
+</body>
+</html>
