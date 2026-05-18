@@ -2050,6 +2050,28 @@ var VVhiRaft = {
   }
 };
 
+// ── Raft Default — Stratul 0 de Fabrica (seed la prima pornire) ───
+(function() {
+  if (localStorage.getItem('vvhi_raft_seeded')) return;
+  var raft = { tokens: {}, decisions_locked: [] };
+  try { var ex = JSON.parse(localStorage.getItem('vvhi_raft')||'{"tokens":{}}'); if(ex.tokens) raft = ex; } catch(e) {}
+  var now = Date.now();
+  function f(k,s){ if(!raft.tokens[k]) raft.tokens[k]={strength:s,count:1,lastSeen:now,source:'factory',permanent:true}; }
+  f('TIME:peak:dimineata:HI:MORN',0.50); f('TIME:low:dupa_pranz:MED:AFT',0.65); f('TIME:peak:seara:MED:EVE',0.50); f('TIME:routine:cafea:HI:MORN',0.75);
+  f('HABIT:eat:cafea:HI:MORN',0.75); f('HABIT:eat:pranz:MED:AFT',0.70); f('HABIT:eat:cina:MED:EVE',0.60); f('HABIT:eat:cald:HI:DAILY',0.65);
+  f('HABIT:social:familie:HI:WEEK',0.70); f('HABIT:social:prieteni:MED:EVE',0.55); f('PERS:familie:mama:HI:ALWAYS',0.70);
+  f('PREF:env:liniste:HI:MORN',0.65); f('PREF:env:cald:HI:DAILY',0.60); f('PREF:social:mic_grup:MED:EVE',0.55);
+  f('MOOD:general:luni:greu:MED',0.55); f('MOOD:general:vineri:bun:HI',0.65); f('MOOD:general:sambata:liber:HI',0.70); f('MOOD:general:duminica:relaxat:MED',0.60);
+  f('MOOD:energy:dimineata:MED:MORN',0.50); f('MOOD:energy:dupa_pranz:LO:AFT',0.65); f('MOOD:energy:seara:MED:EVE',0.55);
+  f('BLOCK:focus:telefon:MED:DAILY',0.55); f('BLOCK:resource:timp:MED:DAILY',0.55); f('BLOCK:motivation:luni:MED:MORN',0.50);
+  f('ZONE:deep_work:dimineata:HI:MORN',0.60); f('ZONE:creative:seara:MED:EVE',0.55); f('ZONE:social:weekend:HI:WEEK',0.65);
+  f('PLACE:home:general:HI:ALWAYS',0.70); f('PLACE:city:centru:MED:WEEK',0.50);
+  f('WANT:financial:stabilitate:HI:ALWAYS',0.65); f('WANT:personal:timp_liber:HI:DAILY',0.60); f('WANT:health:odihna:HI:ALWAYS',0.60);
+  localStorage.setItem('vvhi_raft', JSON.stringify(raft));
+  localStorage.setItem('vvhi_raft_seeded','1.0');
+  console.log('%cVVhi Raft Default — ' + Object.keys(raft.tokens).length + ' patternuri românești', 'color:#10b981;font-weight:600');
+})();
+
 // ── Genesis: Pornire si Identitate ────────────────────────────────
 (function vvhiBoot() {
   if (!localStorage.getItem('vvhi_id')) {
