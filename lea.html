@@ -747,6 +747,11 @@ window.addEventListener('load', function() {
       return;
     }
 
+    // Ajunge la API — numara doar aceste mesaje
+    if(typeof canSend==='function' && !canSend()) {
+      if(typeof showDonate==='function') showDonate(); return;
+    }
+    if(typeof incCount==='function') { incCount(); if(typeof updateLimitBar==='function') updateLimitBar(); }
     try { return await _orig(q); } catch(e) {
       var name2 = localStorage.getItem('lea_name')||'', N2 = name2?', '+name2:'';
       if(typeof addMsg==='function') addMsg('l', 'Lucrez local' + N2 + '. Nu am conexiune acum, dar raftul meu e activ.');
