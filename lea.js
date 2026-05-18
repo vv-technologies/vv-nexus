@@ -628,11 +628,9 @@ function loadAndShowHistory() {
 function send() {
   var b=document.getElementById('ibox'),t=b.value.trim();
   if(!t) return;
-  if(!canSend()) { showDonate(); return; }
   b.value='';b.style.height='auto';
   addMsg('u',t);
   document.getElementById('idle').classList.add('off');
-  incCount(); updateLimitBar();
   processLea(t);
 }
 
