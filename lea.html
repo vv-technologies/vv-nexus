@@ -470,6 +470,86 @@ window.addEventListener('load', function() {
     return parts.join(' ');
   }
 
+  // ── VVhi Lib — biblioteca de raspuns, vocea VV ───────────
+  // Cand nu recunoaste exact, detecteaza categoria si raspunde
+  // din biblioteca proprie. Nu script rigid — reguli + vocabular.
+  var VVhiLib = {
+    pick: function(arr, N) {
+      var s = arr[Math.floor(Math.random() * arr.length)];
+      return s.replace(/\{N\}/g, N||'');
+    },
+    respond: function(msg, N, ctx, tokens) {
+      var l = msg.toLowerCase();
+
+      // ── Somn ──────────────────────────────────────────────
+      if(/somn|adorm|obosit|mort de|nu mai pot sta|pleoapele/.test(l)) {
+        var r = ['E ' + ctx.h + ':00. Normal' + (N||'') + '. Odihneste-te.',
+                 'Du-te la culcare' + (N||'') + '.',
+                 'Somn bun' + (N||'') + '. Maine e alta zi.'];
+        return this.pick(r);
+      }
+
+      // ── Foame ────────────────────────────────────────────
+      if(/foame|flamand|mananc|mi-e foame|vreau sa mananc/.test(l)) {
+        var top = Object.keys(tokens).filter(function(k){ return k.indexOf('PREF:mancare:')===0 && tokens[k].strength>0.3; });
+        if(top.length) return 'Ce-ti place tie' + (N||'') + '. ' + top[0].split(':')[2] + '?';
+        return this.pick(['Ce ai acasa' + (N||'') + '?', 'Ce iti vine la minte?', 'Mananca ceva cald.']);
+      }
+
+      // ── Stres ────────────────────────────────────────────
+      if(/stresat|nu mai pot|prea mult|coplesit|anxios|mi-e frica|ingrijorat/.test(l)) {
+        return this.pick(['Respira' + (N||'') + '. Un lucru o data.',
+                          'Ce e cel mai urgent acum' + (N||'') + '?',
+                          'Ce se intampla exact' + (N||'') + '?']);
+      }
+
+      // ── Tristete ─────────────────────────────────────────
+      if(/trist|rau|nasol|deprimat|mi-e rau|nu e bine|greu/.test(l)) {
+        return this.pick(['Ce s-a intamplat' + (N||'') + '?',
+                          'Sunt aici' + (N||'') + '. Spune-mi.',
+                          'Greu' + (N||'') + '. Ce s-a intamplat?']);
+      }
+
+      // ── Bucurie ──────────────────────────────────────────
+      if(/fericit|super|excelent|minunat|cel mai bun|am reusit|am castigat/.test(l)) {
+        return this.pick(['Bine' + (N||'') + '. Ce e bun azi?',
+                          'Asa da' + (N||'') + '. Spune-mi.',
+                          'Ma bucur' + (N||'') + '. Ce s-a intamplat?']);
+      }
+
+      // ── Plictiseala ──────────────────────────────────────
+      if(/plictisit|nu stiu ce sa fac|ennui|bored/.test(l)) {
+        return this.pick(['Ce vrei sa faci' + (N||'') + '?',
+                          'Raftul tau are idei. Ce ti-ar placea?',
+                          'Ce nu ai facut de mult' + (N||'') + '?']);
+      }
+
+      // ── Durere ───────────────────────────────────────────
+      if(/ma doare|durere|cap|spate|stomac|rau fizic/.test(l)) {
+        return this.pick(['Ai nevoie de ceva' + (N||'') + '?',
+                          'Ma doare si pe mine cand aud asta. Ce ai nevoie?',
+                          'Odihneste-te' + (N||'') + '.']);
+      }
+
+      // ── Multumire / confirmare ────────────────────────────
+      if(/^(ok|okay|bine|perfect|da|aha|inteleg|am inteles|clar)$/.test(l.trim())) {
+        return this.pick(['Bine' + (N||'') + '.',
+                          (N||'') + '.',
+                          'Notat.']);
+      }
+
+      // ── Fallback — raspuns uman, nu "Nu am date" ──────────
+      var fallbacks = [
+        'Spune-mi mai mult' + (N||'') + '.',
+        'Sunt aici' + (N||'') + '.',
+        'Hmm. Continua' + (N||'') + '.',
+        'Inteleg' + (N||'') + '. Ce mai?',
+        'Ce vrei sa fac' + (N||'') + '?'
+      ];
+      return this.pick(fallbacks);
+    }
+  };
+
   // ── Motor local — citeste Raftul, raspunde uman ──────────
   function vvhiThink(msg) {
     var l = msg.toLowerCase().trim();
@@ -620,13 +700,16 @@ window.addEventListener('load', function() {
       return isCEO ? 'Cu placere, Varu.' : 'Cu placere' + N + '.';
     }
 
-    // Mesaj scurt si vag — nimic specific, dar poate Raftul are ceva
+    // Mesaj scurt si vag — poate Raftul are ceva proactiv
     if(l.length < 25 && !/\?/.test(l) && !/\s{2,}/.test(l)) {
       var pro3 = vvhiProactive();
       if(pro3) return pro3;
     }
 
-    return null;
+    // VVhi Lib — detecteaza categoria si raspunde din biblioteca VV
+    // Ultimul strat inainte de Firebase — nu lasa "Nu am date" sa treaca
+    var tokens4 = VVhiRaft.load().tokens || {};
+    return VVhiLib.respond(msg, N, ctx, tokens4);
   }
 
   // ── Wrap processLea ───────────────────────────────────────
