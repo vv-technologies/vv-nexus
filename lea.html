@@ -1,210 +1,96 @@
-﻿﻿﻿﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ro">
 <head>
 <meta charset="UTF-8">
-<link rel="manifest" href="manifest.json">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="VV">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#000">
 <title>Lea</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;1,300;1,400&family=Geist+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="lea.css">
-<style>
-.vv-tabs{position:fixed;bottom:0;left:0;right:0;z-index:999;display:flex;background:rgba(0,0,0,.96);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-top:.5px solid var(--border);padding-bottom:env(safe-area-inset-bottom)}
-.vv-tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 0 9px;text-decoration:none;color:var(--text3);transition:color .2s;-webkit-user-select:none;user-select:none}
-.vv-tab.active{color:var(--accent)}
-.vt-icon{font-size:1.25rem;line-height:1}
-.vt-lbl{font-size:.375rem;font-family:var(--mono);letter-spacing:.2em;text-transform:uppercase}
-.inp-area{padding-bottom:calc(4.75rem + env(safe-area-inset-bottom))!important}
-/* ── SIDEBAR (laptop) ── */
-.vv-sidebar{display:none;position:fixed;top:0;left:0;bottom:0;width:220px;background:rgba(0,0,0,.99);border-right:.5px solid var(--border);flex-direction:column;padding:max(1.75rem,var(--safe-top)) 1rem 1.25rem;z-index:800}
-.sb-brand{margin-bottom:2rem;padding:0 .25rem}
-.sb-logo{font-family:var(--mono);font-size:1.125rem;font-weight:700;letter-spacing:4px;color:var(--accent)}
-.sb-sub{font-size:.4375rem;font-family:var(--mono);letter-spacing:.22em;text-transform:uppercase;color:var(--text3);margin-top:4px}
-.sb-nav{display:flex;flex-direction:column;gap:3px;flex:1}
-.sb-item{display:flex;align-items:center;gap:.875rem;padding:.625rem .875rem;border-radius:var(--r);text-decoration:none;color:var(--text3);font-size:.75rem;font-family:var(--mono);transition:background .15s,color .15s;-webkit-user-select:none}
-.sb-item:hover{background:rgba(255,255,255,.04);color:rgba(255,255,255,.5)}
-.sb-item.active{background:rgba(201,168,76,.1);color:var(--accent)}
-.sb-icon{font-size:1.0625rem;width:1.25rem;text-align:center;flex-shrink:0;line-height:1}
-.sb-lbl{letter-spacing:.05em}
-.sb-divider{height:.5px;background:var(--border);margin:.75rem 0}
-.sb-name{font-size:.625rem;font-family:var(--mono);color:var(--text2);padding:.5rem .875rem;letter-spacing:.05em}
-.sb-ver{font-size:.375rem;font-family:var(--mono);color:var(--text3);letter-spacing:.1em;text-align:center;margin-top:.75rem}
-/* ── LAPTOP RESPONSIVE ── */
-@media (min-width:768px){
-  html{font-size:20px}
-  .vv-tabs{display:none!important}
-  .vv-sidebar{display:flex!important}
-  /* Override lea.css desktop centering (#app{left:50%;transform:...}) */
-  #app{left:220px!important;right:0!important;max-width:none!important;transform:none!important}
-  /* Screens outside #app also need offset */
-  .sc:not(#s-accord){left:220px!important}
-  #sett,#vvme,#studio-mini{left:220px!important}
-  .inp-area{padding-bottom:calc(1.5rem + env(safe-area-inset-bottom))!important}
-  /* Chat layout */
-  .msg-list{padding:2rem 3rem}
-  .inp-row{max-width:780px;margin:0 auto}
-  .ibox{font-size:1rem!important}
-  /* Home screen — premium laptop layout */
-  .home-screen{padding:2rem 3rem!important;display:flex;flex-direction:column;gap:1.5rem}
-  .tiles-time{font-size:3.5rem!important;font-weight:700!important;letter-spacing:-.03em!important;line-height:1!important}
-  .tiles-mood{font-size:1rem!important;opacity:.5!important}
-  .tiles-cta{font-size:1.05rem!important;padding:1.1rem 2.5rem!important;border-radius:16px!important;letter-spacing:.01em!important}
-  .tiles-grid{display:grid!important;grid-template-columns:repeat(3,1fr)!important;gap:1rem!important;margin-top:.5rem!important}
-  .tile{padding:1.75rem 1.5rem!important;border-radius:16px!important;min-height:6rem!important;flex-direction:column!important;align-items:flex-start!important}
-  .tile-icon{font-size:1.75rem!important;margin-bottom:.5rem!important}
-  .tile-label{font-size:.85rem!important;font-weight:500!important;opacity:.8!important}
-  /* Sidebar laptop scale */
-  .sb-logo{font-size:1.3rem!important;letter-spacing:5px!important}
-  .sb-sub{font-size:.5rem!important}
-  .sb-item{font-size:.8rem!important;padding:.7rem 1rem!important}
-  .sb-icon{font-size:1rem!important}
-  .sb-sect{font-size:.45rem!important;letter-spacing:.25em!important}
-  .sb-shelf{font-size:.55rem!important}
-  .sb-ver{font-size:.4rem!important}
-  /* Topbar */
-  .topbar{padding:1.5rem 2rem 1rem!important}
-  .tb-logo{font-size:1.5rem!important}
-}
-.sb-sect{font-size:.375rem;font-family:var(--mono);letter-spacing:.22em;text-transform:uppercase;color:var(--text3);padding:.375rem .875rem .25rem;opacity:.6}
-.sb-shelf{font-size:.5rem;font-family:var(--mono);color:var(--text2);padding:3px .875rem;line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:.8}
-.sb-locked{opacity:.45;cursor:pointer;position:relative}
-.sb-locked:hover{opacity:.7;background:rgba(255,255,255,.03)!important}
-.sb-lock{margin-left:auto;font-size:.625rem;flex-shrink:0}
-.sb-pro-price{font-size:.3125rem;letter-spacing:.1em;color:var(--accent);margin-left:4px;vertical-align:middle;font-family:var(--mono)}
-.sb-upgrade-btn{display:flex;align-items:center;justify-content:center;gap:6px;margin:.75rem .5rem .25rem;padding:.5rem;background:rgba(201,168,76,.1);border:.5px solid rgba(201,168,76,.25);border-radius:var(--r);font-size:.5rem;font-family:var(--mono);color:var(--accent);cursor:pointer;letter-spacing:.08em;transition:background .2s}
-.sb-upgrade-btn:hover{background:rgba(201,168,76,.18)}
-/* upgrade modal */
-.upg-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:1900;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
-.upg-overlay.open{display:block}
-.upg-modal{display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-54%);z-index:2000;background:rgba(6,6,8,.99);border:.5px solid rgba(201,168,76,.3);border-radius:20px;padding:2rem 1.75rem;max-width:360px;width:calc(100% - 2rem);text-align:center;transition:transform .3s cubic-bezier(.4,0,.2,1),opacity .3s;opacity:0}
-.upg-modal.open{display:block;transform:translate(-50%,-50%);opacity:1}
-.upg-modal::before{content:'';position:absolute;top:0;left:20%;right:20%;height:1px;background:linear-gradient(90deg,transparent,rgba(201,168,76,.5),transparent)}
-.upg-hex{font-size:2.25rem;margin-bottom:.5rem;line-height:1}
-.upg-lbl{font-size:.4375rem;font-family:var(--mono);letter-spacing:.3em;text-transform:uppercase;color:rgba(201,168,76,.6);margin-bottom:4px}
-.upg-tier{font-size:2.25rem;font-weight:900;font-family:var(--mono);color:rgba(201,168,76,1);letter-spacing:.05em;margin-bottom:.25rem}
-.upg-feat{font-size:.5625rem;color:rgba(245,240,232,.4);font-family:var(--mono);margin-bottom:1.25rem;letter-spacing:.02em}
-.upg-price{font-size:1.375rem;font-weight:700;color:rgba(245,240,232,.9);margin-bottom:1.25rem}
-.upg-list{text-align:left;margin-bottom:1.5rem;background:rgba(255,255,255,.02);border-radius:var(--r);padding:.75rem}
-.upg-row{font-size:.5rem;font-family:var(--mono);color:rgba(245,240,232,.55);padding:3px 0;display:flex;align-items:center;gap:6px}
-.upg-row::before{content:'✓';color:rgba(201,168,76,.7);flex-shrink:0}
-.upg-btns{display:flex;gap:.625rem;margin-bottom:.875rem}
-.upg-free{flex:1;padding:.625rem;border-radius:var(--r);background:transparent;border:.5px solid rgba(255,255,255,.1);color:rgba(255,255,255,.3);font-family:var(--mono);font-size:.5rem;cursor:pointer;transition:background .2s}
-.upg-free:hover{background:rgba(255,255,255,.04)}
-.upg-pro{flex:1.4;padding:.75rem;border-radius:12px;background:#C9A84C!important;border:none;color:#000!important;font-family:var(--mono);font-size:.5625rem;font-weight:700;cursor:pointer;letter-spacing:.06em;transition:opacity .2s}
-.upg-pro:hover{opacity:.85}
-.upg-note{font-size:.375rem;font-family:var(--mono);color:rgba(255,255,255,.15);letter-spacing:.08em}.now-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:1800;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);align-items:center;justify-content:center}
-.now-ov.open{display:flex}
-.now-card{background:rgba(6,6,8,.99);border:.5px solid var(--border2);border-radius:20px;padding:1.75rem;width:min(480px,90vw);position:relative}
-.now-card::before{content:'';position:absolute;top:0;left:20%;right:20%;height:1px;background:linear-gradient(90deg,transparent,var(--accent),transparent);opacity:.5}
-.now-ttl{font-size:.4375rem;font-family:var(--mono);letter-spacing:.3em;text-transform:uppercase;color:var(--accent);opacity:.6;margin-bottom:.5rem}
-.now-h{font-size:1.5rem;font-weight:700;color:var(--text);margin-bottom:1.25rem;letter-spacing:-.02em}
-.now-inp{width:100%;background:rgba(255,255,255,.04);border:.5px solid var(--border2);border-radius:12px;padding:.875rem 1rem;color:var(--text);font-size:.875rem;font-family:var(--mono);outline:none;box-sizing:border-box;transition:border-color .2s}
-.now-inp:focus{border-color:var(--accent)}
-.now-inp::placeholder{color:var(--text3)}
-.now-btns{display:flex;gap:.625rem;margin-top:.875rem}
-.now-b-lea{flex:1;padding:.625rem;background:rgba(201,168,76,.1);border:.5px solid rgba(201,168,76,.25);border-radius:10px;color:var(--accent);font-family:var(--mono);font-size:.5625rem;cursor:pointer;transition:background .2s}
-.now-b-pulse{flex:1;padding:.625rem;background:rgba(45,184,122,.07);border:.5px solid rgba(45,184,122,.2);border-radius:10px;color:#2db87a;font-family:var(--mono);font-size:.5625rem;cursor:pointer;transition:background .2s}
-.now-b-close{padding:.625rem 1rem;background:transparent;border:.5px solid var(--border);border-radius:10px;color:var(--text3);font-family:var(--mono);font-size:.5rem;cursor:pointer}</style>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⬡</text></svg>">
 </head>
 <body>
-
-<!-- SIDEBAR (visible on laptop) -->
-<aside class="vv-sidebar">
-  <div class="sb-brand">
-    <div class="sb-logo">VV</div>
-    <div class="sb-sub">Hybrid Universe</div>
-  </div>
-  <nav class="sb-nav">
-    <a href="lea.html" class="sb-item active"><span class="sb-icon">◎</span><span class="sb-lbl">LEA</span></a>
-    <a href="vv-pulse.html" class="sb-item"><span class="sb-icon">◉</span><span class="sb-lbl">PULSE</span></a>
-    <a href="#" onclick="openNow();return false;" class="sb-item"><span class="sb-icon">⊡</span><span class="sb-lbl">NOW</span></a>
-    <a href="index.html" class="sb-item"><span class="sb-icon">⊙</span><span class="sb-lbl">EU</span></a>
-  </nav>
-  <!-- Shelves preview (free) -->
-  <div class="sb-divider"></div>
-  <div class="sb-sect">RAFTURI</div>
-  <div class="sb-shelf" id="sb-mood">Dispoziție: —</div>
-  <div class="sb-shelf" id="sb-prefs">Preferințe: —</div>
-  <div class="sb-shelf" id="sb-wishes">Dorințe: —</div>
-  <!-- PRO locked features -->
-  <div class="sb-divider"></div>
-  <div class="sb-sect">HOMME PRO <span class="sb-pro-price">9€/lună</span></div>
-  <div class="sb-item sb-locked" onclick="showUpgrade('studio')"><span class="sb-icon">🎨</span><span class="sb-lbl">Studio</span><span class="sb-lock">🔒</span></div>
-  <div class="sb-item sb-locked" onclick="showUpgrade('moduri')"><span class="sb-icon">⚡</span><span class="sb-lbl">Moduri Pro</span><span class="sb-lock">🔒</span></div>
-  <div class="sb-item sb-locked" onclick="showUpgrade('export')"><span class="sb-icon">↗</span><span class="sb-lbl">Export</span><span class="sb-lock">🔒</span></div>
-  <div class="sb-item sb-locked" onclick="showUpgrade('workplace')"><span class="sb-icon">⬡</span><span class="sb-lbl">Workspace</span><span class="sb-lock">🔒</span></div>
-  <div class="sb-item sb-locked" onclick="showUpgrade('analytics')"><span class="sb-icon">◈</span><span class="sb-lbl">Analytics</span><span class="sb-lock">🔒</span></div>
-  <!-- Footer -->
-  <div class="sb-name" id="sb-name">—</div>
-  <div class="sb-ver">v2.0 · Mai 2026</div>
-</aside>
 <div id="amb"></div>
 <div id="toast"></div>
 
-<!-- ── ONBOARDING ─────────────────────────────────────── -->
+<!-- ONBOARDING — NAME FIRST -->
 <div class="sc on" id="s-accord">
+  <div class="a-logo">Lea</div>
+  <div class="a-sub">VV · Ecosistemul tău personal</div>
 
   <!-- STEP 1: Numele -->
-  <div id="step-name" style="width:100%;max-width:300px;display:flex;flex-direction:column;align-items:center;">
-    <div class="ob-logo">Lea</div>
-    <p class="ob-q">Cum vrei să te știe Lea?</p>
-    <input class="name-input" id="name-input" type="text"
-      placeholder="Numele tău..."
-      maxlength="30" autocomplete="off" autocorrect="off" spellcheck="false"
-      oninput="if(typeof onNameInput==='function')onNameInput(this.value)"
-      onkeydown="if(event.key==='Enter'&&typeof goToTerms==='function')goToTerms()">
-    <button class="btn-primary" id="name-btn" onclick="goToTerms()">Continuă</button>
-    <p class="ob-note">Rămâne doar pe device-ul tău · Zero server · Zero email</p>
-  </div>
-
-  <!-- STEP 2: Acord (checkboxes ascunse, pre-acceptate automat) -->
-  <div id="step-terms" style="width:100%;max-width:300px;display:none;flex-direction:column;align-items:center;">
-    <div class="ob-logo" style="font-size:28px;margin-bottom:12px;">⬡</div>
-    <p class="ob-q" id="terms-greeting" style="margin-bottom:16px;">Bine ai venit.</p>
-    <p class="ob-note" style="margin-bottom:28px;color:rgba(255,255,255,0.35);font-size:12px;line-height:1.7;text-align:center;">
-      Prin continuare accepți VV Charter și confirmi că ai 18 ani.<br>Datele tale rămân local pe device.
-    </p>
-    <!-- Checkboxe ascunse — pre-checked din JS -->
-    <div id="checks-hidden" style="display:none;">
-      <div class="ck" id="ck0" onclick="ck(0)"><div class="ck-box" id="ckb0">✓</div><div class="ck-text">Charter</div></div>
-      <div class="ck" id="ck1" onclick="ck(1)"><div class="ck-box" id="ckb1">✓</div><div class="ck-text">18 ani</div></div>
-      <div class="ck" id="ck2" onclick="ck(2)"><div class="ck-box" id="ckb2">✓</div><div class="ck-text">Învăț</div></div>
+  <div id="step-name" style="width:100%;max-width:320px;display:flex;flex-direction:column;align-items:center;">
+    <p class="a-desc">Cum vrei să te știe Lea?<br>Orice nume. Al tău sau unul ales de tine.</p>
+    <div class="name-wrap">
+      <span class="name-label">Numele tău</span>
+      <input class="name-input" id="name-input" type="text"
+        placeholder="ex: Alex, Vulpea, Cosmin..."
+        maxlength="30" autocomplete="off" autocorrect="off"
+        oninput="if(typeof onNameInput==='function')onNameInput(this.value)"
+        onkeydown="if(event.key==='Enter'&&typeof goToTerms==='function')goToTerms()">
     </div>
-    <button class="btn-primary on" id="a-btn" onclick="acceptAccord()">Intru în Lea</button>
-    <p class="ob-note">VV ID generat automat · Anonim · Invizibil</p>
+    <button class="a-btn" id="name-btn" onclick="goToTerms()">Continuă →</button>
+    <p class="a-note">Numele rămâne doar pe device-ul tău · Zero server · Zero email</p>
   </div>
 
+  <!-- STEP 2: Termeni -->
+  <div id="step-terms" style="width:100%;max-width:320px;display:none;flex-direction:column;align-items:center;">
+    <p class="a-desc" id="terms-greeting">Bine ai venit.</p>
+    <div class="checks">
+      <div class="ck" id="ck0" onclick="ck(0)">
+        <div class="ck-box" id="ckb0">✓</div>
+        <div class="ck-text"><b>Accept VV Charter.</b> Datele mele rămân local. Zero email, zero parolă.</div>
+      </div>
+      <div class="ck" id="ck1" onclick="ck(1)">
+        <div class="ck-box" id="ckb1">✓</div>
+        <div class="ck-text"><b>Confirm că am 18 ani</b> și accesez o platformă Beta.</div>
+      </div>
+      <div class="ck" id="ck2" onclick="ck(2)">
+        <div class="ck-box" id="ckb2">✓</div>
+        <div class="ck-text"><b>Accept că Lea învață din mine</b> — anonim, local, pentru mine.</div>
+      </div>
+    </div>
+    <button class="a-btn" id="a-btn" onclick="acceptAccord()">Intru în Lea →</button>
+    <p class="a-note">VV ID generat automat · Invizibil · Doar pe device-ul tău</p>
+  </div>
 </div>
 
-<!-- ── RECOGNITION ────────────────────────────────────── -->
+<!-- RECOGNITION -->
 <div class="sc" id="s-rec">
-  <div class="rec-orb"><div class="rec-l">L</div></div>
-  <div class="rec-status" id="r-s">Se sincronizează...</div>
-  <div class="rec-name" id="r-n"></div>
+  <div class="r-orb"><div class="r-l">L</div></div>
+  <div class="r-s" id="r-s">Se sincronizează...</div>
+  <div class="r-n" id="r-n"></div>
 </div>
 
-<!-- ── VV AER (accesat din setări, nu din onboarding) ── -->
-<div class="sc" id="s-aer" style="display:none;">
-  <div class="ob-logo" style="font-size:24px;letter-spacing:2px;margin-bottom:6px;">◎ VV Aer</div>
-  <p class="ob-note" style="margin-bottom:32px;">Sincronizează identitatea între device-uri</p>
+<!-- VV AER -->
+<div class="sc" id="s-aer">
+  <h2 class="aer-t">VV <em>Aer</em></h2>
+  <p class="aer-s">Sincronizează identitatea între device-uri. Fără coduri. Fără scanat.</p>
   <div class="aer-orb" id="aer-orb">
     <div class="aer-icon">◎</div>
     <div class="aer-lbl" id="aer-lbl">Apasă</div>
   </div>
   <div class="aer-msg" id="aer-msg"></div>
-  <div style="display:flex;gap:10px;margin-top:24px;width:100%;max-width:280px;">
-    <button class="btn-secondary" onclick="aerSend()">Trimite</button>
-    <button class="btn-secondary" onclick="aerRecv()">Primesc</button>
+  <div class="aer-acts">
+    <button class="aer-send" onclick="aerSend()">Trimite identitatea mea</button>
+    <button class="aer-recv" onclick="aerRecv()">Primesc de pe alt device</button>
   </div>
-  <button class="btn-ghost" onclick="skipAer()">Închide</button>
+  <button onclick="startVoiceSync()" style="
+    margin-top:12px;padding:11px 24px;
+    background:rgba(45,184,122,.1);
+    border:0.5px solid rgba(45,184,122,.3);
+    border-radius:100px;color:rgba(45,184,122,.9);
+    font-family:var(--mono);font-size:12px;cursor:pointer;
+    letter-spacing:1px;display:flex;align-items:center;gap:8px;">
+    🎙 Conectează prin voce <span style="font-size:9px;opacity:.6;">experimental</span>
+  </button>
+  <button class="aer-skip" onclick="skipAer()">Nu acum · Continuu</button>
 </div>
 
-<!-- ── ONBOARDING SLIDES (bypass direct) ─────────────── -->
-<div class="sc" id="s-ob" style="display:none;">
+<!-- ONBOARDING -->
+<div class="sc" id="s-ob">
   <div class="ob-wrap">
     <div class="ob-slides">
       <div class="ob-sl on" id="ob0">
@@ -220,7 +106,7 @@
       <div class="ob-sl" id="ob2">
         <div class="ob-ic">🎙</div>
         <div class="ob-ti">Lea vorbește.</div>
-        <div class="ob-de">Scrie sau vorbește. Lea răspunde instant.</div>
+        <div class="ob-de">Scrie sau vorbește. Lea răspunde cu vocea fondatorului VV.</div>
       </div>
     </div>
     <div class="ob-dots">
@@ -228,485 +114,209 @@
       <div class="ob-d" id="od1"></div>
       <div class="ob-d" id="od2"></div>
     </div>
-    <button class="btn-primary on" id="ob-nx" onclick="nextOb()">Continuă</button>
-    <button class="btn-ghost" onclick="finishOb()">Sari · Intru direct</button>
+    <button class="ob-nx" id="ob-nx" onclick="nextOb()">Continuă →</button>
+    <button class="ob-sk" onclick="finishOb()">Sari · Intru direct</button>
   </div>
 </div>
 
-<!-- ── APP ────────────────────────────────────────────── -->
+<!-- APP -->
 <div id="app">
-
-  <!-- TOPBAR -->
   <div class="topbar">
-    <!-- Chat state: back button | Home state: logo -->
-    <button class="tb-back" id="tb-back" onclick="enterHome()">← Înapoi</button>
-    <div class="tb-logo" id="tb-logo">Lea</div>
-    <div class="tb-mid">
-      <div class="tb-dot"></div>
-      <div class="tb-city" id="tb-city">—</div>
-      <span class="dev-badge" id="dev-badge" style="display:none;"></span>
-    </div>
+    <div class="tb-logo">Lea</div>
+    <div class="tb-mid"><div class="tb-dot"></div><div class="tb-city" id="tb-city">—</div></div>
     <div class="tb-r">
+      <button class="tb-btn" onclick="showAer()" title="VV Aer">◎</button>
       <button class="tb-btn" onclick="openSett()">⚙</button>
     </div>
   </div>
-
-  <!-- HOME SCREEN (tiles) -->
-  <div class="home-screen" id="tiles-area">
-    <div class="tiles-time" id="time-display">—</div>
-    <div class="tiles-mood" id="mood-display">Zona ta · VV Beta</div>
-
-    <!-- CTA: intrare în chat -->
-    <button class="tiles-cta" onclick="enterChat()">
-      <span>Vorbește cu Lea</span>
-      <span class="tiles-cta-icon">↑</span>
-    </button>
-
-    <!-- Shortcuts -->
-    <div class="tiles-grid">
-      <div class="tile" onclick="tileAsk('Unde mănânc ceva bun acum în zona mea?')">
-        <div class="tile-icon">🍕</div>
-        <div class="tile-label">Mâncare</div>
-      </div>
-      <div class="tile" onclick="tileAsk('Unde beau o cafea bună acum?')">
-        <div class="tile-icon">☕</div>
-        <div class="tile-label">Cafea</div>
-      </div>
-      <div class="tile" onclick="tileAsk('Ce misiuni VV active sunt în zona mea?')">
-        <div class="tile-icon">⬡</div>
-        <div class="tile-label">Misiune</div>
-      </div>
-      <div class="tile" onclick="openVVMe()">
-        <div class="tile-icon">🧠</div>
-        <div class="tile-label">Eu</div>
-      </div>
-      <div class="tile" onclick="openStudio()">
-        <div class="tile-icon">✦</div>
-        <div class="tile-label">VV Studio</div>
-      </div>
-      <div class="tile" onclick="enterChat()">
-        <div class="tile-icon" style="font-size:18px;letter-spacing:2px;">···</div>
-        <div class="tile-label">Altceva</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- CHAT SCREEN -->
-  <div class="chat-screen" id="chat-screen">
-    <div class="conv" id="conv">
-      <div class="idle" id="idle">
-        <div class="idle-l">L</div>
-        <div class="idle-t" id="idle-t">Sunt Lea.<br>Ce vrei să știi?</div>
-        <div class="idle-c" id="idle-c"></div>
-      </div>
-      <div class="vvis" id="vvis">
-        <div class="vb"></div><div class="vb"></div><div class="vb"></div>
-        <div class="vb"></div><div class="vb"></div><div class="vb"></div><div class="vb"></div>
-      </div>
-    </div>
-    <div class="inp-area">
-      <div class="sugs" id="sugs"></div>
-      <div class="inp-row">
-        <textarea class="ibox" id="ibox" placeholder="Întreabă-o pe Lea..." rows="1"
-          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();send();}"
-          oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px';"></textarea>
-        <button class="mic-b" id="mic-b"
-          onclick="startMic(event)"
-          oncontextmenu="return false;"
-          style="touch-action:manipulation;">🎙</button>
-        <button class="send-b" onclick="send()">↑</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- LIMIT BAR (funcțional în JS) -->
-  <div class="lim" style="display:none;">
+  <div class="lim">
     <div class="lim-bar"><div class="lim-fill" id="lim-fill" style="width:0%"></div></div>
-    <div class="lim-txt"><span id="lim-lbl">0/20 azi</span><span>Beta</span></div>
+    <div class="lim-txt"><span id="lim-lbl">0/20 azi</span><span>Beta · VV Lea</span></div>
   </div>
-
+  <div class="conv" id="conv">
+    <div class="idle" id="idle">
+      <div class="idle-l">L</div>
+      <div class="idle-t" id="idle-t">Sunt Lea.<br>Ce vrei să știi?</div>
+      <div class="idle-c" id="idle-c"></div>
+    </div>
+    <div class="vvis" id="vvis">
+      <div class="vb"></div><div class="vb"></div><div class="vb"></div>
+      <div class="vb"></div><div class="vb"></div><div class="vb"></div><div class="vb"></div>
+    </div>
+  </div>
+  <div class="inp-area">
+    <div class="sugs" id="sugs"></div>
+    <div class="inp-row">
+      <textarea class="ibox" id="ibox" placeholder="Întreabă-o pe Lea..." rows="1"
+        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();send();}"
+        oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px'"></textarea>
+      <button class="mic-b" id="mic-b"
+        onclick="startMic(event)"
+        oncontextmenu="return false;"
+        style="touch-action:manipulation;">🎙</button>
+      <button class="send-b" onclick="send()">↑</button>
+    </div>
+  </div>
 </div>
 
-<!-- ── SETTINGS ────────────────────────────────────────── -->
+<!-- SETTINGS -->
 <div id="sett" onclick="if(event.target===this)closeSett()">
   <div class="ss">
     <div class="ss-h"></div>
-    <div class="ss-title">Setări</div>
-
-    <!-- PROFIL -->
+    <div class="ss-title">Setări Lea</div>
     <div class="ss-row"><span class="ss-l">VV ID</span><span class="ss-v" id="ss-id">—</span></div>
     <div class="ss-row"><span class="ss-l">Rang</span><span class="ss-v" id="ss-rang">—</span></div>
-    <div class="ss-row"><span class="ss-l">Oraș</span><span class="ss-v" id="ss-city">—</span></div>
-    <div class="ss-row"><span class="ss-l">Nume</span><input class="ss-input" id="si-name" placeholder="Numele tău" /></div>
-
-    <!-- API -->
-    <div class="ss-sect">Conexiuni API</div>
-    <div class="ss-row">
-      <span class="ss-l">Gemini Key</span>
-      <span class="ss-status" id="si-gk-status">—</span>
-    </div>
-    <div class="ss-row" style="gap:6px">
-      <input class="ss-input" id="si-gk" placeholder="AIza..." type="password" style="flex:1" />
-      <button class="ss-b" onclick="testGemini()" style="white-space:nowrap">Testează</button>
-    </div>
-    <div class="ss-row"><span class="ss-l">Proxy CEO</span><span class="ss-status" id="si-proxy-status">—</span></div>
-    <input class="ss-input" id="si-proxy" placeholder="https://script.google.com/..." style="margin:0 0 10px" />
-    <div class="ss-row"><span class="ss-l">ElevenLabs Key</span></div>
-    <input class="ss-input" id="si-ek" placeholder="API Key voce..." type="password" style="margin:0 0 6px" />
-    <input class="ss-input" id="si-vi" placeholder="Voice ID..." style="margin:0 0 10px" />
-
-    <!-- STATS -->
-    <div class="ss-sect">Stare</div>
-    <div class="ss-row"><span class="ss-l">Mesaje azi</span><span class="ss-v" id="si-usage">—</span></div>
-    <div class="ss-row"><span class="ss-l">Cache</span><span class="ss-v" id="si-cache">—</span></div>
-    <div class="ss-row"><span class="ss-l">Archetype</span><span class="ss-v" id="si-arch">—</span></div>
-    <div class="ss-row" style="gap:6px;margin-top:2px">
-      <button class="ss-b" onclick="clearCacheSettings()" style="flex:1">Golește cache</button>
-      <button class="ss-b" onclick="resetArchSettings()" style="flex:1">Reset archetype</button>
-    </div>
-
-    <button class="ss-b" onclick="saveSettings()" style="width:100%;margin:14px 0 6px;background:rgba(201,168,76,.18);color:#C9A84C;border-color:rgba(201,168,76,.3);font-size:13px;padding:12px">Salvează</button>
-    <button class="ss-aer" onclick="showAer()">◎ VV Aer · Sincronizare device</button>
-    <button class="ss-aer" onclick="closeSett();showCardManual();" style="background:rgba(255,255,255,.03);color:rgba(255,255,255,.4);">⬡ Cardul tău VV</button>
+    <div class="ss-row"><span class="ss-l">Oraș curent</span><span class="ss-v" id="ss-city">—</span></div>
+    <div class="ss-row"><span class="ss-l">Voce Lea</span><button class="ss-b" onclick="cfgVoice()">Configurează</button></div>
+    <button class="ss-aer" onclick="window.location.href='vv-studios.html'" style="margin-bottom:6px;">📝 VV Studio · Spațiul tău personal</button>
+    <button class="ss-aer" onclick="showAer()">◎ VV Aer · Sync device nou</button>
+    <button class="ss-aer" onclick="closeSett();showCardManual()" style="background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.1);color:rgba(255,255,255,.5);">⬡ Vezi cardul tău VV</button>
     <button class="ss-close" onclick="closeSett()">Închide</button>
-    <button class="ss-out" onclick="logout()">Resetează tot</button>
+    <button class="ss-out" onclick="logout()">Deconectare · Resetează</button>
   </div>
 </div>
 
-<!-- ── VV ME ─────────────────────────────────────────── -->
-<div id="vvme" onclick="if(event.target===this)closeVVMe()">
-  <div class="vme-sheet">
-    <div class="ss-h"></div>
-    <div class="vme-head">
-      <div class="vme-title">Mintea ta</div>
-      <div class="vme-sub" id="vme-archetype">Lea te descopera...</div>
-    </div>
-    <div class="vme-shelves" id="vme-shelves">
-      <!-- populate din JS -->
-    </div>
-    <button class="ss-close" onclick="closeVVMe()">Închide</button>
-  </div>
-</div>
-
-<!-- ── VV STUDIO MINI (mobile only) ──────────────────── -->
-<div id="studio-mini" onclick="if(event.target===this)closeStudioMini()" style="display:none;">
-  <div class="vme-sheet">
-    <div class="ss-h"></div>
-    <div class="vme-head">
-      <div class="vme-title">✦ VV Studio</div>
-      <div class="vme-sub" id="studio-mini-sub">Explorer · Mobile Studio</div>
-    </div>
-    <div style="display:flex;gap:8px;padding:16px 20px;flex-wrap:wrap;">
-      <button class="studio-act-btn" onclick="studioNote()">📝 Notă rapidă</button>
-      <button class="studio-act-btn" onclick="studioAsk('Cum mă simt azi și ce ar trebui să fac?')">◐ Starea mea</button>
-      <button class="studio-act-btn" onclick="studioAsk('Ce ar trebui să prioritizez azi?')">⬡ Sarcini azi</button>
-    </div>
-    <div style="padding:0 20px 4px;font-size:11px;font-family:var(--mono);color:var(--text3);letter-spacing:.5px;">NOTELE TALE</div>
-    <div id="studio-recent" style="padding:0 20px 8px;"></div>
-    <button class="ss-close" onclick="closeStudioMini()">Închide</button>
-  </div>
-</div>
-
-<!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js" onerror="console.log('[Lea] offline')"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js" onerror="console.log('[Lea] offline')"></script>
+<!-- Firebase (opțional) -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js" onerror="console.log('Firebase offline')"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js" onerror="console.log('Firestore offline')"></script>
 <script src="lea.js" defer></script>
 
+<!-- ── VVHI MOTOR IN LEA — Stratul de Inteligenta ─────────── -->
 <script>
-// ── DEVICE DETECTION ──────────────────────────────
-var _isMobile = /Android|iPhone|iPod|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
-                || (window.innerWidth <= 820 && ('ontouchstart' in window || navigator.maxTouchPoints > 0));
-var _deviceType = _isMobile ? 'mobile' : 'desktop';
-document.body.classList.add('dev-' + _deviceType);
-localStorage.setItem('lea_device', _deviceType);
-(function() {
-  var b = document.getElementById('dev-badge');
-  if(b) { b.textContent = _isMobile ? 'Companion' : 'Acasă'; b.style.display = 'inline'; }
-})();
+window.addEventListener('load', function() {
 
-// Pre-check checkboxes
-setTimeout(function() {
-  try { if(typeof ck === 'function') { ck(0); ck(1); ck(2); } } catch(e) {}
-}, 300);
-
-// Ceas live
-  // Sidebar name sync
-  (function(){
-    var n=localStorage.getItem('lea_name')||'';
-    var el=document.getElementById('sb-name');
-    if(el && n) el.textContent=n;
-  })();
-function updateClock() {
-  var el = document.getElementById('time-display');
-  if(el) el.textContent = new Date().toLocaleTimeString('ro-RO', {hour:'2-digit',minute:'2-digit'});
-}
-setInterval(updateClock, 1000);
-updateClock();
-
-// ── APP STATE: home ↔ chat ─────────────────────────
-var _appState = 'home';
-
-function enterChat() {
-  if(_appState === 'chat') return;
-  _appState = 'chat';
-  document.body.classList.add('app-chat');
-  var ibox = document.getElementById('ibox');
-  if(ibox) setTimeout(function(){ ibox.focus(); }, 250);
-}
-
-function enterHome() {
-  _appState = 'home';
-  document.body.classList.remove('app-chat');
-  var ibox = document.getElementById('ibox');
-  if(ibox) { ibox.value = ''; ibox.style.height = 'auto'; ibox.blur(); }
-}
-
-// Dacă există istoric → intră direct în chat fără animație
-setTimeout(function() {
-  if(document.querySelectorAll('#conv .msg').length > 0) {
-    _appState = 'chat';
-    document.body.classList.add('app-chat', 'no-transition');
-    setTimeout(function(){ document.body.classList.remove('no-transition'); }, 50);
-  }
-}, 900);
-
-// Shortcut tiles → chat + trimite
-function tileAsk(q) {
-  enterChat();
-  var ibox = document.getElementById('ibox');
-  if(ibox) ibox.value = q;
-  setTimeout(function() { if(typeof send === 'function') send(); }, 200);
-}
-
-// ── VV ME ─────────────────────────────────────────
-var VV_SHELVES = [
-  { key:'lea_family',  icon:'👨‍👩‍👧', label:'Familie',    hint:'Cine contează pentru tine' },
-  { key:'lea_places',  icon:'📍', label:'Locuri',      hint:'Unde te simți acasă' },
-  { key:'lea_prefs',   icon:'✦',  label:'Preferințe',  hint:'Ce îți place, ce evitați' },
-  { key:'lea_habits',  icon:'⟳',  label:'Obiceiuri',   hint:'Rutina ta zilnică' },
-  { key:'lea_mood',    icon:'◐',  label:'Dispoziție',  hint:'Cum te simți de obicei' }
-];
-
-function openVVMe() {
-  refreshArchetypeDisplay();
-  var sheet = document.getElementById('vvme');
-  var cont = document.getElementById('vme-shelves');
-  if(!sheet || !cont) return;
-
-  var S = {};
-  try { S = JSON.parse(localStorage.getItem('vv_shelves') || '{}'); } catch(e){}
-
-  // Formatează rafturi din SHELVES real
-  var rows = [
-    {
-      icon:'👨‍👩‍👧', label:'Familie', hint:'Ce știe Lea despre cei dragi',
-      val: (function(){
-        if(!S.family) return '';
-        var p = [];
-        if(S.family.hasKids) p.push('copii');
-        if(S.family.hasCar) p.push('mașină');
-        if(S.family.petFriendly) p.push('animale');
-        return p.join(' · ');
-      })()
+  // ── Raft (memoria locala) ────────────────────────────────
+  var VVhiRaft = {
+    key: 'vvhi_raft',
+    load: function() {
+      try { return JSON.parse(localStorage.getItem(this.key)||'{"tokens":{},"decisions_locked":[]}'); }
+      catch(e) { return {tokens:{},decisions_locked:[]}; }
     },
-    {
-      icon:'📍', label:'Locuri', hint:'Unde ai fost, ce ai căutat',
-      val: (function(){
-        if(!S.places || !S.places.favorites || !S.places.favorites.length) return '';
-        return S.places.favorites.slice(0,5).map(function(p){return p.name;}).join(', ');
-      })()
+    save: function(r) { try { localStorage.setItem(this.key,JSON.stringify(r)); } catch(e) {} },
+    add: function(token, str) {
+      var r = this.load();
+      if(!r.tokens[token]) r.tokens[token] = {strength:0,count:0,lastSeen:Date.now()};
+      var t = r.tokens[token];
+      t.count++; t.strength = Math.min(1.0, t.strength+(str||0.1)); t.lastSeen = Date.now();
+      this.save(r);
     },
-    {
-      icon:'✦', label:'Preferințe', hint:'Ce îți place să mănânci, să bei',
-      val: (S.prefs && S.prefs.foodTypes && S.prefs.foodTypes.length)
-            ? S.prefs.foodTypes.join(', ') : ''
-    },
-    {
-      icon:'⟳', label:'Obiceiuri', hint:'Când și ce cauți de obicei',
-      val: (function(){
-        if(!S.habits || !S.habits.peakHours) return '';
-        var parts = [];
-        Object.keys(S.habits.peakHours).forEach(function(period) {
-          var intents = S.habits.peakHours[period];
-          var top = Object.keys(intents).sort(function(a,b){return intents[b]-intents[a];})[0];
-          if(top) parts.push(period + ' → ' + top);
-        });
-        return parts.join(' · ');
-      })()
-    },
-    {
-      icon:'◐', label:'Dispoziție', hint:'Starea ta detectată din conversații',
-      val: (function(){
-        if(!S.mood) return '';
-        var p = [];
-        if(S.mood.lastMood) p.push(S.mood.lastMood);
-        if(S.mood.stressIndicators > 2) p.push('stres detectat (' + S.mood.stressIndicators + ')');
-        if(S.wishes && S.wishes.financialCtx === 'tight') p.push('buget limitat');
-        return p.join(' · ');
-      })()
-    },
-    {
-      icon:'✨', label:'Dorințe', hint:'Ce vrei să faci, să guști, să trăiești',
-      val: (function(){
-        if(!S.wishes || !S.wishes.items || !S.wishes.items.length) return '';
-        return S.wishes.items.slice(-5).map(function(w){return w.text;}).join(' · ');
-      })()
+    isCEO: function() {
+      return localStorage.getItem('vvhi_role')==='CEO';
     }
-  ];
+  };
 
-  cont.innerHTML = '';
-  rows.forEach(function(r) {
-    var div = document.createElement('div');
-    div.className = 'vme-shelf' + (r.val ? '' : ' vme-empty');
-    div.innerHTML =
-      '<div class="vme-shelf-head"><span class="vme-si">' + r.icon + '</span>' +
-      '<div><div class="vme-sl">' + r.label + '</div><div class="vme-sh">' + r.hint + '</div></div></div>' +
-      '<div class="vme-sv">' + (r.val || 'Lea nu știe încă · vorbește cu ea') + '</div>';
-    cont.appendChild(div);
-  });
-
-  sheet.style.display = 'flex';
-  setTimeout(function(){ sheet.classList.add('on'); }, 10);
-}
-function closeVVMe() {
-  var s = document.getElementById('vvme');
-  if(!s) return;
-  s.classList.remove('on');
-  setTimeout(function(){ s.style.display = 'none'; }, 300);
-}
-
-// ── VV STUDIO ─────────────────────────────────────
-function openStudio() {
-  if(_isMobile) {
-    var el = document.getElementById('studio-mini');
-    if(!el) return;
-    buildStudioMini();
-    el.style.display = 'flex';
-    setTimeout(function(){ el.classList.add('on'); }, 10);
-  } else {
-    window.location.href = 'vv-studios.html';
+  // ── CEO auto-recognition ──────────────────────────────────
+  var savedUid = localStorage.getItem('vvhi_id') || localStorage.getItem('vvhi_ceo_uid') || '';
+  if(savedUid === 'VV_CEO_ELENA_2026') {
+    localStorage.setItem('vvhi_role','CEO');
+    localStorage.setItem('vvhi_ceo_uid','VV_CEO_ELENA_2026');
+    // Actualizeaza si obiectul user din LEA
+    try {
+      var lu = JSON.parse(localStorage.getItem('lea_u')||'{}');
+      if(lu && lu.vvid) { lu.type='ceo'; localStorage.setItem('lea_u',JSON.stringify(lu)); }
+    } catch(e) {}
   }
-}
-function closeStudioMini() {
-  var el = document.getElementById('studio-mini');
-  if(!el) return;
-  el.classList.remove('on');
-  setTimeout(function(){ el.style.display='none'; }, 300);
-}
-function buildStudioMini() {
-  var archetype = localStorage.getItem('lea_archetype') || 'Explorer';
-  var sub = document.getElementById('studio-mini-sub');
-  if(sub) sub.textContent = archetype + ' · Mobile Studio';
-  var recent = document.getElementById('studio-recent');
-  if(!recent) return;
-  var notes = JSON.parse(localStorage.getItem('lea_studio_notes') || '[]');
-  recent.innerHTML = notes.length
-    ? notes.slice(-3).reverse().map(function(n){
-        return '<div class="studio-note-item">' + n.text.slice(0,80) + '</div>';
-      }).join('')
-    : '<div style="color:var(--text3);font-size:13px;font-family:var(--mono);padding:12px 0;">Nicio notă · Scrie prima ta idee</div>';
-}
-function studioNote() {
-  var txt = prompt('Notă rapidă:');
-  if(!txt || !txt.trim()) return;
-  var notes = JSON.parse(localStorage.getItem('lea_studio_notes') || '[]');
-  notes.push({ text: txt.trim(), ts: Date.now() });
-  localStorage.setItem('lea_studio_notes', JSON.stringify(notes));
-  buildStudioMini();
-  if(typeof showToast === 'function') showToast('Notă salvată ✓');
-}
-function studioAsk(q) {
-  closeStudioMini();
-  enterChat();
-  var ibox = document.getElementById('ibox');
-  if(ibox) ibox.value = q;
-  setTimeout(function(){ if(typeof send === 'function') send(); }, 200);
-}
-// ── SHELVES SIDEBAR SYNC
-function syncSidebarShelves(){
-  try{
-    var s=JSON.parse(localStorage.getItem('lea_shelves')||'{}');
-    var prefs=s.preferences&&s.preferences.items&&s.preferences.items.length?s.preferences.items.slice(-2).map(function(i){return i.text||i;}).join(' · '):'—';
-    var mood=s.moods&&s.moods.items&&s.moods.items.length?s.moods.items.slice(-1)[0].text||s.moods.items.slice(-1)[0]:'—';
-    var wish=s.wishes&&s.wishes.items&&s.wishes.items.length?s.wishes.items.slice(-1)[0].text||s.wishes.items.slice(-1)[0]:'—';
-    var ep=document.getElementById('sb-prefs'); if(ep) ep.textContent='Prefs: '+prefs;
-    var em=document.getElementById('sb-mood'); if(em) em.textContent='Mood: '+mood;
-    var ew=document.getElementById('sb-wishes'); if(ew) ew.textContent='Doresc: '+wish;
-  }catch(e){}
-}
-setInterval(syncSidebarShelves,4000);
-setTimeout(syncSidebarShelves,800);
 
-// ── UPGRADE MODAL
-var _upgFeats={'studio':'VV Studio — workspace creativ avansat','workplace':'LEA Workspace — spatiu de lucru profesional','moduri':'Moduri Pro — Artist, Creator, Business','export':'Export — PDF și Markdown','analytics':'Analytics — patterns și statistici'};
-function showUpgrade(f){
-  var el=document.getElementById('upg-feat'); if(el) el.textContent=_upgFeats[f]||f;
-  document.getElementById('upg-overlay').classList.add('open');
-  document.getElementById('upg-modal').classList.add('open');
-}
-function closeUpgrade(){
-  document.getElementById('upg-overlay').classList.remove('open');
-  document.getElementById('upg-modal').classList.remove('open');
-}
+  // ── Pattern extraction (VVPL) ─────────────────────────────
+  function vvhiExtract(msg) {
+    var l = msg.toLowerCase();
+    ['pizza','burger','shaorma','sushi','kebab','paste','salata'].forEach(function(f) {
+      if(l.includes(f)) VVhiRaft.add('PREF:mancare:'+f+':0.6', 0.1);
+    });
+    if(/obosit|oboseala|stres|epuizat/i.test(l)) VVhiRaft.add('MOOD:oboseala:prezent:0.7', 0.15);
+    if(/energic|fain|super|misto|bine/i.test(l)) VVhiRaft.add('MOOD:energie:prezent:0.8', 0.1);
+    if(/urgent|repede|rapid|imediat/i.test(l)) VVhiRaft.add('MOOD:urgenta:prezent:0.8', 0.2);
+    if(/cafea|coffee|cappuccino|latte/i.test(l)) VVhiRaft.add('PREF:cafea:prezent:0.6', 0.1);
+    if(/copil|copii|bebe/i.test(l)) VVhiRaft.add('PERS:familie:copii:0.9', 0.3);
+    if(/parcare|masina|mașina/i.test(l)) VVhiRaft.add('HABIT:transport:masina:0.7', 0.15);
+  }
+
+  // ── Motor local — raspunsuri fara API ────────────────────
+  function vvhiThink(msg) {
+    var l = msg.toLowerCase().trim();
+    var name = localStorage.getItem('lea_name') || '';
+    var isCEO = VVhiRaft.isCEO();
+
+    // Salut
+    if(/^(salut|buna|bună|hello|hey|ce mai faci|servus|ciao|hi\b)/i.test(l)) {
+      if(isCEO) return 'Varu! Ce mai e prin ecosistem?';
+      var h = new Date().getHours();
+      var g = h<12?'dimineața':h<18?'ziua':'seara';
+      return 'Bună ' + g + (name?', '+name:'') + '! Cu ce te ajut?';
+    }
+
+    // Cine esti / ce esti
+    if(/cine ești|cine esti|ce ești|ce esti|despre tine|ești ai|esti ai|cum te chemi/i.test(l)) {
+      if(isCEO) return 'Varu, sunt Lea — interfața VV. Motorul din spate e VVhi, sistemul nostru propriu. Cresc cu fiecare conversație, rămân local pe device.';
+      return 'Sunt Lea — asistentul tău din ecosistemul VV. Îmi amintesc preferințele tale, rămân pe device-ul tău. Zero server, zero date personale trimise.';
+    }
+
+    // Status / test
+    if(/funcționezi|ești ok|esti ok|ești activ|esti activ|ești online|esti online/i.test(l)) {
+      var r = VVhiRaft.load();
+      var n = Object.keys(r.tokens||{}).length;
+      return (isCEO?'Varu, ':'') + 'Activă. ' + (n>0 ? n+' pattern'+(n>1?'uri':'')+' în memorie din conversațiile noastre.' : 'Prima noastră conversație — mă construiesc din ea.');
+    }
+
+    // Ora exacta
+    if(/cât e ceasul|ce ora|ce oră|cat e ceasul|ora exacta/i.test(l)) {
+      var now = new Date();
+      return 'E ' + now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0') + '.';
+    }
+
+    // Multumesc
+    if(/^(mulțumesc|multumesc|mersi|thanks|thx|ok mulțumesc|ok multumesc)/i.test(l)) {
+      return isCEO ? 'Cu plăcere, Varu.' : 'Cu plăcere' + (name?', '+name:'') + '.';
+    }
+
+    return null; // nu stiu — trece la Gemini/proxy
+  }
+
+  // ── Wrap processLea ───────────────────────────────────────
+  if(typeof processLea !== 'function') return;
+  var _orig = processLea;
+
+  processLea = async function(q) {
+    // Extrage pattern VVPL din fiecare mesaj
+    vvhiExtract(q);
+
+    // CEO login secret — tastat direct in chat
+    if(q.trim() === 'VV_CEO_ELENA_2026') {
+      localStorage.setItem('vvhi_id','VV_CEO_ELENA_2026');
+      localStorage.setItem('vvhi_role','CEO');
+      localStorage.setItem('vvhi_ceo_uid','VV_CEO_ELENA_2026');
+      try {
+        var lu2 = JSON.parse(localStorage.getItem('lea_u')||'{}');
+        if(lu2) { lu2.type='ceo'; localStorage.setItem('lea_u',JSON.stringify(lu2)); }
+      } catch(e) {}
+      await new Promise(function(r){ setTimeout(r,600); });
+      if(typeof addMsg==='function') addMsg('l','✓ CEO recunoscut. Bine ai venit, Cosmin. Ecosistemul e activ.');
+      return;
+    }
+
+    // Incearca raspuns local
+    var local = vvhiThink(q);
+    if(local !== null) {
+      var tk = typeof addMsg==='function' ? addMsg('l','',true) : null;
+      var pause = 80 + Math.min(q.length*0.4, 250) + Math.random()*80;
+      await new Promise(function(r){ setTimeout(r, pause); });
+      if(tk) tk.remove();
+      var amb = document.getElementById('amb');
+      if(amb) amb.className='';
+      if(typeof addMsg==='function') addMsg('l', local);
+      if(typeof _hist!=='undefined') {
+        _hist.push({r:'u',t:q}); _hist.push({r:'l',t:local});
+      }
+      if(typeof saveHistory==='function') saveHistory();
+      return;
+    }
+
+    // Fallback — motorul original (Gemini/proxy)
+    return _orig(q);
+  };
+
+  console.log('%cVVhi in LEA — activ', 'color:#10b981;font-weight:600');
+});
 </script>
-
-<nav class="vv-tabs">
-  <a href="lea.html" class="vv-tab active"><div class="vt-icon">◎</div><div class="vt-lbl">LEA</div></a>
-  <a href="vv-pulse.html" class="vv-tab"><div class="vt-icon">◉</div><div class="vt-lbl">PULSE</div></a>
-  <a href="#" onclick="openNow();return false;" class="vv-tab"><div class="vt-icon">⊡</div><div class="vt-lbl">NOW</div></a>
-  <a href="index.html" class="vv-tab"><div class="vt-icon">⊙</div><div class="vt-lbl">EU</div></a>
-</nav><!-- UPGRADE MODAL -->
-<div class="upg-overlay" id="upg-overlay" onclick="closeUpgrade()"></div>
-<div class="upg-modal" id="upg-modal">
-  <div class="upg-hex">⬡</div>
-  <div class="upg-lbl">LEA HOMME</div>
-  <div class="upg-tier">PRO</div>
-  <div class="upg-feat" id="upg-feat">Funcție avansată</div>
-  <div class="upg-price">9€ / lună</div>
-  <div class="upg-list">
-    <div class="upg-row">Moduri Profesionale — Artist, Creator, Business</div>
-    <div class="upg-row">LEA Workspace — spatiu de lucru profesional</div>
-    <div class="upg-row">VV Studio — workspace creativ AI-powered</div>
-    <div class="upg-row">Export conversații în PDF și Markdown</div>
-    <div class="upg-row">Analytics personal — patterns și statistici</div>
-    <div class="upg-row">Prioritate AI — model și viteză superioare</div>
-    <div class="upg-row">Procesare locală offline — fără internet</div>
-  </div>
-  <div class="upg-btns">
-    <button class="upg-free" onclick="closeUpgrade()">Rămân pe Free</button>
-    <button class="upg-pro" onclick="closeUpgrade()">Activează PRO →</button>
-  </div>
-  <div class="upg-note">Local-first · GDPR-ready · Constituția VV ART-6</div>
-</div><div class="now-ov" id="now-ov" onclick="if(event.target===this)closeNow()">
-  <div class="now-card">
-    <div class="now-ttl">VV NOW</div>
-    <div class="now-h">Caută inteligent</div>
-    <input class="now-inp" id="now-inp" placeholder="Ce cauti? Restaurant, parc, ruta, idee..." onkeydown="if(event.key==='Enter')submitNowLea()">
-    <div class="now-btns">
-      <button class="now-b-lea" onclick="submitNowLea()">◎ Intreaba LEA</button>
-      <button class="now-b-pulse" onclick="submitNowPulse()">◉ Cauta pe Pulse</button>
-      <button class="now-b-close" onclick="closeNow()">✕</button>
-    </div>
-  </div>
-</div>
-<script>
-function openNow(){ document.getElementById('now-ov').classList.add('open'); setTimeout(function(){var i=document.getElementById('now-inp');if(i)i.focus();},150); }
-function closeNow(){ document.getElementById('now-ov').classList.remove('open'); }
-function submitNowLea(){ var q=document.getElementById('now-inp').value.trim(); if(!q) return; closeNow(); var ibox=document.getElementById('ibox'); if(ibox){ibox.value=q; if(typeof enterChat==='function')enterChat(); if(typeof send==='function')setTimeout(send,200);} }
-function submitNowPulse(){ var q=document.getElementById('now-inp').value.trim(); if(!q) return; window.location.href='vv-pulse.html?search='+encodeURIComponent(q); }
-// Auto-update SW
-if('serviceWorker' in navigator){
-  navigator.serviceWorker.addEventListener('message',function(e){
-    if(e.data&&e.data.type==='SW_UPDATED') window.location.reload();
-  });
-}
-</script></body>
+</body>
 </html>
-
-
-
-
-
-
-
-
