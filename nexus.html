@@ -2108,123 +2108,115 @@ function vvhiRateCheck() {
   return true;
 }
 
-// ── Fallback inteligent fara Ollama ────────────────────────────────
-function vvhiFallback(msg) {
+// ── Extragere patternuri — pur JavaScript, zero apeluri externe ────
+function vvhiExtract(msg) {
+  var m = msg.toLowerCase();
+  var tokens = [];
+  if (/blocat|obosit|stresat|greu|nu pot|frustrat|suparat/.test(m)) tokens.push('MOOD:general:negativ:HI:TODAY');
+  if (/bine|super|misto|perfect|fericit|excelent|energic/.test(m)) tokens.push('MOOD:general:pozitiv:HI:TODAY');
+  if (/vreau|vreu|trebuie|am nevoie|doresc/.test(m)) tokens.push('WANT:general:activ:MED:NOW');
+  if (/lansare|lans|deploy|live|lansam/.test(m)) tokens.push('WANT:biz:lansare:HI:WEEK');
+  if (/cod|html|css|js|javascript|function|fix|bug|repara/.test(m)) tokens.push('WANT:biz:cod:HI:NOW');
+  if (/user|utilizator|client|produs/.test(m)) tokens.push('WANT:biz:useri:MED:WEEK');
+  if (/nu merge|nu functioneaza|eroare|error|problema|stricat/.test(m)) tokens.push('BLOCK:technical:eroare:HI:NOW');
+  if (/bani|finant|investit|cost|buget/.test(m)) tokens.push('WANT:financial:activ:MED:NOW');
+  if (tokens.length > 0) VVhiRaft.addTokens(tokens);
+}
+
+// ── Creierul VVhi — raspuns pur JS din logica + Raft ───────────────
+function vvhiThink(msg) {
+  var m = msg.toLowerCase().trim();
   var stats = VVhiRaft.getStats();
-  if (stats.total > 0) {
-    var top = VVhiRaft.getTop(3).map(function(p){ return p.token; }).join(', ');
-    return '🟡 VVhi activ | Raft: '+stats.total+' patternuri\nTop patternuri: '+top+'\n\nTinyLlama offline — porneste Ollama pentru raspunsuri complete:\n```\nollama run tinyllama\n```\nMessajul tau a fost inregistrat.';
-  }
-  return '🟡 VVhi pornit — TinyLlama nu e activ.\nPorneste Ollama:\n```\nollama run tinyllama\n```';
-}
+  var top = VVhiRaft.getTop(3);
+  var raft = VVhiRaft.load();
 
-// ── Extragere patternuri (silentios in fundal) ─────────────────────
-async function vvhiExtract(msg) {
-  try {
-    var r = await fetch('http://localhost:11434/api/generate', {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({
-        model:'tinyllama',
-        prompt:'Extrage patternuri VV Pattern Language din text. Format JSON: {"tokens":["CAT:sub:val:INT:TIMP"]}. Daca nu exista patternuri clare, returneaza {"tokens":[]}. Text: "'+msg.replace(/"/g,"'")+'"',
-        stream:false
-      })
-    });
-    if (r.ok) {
-      var d = await r.json();
-      var m = d.response.match(/\{"tokens"\s*:\s*\[.*?\]\}/s);
-      if (m) { var ex = JSON.parse(m[0]); if (ex.tokens && ex.tokens.length > 0) { VVhiRaft.addTokens(ex.tokens); } }
+  // Salutari
+  if (/^(bun[ae]?|salut|hei|hello|hey|ciao|alo|yo)[\s!?.]*$/.test(m)) {
+    var ora = new Date().getHours();
+    var salut = ora < 12 ? 'Buna dimineata' : ora < 18 ? 'Buna ziua' : 'Buna seara';
+    return salut + '. VVhi activ.'
+      + (stats.total > 0 ? ' Raft: ' + stats.total + ' patternuri.' : '')
+      + ' Cu ce lucram?';
+  }
+
+  // Identitate
+  if (/cine esti|ce esti|prezinta|despre tine|ce e vvhi/.test(m)) {
+    return 'Sunt VVhi — VV Hybrid Intelligence.\n\nNu sunt Gemini. Nu sunt ChatGPT. Sunt motorul construit de Cosmin Toma pentru ecosistemul VV Technologies.\n\nStiu ce mi s-a dat: arhitectura VV, Raftul tau personal, principiile fondatoare. Cresc cu fiecare interactiune. Zero cloud. Zero date trimise afara.';
+  }
+
+  // Status / stare
+  if (/toate bune|cum esti|status|ce mai|operational|functionez/.test(m)) {
+    return 'Operational.\n— Raft: ' + stats.total + ' patternuri (' + stats.active + ' active)\n— Decizii blocate: ' + stats.locked + '\n— Cloud AI: dezactivat\n— Motor: JavaScript pur, rulează pe device-ul tau\n\nCu ce lucram?';
+  }
+
+  // Raft / ce stii
+  if (/raft|patternuri|ce stii|ce ai invatat|memoria ta/.test(m)) {
+    if (top.length === 0) return 'Raftul e gol inca. Scrie-mi mai multe mesaje — incep sa invat patternurile tale din secunda 1.';
+    return 'Patternuri active in Raftul tau:\n'
+      + top.map(function(p, i) { return (i+1) + '. ' + p.token + ' — putere ' + Math.round(p.strength*100) + '%'; }).join('\n')
+      + '\n\nTotal: ' + stats.total + ' patternuri invatate.';
+  }
+
+  // VV Beta / Firebase / proiect tehnic
+  if (/vv beta|firebase|firestore|misiune|harta|insider|vv coin/.test(m)) {
+    return 'Context VV Beta activ.\n\nArhitectura: HTML+CSS+Vanilla JS+Firebase Firestore (vv-ep-beta).\nFisiere principale: index.html, vv-beta-app.js, vv-beta-style.css.\n\nCe vrei sa modificam sau sa construim?';
+  }
+
+  // Cod
+  if (/cod|html|css|javascript|function|buton|pagina|fisier/.test(m)) {
+    return 'Task tehnic. Specifica:\n1. Ce fisier (ex: lea.html, nexus.html)\n2. Ce trebuie modificat exact\n3. Unde in fisier\n\nDupa iti generez codul direct.';
+  }
+
+  // Decizii blocate
+  var locked = raft.decisions_locked || [];
+  for (var i = 0; i < locked.length; i++) {
+    if (m.indexOf(locked[i].toLowerCase().substring(0, 12)) > -1) {
+      return 'Aceasta decizie e blocata: "' + locked[i] + '".\nNu se rediscuta.';
     }
-  } catch(e) { /* silentios */ }
+  }
+
+  // Context din Raft disponibil
+  if (top.length > 0) {
+    return 'Am context din Raftul tau ('+ stats.total +' patternuri).\n\n'
+      + 'Top pattern activ: ' + top[0].token + ' (' + Math.round(top[0].strength*100) + '%)\n\n'
+      + 'Intrebare primita. Descrie mai detaliat ce ai nevoie si raspund direct.';
+  }
+
+  // Default
+  return 'VVhi a primit mesajul.\n\nRaft: ' + stats.total + ' patternuri. Motor: activ.\n\nFi mai specific si raspund direct — ce construim?';
 }
 
-// ── OVERRIDE callAI: Inlocuieste Gemini + Groq cu VVhi ────────────
+// ── OVERRIDE callAI — pur JavaScript, zero externe ────────────────
 async function callAI() {
-  // Freeze check
-  if (VVhiFrozen) {
-    addMsg('a', '🔴 VVhi inghetat. Activitate suspecta detectata. Reincarca pagina sau contacteaza CEO.');
-    G.busy = false; return;
-  }
-  if (!vvhiRateCheck()) {
-    addMsg('a', '🔴 Prea multe cereri. VVhi s-a inghetat automat. Reincarca pagina.');
-    G.busy = false; return;
-  }
+  if (VVhiFrozen) { addMsg('a','VVhi inghetat. Reincarca pagina.'); G.busy=false; return; }
+  if (!vvhiRateCheck()) { addMsg('a','Prea multe cereri. Asteapta 60s.'); G.busy=false; return; }
 
-  G.busy = true; setDot('bsy');
-  setStatus('VVhi 🟡');
-
+  G.busy = true; setDot('bsy'); setStatus('VVhi');
   var typEl = document.getElementById('typing');
   var sendBtn = document.getElementById('btn-send');
   if (typEl) typEl.style.display = 'block';
   if (sendBtn) sendBtn.disabled = true;
-  setFailover('VVhi proceseaza...');
 
   var lastMsg = G.msgs.length > 0 ? G.msgs[G.msgs.length-1].parts[0].text : '';
-  var raftCtx = VVhiRaft.assembleContext();
-  var projCtx = PROJ_CTX[G.proj] || PROJ_CTX.vv;
 
-  // Construieste prompt complet cu context VV + Raft personal
-  var conversatie = G.msgs.slice(-6).map(function(m){
-    return (m.role==='user' ? 'User: ' : 'VVhi: ') + m.parts[0].text;
-  }).join('\n');
+  // Extrage patternuri silentios
+  vvhiExtract(lastMsg);
 
-  var prompt = 'Esti VVhi (VV Hybrid Intelligence), asistentul AI personal al Arhitectului Cosmin Toma - VV Technologies.\n'
-    + 'Ton: direct, scurt, fara BS, ca un partener de business senior. Raspunde in romana.\n'
-    + 'Reguli: NU inventa date. NU repeta intrebarea. NU spune procente fictive. Cod functional din prima.\n\n'
-    + '=== CONTEXT VV ===\n' + CTX + '\n\n'
-    + '=== PROIECT ACTIV ===\n' + projCtx + '\n\n'
-    + (raftCtx ? '=== CONTEXT PERSONAL (Raft) ===\n' + raftCtx + '\n\n' : '')
-    + '=== CONVERSATIE ===\n' + conversatie + '\n\nVVhi:';
+  // Raspunde din logica proprie
+  var reply = vvhiThink(lastMsg);
 
-  var timeout = setTimeout(function() {
-    if (!G.busy) return;
-    G.busy = false;
-    if (typEl) typEl.style.display = 'none';
-    if (sendBtn) sendBtn.disabled = false;
-    setDot('on'); setStatus('VVhi ✓'); setFailover('');
-    addMsg('a', vvhiFallback(lastMsg));
-  }, 25000);
+  // Timp de procesare natural (60-180ms)
+  await new Promise(function(r){ setTimeout(r, 60 + Math.random()*120); });
 
-  try {
-    setFailover('TinyLlama local...');
-    var r = await fetch('http://localhost:11434/api/generate', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({
-        model: 'tinyllama',
-        prompt: prompt,
-        stream: false,
-        options: {temperature: 0.7, num_predict: 600}
-      })
-    });
-
-    clearTimeout(timeout);
-
-    if (!r.ok) throw new Error('Ollama status: ' + r.status);
-
-    var data = await r.json();
-    var reply = (data.response || '').trim();
-    if (!reply) throw new Error('Raspuns gol');
-
-    // Salveaza patternuri in Raft (silentios)
-    vvhiExtract(lastMsg);
-
-    G.msgs.push({role:'model', parts:[{text:reply}]});
-    processReply(reply);
-    if (typeof addDNA === 'function') addDNA(lastMsg.substring(0,60), 'vvhi', true);
-    if (typeof extractMemoryFromReply === 'function') extractMemoryFromReply(reply);
-
-  } catch(err) {
-    clearTimeout(timeout);
-    var fallback = vvhiFallback(lastMsg);
-    G.msgs.push({role:'model', parts:[{text:fallback}]});
-    processReply(fallback);
-    vvhiExtract(lastMsg);
-  }
+  G.msgs.push({role:'model', parts:[{text:reply}]});
+  processReply(reply);
+  if (typeof addDNA === 'function') addDNA(lastMsg.substring(0,60), 'vvhi', true);
+  if (typeof extractMemoryFromReply === 'function') extractMemoryFromReply(reply);
 
   G.busy = false;
   if (typEl) typEl.style.display = 'none';
   if (sendBtn) sendBtn.disabled = false;
-  setDot('on'); setStatus('VVhi ✓'); setFailover('');
+  setDot('on'); setStatus('VVhi'); setFailover('');
 }
 
 // ── Override qsend: fara check cheie Gemini ───────────────────────
