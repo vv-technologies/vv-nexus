@@ -215,11 +215,11 @@
 })();
 </script>
 
-<!-- ── VVHI MOTOR IN LEA — Stratul de Inteligenta ─────────── -->
+<!-- ── VVHI MOTOR IN LEA — Stratul de Inteligenta v2 ─────── -->
 <script>
 window.addEventListener('load', function() {
 
-  // ── Raft (memoria locala) ────────────────────────────────
+  // ── Raft ─────────────────────────────────────────────────
   var VVhiRaft = {
     key: 'vvhi_raft',
     load: function() {
@@ -234,9 +234,18 @@ window.addEventListener('load', function() {
       t.count++; t.strength = Math.min(1.0, t.strength+(str||0.1)); t.lastSeen = Date.now();
       this.save(r);
     },
-    isCEO: function() {
-      return localStorage.getItem('vvhi_role')==='CEO';
-    }
+    top: function(prefix, n) {
+      var r = this.load();
+      return Object.keys(r.tokens||{})
+        .filter(function(k){ return k.startsWith(prefix) && r.tokens[k].strength > 0.3; })
+        .sort(function(a,b){ return r.tokens[b].strength - r.tokens[a].strength; })
+        .slice(0, n||3);
+    },
+    personal: function() {
+      var r = this.load();
+      return Object.keys(r.tokens||{}).filter(function(k){ return r.tokens[k].source !== 'factory'; }).length;
+    },
+    isCEO: function() { return localStorage.getItem('vvhi_role')==='CEO'; }
   };
 
   // ── CEO auto-recognition ──────────────────────────────────
@@ -244,66 +253,136 @@ window.addEventListener('load', function() {
   if(savedUid === 'VV_CEO_ELENA_2026') {
     localStorage.setItem('vvhi_role','CEO');
     localStorage.setItem('vvhi_ceo_uid','VV_CEO_ELENA_2026');
-    // Actualizeaza si obiectul user din LEA
     try {
       var lu = JSON.parse(localStorage.getItem('lea_u')||'{}');
       if(lu && lu.vvid) { lu.type='ceo'; localStorage.setItem('lea_u',JSON.stringify(lu)); }
     } catch(e) {}
   }
 
-  // ── Pattern extraction (VVPL) ─────────────────────────────
-  function vvhiExtract(msg) {
-    var l = msg.toLowerCase();
-    ['pizza','burger','shaorma','sushi','kebab','paste','salata'].forEach(function(f) {
-      if(l.includes(f)) VVhiRaft.add('PREF:mancare:'+f+':0.6', 0.1);
-    });
-    if(/obosit|oboseala|stres|epuizat/i.test(l)) VVhiRaft.add('MOOD:oboseala:prezent:0.7', 0.15);
-    if(/energic|fain|super|misto|bine/i.test(l)) VVhiRaft.add('MOOD:energie:prezent:0.8', 0.1);
-    if(/urgent|repede|rapid|imediat/i.test(l)) VVhiRaft.add('MOOD:urgenta:prezent:0.8', 0.2);
-    if(/cafea|coffee|cappuccino|latte/i.test(l)) VVhiRaft.add('PREF:cafea:prezent:0.6', 0.1);
-    if(/copil|copii|bebe/i.test(l)) VVhiRaft.add('PERS:familie:copii:0.9', 0.3);
-    if(/parcare|masina|mașina/i.test(l)) VVhiRaft.add('HABIT:transport:masina:0.7', 0.15);
+  // ── Timp curent ───────────────────────────────────────────
+  function vvhiNow() {
+    var d = new Date(), h = d.getHours();
+    return {
+      h: h,
+      zi: ['duminica','luni','marti','miercuri','joi','vineri','sambata'][d.getDay()],
+      period: h<6?'noapte':h<12?'dimineata':h<17?'dupa_pranz':h<21?'seara':'noapte'
+    };
   }
 
-  // ── Motor local — raspunsuri fara API ────────────────────
+  // ── Citeste starea din Raft ───────────────────────────────
+  function vvhiCtx() {
+    var t = vvhiNow(), tokens = VVhiRaft.load().tokens || {};
+    return {
+      h: t.h, zi: t.zi, period: t.period,
+      lowEnergy: t.period==='dupa_pranz' || (t.zi==='luni' && t.period==='dimineata') || t.h>=23,
+      obosit: !!(tokens['MOOD:oboseala:prezent:0.7'] && tokens['MOOD:oboseala:prezent:0.7'].strength > 0.5),
+      energic: !!(tokens['MOOD:energie:prezent:0.8'] && tokens['MOOD:energie:prezent:0.8'].strength > 0.4),
+      areObiceiuriAzi: Object.keys(tokens).some(function(k){
+        return k.includes(':zi:' + t.zi) && tokens[k].source !== 'factory' && tokens[k].strength > 0.4;
+      }),
+      topMancare: VVhiRaft.top('PREF:mancare', 2).map(function(k){ return k.split(':')[2]; })
+    };
+  }
+
+  // ── Pattern extraction VVPL ──────────────────────────────
+  function vvhiExtract(msg) {
+    var l = msg.toLowerCase(), t = vvhiNow();
+    ['pizza','burger','shaorma','sushi','kebab','paste','salata','grill','mici','ciorba','sarmale'].forEach(function(f) {
+      if(l.includes(f)) VVhiRaft.add('PREF:mancare:'+f+':HI', 0.12);
+    });
+    if(/cafea|coffee|cappuccino|latte|espresso/.test(l)) VVhiRaft.add('PREF:bautura:cafea:HI:'+t.period, 0.12);
+    if(/obosit|oboseala|stres|epuizat|mort/.test(l)) {
+      VVhiRaft.add('MOOD:oboseala:prezent:0.7', 0.18);
+      VVhiRaft.add('MOOD:energy:'+t.zi+':LO', 0.15);
+    }
+    if(/energic|super|fain|misto|in forma/.test(l)) {
+      VVhiRaft.add('MOOD:energie:prezent:0.8', 0.12);
+      VVhiRaft.add('MOOD:energy:'+t.zi+':HI', 0.12);
+    }
+    if(/stresat|nervos|suparat|anxios/.test(l)) VVhiRaft.add('MOOD:stres:prezent:0.8', 0.2);
+    ['sala','alergat','fotbal','inot','yoga','tenis','baschet','ciclism'].forEach(function(s) {
+      if(l.includes(s)) {
+        VVhiRaft.add('HABIT:sport:'+s+':HI', 0.2);
+        VVhiRaft.add('HABIT:sport:'+s+':zi:'+t.zi, 0.25);
+      }
+    });
+    if(/mama|mamica/.test(l)) VVhiRaft.add('PERS:familie:mama:HI:ALWAYS', 0.2);
+    if(/tata/.test(l)) VVhiRaft.add('PERS:familie:tata:HI:ALWAYS', 0.2);
+    if(/sotia|nevasta|iubita|partener/.test(l)) VVhiRaft.add('PERS:relatii:partener:HI:ALWAYS', 0.25);
+    if(/copil|copii|bebe|fiu|fiica/.test(l)) VVhiRaft.add('PERS:familie:copii:HI:ALWAYS', 0.3);
+    if(/masina|mașina|parcare/.test(l)) VVhiRaft.add('HABIT:transport:masina:HI:DAILY', 0.15);
+    if(/urgent|repede|rapid|imediat/.test(l)) VVhiRaft.add('MOOD:urgenta:prezent:0.8', 0.2);
+  }
+
+  // ── Motor local — citeste Raftul, raspunde uman ──────────
   function vvhiThink(msg) {
     var l = msg.toLowerCase().trim();
-    var name = localStorage.getItem('lea_name') || '';
+    var name = localStorage.getItem('lea_name') || '', N = name ? ', ' + name : '';
     var isCEO = VVhiRaft.isCEO();
+    var ctx = vvhiCtx();
 
-    // Salut
-    if(/^(salut|buna|bună|hello|hey|ce mai faci|servus|ciao|hi\b)/i.test(l)) {
-      if(isCEO) return 'Varu! Ce mai e prin ecosistem?';
-      var h = new Date().getHours();
-      var g = h<12?'dimineața':h<18?'ziua':'seara';
-      return 'Bună ' + g + (name?', '+name:'') + '! Cu ce te ajut?';
+    // Salut — diferit dupa zi, ora, Raft
+    if(/^(salut|buna|bun[aă]|hello|hey|ce mai faci|servus|ciao|hi\b)/i.test(l)) {
+      if(isCEO) return 'Salut, Varu. ' + (ctx.zi==='luni'?'Luni. ':ctx.zi==='vineri'?'Vineri — gata. ':'') + 'Cu ce lucram?';
+      if(ctx.zi==='luni' && ctx.period==='dimineata') return 'Buna dimineata' + N + '. E luni, stiu. Cu ce te ajut?';
+      if(ctx.zi==='vineri' && ctx.period==='seara') return 'Buna seara' + N + '! Vineri in sfarsit. Ce iti trebuie?';
+      if(ctx.period==='dupa_pranz') return 'Buna' + N + '. Ora de dupa pranz — cu ce te ajut?';
+      if(ctx.h>=23) return 'Inca treaz' + N + '? Cu ce te ajut?';
+      if(ctx.obosit) return 'Buna' + N + '. Vad ca esti obosit. Cu ce pot ajuta?';
+      var g = ctx.h<12?'dimineata':ctx.h<18?'ziua':'seara';
+      return 'Buna ' + g + N + '! Cu ce te ajut?';
     }
 
-    // Cine esti / ce esti
-    if(/cine ești|cine esti|ce ești|ce esti|despre tine|ești ai|esti ai|cum te chemi/i.test(l)) {
-      if(isCEO) return 'Varu, sunt Lea — interfața VV. Motorul din spate e VVhi, sistemul nostru propriu. Cresc cu fiecare conversație, rămân local pe device.';
-      return 'Sunt Lea — asistentul tău din ecosistemul VV. Îmi amintesc preferințele tale, rămân pe device-ul tău. Zero server, zero date personale trimise.';
+    // Ce mai faci / cum esti
+    if(/ce mai faci|cum esti|cum ești|cum te simti|cum te simți/.test(l)) {
+      if(isCEO) return 'Lucrez, Varu. Tu?';
+      if(ctx.obosit) return 'Stiu ca ai fost obosit' + (ctx.areObiceiuriAzi?' — si azi ai avut program':'') + '. Cum e acum?';
+      if(ctx.energic) return 'Bine' + N + ' — vad ca esti in forma. Cu ce te ajut?';
+      if(ctx.zi==='luni') return 'E luni' + N + '. Cum pot ajuta?';
+      return 'Bine' + N + '. Tu?';
     }
 
-    // Status / test
-    if(/funcționezi|ești ok|esti ok|ești activ|esti activ|ești online|esti online/i.test(l)) {
-      var r = VVhiRaft.load();
-      var n = Object.keys(r.tokens||{}).length;
-      return (isCEO?'Varu, ':'') + 'Activă. ' + (n>0 ? n+' pattern'+(n>1?'uri':'')+' în memorie din conversațiile noastre.' : 'Prima noastră conversație — mă construiesc din ea.');
+    // Ce stie Lea despre mine — citeste Raftul personal
+    if(/ce stii despre mine|ce ai invatat|ce tii minte|ce iti amintesti/.test(l)) {
+      var tokens = VVhiRaft.load().tokens || {};
+      var personal = Object.keys(tokens).filter(function(k){ return tokens[k].source !== 'factory' && tokens[k].strength > 0.3; });
+      if(personal.length === 0) return 'Suntem la inceput' + N + '. Cu fiecare conversatie, raftul meu creste.';
+      var fapte = [];
+      if(ctx.topMancare.length > 0) fapte.push('iti place ' + ctx.topMancare.join(' si '));
+      if(tokens['PERS:familie:mama:HI:ALWAYS']) fapte.push('mama e importanta pentru tine');
+      if(tokens['PERS:familie:copii:HI:ALWAYS']) fapte.push('ai copii');
+      if(tokens['HABIT:transport:masina:HI:DAILY']) fapte.push('mergi cu masina');
+      var sporturi = personal.filter(function(k){ return k.startsWith('HABIT:sport') && !k.includes(':zi:'); }).map(function(k){ return k.split(':')[2]; });
+      if(sporturi.length > 0) fapte.push('faci ' + sporturi[0]);
+      return 'Stiu ca ' + (fapte.length>0 ? fapte.slice(0,3).join(', ')+'.' : personal.length+' lucruri sunt in memoria mea.') + ' Si tot mai invat.';
     }
 
-    // Ora exacta
-    if(/cât e ceasul|ce ora|ce oră|cat e ceasul|ora exacta/i.test(l)) {
-      var now = new Date();
-      return 'E ' + now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0') + '.';
+    // Cine esti
+    if(/cine esti|cine ești|ce esti|ce ești|despre tine|cum te chemi/.test(l)) {
+      if(isCEO) return 'Varu, sunt Lea. Motorul e VVhi — al nostru, construit de tine. Cresc din conversatii, raman local.';
+      var pers2 = VVhiRaft.personal();
+      return 'Sunt Lea' + N + '.' + (pers2>0 ? ' Stiu deja '+pers2+' lucruri despre tine.' : ' Ma construiesc din fiecare conversatie.') + ' Zero server, totul pe device-ul tau.';
+    }
+
+    // Status
+    if(/functionezi|esti ok|ești ok|esti activ|ești activ|esti online/.test(l)) {
+      var total = Object.keys(VVhiRaft.load().tokens||{}).length;
+      var pers3 = VVhiRaft.personal();
+      return (isCEO?'Varu, ':'') + 'Activa. ' + total + ' patternuri (' + pers3 + ' personale, ' + (total-pers3) + ' din fabrica).';
+    }
+
+    // Ora
+    if(/cat e ceasul|ce ora|cat e ora/.test(l)) {
+      var now2 = new Date();
+      return 'E ' + now2.getHours().toString().padStart(2,'0') + ':' + now2.getMinutes().toString().padStart(2,'0') + '.';
     }
 
     // Multumesc
-    if(/^(mulțumesc|multumesc|mersi|thanks|thx|ok mulțumesc|ok multumesc)/i.test(l)) {
-      return isCEO ? 'Cu plăcere, Varu.' : 'Cu plăcere' + (name?', '+name:'') + '.';
+    if(/^(multumesc|mersi|thanks|thx)/.test(l)) {
+      return isCEO ? 'Cu placere, Varu.' : 'Cu placere' + N + '.';
     }
 
-    return null; // nu stiu — trece la Gemini/proxy
+    return null;
   }
 
   // ── Wrap processLea ───────────────────────────────────────
@@ -311,10 +390,8 @@ window.addEventListener('load', function() {
   var _orig = processLea;
 
   processLea = async function(q) {
-    // Extrage pattern VVPL din fiecare mesaj
     vvhiExtract(q);
 
-    // CEO login secret — tastat direct in chat
     if(q.trim() === 'VV_CEO_ELENA_2026') {
       localStorage.setItem('vvhi_id','VV_CEO_ELENA_2026');
       localStorage.setItem('vvhi_role','CEO');
@@ -324,11 +401,10 @@ window.addEventListener('load', function() {
         if(lu2) { lu2.type='ceo'; localStorage.setItem('lea_u',JSON.stringify(lu2)); }
       } catch(e) {}
       await new Promise(function(r){ setTimeout(r,600); });
-      if(typeof addMsg==='function') addMsg('l','✓ CEO recunoscut. Bine ai venit, Cosmin. Ecosistemul e activ.');
+      if(typeof addMsg==='function') addMsg('l','CEO recunoscut. Bine ai venit, Cosmin.');
       return;
     }
 
-    // Incearca raspuns local
     var local = vvhiThink(q);
     if(local !== null) {
       var tk = typeof addMsg==='function' ? addMsg('l','',true) : null;
@@ -338,18 +414,15 @@ window.addEventListener('load', function() {
       var amb = document.getElementById('amb');
       if(amb) amb.className='';
       if(typeof addMsg==='function') addMsg('l', local);
-      if(typeof _hist!=='undefined') {
-        _hist.push({r:'u',t:q}); _hist.push({r:'l',t:local});
-      }
+      if(typeof _hist!=='undefined') { _hist.push({r:'u',t:q}); _hist.push({r:'l',t:local}); }
       if(typeof saveHistory==='function') saveHistory();
       return;
     }
 
-    // Fallback — motorul original (Gemini/proxy)
     return _orig(q);
   };
 
-  console.log('%cVVhi in LEA — activ', 'color:#10b981;font-weight:600');
+  console.log('%cVVhi LEA v2 — Raft activ', 'color:#10b981;font-weight:600');
 });
 </script>
 </body>
