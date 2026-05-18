@@ -2065,11 +2065,64 @@ var VVhiRaft = {
     }));
     console.log('%cVVhi: Device nou inregistrat. ID: ' + id, 'color:#D4AF37;font-weight:bold');
   }
-  // Activeaza VVhi — bypass verificare cheie Gemini (nu mai e necesara)
   if (!G.gk) G.gk = 'vvhi_local_active';
+  // CEO auto-recunoastere dupa ID
+  var savedId = localStorage.getItem('vvhi_id') || '';
+  if (savedId === 'VV_CEO_ELENA_2026') {
+    localStorage.setItem('vvhi_role', 'CEO');
+    localStorage.setItem('vvhi_ceo_uid', 'VV_CEO_ELENA_2026');
+  }
   var stats = VVhiRaft.getStats();
-  console.log('%cVVhi Engine v1.1 | First Feeling: ACTIV | Cloud AI: DEZACTIVAT | Raft: ' + stats.total + ' tokens', 'color:#D4AF37;font-weight:bold');
+  var isCEOnow = localStorage.getItem('vvhi_role') === 'CEO';
+  console.log('%cVVhi Engine v1.1 | ' + (isCEOnow ? '👑 CEO MODE' : 'USER MODE') + ' | Raft: ' + stats.total + ' tokens', 'color:#D4AF37;font-weight:bold');
+  // Indicator CEO vizual
+  if (isCEOnow) {
+    var dot = document.createElement('div');
+    dot.id = 'vvhi-ceo-dot';
+    dot.title = 'VVhi CEO Mode';
+    dot.style.cssText = 'position:fixed;bottom:12px;left:12px;width:8px;height:8px;border-radius:50%;background:#D4AF37;z-index:99999;box-shadow:0 0 6px #D4AF37;';
+    document.body.appendChild(dot);
+  }
 })();
+
+// ── CEO Login UI — discret, doar in Nexus ─────────────────────────
+function vvhiCEOLogin() {
+  var existing = document.getElementById('vvhi-login-box');
+  if (existing) { existing.remove(); return; }
+  var box = document.createElement('div');
+  box.id = 'vvhi-login-box';
+  box.style.cssText = 'position:fixed;bottom:40px;left:50%;transform:translateX(-50%);background:#0a0a0c;border:1px solid #D4AF37;border-radius:12px;padding:20px 24px;z-index:999999;min-width:280px;box-shadow:0 0 30px rgba(212,175,55,0.2);';
+  box.innerHTML = '<div style="color:#D4AF37;font-size:13px;margin-bottom:12px;letter-spacing:2px;">VVhi — CEO ACCESS</div>'
+    + '<input id="vvhi-ceo-input" type="password" placeholder="VV ID" autocomplete="off" style="width:100%;background:#050507;border:1px solid #333;color:#fff;padding:10px 14px;border-radius:8px;font-size:14px;outline:none;box-sizing:border-box;">'
+    + '<button onclick="vvhiCEOConfirm()" style="margin-top:10px;width:100%;background:#D4AF37;color:#050507;border:none;padding:10px;border-radius:8px;font-weight:700;cursor:pointer;font-size:13px;letter-spacing:1px;">ACTIVEAZĂ</button>';
+  document.body.appendChild(box);
+  setTimeout(function(){ var inp = document.getElementById('vvhi-ceo-input'); if(inp) inp.focus(); }, 100);
+}
+
+function vvhiCEOConfirm() {
+  var inp = document.getElementById('vvhi-ceo-input');
+  if (!inp) return;
+  var val = inp.value.trim();
+  if (val === 'VV_CEO_ELENA_2026') {
+    localStorage.setItem('vvhi_id', 'VV_CEO_ELENA_2026');
+    localStorage.setItem('vvhi_role', 'CEO');
+    localStorage.setItem('vvhi_ceo_uid', 'VV_CEO_ELENA_2026');
+    var box = document.getElementById('vvhi-login-box');
+    if (box) box.remove();
+    // Adauga dot auriu
+    var old = document.getElementById('vvhi-ceo-dot');
+    if (old) old.remove();
+    var dot = document.createElement('div');
+    dot.id = 'vvhi-ceo-dot';
+    dot.title = 'VVhi CEO Mode';
+    dot.style.cssText = 'position:fixed;bottom:12px;left:12px;width:8px;height:8px;border-radius:50%;background:#D4AF37;z-index:99999;box-shadow:0 0 6px #D4AF37;';
+    document.body.appendChild(dot);
+    addMsg('a', 'Buna, Varu. CEO mode activat. VVhi te recunoaste pe orice device cu acest ID.');
+  } else {
+    inp.style.borderColor = '#ff3b30';
+    setTimeout(function(){ inp.style.borderColor = '#333'; inp.value = ''; }, 1000);
+  }
+}
 
 // ── First Feeling — Sufletul lui VVhi ─────────────────────────────
 var VVhiFF = {
