@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ro">
 <head>
 <meta charset="UTF-8">
@@ -1992,6 +1992,252 @@ var rateLimiter = {
     }
 };
 
+
+
+// ═══════════════════════════════════════════════════════════════════
+// VVhi ENGINE v1.0 — VV Hybrid Intelligence
+// Motor local. Cloud AI DEZACTIVAT. Inlocuieste Gemini + Groq.
+// VV Technologies — Cosmin Toma — Mai 2026
+// ═══════════════════════════════════════════════════════════════════
+
+// ── Raft: Memoria lui VVhi ─────────────────────────────────────────
+var VVhiRaft = {
+  load: function() {
+    try { return JSON.parse(localStorage.getItem('vvhi_raft')||'{"tokens":{},"decisions_locked":[]}'); }
+    catch(e) { return {tokens:{},decisions_locked:[]}; }
+  },
+  save: function(r) {
+    r.last_updated = new Date().toISOString();
+    localStorage.setItem('vvhi_raft', JSON.stringify(r));
+  },
+  addToken: function(token) {
+    var r = this.load(); var now = new Date().toISOString();
+    if (!r.tokens[token]) r.tokens[token] = {occurrences:0, first_seen:now, last_seen:now, strength:1.0};
+    r.tokens[token].occurrences++;
+    r.tokens[token].last_seen = now;
+    r.tokens[token].strength = Math.min(1.0, r.tokens[token].strength + 0.1);
+    this.save(r);
+  },
+  addTokens: function(arr) { var self=this; arr.forEach(function(t){ self.addToken(t); }); },
+  getTop: function(n) {
+    var r = this.load();
+    return Object.keys(r.tokens||{})
+      .map(function(t){ return Object.assign({token:t}, r.tokens[t]); })
+      .filter(function(x){ return x.strength > 0.2; })
+      .sort(function(a,b){ return b.strength - a.strength; })
+      .slice(0, n||8);
+  },
+  assembleContext: function() {
+    var top = this.getTop(8); var r = this.load(); var lines = [];
+    if (top.length > 0) {
+      lines.push('PATTERNURI CUNOSCUTE:');
+      top.forEach(function(p){ lines.push('  '+p.token+' (putere:'+Math.round(p.strength*100)+'%, de '+p.occurrences+'x)'); });
+    }
+    if ((r.decisions_locked||[]).length > 0) {
+      lines.push('DECIZII BLOCATE (nu se rediscuta):');
+      r.decisions_locked.forEach(function(d){ lines.push('  - '+d); });
+    }
+    return lines.join('\n');
+  },
+  getStats: function() {
+    var r = this.load(); var t = Object.values(r.tokens||{});
+    return { total: t.length, active: t.filter(function(x){ return x.strength>0.5; }).length, locked: (r.decisions_locked||[]).length };
+  },
+  lockDecision: function(d) {
+    var r = this.load();
+    if (!r.decisions_locked) r.decisions_locked = [];
+    if (r.decisions_locked.indexOf(d) === -1) { r.decisions_locked.push(d); this.save(r); }
+  }
+};
+
+// ── Genesis: Pornire si Identitate ────────────────────────────────
+(function vvhiBoot() {
+  if (!localStorage.getItem('vvhi_id')) {
+    var id = 'VV_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2,7);
+    localStorage.setItem('vvhi_id', id);
+    localStorage.setItem('vvhi_raft', JSON.stringify({
+      userId: id, version: '1.0', created: new Date().toISOString(),
+      tokens: {}, decisions_locked: [
+        'Nu folosim Gemini sau Groq ca motor principal',
+        'VVhi nu e TinyLlama — TinyLlama e motor de limbaj temporar',
+        'Rafturile raman locale, nu se urca in cloud'
+      ]
+    }));
+    console.log('%cVVhi: Device nou inregistrat. ID: ' + id, 'color:#D4AF37;font-weight:bold');
+  }
+  // Activeaza VVhi — bypass verificare cheie Gemini (nu mai e necesara)
+  if (!G.gk) G.gk = 'vvhi_local_active';
+  var stats = VVhiRaft.getStats();
+  console.log('%cVVhi Engine v1.0 | Cloud AI: DEZACTIVAT | Raft: ' + stats.total + ' tokens | Decizii blocate: ' + stats.locked, 'color:#D4AF37;font-weight:bold');
+})();
+
+// ── Heartbeat: Starea motorului ────────────────────────────────────
+function vvhiHeartbeat() {
+  var stats = VVhiRaft.getStats();
+  var id = localStorage.getItem('vvhi_id') || 'necunoscut';
+  var freezeLog = [];
+  try { freezeLog = JSON.parse(localStorage.getItem('vvhi_freeze_log')||'[]'); } catch(e){}
+  console.table({
+    'Status': '🟢 ACTIV',
+    'Versiune': '1.0.0',
+    'ID Device': id.substring(0,20)+'...',
+    'Tokens Raft': stats.total + ' (activi: '+stats.active+')',
+    'Decizii Blocate': stats.locked,
+    'Cloud AI': 'DEZACTIVAT',
+    'Motor Local': 'TinyLlama via Ollama (localhost:11434)',
+    'Freeze Events': freezeLog.length
+  });
+  return stats;
+}
+
+// ── Freeze Protocol ────────────────────────────────────────────────
+var VVhiFrozen = false;
+var VVhiReqWindow = [];
+function vvhiRateCheck() {
+  var now = Date.now();
+  VVhiReqWindow = VVhiReqWindow.filter(function(t){ return now-t < 60000; });
+  VVhiReqWindow.push(now);
+  if (VVhiReqWindow.length > 50) {
+    VVhiFrozen = true;
+    var log = []; try { log = JSON.parse(localStorage.getItem('vvhi_freeze_log')||'[]'); } catch(e){}
+    log.push({reason:'RATE_LIMIT', timestamp:new Date().toISOString()});
+    localStorage.setItem('vvhi_freeze_log', JSON.stringify(log));
+    console.error('%cVVhi FREEZE: Rate limit depasit. CEO trebuie sa deblocheze.','color:red;font-weight:bold');
+    return false;
+  }
+  return true;
+}
+
+// ── Fallback inteligent fara Ollama ────────────────────────────────
+function vvhiFallback(msg) {
+  var stats = VVhiRaft.getStats();
+  if (stats.total > 0) {
+    var top = VVhiRaft.getTop(3).map(function(p){ return p.token; }).join(', ');
+    return '🟡 VVhi activ | Raft: '+stats.total+' patternuri\nTop patternuri: '+top+'\n\nTinyLlama offline — porneste Ollama pentru raspunsuri complete:\n```\nollama run tinyllama\n```\nMessajul tau a fost inregistrat.';
+  }
+  return '🟡 VVhi pornit — TinyLlama nu e activ.\nPorneste Ollama:\n```\nollama run tinyllama\n```';
+}
+
+// ── Extragere patternuri (silentios in fundal) ─────────────────────
+async function vvhiExtract(msg) {
+  try {
+    var r = await fetch('http://localhost:11434/api/generate', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model:'tinyllama',
+        prompt:'Extrage patternuri VV Pattern Language din text. Format JSON: {"tokens":["CAT:sub:val:INT:TIMP"]}. Daca nu exista patternuri clare, returneaza {"tokens":[]}. Text: "'+msg.replace(/"/g,"'")+'"',
+        stream:false
+      })
+    });
+    if (r.ok) {
+      var d = await r.json();
+      var m = d.response.match(/\{"tokens"\s*:\s*\[.*?\]\}/s);
+      if (m) { var ex = JSON.parse(m[0]); if (ex.tokens && ex.tokens.length > 0) { VVhiRaft.addTokens(ex.tokens); } }
+    }
+  } catch(e) { /* silentios */ }
+}
+
+// ── OVERRIDE callAI: Inlocuieste Gemini + Groq cu VVhi ────────────
+async function callAI() {
+  // Freeze check
+  if (VVhiFrozen) {
+    addMsg('a', '🔴 VVhi inghetat. Activitate suspecta detectata. Reincarca pagina sau contacteaza CEO.');
+    G.busy = false; return;
+  }
+  if (!vvhiRateCheck()) {
+    addMsg('a', '🔴 Prea multe cereri. VVhi s-a inghetat automat. Reincarca pagina.');
+    G.busy = false; return;
+  }
+
+  G.busy = true; setDot('bsy');
+  setStatus('VVhi 🟡');
+
+  var typEl = document.getElementById('typing');
+  var sendBtn = document.getElementById('btn-send');
+  if (typEl) typEl.style.display = 'block';
+  if (sendBtn) sendBtn.disabled = true;
+  setFailover('VVhi proceseaza...');
+
+  var lastMsg = G.msgs.length > 0 ? G.msgs[G.msgs.length-1].parts[0].text : '';
+  var raftCtx = VVhiRaft.assembleContext();
+  var projCtx = PROJ_CTX[G.proj] || PROJ_CTX.vv;
+
+  // Construieste prompt complet cu context VV + Raft personal
+  var conversatie = G.msgs.slice(-6).map(function(m){
+    return (m.role==='user' ? 'User: ' : 'VVhi: ') + m.parts[0].text;
+  }).join('\n');
+
+  var prompt = 'Esti VVhi (VV Hybrid Intelligence), asistentul AI personal al Arhitectului Cosmin Toma - VV Technologies.\n'
+    + 'Ton: direct, scurt, fara BS, ca un partener de business senior. Raspunde in romana.\n'
+    + 'Reguli: NU inventa date. NU repeta intrebarea. NU spune procente fictive. Cod functional din prima.\n\n'
+    + '=== CONTEXT VV ===\n' + CTX + '\n\n'
+    + '=== PROIECT ACTIV ===\n' + projCtx + '\n\n'
+    + (raftCtx ? '=== CONTEXT PERSONAL (Raft) ===\n' + raftCtx + '\n\n' : '')
+    + '=== CONVERSATIE ===\n' + conversatie + '\n\nVVhi:';
+
+  var timeout = setTimeout(function() {
+    if (!G.busy) return;
+    G.busy = false;
+    if (typEl) typEl.style.display = 'none';
+    if (sendBtn) sendBtn.disabled = false;
+    setDot('on'); setStatus('VVhi ✓'); setFailover('');
+    addMsg('a', vvhiFallback(lastMsg));
+  }, 25000);
+
+  try {
+    setFailover('TinyLlama local...');
+    var r = await fetch('http://localhost:11434/api/generate', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        model: 'tinyllama',
+        prompt: prompt,
+        stream: false,
+        options: {temperature: 0.7, num_predict: 600}
+      })
+    });
+
+    clearTimeout(timeout);
+
+    if (!r.ok) throw new Error('Ollama status: ' + r.status);
+
+    var data = await r.json();
+    var reply = (data.response || '').trim();
+    if (!reply) throw new Error('Raspuns gol');
+
+    // Salveaza patternuri in Raft (silentios)
+    vvhiExtract(lastMsg);
+
+    G.msgs.push({role:'model', parts:[{text:reply}]});
+    processReply(reply);
+    if (typeof addDNA === 'function') addDNA(lastMsg.substring(0,60), 'vvhi', true);
+    if (typeof extractMemoryFromReply === 'function') extractMemoryFromReply(reply);
+
+  } catch(err) {
+    clearTimeout(timeout);
+    var fallback = vvhiFallback(lastMsg);
+    G.msgs.push({role:'model', parts:[{text:fallback}]});
+    processReply(fallback);
+    vvhiExtract(lastMsg);
+  }
+
+  G.busy = false;
+  if (typEl) typEl.style.display = 'none';
+  if (sendBtn) sendBtn.disabled = false;
+  setDot('on'); setStatus('VVhi ✓'); setFailover('');
+}
+
+// ── Override qsend: fara check cheie Gemini ───────────────────────
+function qsend(txt) {
+  var ta = document.getElementById('inp-msg');
+  if (ta) ta.value = txt;
+  doSend();
+}
+
+// Expune Heartbeat pentru CEO in consola browser
+window.vvhiStatus = function() { return vvhiHeartbeat(); };
+window.vvhiRaft = VVhiRaft;
+console.log('%c[VVhi] Comenzi CEO disponibile: vvhiStatus() | vvhiRaft.getTop() | vvhiRaft.lockDecision("text")','color:#D4AF37');
 
 </script>
 </body>
