@@ -314,6 +314,49 @@ window.addEventListener('load', function() {
     if(/urgent|repede|rapid|imediat/.test(l)) VVhiRaft.add('MOOD:urgenta:prezent:0.8', 0.2);
   }
 
+  // ── Proactiv — anticipeaza din Raft fara sa fie intrebat ──
+  function vvhiProactive() {
+    var ctx = vvhiCtx();
+    var tokens = VVhiRaft.load().tokens || {};
+
+    // Sport azi? — HABIT:sport:sala:zi:joi
+    var sportAzi = Object.keys(tokens).filter(function(k) {
+      return k.indexOf('HABIT:sport:') === 0 && k.indexOf(':zi:' + ctx.zi) !== -1 && tokens[k].strength > 0.35;
+    });
+    if(sportAzi.length > 0) {
+      var sp = sportAzi[0].split(':')[2];
+      return 'Ai ' + sp + ' azi, nu?';
+    }
+
+    // Pranz — e 13-14
+    if(ctx.h >= 13 && ctx.h < 15) {
+      var pr = tokens['HABIT:eat:pranz:MED:AFT'];
+      if(pr && pr.strength > 0.4) return 'Mananci ceva la pranz?';
+    }
+
+    // Mama — vineri seara
+    if(ctx.zi === 'vineri' && ctx.period === 'seara' && tokens['PERS:familie:mama:HI:ALWAYS']) {
+      return 'Suni-o pe mama diseara?';
+    }
+
+    // Cafea dimineata
+    if(ctx.period === 'dimineata' && ctx.h >= 7 && ctx.h < 10) {
+      var cf = tokens['HABIT:eat:cafea:HI:MORN'] || tokens['TIME:routine:cafea:HI:MORN'];
+      if(cf && cf.strength > 0.5) return 'Ai cafeaua?';
+    }
+
+    // Somnolenta dupa pranz — dar numai daca nu a mai zis azi
+    if(ctx.period === 'dupa_pranz' && ctx.h >= 14 && ctx.h < 16) {
+      var lastSomn = parseInt(localStorage.getItem('vvhi_last_somn') || '0');
+      if(Date.now() - lastSomn > 3 * 3600 * 1000) {
+        localStorage.setItem('vvhi_last_somn', Date.now());
+        return 'E ' + ctx.h + ':00. Stiu — somnolenta de dupa masa. Ce ai nevoie?';
+      }
+    }
+
+    return null;
+  }
+
   // ── Motor local — citeste Raftul, raspunde uman ──────────
   function vvhiThink(msg) {
     var l = msg.toLowerCase().trim();
@@ -321,16 +364,17 @@ window.addEventListener('load', function() {
     var isCEO = VVhiRaft.isCEO();
     var ctx = vvhiCtx();
 
-    // Salut — diferit dupa zi, ora, Raft
-    if(/^(salut|buna|bun[aă]|hello|hey|ce mai faci|servus|ciao|hi\b)/i.test(l)) {
-      if(isCEO) return 'Salut, Varu. ' + (ctx.zi==='luni'?'Luni. ':ctx.zi==='vineri'?'Vineri — gata. ':'') + 'Cu ce lucram?';
-      if(ctx.zi==='luni' && ctx.period==='dimineata') return 'Buna dimineata' + N + '. E luni, stiu. Cu ce te ajut?';
-      if(ctx.zi==='vineri' && ctx.period==='seara') return 'Buna seara' + N + '! Vineri in sfarsit. Ce iti trebuie?';
-      if(ctx.period==='dupa_pranz') return 'Buna' + N + '. Ora de dupa pranz — cu ce te ajut?';
-      if(ctx.h>=23) return 'Inca treaz' + N + '? Cu ce te ajut?';
-      if(ctx.obosit) return 'Buna' + N + '. Vad ca esti obosit. Cu ce pot ajuta?';
+    // Salut — diferit dupa zi, ora, Raft + proactive
+    if(/^(salut|buna|bun[aă]|hello|hey|servus|ciao|hi\b)/i.test(l)) {
+      var pro = vvhiProactive();
+      if(isCEO) return 'Salut, Varu. ' + (ctx.zi==='luni'?'Luni. ':ctx.zi==='vineri'?'Vineri — gata. ':'') + (pro || 'Cu ce lucram?');
+      if(ctx.h>=23) return 'Inca treaz' + N + '? ' + (pro || 'Cu ce te ajut?');
+      if(ctx.obosit) return 'Buna' + N + '. Vad ca esti obosit. ' + (pro || 'Cu ce pot ajuta?');
+      if(ctx.zi==='luni' && ctx.period==='dimineata') return 'Buna dimineata' + N + '. E luni, stiu. ' + (pro || 'Cu ce te ajut?');
+      if(ctx.zi==='vineri' && ctx.period==='seara') return 'Buna seara' + N + '! Vineri in sfarsit. ' + (pro || 'Ce iti trebuie?');
+      if(ctx.period==='dupa_pranz') return 'Buna' + N + '. ' + (pro || 'Ora de dupa pranz — cu ce te ajut?');
       var g = ctx.h<12?'dimineata':ctx.h<18?'ziua':'seara';
-      return 'Buna ' + g + N + '! Cu ce te ajut?';
+      return 'Buna ' + g + N + '! ' + (pro || 'Cu ce te ajut?');
     }
 
     // Ce mai faci / cum esti
@@ -380,6 +424,12 @@ window.addEventListener('load', function() {
     // Multumesc
     if(/^(multumesc|mersi|thanks|thx)/.test(l)) {
       return isCEO ? 'Cu placere, Varu.' : 'Cu placere' + N + '.';
+    }
+
+    // Mesaj scurt si vag — nimic specific, dar poate Raftul are ceva
+    if(l.length < 25 && !/\?/.test(l) && !/\s{2,}/.test(l)) {
+      var pro3 = vvhiProactive();
+      if(pro3) return pro3;
     }
 
     return null;
