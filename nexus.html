@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ro">
 <head>
 <meta charset="UTF-8">
@@ -2079,9 +2079,16 @@ var VVhiRaft = {
   if (isCEOnow) {
     var dot = document.createElement('div');
     dot.id = 'vvhi-ceo-dot';
-    dot.title = 'VVhi CEO Mode';
-    dot.style.cssText = 'position:fixed;bottom:12px;left:12px;width:8px;height:8px;border-radius:50%;background:#D4AF37;z-index:99999;box-shadow:0 0 6px #D4AF37;';
+    dot.title = '→ VVhi Monitor';
+    dot.style.cssText = 'position:fixed;bottom:12px;left:12px;width:8px;height:8px;border-radius:50%;background:#D4AF37;z-index:99999;box-shadow:0 0 6px #D4AF37;cursor:pointer;';
+    dot.onclick = function(){ window.location.href='vvhi_monitor.html'; };
     document.body.appendChild(dot);
+    var monLnk = document.createElement('a');
+    monLnk.id = 'vvhi-mon-lnk';
+    monLnk.href = 'vvhi_monitor.html';
+    monLnk.textContent = 'Monitor';
+    monLnk.style.cssText = 'position:fixed;bottom:9px;left:26px;font-size:9px;color:rgba(212,175,55,0.45);text-decoration:none;letter-spacing:1px;z-index:99999;font-family:-apple-system,sans-serif;';
+    document.body.appendChild(monLnk);
   }
 })();
 
@@ -2112,11 +2119,20 @@ function vvhiCEOConfirm() {
     // Adauga dot auriu
     var old = document.getElementById('vvhi-ceo-dot');
     if (old) old.remove();
+    var oldLnk = document.getElementById('vvhi-mon-lnk');
+    if (oldLnk) oldLnk.remove();
     var dot = document.createElement('div');
     dot.id = 'vvhi-ceo-dot';
-    dot.title = 'VVhi CEO Mode';
-    dot.style.cssText = 'position:fixed;bottom:12px;left:12px;width:8px;height:8px;border-radius:50%;background:#D4AF37;z-index:99999;box-shadow:0 0 6px #D4AF37;';
+    dot.title = '→ VVhi Monitor';
+    dot.style.cssText = 'position:fixed;bottom:12px;left:12px;width:8px;height:8px;border-radius:50%;background:#D4AF37;z-index:99999;box-shadow:0 0 6px #D4AF37;cursor:pointer;';
+    dot.onclick = function(){ window.location.href='vvhi_monitor.html'; };
     document.body.appendChild(dot);
+    var monLnk2 = document.createElement('a');
+    monLnk2.id = 'vvhi-mon-lnk';
+    monLnk2.href = 'vvhi_monitor.html';
+    monLnk2.textContent = 'Monitor';
+    monLnk2.style.cssText = 'position:fixed;bottom:9px;left:26px;font-size:9px;color:rgba(212,175,55,0.45);text-decoration:none;letter-spacing:1px;z-index:99999;font-family:-apple-system,sans-serif;';
+    document.body.appendChild(monLnk2);
     addMsg('a', 'Buna, Varu. CEO mode activat. VVhi te recunoaste pe orice device cu acest ID.');
   } else {
     inp.style.borderColor = '#ff3b30';
