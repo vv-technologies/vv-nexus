@@ -150,10 +150,25 @@
     padding: 24px;
   }
 
-  canvas#ekg {
+  /* EKG pur CSS — zero CPU */
+  .ekg-wrap {
     width: 100%;
     height: 60px;
-    display: block;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .ekg-line {
+    position: absolute;
+    top: 0; left: 0;
+    width: 200%;
+    height: 100%;
+    animation: ekg-scroll 4s linear infinite;
+  }
+
+  @keyframes ekg-scroll {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
   }
 
   /* Log */
@@ -298,7 +313,18 @@
 <div class="ekg-section">
   <div class="ekg-header">Puls VVhi</div>
   <div class="ekg-card glass">
-    <canvas id="ekg" height="60"></canvas>
+    <div class="ekg-wrap">
+      <svg class="ekg-line" viewBox="0 0 1200 60" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <polyline
+          points="0,30 60,30 70,30 75,10 80,50 85,15 90,45 95,30 150,30 210,30 215,28 220,32 225,30 280,30 340,30 345,10 350,50 355,15 360,45 365,30 420,30 480,30 485,28 490,32 495,30 550,30 610,30 615,10 620,50 625,15 630,45 635,30 690,30 750,30 755,28 760,32 765,30 820,30 880,30 885,10 890,50 895,15 900,45 905,30 960,30 1020,30 1025,28 1030,32 1035,30 1090,30 1150,30 1155,10 1160,50 1165,15 1170,45 1175,30 1200,30"
+          fill="none"
+          stroke="rgba(255,255,255,0.45)"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </svg>
+    </div>
   </div>
 </div>
 
@@ -391,52 +417,6 @@ function renderStats() {
   }
 }
 
-// ── EKG ───────────────────────────────────────────────────────────
-var ekgCanvas = document.getElementById('ekg');
-var ekgCtx = ekgCanvas.getContext('2d');
-var ekgData = [];
-var ekgFrame = 0;
-
-function resizeEkg() {
-  ekgCanvas.width = ekgCanvas.offsetWidth;
-  ekgCanvas.height = 60;
-}
-
-function drawEkg() {
-  resizeEkg();
-  var w = ekgCanvas.width, h = ekgCanvas.height;
-  ekgCtx.clearRect(0, 0, w, h);
-
-  ekgFrame++;
-  var val = 0.5;
-  var mod = ekgFrame % 60;
-  if (mod === 0) val = 0.1;
-  else if (mod === 5) val = 0.9;
-  else if (mod === 8) val = 0.2;
-  else if (mod === 10) val = 0.85;
-  else if (mod === 13) val = 0.5;
-  else val = 0.5 + (Math.random() - 0.5) * 0.04;
-
-  ekgData.push(val);
-  if (ekgData.length > w) ekgData.shift();
-
-  ekgCtx.beginPath();
-  ekgCtx.strokeStyle = 'rgba(255,255,255,0.5)';
-  ekgCtx.lineWidth = 1.5;
-  ekgCtx.shadowColor = 'rgba(255,255,255,0.2)';
-  ekgCtx.shadowBlur = 4;
-
-  for (var i = 0; i < ekgData.length; i++) {
-    var x = i;
-    var y = h - (ekgData[i] * h * 0.8) - h * 0.1;
-    if (i === 0) ekgCtx.moveTo(x, y);
-    else ekgCtx.lineTo(x, y);
-  }
-  ekgCtx.stroke();
-
-  requestAnimationFrame(drawEkg);
-}
-
 // ── Log ───────────────────────────────────────────────────────────
 function addLog(msg, isCEO) {
   var logEl = document.getElementById('log-list');
@@ -452,7 +432,6 @@ function addLog(msg, isCEO) {
 
 // ── Init ──────────────────────────────────────────────────────────
 renderStats();
-drawEkg();
 
 var role = localStorage.getItem('vvhi_role') || 'user';
 addLog('Monitor pornit. Role: ' + role, role === 'CEO');
