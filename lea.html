@@ -533,9 +533,36 @@ window.addEventListener('load', function() {
       return 'E ' + now2.getHours().toString().padStart(2,'0') + ':' + now2.getMinutes().toString().padStart(2,'0') + '.';
     }
 
-    // Daily Brief — ce fac azi, cum e ziua
+    // Daily Brief — ce fac azi
     if(/ce fac azi|cum e azi|ziua mea|programul meu|ce am azi|cum imi organizez|brief/.test(l)) {
       return vvhiDailyBrief();
+    }
+
+    // Maine — ce fac maine
+    if(/ce fac maine|cum e maine|maine ce|planuri maine/.test(l)) {
+      var dm = new Date(); dm.setDate(dm.getDate()+1);
+      var zileN = ['duminica','luni','marti','miercuri','joi','vineri','sambata'];
+      var ziM = zileN[dm.getDay()];
+      var ZIM = {luni:'Luni',marti:'Marti',miercuri:'Miercuri',joi:'Joi',vineri:'Vineri',sambata:'Sambata',duminica:'Duminica'};
+      var tokM = VVhiRaft.load().tokens || {}, pM = [ZIM[ziM] + ' — maine.'];
+      var spM = Object.keys(tokM).filter(function(k){
+        return k.indexOf('HABIT:sport:')===0 && k.indexOf(':zi:'+ziM)!==-1 && tokM[k].strength>0.3;
+      });
+      if(spM.length) pM.push('Ai '+spM[0].split(':')[2]+'.');
+      if(tokM['BLOCK:energy:dupa_pranz:LO:AFT']) pM.push('La 14 scade — planifica dimineata.');
+      if(ziM==='sambata'||ziM==='duminica') pM.push('Weekend — reincarca.');
+      return pM.join(' ');
+    }
+
+    // Statement — "am fost la sala", "am mancat", "am lucrat"
+    if(/^(am |azi am |am fost |azi am fost )/.test(l)) {
+      var actS = '';
+      if(/sala|alergat|sport|fotbal|yoga|inot|tenis/.test(l)) actS = 'sportul';
+      else if(/mancat|pizza|burger|shaorma|sushi/.test(l)) actS = 'mancarea';
+      else if(/lucrat|munca|proiect|sedinta/.test(l)) actS = 'munca';
+      else if(/mama|tata|familie/.test(l)) actS = 'familia';
+      if(actS) return 'Notat' + N + '. Am actualizat raftul pentru ' + actS + '.';
+      return 'Notat' + N + '.';
     }
 
     // Memorie — cum eram intr-o zi a saptamanii
@@ -636,7 +663,10 @@ window.addEventListener('load', function() {
       return;
     }
 
-    return _orig(q);
+    try { return await _orig(q); } catch(e) {
+      var name2 = localStorage.getItem('lea_name')||'', N2 = name2?', '+name2:'';
+      if(typeof addMsg==='function') addMsg('l', 'Lucrez local' + N2 + '. Nu am conexiune acum, dar raftul meu e activ.');
+    }
   };
 
   console.log('%cVVhi LEA v3 — Raft + Memory activ', 'color:#10b981;font-weight:600');
