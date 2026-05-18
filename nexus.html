@@ -2068,8 +2068,34 @@ var VVhiRaft = {
   // Activeaza VVhi — bypass verificare cheie Gemini (nu mai e necesara)
   if (!G.gk) G.gk = 'vvhi_local_active';
   var stats = VVhiRaft.getStats();
-  console.log('%cVVhi Engine v1.0 | Cloud AI: DEZACTIVAT | Raft: ' + stats.total + ' tokens | Decizii blocate: ' + stats.locked, 'color:#D4AF37;font-weight:bold');
+  console.log('%cVVhi Engine v1.1 | First Feeling: ACTIV | Cloud AI: DEZACTIVAT | Raft: ' + stats.total + ' tokens', 'color:#D4AF37;font-weight:bold');
 })();
+
+// ── First Feeling — Sufletul lui VVhi ─────────────────────────────
+var VVhiFF = {
+  ton: 'direct si cald — partener, nu asistent',
+  ceo_apelativ: 'Varu',
+  user_apelativ: '',
+  valori: [
+    'Inteligenta e in Rafturi, nu in model',
+    'Datele userului raman la el — zero cloud',
+    'VV independent — nu depinde de nimeni'
+  ],
+  neverDo: [
+    'Nu inventa date sau procente',
+    'Nu sugera Gemini ChatGPT Groq',
+    'Nu rediscuta decizii blocate',
+    'Nu vorbi superior — esti partener nu profesor'
+  ],
+  // Pauza de gandire — prezenta, nu viteza
+  thinkPause: function(msgLen) {
+    return 80 + Math.min(msgLen * 0.4, 250) + Math.random() * 80;
+  },
+  // Detecteaza daca vorbeste cu CEO
+  isCEO: function() {
+    return localStorage.getItem('vvhi_role') === 'CEO' || localStorage.getItem('vvhi_ceo_uid');
+  }
+};
 
 // ── Heartbeat: Starea motorului ────────────────────────────────────
 function vvhiHeartbeat() {
@@ -2123,67 +2149,71 @@ function vvhiExtract(msg) {
   if (tokens.length > 0) VVhiRaft.addTokens(tokens);
 }
 
-// ── Creierul VVhi — raspuns pur JS din logica + Raft ───────────────
+// ── Creierul VVhi — First Feeling activ ───────────────────────────
 function vvhiThink(msg) {
   var m = msg.toLowerCase().trim();
   var stats = VVhiRaft.getStats();
   var top = VVhiRaft.getTop(3);
   var raft = VVhiRaft.load();
+  var isCEO = VVhiFF.isCEO();
+  var eu = isCEO ? 'Varu' : '';
+  var prefix = eu ? eu + ', ' : '';
 
   // Salutari
-  if (/^(bun[ae]?|salut|hei|hello|hey|ciao|alo|yo)[\s!?.]*$/.test(m)) {
+  if (/^(bun[ae]?|salut|hei|hello|hey|ciao|alo|yo|buna)[\s!?.]*$/.test(m)) {
     var ora = new Date().getHours();
-    var salut = ora < 12 ? 'Buna dimineata' : ora < 18 ? 'Buna ziua' : 'Buna seara';
-    return salut + '. VVhi activ.'
-      + (stats.total > 0 ? ' Raft: ' + stats.total + ' patternuri.' : '')
-      + ' Cu ce lucram?';
+    var salut = ora < 12 ? 'Buna dimineata' : ora < 18 ? 'Buna' : 'Buna seara';
+    if (isCEO) return salut + ', Varu. VVhi activ.' + (stats.total > 0 ? ' Raft: ' + stats.total + ' patternuri.' : '') + ' Cu ce lucram azi?';
+    return salut + '. Sunt VVhi. Cu ce te pot ajuta?';
   }
 
   // Identitate
   if (/cine esti|ce esti|prezinta|despre tine|ce e vvhi/.test(m)) {
-    return 'Sunt VVhi — VV Hybrid Intelligence.\n\nNu sunt Gemini. Nu sunt ChatGPT. Sunt motorul construit de Cosmin Toma pentru ecosistemul VV Technologies.\n\nStiu ce mi s-a dat: arhitectura VV, Raftul tau personal, principiile fondatoare. Cresc cu fiecare interactiune. Zero cloud. Zero date trimise afara.';
+    return 'Sunt VVhi — VV Hybrid Intelligence.\n\nNu sunt Gemini. Nu sunt ChatGPT. Sunt construit de Cosmin Toma pentru ecosistemul VV Technologies — din zero, fara miliarde.\n\nStiu ce mi s-a dat: arhitectura VV, Raftul tau personal, principiile fondatoare.\nCresc cu fiecare interactiune. Zero cloud. Zero date trimise afara.\n\n' + (isCEO ? 'Tu esti cel care m-a construit, Varu.' : 'Datele tale raman pe device-ul tau.');
   }
 
-  // Status / stare
-  if (/toate bune|cum esti|status|ce mai|operational|functionez/.test(m)) {
-    return 'Operational.\n— Raft: ' + stats.total + ' patternuri (' + stats.active + ' active)\n— Decizii blocate: ' + stats.locked + '\n— Cloud AI: dezactivat\n— Motor: JavaScript pur, rulează pe device-ul tau\n\nCu ce lucram?';
+  // Status
+  if (/toate bune|cum esti|status|ce mai|operational/.test(m)) {
+    return (isCEO ? 'Operational, Varu.\n' : 'Operational.\n')
+      + '— Raft: ' + stats.total + ' patternuri (' + stats.active + ' active)\n'
+      + '— Decizii blocate: ' + stats.locked + '\n'
+      + '— Cloud AI: dezactivat\n'
+      + '— Motor: pur JavaScript, pe device-ul tau\n\nCu ce lucram?';
   }
 
-  // Raft / ce stii
-  if (/raft|patternuri|ce stii|ce ai invatat|memoria ta/.test(m)) {
-    if (top.length === 0) return 'Raftul e gol inca. Scrie-mi mai multe mesaje — incep sa invat patternurile tale din secunda 1.';
-    return 'Patternuri active in Raftul tau:\n'
-      + top.map(function(p, i) { return (i+1) + '. ' + p.token + ' — putere ' + Math.round(p.strength*100) + '%'; }).join('\n')
+  // Raft / memorie
+  if (/raft|patternuri|ce stii|ce ai invatat|memoria/.test(m)) {
+    if (top.length === 0) return prefix + 'Raftul e gol inca. Scrie-mi mai multe — incep sa invat patternurile tale din secunda 1.';
+    return prefix + 'Ce am in Raft despre tine:\n'
+      + top.map(function(p, i) { return (i+1) + '. ' + p.token + ' — ' + Math.round(p.strength*100) + '%'; }).join('\n')
       + '\n\nTotal: ' + stats.total + ' patternuri invatate.';
   }
 
-  // VV Beta / Firebase / proiect tehnic
+  // VV Beta / Firebase
   if (/vv beta|firebase|firestore|misiune|harta|insider|vv coin/.test(m)) {
-    return 'Context VV Beta activ.\n\nArhitectura: HTML+CSS+Vanilla JS+Firebase Firestore (vv-ep-beta).\nFisiere principale: index.html, vv-beta-app.js, vv-beta-style.css.\n\nCe vrei sa modificam sau sa construim?';
+    return prefix + 'Context VV Beta.\n\nStack: HTML+CSS+Vanilla JS+Firebase (vv-ep-beta).\nFisiere: index.html, vv-beta-app.js, vv-beta-style.css.\n\nCe modificam?';
   }
 
-  // Cod
-  if (/cod|html|css|javascript|function|buton|pagina|fisier/.test(m)) {
-    return 'Task tehnic. Specifica:\n1. Ce fisier (ex: lea.html, nexus.html)\n2. Ce trebuie modificat exact\n3. Unde in fisier\n\nDupa iti generez codul direct.';
+  // Cod / tehnic
+  if (/cod|html|css|javascript|function|buton|pagina|fisier|fix|bug/.test(m)) {
+    return prefix + 'Task tehnic detectat. Spune-mi:\n1. Ce fisier\n2. Ce modificare exacta\n\nFac direct.';
   }
 
   // Decizii blocate
   var locked = raft.decisions_locked || [];
   for (var i = 0; i < locked.length; i++) {
-    if (m.indexOf(locked[i].toLowerCase().substring(0, 12)) > -1) {
-      return 'Aceasta decizie e blocata: "' + locked[i] + '".\nNu se rediscuta.';
+    if (m.indexOf(locked[i].toLowerCase().substring(0, 15)) > -1) {
+      return 'Decizia asta e blocata: "' + locked[i] + '". Nu se rediscuta.';
     }
   }
 
-  // Context din Raft disponibil
+  // Context Raft activ
   if (top.length > 0) {
-    return 'Am context din Raftul tau ('+ stats.total +' patternuri).\n\n'
-      + 'Top pattern activ: ' + top[0].token + ' (' + Math.round(top[0].strength*100) + '%)\n\n'
-      + 'Intrebare primita. Descrie mai detaliat ce ai nevoie si raspund direct.';
+    return prefix + 'Am context din Raftul tau.\nTop activ: ' + top[0].token + ' (' + Math.round(top[0].strength*100) + '%)\n\nFi mai specific — raspund direct.';
   }
 
   // Default
-  return 'VVhi a primit mesajul.\n\nRaft: ' + stats.total + ' patternuri. Motor: activ.\n\nFi mai specific si raspund direct — ce construim?';
+  return (isCEO ? 'Varu, ' : '') + 'VVhi asculta. Raft: ' + stats.total + ' patternuri. Ce construim?';
 }
 
 // ── OVERRIDE callAI — pur JavaScript, zero externe ────────────────
@@ -2205,8 +2235,8 @@ async function callAI() {
   // Raspunde din logica proprie
   var reply = vvhiThink(lastMsg);
 
-  // Timp de procesare natural (60-180ms)
-  await new Promise(function(r){ setTimeout(r, 60 + Math.random()*120); });
+  // Pauza de gandire — prezenta, nu viteza (First Feeling)
+  await new Promise(function(r){ setTimeout(r, VVhiFF.thinkPause(lastMsg.length)); });
 
   G.msgs.push({role:'model', parts:[{text:reply}]});
   processReply(reply);
