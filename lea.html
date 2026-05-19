@@ -1172,6 +1172,86 @@ window.addEventListener('load', function() {
     return null;
   }
 
+  // ── Idle screen dinamic din Raft ─────────────────────────
+  function vvhiIdleText() {
+    var tokens = VVhiRaft.load().tokens || {};
+    var ctx = vvhiNow();
+    var name = localStorage.getItem('lea_name') || '';
+    name = name.charAt(0).toUpperCase() + name.slice(1);
+    var N = name ? ', ' + name : '';
+    var isCEO = VVhiRaft.isCEO();
+
+    // CEO — mesaj special
+    if(isCEO) {
+      var pro = vvhiProactive();
+      if(pro) return 'Varu.' + '<br><span style="font-size:0.85em;opacity:0.7">' + pro + '</span>';
+      return 'Salut, Varu.<br><span style="font-size:0.85em;opacity:0.7">Cu ce lucram azi?</span>';
+    }
+
+    // Noaptea
+    if(ctx.h >= 23 || ctx.h < 6) {
+      return 'Încă treaz' + N + '?<br><span style="font-size:0.85em;opacity:0.7">Sunt aici.</span>';
+    }
+
+    // Luni dimineața — greu
+    if(ctx.zi === 'luni' && ctx.period === 'dimineata') {
+      return 'Luni' + N + '. Știu.<br><span style="font-size:0.85em;opacity:0.7">Cu ce începem?</span>';
+    }
+
+    // Vineri seară — celebrare
+    if(ctx.zi === 'vineri' && ctx.period === 'seara') {
+      return 'Vineri în sfârșit' + N + '.<br><span style="font-size:0.85em;opacity:0.7">Ce planuri?</span>';
+    }
+
+    // Weekend
+    if(ctx.zi === 'sambata' || ctx.zi === 'duminica') {
+      return 'Weekend' + N + '.<br><span style="font-size:0.85em;opacity:0.7">Reîncarcă sau lucrăm?</span>';
+    }
+
+    // Dimineata — cafea + sport
+    if(ctx.period === 'dimineata') {
+      var sportAzi = Object.keys(tokens).filter(function(k) {
+        return k.indexOf('HABIT:sport:') === 0 && k.indexOf(':zi:' + ctx.zi) !== -1 && tokens[k].strength > 0.35;
+      });
+      if(sportAzi.length) {
+        var sp = sportAzi[0].split(':')[2];
+        return 'Bună dimineața' + N + '.<br><span style="font-size:0.85em;opacity:0.7">Ai ' + sp + ' azi.</span>';
+      }
+      var hasCafea = tokens['HABIT:eat:cafea:HI:MORN'] || tokens['TIME:routine:cafea:HI:MORN'];
+      if(hasCafea && ctx.h >= 6 && ctx.h < 10) {
+        return 'Bună dimineața' + N + '.<br><span style="font-size:0.85em;opacity:0.7">Cafeaua e gata?</span>';
+      }
+      return 'Bună dimineața' + N + '.<br><span style="font-size:0.85em;opacity:0.7">Cu ce începem?</span>';
+    }
+
+    // Dupa-amiaza — scade energia
+    if(ctx.period === 'dupa_pranz') {
+      return 'Bună' + N + '.<br><span style="font-size:0.85em;opacity:0.7">Ora de după masă — cu ce te ajut?</span>';
+    }
+
+    // Seara — check-in
+    if(ctx.period === 'seara') {
+      // Goal activ — reminder
+      var goals = Object.keys(tokens).filter(function(k){ return k.startsWith('GOAL:') && tokens[k].strength > 0.3; });
+      if(goals.length) {
+        var g = goals[0].split(':')[2].replace(/_/g,' ');
+        return 'Bună seara' + N + '.<br><span style="font-size:0.85em;opacity:0.7">Cum a fost azi pentru ' + g + '?</span>';
+      }
+      return 'Bună seara' + N + '.<br><span style="font-size:0.85em;opacity:0.7">Cum a fost azi?</span>';
+    }
+
+    // Generic fallback
+    return 'Bună' + N + '.<br><span style="font-size:0.85em;opacity:0.7">Ce vrei să știi?</span>';
+  }
+
+  // Aplica idle text dinamic — suprascrie ce a setat init()
+  setTimeout(function() {
+    var el = document.getElementById('idle-t');
+    if(el && document.getElementById('idle') && !document.getElementById('idle').classList.contains('off')) {
+      el.innerHTML = vvhiIdleText();
+    }
+  }, 150);
+
   // Override showSugs — chip-uri personale in loc de generice
   if(typeof showSugs === 'function') {
     showSugs = function() {
