@@ -10,6 +10,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;1,300;1,400&family=Geist+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="lea.css">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⬡</text></svg>">
+<link rel="manifest" href="manifest.json">
 </head>
 <body>
 <div id="amb"></div>
@@ -170,11 +171,28 @@
     <div class="ss-row"><span class="ss-l">Voce Lea</span><button class="ss-b" onclick="cfgVoice()">Configurează</button></div>
     <button class="ss-aer" onclick="window.location.href='vv-studios.html'" style="margin-bottom:6px;">📝 VV Studio · Spațiul tău personal</button>
     <button class="ss-aer" onclick="showAer()">◎ VV Aer · Sync device nou</button>
+    <button id="pwa-install-btn" onclick="if(window._pwaPrompt){window._pwaPrompt.prompt();window._pwaPrompt.userChoice.then(function(){window._pwaPrompt=null;document.getElementById('pwa-install-btn').style.display='none';});}" style="display:none;background:rgba(212,175,55,.1);border-color:rgba(212,175,55,.3);color:rgba(212,175,55,.9);margin-bottom:6px;">⬡ Instalează Lea pe ecranul principal</button>
     <button class="ss-aer" onclick="closeSett();showCardManual()" style="background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.1);color:rgba(255,255,255,.5);">⬡ Vezi cardul tău VV</button>
     <button class="ss-close" onclick="closeSett()">Închide</button>
     <button class="ss-out" onclick="logout()">Deconectare · Resetează</button>
   </div>
 </div>
+
+<!-- PWA Install Prompt -->
+<script>
+window._pwaPrompt = null;
+window.addEventListener('beforeinstallprompt', function(e) {
+  e.preventDefault();
+  window._pwaPrompt = e;
+  var btn = document.getElementById('pwa-install-btn');
+  if(btn) btn.style.display = 'flex';
+});
+window.addEventListener('appinstalled', function() {
+  window._pwaPrompt = null;
+  var btn = document.getElementById('pwa-install-btn');
+  if(btn) btn.style.display = 'none';
+});
+</script>
 
 <!-- Firebase (opțional) -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js" onerror="console.log('Firebase offline')"></script>
@@ -219,6 +237,10 @@
 <!-- ── VVHI MOTOR IN LEA — Stratul de Inteligenta v2 ─────── -->
 <script>
 window.addEventListener('load', function() {
+
+  // ── Context sesiune ───────────────────────────────────────
+  var _vvhiLastReply = '';
+  var _vvhiLastTopic = '';
 
   // ── Raft ─────────────────────────────────────────────────
   var VVhiRaft = {
@@ -474,8 +496,12 @@ window.addEventListener('load', function() {
   // Cand nu recunoaste exact, detecteaza categoria si raspunde
   // din biblioteca proprie. Nu script rigid — reguli + vocabular.
   var VVhiLib = {
+    _lastRaw: '',
     pick: function(arr, N) {
-      var s = arr[Math.floor(Math.random() * arr.length)];
+      var pool = arr.length > 1 ? arr.filter(function(x){ return x !== VVhiLib._lastRaw; }) : arr;
+      if(!pool.length) pool = arr;
+      var s = pool[Math.floor(Math.random() * pool.length)];
+      VVhiLib._lastRaw = s;
       return s.replace(/\{N\}/g, N||'');
     },
     respond: function(msg, N, ctx, tokens) {
@@ -695,6 +721,28 @@ window.addEventListener('load', function() {
       } catch(e) {}
     }
 
+    // Cum sa... — sfat practic
+    if(/cum (sa|s[aă])\s/.test(l)) {
+      if(/odihnesc|dorm|adorm|somn/.test(l)) return 'Dus cald cu o ora inainte. Ecrane jos. Camera la 18-19 grade. In ' + ctx.h + ':00 inca ai timp bun.';
+      if(/slab(esc|it)|dieta|tin[aă] regim|slab la/.test(l)) return 'Mic dejun mic, pranz mare, cina mica. Miscare 30 min zilnic — nu trebuie sala, ajunge plimbat.';
+      if(/focus|concentr|fiu atent/.test(l)) return 'Telefon in alta camera. Un singur task la inceput. Pauza la 90 minute — nu la 4 ore.';
+      if(/relaxez|calm(ez)?|linistesc/.test(l)) return 'Respira 4 secunde — retine 4 — elibereaza 4. Sau 10 minute afara. Functioneaza rapid.';
+      if(/motivez|motivat|incep/.test(l)) return 'Un minut. Ai nevoie de 60 de secunde sa incepi — creierul continua singur.';
+      if(/mananc mai (bine|sanatos|putin)/.test(l)) return 'Nu tine dieta. Adauga un lucru bun pe zi. Treptat functioneaza mai bine decat resetat.';
+      _vvhiLastTopic = 'sfat';
+      return 'Spune-mi mai mult' + N + '. Ce vrei sa obtii exact?';
+    }
+
+    // Continuare — "si?", "mai spune", "deci", "si ce"
+    if(/^(si\??$|mai spune|continua|si ce\b|si dupa\b|si mai\b|spune mi mai)/.test(l.trim())) {
+      if(_vvhiLastReply && /sala|sport|alergat|yoga|fotbal/.test(_vvhiLastReply)) return 'La ' + (_vvhiLastTopic||'sport') + ' — ce faci de obicei' + N + '?';
+      if(_vvhiLastReply && /pranz|mananca|mancat/.test(_vvhiLastReply)) return 'Ai mancat deja' + N + '?';
+      if(_vvhiLastReply && /mama|tata|familie/.test(_vvhiLastReply)) return 'Cum e familia' + N + '?';
+      if(_vvhiLastReply && /obosit|somn|odihn/.test(_vvhiLastReply)) return 'Cum te simti acum' + N + '?';
+      if(_vvhiLastReply && /Luni|Marti|Miercuri|Joi|Vineri|Sambata|Duminica/.test(_vvhiLastReply)) return 'Ce vrei sa planifici' + N + '?';
+      return 'Te ascult' + N + '. Continua.';
+    }
+
     // Multumesc
     if(/^(multumesc|mersi|thanks|thx)/.test(l)) {
       return isCEO ? 'Cu placere, Varu.' : 'Cu placere' + N + '.';
@@ -735,6 +783,7 @@ window.addEventListener('load', function() {
 
     var local = vvhiThink(q);
     if(local !== null) {
+      _vvhiLastReply = local;
       var tk = typeof addMsg==='function' ? addMsg('l','',true) : null;
       var pause = 80 + Math.min(q.length*0.4, 250) + Math.random()*80;
       await new Promise(function(r){ setTimeout(r, pause); });
