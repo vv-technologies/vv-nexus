@@ -1,32 +1,19 @@
 {
-  "name": "VV Hybrid Universe",
-  "short_name": "VV",
-  "description": "Inteligență Urbană. Locală. Liberă.",
-  "start_url": "/vv-nexus/",
-  "scope": "/vv-nexus/",
+  "name": "Lea · VV",
+  "short_name": "Lea",
+  "description": "Asistentul tău personal. Zero server. Totul pe device-ul tău.",
+  "start_url": "./lea.html",
   "display": "standalone",
-  "background_color": "#060608",
-  "theme_color": "#060608",
-  "orientation": "portrait-primary",
-  "categories": ["lifestyle", "productivity"],
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "orientation": "portrait",
+  "lang": "ro",
   "icons": [
     {
-      "src": "icons/icon.svg",
+      "src": "lea-icon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
-      "purpose": "any"
-    }
-  ],
-  "shortcuts": [
-    {
-      "name": "LEA",
-      "short_name": "Lea",
-      "url": "/vv-nexus/lea.html"
-    },
-    {
-      "name": "VV Pulse",
-      "short_name": "Pulse",
-      "url": "/vv-nexus/vv-pulse.html"
+      "purpose": "any maskable"
     }
   ]
 }
