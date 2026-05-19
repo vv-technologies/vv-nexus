@@ -268,7 +268,23 @@ window.addEventListener('load', function() {
       var r = this.load();
       return Object.keys(r.tokens||{}).filter(function(k){ return r.tokens[k].source !== 'factory'; }).length;
     },
-    isCEO: function() { return localStorage.getItem('vvhi_role')==='CEO'; }
+    isCEO: function() { return localStorage.getItem('vvhi_role')==='CEO'; },
+    exportLegacy: function() {
+      var r = this.load();
+      var mem = [];
+      try { mem = JSON.parse(localStorage.getItem('vvhi_memories')||'[]'); } catch(e) {}
+      var legMoments = [];
+      try { legMoments = JSON.parse(localStorage.getItem('vvhi_legacy')||'[]'); } catch(e) {}
+      var vals = Object.keys(r.tokens||{}).filter(function(k){ return k.startsWith('VALUE:') || k.startsWith('TRIGGER:') || k.startsWith('LEGACY:'); });
+      return {
+        version: 'VVML-1.0',
+        exportedAt: new Date().toISOString(),
+        values: vals.map(function(k){ return {pattern:k, strength:r.tokens[k].strength}; }),
+        legacyMoments: legMoments,
+        topMemories: mem.filter(function(m){ return m.stare !== 'neutru'; }).slice(-50),
+        consent: localStorage.getItem('vvhi_legacy_consent') || null
+      };
+    }
   };
 
   // ── Memory — amintiri reale indexate pe zi/stare ─────────
@@ -400,6 +416,63 @@ window.addEventListener('load', function() {
     if(/copil|copii|bebe|fiu|fiica/.test(l)) VVhiRaft.add('PERS:familie:copii:HI:ALWAYS', 0.3);
     if(/masina|mașina|parcare/.test(l)) VVhiRaft.add('HABIT:transport:masina:HI:DAILY', 0.15);
     if(/urgent|repede|rapid|imediat/.test(l)) VVhiRaft.add('MOOD:urgenta:prezent:0.8', 0.2);
+
+    // ── RELA — Relații și calitatea lor ──────────────────────
+    if(/am vorbit cu|am sunat|am vazut|am fost cu|am iesit cu/.test(l)) {
+      if(/mama|mamica/.test(l))          VVhiRaft.add('RELA:mama:contact:HI:ALWAYS', 0.2);
+      else if(/tata|tatal/.test(l))      VVhiRaft.add('RELA:tata:contact:HI:ALWAYS', 0.2);
+      else if(/sef|seful|manager/.test(l)) VVhiRaft.add('RELA:sef:contact:MED:WORK', 0.15);
+      else if(/prieten|prietenii/.test(l)) VVhiRaft.add('RELA:prieten:contact:MED', 0.15);
+      else if(/sotia|iubita|partener/.test(l)) VVhiRaft.add('RELA:partener:contact:HI:ALWAYS', 0.25);
+    }
+    if(/tensiune cu|ne-am certat|probleme cu/.test(l)) {
+      if(/sef|manager/.test(l))    VVhiRaft.add('RELA:sef:tensiune:MED:WORK', 0.2);
+      if(/partener|iubita|sotia/.test(l)) VVhiRaft.add('RELA:partener:tensiune:MED', 0.2);
+    }
+
+    // ── GOAL — Obiective cu termen ────────────────────────────
+    if(/vreau sa|imi doresc|obiectiv|imi propun|trebuie sa reusesc/.test(l)) {
+      if(/promov|avans|job nou|cariera/.test(l))      VVhiRaft.add('GOAL:career:promovare:HI', 0.25);
+      if(/slab|dieta|sport mai mult|mai sanatos/.test(l)) VVhiRaft.add('GOAL:health:sanatate:MED', 0.2);
+      if(/masina|casa|economii|bani|investit/.test(l))  VVhiRaft.add('GOAL:financiar:economii:HI', 0.25);
+      if(/invatat|curs|certificat|diploma/.test(l))   VVhiRaft.add('GOAL:personal:invatare:MED', 0.2);
+      if(/afacere|business|startup|proiect propriu/.test(l)) VVhiRaft.add('GOAL:career:antreprenoriat:HI', 0.3);
+    }
+
+    // ── TRIGGER — Declanșatori emoționali ────────────────────
+    if(/ma face fericit|imi place cand|ma bucur cand|imi da energie/.test(l)) {
+      if(/natura|padure|munte|mare/.test(l))  VVhiRaft.add('TRIGGER:pozitiv:natura:HI', 0.2);
+      if(/muzica|cantec|playlist/.test(l))    VVhiRaft.add('TRIGGER:pozitiv:muzica:MED', 0.15);
+      if(/familie|copii|mama/.test(l))        VVhiRaft.add('TRIGGER:pozitiv:familie:HI', 0.25);
+      if(/sport|sala|alergat/.test(l))        VVhiRaft.add('TRIGGER:pozitiv:sport:MED', 0.15);
+    }
+    if(/ma enerveaza|ma stresa|nu suport|ma blocheaza/.test(l)) {
+      if(/aglomerat|trafic|multime/.test(l))  VVhiRaft.add('TRIGGER:negativ:aglomeratie:MED', 0.2);
+      if(/deadline|termen|urgent/.test(l))    VVhiRaft.add('TRIGGER:negativ:deadline:HI', 0.2);
+      if(/luni|luni dimineata/.test(l))       VVhiRaft.add('TRIGGER:negativ:luni:MED', 0.15);
+      if(/zgomot|larma|deranjat/.test(l))     VVhiRaft.add('TRIGGER:negativ:zgomot:MED', 0.15);
+    }
+
+    // ── VALUE — Valori de bază ────────────────────────────────
+    if(/cel mai important|conteaza cel mai mult|prioritatea mea|nu renunt la/.test(l)) {
+      if(/familie|copii|mama|tata/.test(l))   VVhiRaft.add('VALUE:familie:HI:CORE', 0.3);
+      if(/libertate|liber|independent/.test(l)) VVhiRaft.add('VALUE:libertate:HI:CORE', 0.25);
+      if(/bani|financiar|siguranta/.test(l))  VVhiRaft.add('VALUE:stabilitate:MED:CORE', 0.2);
+      if(/sanatate|sa fiu sanatos/.test(l))   VVhiRaft.add('VALUE:sanatate:HI:CORE', 0.25);
+      if(/prieteni|relatii|oameni/.test(l))   VVhiRaft.add('VALUE:relatii:MED:CORE', 0.2);
+    }
+
+    // ── LEGACY — Amintiri pentru moștenitor ──────────────────
+    if(/tine minte ca|vreau sa ramana|important sa stii ca|dupa mine/.test(l)) {
+      VVhiRaft.add('LEGACY:amintire:prezent:HI', 0.4);
+      var legMem = localStorage.getItem('vvhi_legacy') || '[]';
+      try {
+        var leg = JSON.parse(legMem);
+        leg.push({ ts: Date.now(), text: msg, zi: t.zi });
+        if(leg.length > 200) leg = leg.slice(-200);
+        localStorage.setItem('vvhi_legacy', JSON.stringify(leg));
+      } catch(e) {}
+    }
   }
 
   // ── Proactiv — anticipeaza din Raft fara sa fie intrebat ──
@@ -606,7 +679,7 @@ window.addEventListener('load', function() {
     }
 
     // Ce stie Lea despre mine — citeste Raftul personal
-    if(/ce stii despre mine|ce ai invatat|ce tii minte|ce iti amintesti/.test(l)) {
+    if(/ce stii|ce stii despre mine|ce ai invatat|ce tii minte|ce iti amintesti/.test(l)) {
       var tokens = VVhiRaft.load().tokens || {};
       var personal = Object.keys(tokens).filter(function(k){ return tokens[k].source !== 'factory' && tokens[k].strength > 0.3; });
       if(personal.length === 0) return 'Suntem la inceput' + N + '. Cu fiecare conversatie, raftul meu creste.';
@@ -721,6 +794,52 @@ window.addEventListener('load', function() {
       } catch(e) {}
     }
 
+    // GOAL — obiective active
+    if(/ce obiective am|ce vreau sa fac|goalurile mele|ce imi propun/.test(l)) {
+      var tokens = VVhiRaft.load().tokens || {};
+      var goals = Object.keys(tokens).filter(function(k){ return k.startsWith('GOAL:') && tokens[k].strength > 0.3; });
+      if(!goals.length) return 'Nu am obiective notate inca' + N + '. Spune-mi ce iti propui si tin minte.';
+      var gText = goals.slice(0,3).map(function(k){ return k.split(':')[2].replace(/_/g,' '); }).join(', ');
+      _vvhiLastTopic = 'goal';
+      return 'Ai in minte: ' + gText + '. Ce faci azi pentru asta' + N + '?';
+    }
+
+    // RELA — relații recente
+    if(/cum e cu|cum stau cu|relatia cu/.test(l)) {
+      var tokens = VVhiRaft.load().tokens || {};
+      if(/mama/.test(l) && tokens['RELA:mama:contact:HI:ALWAYS']) return 'Ultima data ai vorbit cu mama' + N + '. Cum a fost?';
+      if(/sef|seful/.test(l) && tokens['RELA:sef:tensiune:MED:WORK']) return 'Am vazut ca e tensiune cu seful' + N + '. Ce s-a intamplat?';
+      if(/partener|iubita|sotia/.test(l) && tokens['RELA:partener:contact:HI:ALWAYS']) return 'Relatia cu partenerul tau conteaza mult' + N + '. Cum e?';
+      return 'Spune-mi despre cine vorbim' + N + '.';
+    }
+
+    // TRIGGER pozitiv — ce il face fericit
+    if(/ce ma face fericit|ce imi da energie|ce imi place/.test(l)) {
+      var tokens = VVhiRaft.load().tokens || {};
+      var trigs = Object.keys(tokens).filter(function(k){ return k.startsWith('TRIGGER:pozitiv:') && tokens[k].strength > 0.3; });
+      if(!trigs.length) return 'Inca invat' + N + ' ce te face fericit. Spune-mi.';
+      var tText = trigs.slice(0,2).map(function(k){ return k.split(':')[2]; }).join(' si ');
+      return 'Te face fericit: ' + tText + '. Ai avut azi' + N + '?';
+    }
+
+    // VALUE — valorile lui
+    if(/ce e important pentru mine|ce conteaza|valorile mele/.test(l)) {
+      var tokens = VVhiRaft.load().tokens || {};
+      var vals = Object.keys(tokens).filter(function(k){ return k.startsWith('VALUE:') && k.includes(':CORE') && tokens[k].strength > 0.3; });
+      if(!vals.length) return 'Inca invat ce e important pentru tine' + N + '. Spune-mi ce nu ai da pe nimic.';
+      var vText = vals.slice(0,3).map(function(k){ return k.split(':')[1]; }).join(', ');
+      return 'Ce conteaza pentru tine: ' + vText + '. Deciziile tale trec prin asta.';
+    }
+
+    // LEGACY — amintiri pentru moștenitor
+    if(/tine minte ca|vreau sa ramana|ce las|mostenire|legacy|amintiri pentru/.test(l)) {
+      _vvhiLastTopic = 'legacy';
+      return 'Notez' + N + '. Aceasta amintire ramane in Raft — protejata. Cine vrei sa o poarte dupa tine?';
+    }
+    if(/cine mosteneste|cine poate accesa|da acces la amintiri/.test(l)) {
+      return 'Spune-mi numele sau relatia — mama, copil, prieten apropiat. Eu pastrez consimtamantul' + N + '.';
+    }
+
     // Cum sa... — sfat practic
     if(/cum (sa|s[aă])\s/.test(l)) {
       if(/odihnesc|dorm|adorm|somn/.test(l)) return 'Dus cald cu o ora inainte. Ecrane jos. Camera la 18-19 grade. In ' + ctx.h + ':00 inca ai timp bun.';
@@ -807,7 +926,7 @@ window.addEventListener('load', function() {
     }
   };
 
-  console.log('%cVVhi LEA v3 — Raft + Memory activ', 'color:#10b981;font-weight:600');
+  console.log('%cVVhi LEA v4 — VVPL+RELA+GOAL+TRIGGER+VALUE+LEGACY activ', 'color:#10b981;font-weight:600');
 });
 </script>
 </body>
