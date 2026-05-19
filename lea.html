@@ -120,6 +120,59 @@
   </div>
 </div>
 
+<!-- QUICK SEED — 3 întrebări rapide după onboarding -->
+<div class="sc" id="s-quick">
+  <div style="width:100%;max-width:340px;display:flex;flex-direction:column;align-items:center;gap:28px;padding:0 20px;">
+    <div style="text-align:center;">
+      <div style="font-family:var(--serif);font-size:1.6em;font-style:italic;color:var(--w);margin-bottom:6px;">O ultimă chestie.</div>
+      <div style="font-size:12px;color:var(--w40);letter-spacing:0.5px;">3 răspunsuri rapide — Lea devine personală instant.</div>
+    </div>
+
+    <!-- Q1 -->
+    <div style="width:100%;">
+      <div style="font-size:11px;color:var(--w40);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;">Dimineața bei...</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;" id="q1-opts">
+        <div class="qchip" id="q1-0" onclick="qPick(1,0,'HABIT:eat:cafea:HI:MORN',0.65,'TIME:routine:cafea:HI:MORN',0.65)">☕ Cafea</div>
+        <div class="qchip" id="q1-1" onclick="qPick(1,1,'HABIT:eat:ceai:MED:MORN',0.5,'',0)">🍵 Ceai</div>
+        <div class="qchip" id="q1-2" onclick="qPick(1,2,'HABIT:eat:apa:NEU:MORN',0.3,'',0)">💧 Apă</div>
+        <div class="qchip" id="q1-3" onclick="qPick(1,3,'','','',0)">— Nimic</div>
+      </div>
+    </div>
+
+    <!-- Q2 -->
+    <div style="width:100%;">
+      <div style="font-size:11px;color:var(--w40);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;">Sport?</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;" id="q2-opts">
+        <div class="qchip" id="q2-0" onclick="qPick(2,0,'HABIT:sport:general:HI:DAILY',0.65,'ZONE:sport:activ:HI',0.5)">💪 Da, des</div>
+        <div class="qchip" id="q2-1" onclick="qPick(2,1,'HABIT:sport:general:MED',0.45,'',0)">🏃 Uneori</div>
+        <div class="qchip" id="q2-2" onclick="qPick(2,2,'HABIT:sport:general:LO',0.2,'',0)">🛋 Rar</div>
+        <div class="qchip" id="q2-3" onclick="qPick(2,3,'BLOCK:sport:inactiv:NEG',0.3,'',0)">— Nu fac</div>
+      </div>
+    </div>
+
+    <!-- Q3 -->
+    <div style="width:100%;">
+      <div style="font-size:11px;color:var(--w40);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;">Cel mai important pentru tine:</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;" id="q3-opts">
+        <div class="qchip" id="q3-0" onclick="qPick(3,0,'VALUE:familie:HI:CORE',0.8,'PERS:familie:general:HI:ALWAYS',0.5)">👨‍👩‍👧 Familia</div>
+        <div class="qchip" id="q3-1" onclick="qPick(3,1,'VALUE:libertate:HI:CORE',0.8,'',0)">🕊 Libertatea</div>
+        <div class="qchip" id="q3-2" onclick="qPick(3,2,'VALUE:sanatate:HI:CORE',0.8,'GOAL:health:sanatate:HI',0.4)">💚 Sănătatea</div>
+        <div class="qchip" id="q3-3" onclick="qPick(3,3,'VALUE:cariera:HI:CORE',0.8,'GOAL:career:general:HI',0.4)">💼 Cariera</div>
+      </div>
+    </div>
+
+    <button id="q-btn" onclick="qFinish()" style="
+      width:100%;padding:14px;border-radius:100px;border:none;cursor:pointer;
+      font-family:var(--mono);font-size:13px;letter-spacing:1px;
+      background:rgba(212,175,55,0.15);color:rgba(212,175,55,0.5);
+      border:0.5px solid rgba(212,175,55,0.2);
+      transition:all 0.3s;pointer-events:none;" id="q-btn">
+      Intru în Lea →
+    </button>
+    <div onclick="qSkip()" style="font-size:11px;color:var(--w25);cursor:pointer;letter-spacing:0.5px;">Sar peste · intru direct</div>
+  </div>
+</div>
+
 <!-- APP -->
 <div id="app">
   <div class="topbar">
@@ -1170,6 +1223,57 @@ window.addEventListener('load', function() {
     }
 
     return null;
+  }
+
+  // ── Onboarding v2 — Quick Seed ───────────────────────────
+  var _qAnswers = { 1: false, 2: false, 3: false };
+
+  window.qPick = function(q, idx, tok1, str1, tok2, str2) {
+    // Deselecteaza restul din aceeasi intrebare
+    for(var i = 0; i < 4; i++) {
+      var c = document.getElementById('q' + q + '-' + i);
+      if(c) c.classList.remove('sel');
+    }
+    var sel = document.getElementById('q' + q + '-' + idx);
+    if(sel) sel.classList.add('sel');
+    _qAnswers[q] = { tok1: tok1, str1: str1, tok2: tok2, str2: str2 };
+
+    // Activeaza butonul daca toate 3 sunt raspunse
+    if(_qAnswers[1] && _qAnswers[2] && _qAnswers[3]) {
+      var btn = document.getElementById('q-btn');
+      if(btn) {
+        btn.style.background = 'rgba(212,175,55,0.15)';
+        btn.style.color = 'rgba(212,175,55,0.9)';
+        btn.style.borderColor = 'rgba(212,175,55,0.4)';
+        btn.style.pointerEvents = 'auto';
+      }
+    }
+  };
+
+  window.qFinish = function() {
+    // Seed Raftul cu raspunsurile
+    [1, 2, 3].forEach(function(q) {
+      var a = _qAnswers[q];
+      if(!a) return;
+      if(a.tok1) VVhiRaft.add(a.tok1, a.str1);
+      if(a.tok2) VVhiRaft.add(a.tok2, a.str2);
+    });
+    localStorage.setItem('vvhi_quick_done', '1');
+    if(typeof enterApp === 'function') enterApp();
+  };
+
+  window.qSkip = function() {
+    localStorage.setItem('vvhi_quick_done', '1');
+    if(typeof enterApp === 'function') enterApp();
+  };
+
+  // Override finishOb — arata quick seed inainte de app
+  if(typeof finishOb === 'function' && !localStorage.getItem('vvhi_quick_done')) {
+    var _origFinishOb = finishOb;
+    window.finishOb = function() {
+      localStorage.setItem('lea_ob_done', '1');
+      if(typeof sc === 'function') sc('s-quick');
+    };
   }
 
   // ── Idle screen dinamic din Raft ─────────────────────────
