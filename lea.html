@@ -512,7 +512,7 @@ window.addEventListener('load', function() {
     if(/urgent|repede|rapid|imediat/.test(l)) VVhiRaft.add('MOOD:urgenta:prezent:0.8', 0.2);
 
     // ── RITUAL — Secvențe fixe de comportament ───────────────
-    if(ctx.period === 'dimineata' && /cafea|stiri|dus|gimnastica|meditatie/.test(l)) {
+    if(t.period === 'dimineata' && /cafea|stiri|dus|gimnastica|meditatie/.test(l)) {
       var seq = [];
       if(/cafea/.test(l)) seq.push('cafea');
       if(/stiri|news/.test(l)) seq.push('stiri');
@@ -520,7 +520,7 @@ window.addEventListener('load', function() {
       if(/sport|gimnastica|yoga/.test(l)) seq.push('sport');
       if(seq.length >= 2) VVhiRaft.add('RITUAL:dimineata:' + seq.join('+') + ':HI:MORN', 0.2);
     }
-    if((ctx.period === 'seara' || ctx.period === 'noapte') && /telefon|citit|netflix|muzica|relaxez/.test(l)) {
+    if((t.period === 'seara' || t.period === 'noapte') && /telefon|citit|netflix|muzica|relaxez/.test(l)) {
       var seqS = [];
       if(/telefon/.test(l)) seqS.push('telefon');
       if(/citit|carte/.test(l)) seqS.push('citit');
