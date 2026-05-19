@@ -599,8 +599,13 @@ window.addEventListener('load', function() {
     var ctx = vvhiCtx();
     var tokens = VVhiRaft.load().tokens || {};
 
+    // Cooldown global — nu mai intreba daca am intrebat in ultimele 2 ore
+    var lastPro = parseInt(localStorage.getItem('vvhi_last_pro_ts') || '0');
+    if(Date.now() - lastPro < 2 * 3600 * 1000) return null;
+
     function setPro(key, label) {
       localStorage.setItem('vvhi_pro_ctx', JSON.stringify({key:key, ts:Date.now(), label:label}));
+      localStorage.setItem('vvhi_last_pro_ts', Date.now().toString());
     }
 
     // Sport azi? — HABIT:sport:sala:zi:joi
@@ -751,13 +756,32 @@ window.addEventListener('load', function() {
     },
     {
       name: 'ora_curenta',
-      when: /cat e ceasul|ce ora|cat e ora/,
+      when: /cat e ceasul|ce ora|cat e ora|ora acum|ora e|ce ora/,
       say: function(ctx){ var n=new Date(); return 'E '+n.getHours().toString().padStart(2,'0')+':'+n.getMinutes().toString().padStart(2,'0')+'.'; }
     },
     {
       name: 'stare_sistem',
       when: /functionezi|esti ok|ești ok|esti activ|ești activ|esti online/,
       say: function(ctx,N,tokens){ var total=Object.keys(tokens).length; var pers=VVhiRaft.personal(); return (ctx.isCEO?'Varu, ':'')+' Activa. '+total+' patternuri ('+pers+' personale, '+(total-pers)+' din fabrica).'; }
+    },
+    {
+      name: 'cine_sunt',
+      when: /cine sunt\??|despre mine\??|ce stii despre mine|povesteste despre mine/,
+      say: function(ctx,N,tokens) {
+        var personal = Object.keys(tokens).filter(function(k){ return tokens[k].source !== 'factory' && tokens[k].strength > 0.3; });
+        if(!personal.length) return 'Suntem la început' + N + '. Cu fiecare conversație aflu mai mult.';
+        var fapte = [];
+        var mancare = Object.keys(tokens).filter(function(k){ return k.startsWith('PREF:mancare:') && tokens[k].strength > 0.3; });
+        if(mancare.length) fapte.push('îți place ' + mancare[0].split(':')[2]);
+        var sporturi = personal.filter(function(k){ return k.startsWith('HABIT:sport:') && !k.includes(':zi:'); });
+        if(sporturi.length) fapte.push('faci ' + sporturi[0].split(':')[2]);
+        if(tokens['PERS:familie:mama:HI:ALWAYS']) fapte.push('mama e importantă');
+        if(tokens['VALUE:familie:HI:CORE']) fapte.push('familia contează cel mai mult');
+        if(tokens['VALUE:libertate:HI:CORE']) fapte.push('libertatea e esențială');
+        if(tokens['GOAL:career:promovare:HI']) fapte.push('vrei promovare');
+        if(!fapte.length) return 'Am ' + personal.length + ' lucruri notate' + N + '. Încă învăț.';
+        return 'Știu că ' + fapte.slice(0,3).join(', ') + '. Și tot mai aflu' + N + '.';
+      }
     },
     {
       name: 'cine_esti',
@@ -966,8 +990,8 @@ window.addEventListener('load', function() {
       return pM.join(' ');
     }
 
-    // Statement — "am fost la sala", "am mancat", "am lucrat"
-    if(/^(am |azi am |am fost |azi am fost )/.test(l)) {
+    // Statement — "am fost la sala", "merg la sala", "am mancat"
+    if(/^(am |azi am |am fost |azi am fost |merg la|ma duc la|plec la|am mers|azi merg)/.test(l)) {
       var actS = '';
       if(/sala|alergat|sport|fotbal|yoga|inot|tenis/.test(l)) actS = 'sportul';
       else if(/mancat|pizza|burger|shaorma|sushi/.test(l)) actS = 'mancarea';
