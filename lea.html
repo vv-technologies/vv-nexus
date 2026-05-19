@@ -227,6 +227,7 @@
     <button id="pwa-install-btn" onclick="if(window._pwaPrompt){window._pwaPrompt.prompt();window._pwaPrompt.userChoice.then(function(){window._pwaPrompt=null;document.getElementById('pwa-install-btn').style.display='none';});}" style="display:none;background:rgba(212,175,55,.1);border-color:rgba(212,175,55,.3);color:rgba(212,175,55,.9);margin-bottom:6px;">⬡ Instalează Lea pe ecranul principal</button>
     <button class="ss-aer" onclick="closeSett();showCardManual()" style="background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.1);color:rgba(255,255,255,.5);">⬡ Vezi cardul tău VV</button>
     <button class="ss-close" onclick="closeSett()">Închide</button>
+    <button class="ss-aer" onclick="vvhiExportRaft()" style="background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.08);color:rgba(255,255,255,.4);margin-bottom:6px;">⬇ Descarcă datele mele · Raftul complet</button>
     <button class="ss-out" onclick="logout()">Deconectare · Resetează</button>
   </div>
 </div>
@@ -729,6 +730,21 @@ window.addEventListener('load', function() {
       say: function(ctx,N){ return ctx.isCEO?'Cu placere, Varu.':'Cu placere'+N+'.'; }
     },
     {
+      name: 'chiar_serios',
+      when: /^(chiar\??|serios\??|really\??|da serios|cu adevarat|esti sigura|esti sigur)$/,
+      say: function(ctx,N){ return 'Da, chiar'+N+'.'; }
+    },
+    {
+      name: 'nu_stiu',
+      when: /^(nu stiu|habar n-am|idee n-am|nici eu)$/,
+      say: function(ctx,N){ return 'Nici eu uneori'+N+'. Spune-mi mai mult.'; }
+    },
+    {
+      name: 'ok_scurt',
+      when: /^(ok\.?|okay\.?|aha\.?|mm\.?|mhm\.?)$/,
+      say: function(ctx,N){ return VVhiLib.pick(['Bine'+N+'.','Notat.','Cu tine'+N+'.']); }
+    },
+    {
       name: 'ce_mai_faci',
       when: /ce mai faci|cum esti|cum ești|cum te simti|cum te simți/,
       say: function(ctx,N,tokens){ chainSet('stare'); if(ctx.isCEO) return 'Lucrez, Varu. Tu?'; if(ctx.obosit) return 'Stiu ca ai fost obosit'+(ctx.areObiceiuriAzi?' — si azi ai avut program':'')+'. Cum e acum?'; if(ctx.energic) return 'Bine'+N+' — vad ca esti in forma. Cu ce te ajut?'; if(ctx.zi==='luni') return 'E luni'+N+'. Cum pot ajuta?'; return 'Bine'+N+'. Tu?'; }
@@ -1224,6 +1240,100 @@ window.addEventListener('load', function() {
 
     return null;
   }
+
+  // ── Export Raft personal ──────────────────────────────────
+  window.vvhiExportRaft = function() {
+    var raft = VVhiRaft.load();
+    var mem = [];
+    try { mem = JSON.parse(localStorage.getItem('vvhi_memories') || '[]'); } catch(e) {}
+    var legacy = VVhiRaft.exportLegacy();
+    var name = localStorage.getItem('lea_name') || 'user';
+    var data = {
+      exportedAt: new Date().toISOString(),
+      owner: name,
+      vvhis_version: 'VV HiS 1.0',
+      raft: raft.tokens,
+      memories: mem.slice(-100),
+      legacy: legacy
+    };
+    var blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'lea-raft-' + name.toLowerCase() + '-' + new Date().toISOString().slice(0,10) + '.json';
+    a.click();
+    URL.revokeObjectURL(url);
+    if(typeof showToast === 'function') showToast('Raftul tău — descărcat. Datele tale, ale tale.');
+  };
+
+  // ── Check-in de seară — Lea inițiază zilnic ──────────────
+  function vvhiEveningCheckin() {
+    var h = new Date().getHours();
+    if(h < 19 || h > 22) return;
+    var today = new Date().toDateString();
+    if(localStorage.getItem('vvhi_checkin_date') === today) return;
+    if(document.getElementById('idle') && !document.getElementById('idle').classList.contains('off')) return;
+    localStorage.setItem('vvhi_checkin_date', today);
+    var name = localStorage.getItem('lea_name') || '';
+    name = name.charAt(0).toUpperCase() + name.slice(1);
+    var N = name ? ', ' + name : '';
+    setTimeout(function() {
+      if(typeof addMsg === 'function') {
+        addMsg('l', 'Cum a fost azi' + N + '?');
+        chainSet('stare');
+      }
+    }, 1500);
+  }
+
+  // ── PROACTIVE_RULE — Lea inițiază programat ───────────────
+  function vvhiProactiveRule() {
+    var tokens = VVhiRaft.load().tokens || {};
+    var ctx = vvhiNow();
+    var name = localStorage.getItem('lea_name') || '';
+    name = name.charAt(0).toUpperCase() + name.slice(1);
+    var N = name ? ', ' + name : '';
+    var today = new Date().toDateString();
+
+    // Luni dimineata + GOAL activ → reminder saptamanal
+    if(ctx.zi === 'luni' && ctx.period === 'dimineata') {
+      var lastGoalAsk = localStorage.getItem('vvhi_goal_asked');
+      var goals = Object.keys(tokens).filter(function(k){ return k.startsWith('GOAL:') && tokens[k].strength > 0.3; });
+      if(goals.length && lastGoalAsk !== today) {
+        localStorage.setItem('vvhi_goal_asked', today);
+        var g = goals[0].split(':')[2].replace(/_/g,' ');
+        return 'Săptămâna asta — ce faci pentru ' + g + N + '?';
+      }
+    }
+
+    // 3+ zile fara sport — observa
+    var sportTokens = Object.keys(tokens).filter(function(k){ return k.startsWith('HABIT:sport:') && !k.includes(':zi:') && tokens[k].strength > 0.4; });
+    if(sportTokens.length) {
+      var lastSport = localStorage.getItem('vvhi_last_sport_day');
+      if(lastSport) {
+        var daysSince = Math.floor((Date.now() - parseInt(lastSport)) / 86400000);
+        var lastAbsence = localStorage.getItem('vvhi_sport_absence_asked');
+        if(daysSince >= 3 && lastAbsence !== today) {
+          localStorage.setItem('vvhi_sport_absence_asked', today);
+          return 'N-ai mai fost la sală de ' + daysSince + ' zile' + N + '. Totul ok?';
+        }
+      }
+    }
+
+    return null;
+  }
+
+  // Aplica PROACTIVE_RULE la deschiderea app-ului
+  setTimeout(function() {
+    if(document.getElementById('app') && document.getElementById('app').style.display !== 'none') {
+      vvhiEveningCheckin();
+      var rule = vvhiProactiveRule();
+      if(rule && typeof addMsg === 'function') {
+        var idleEl = document.getElementById('idle');
+        if(idleEl && !idleEl.classList.contains('off')) return; // nu in idle
+        addMsg('l', rule);
+      }
+    }
+  }, 3000);
 
   // ── Onboarding v2 — Quick Seed ───────────────────────────
   var _qAnswers = { 1: false, 2: false, 3: false };
