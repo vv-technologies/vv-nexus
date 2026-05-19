@@ -565,6 +565,118 @@ window.addEventListener('load', function() {
     return parts.join(' ');
   }
 
+  // ── VVBL — VV Behavior Language ──────────────────────────
+  // Comportamentele Leii definite ca date, nu hardcodat in cod.
+  // Interpretorul citeste VVhiBehaviors[] si executa SAY + LEARN.
+  var VVhiBehaviors = [
+    {
+      name: 'salut_ceo',
+      when: /^(salut|buna|bun[aă]|hello|hey|servus|ciao|hi\b)/i,
+      guard: function(ctx){ return ctx.isCEO; },
+      say: function(ctx,N,tokens){ var pro=vvhiProactive(); return 'Salut, Varu. '+(ctx.zi==='luni'?'Luni. ':ctx.zi==='vineri'?'Vineri — gata. ':'')+( pro||'Cu ce lucram?'); },
+      learn: [['MOOD:interactiune:prezent', 0.05]]
+    },
+    {
+      name: 'salut_noapte',
+      when: /^(salut|buna|bun[aă]|hello|hey|servus|ciao|hi\b)/i,
+      guard: function(ctx){ return !ctx.isCEO && ctx.h >= 23; },
+      say: function(ctx,N){ var pro=vvhiProactive(); return 'Inca treaz'+N+'? '+(pro||'Cu ce te ajut?'); }
+    },
+    {
+      name: 'salut_obosit',
+      when: /^(salut|buna|bun[aă]|hello|hey|servus|ciao|hi\b)/i,
+      guard: function(ctx){ return !ctx.isCEO && ctx.obosit; },
+      say: function(ctx,N){ var pro=vvhiProactive(); return 'Buna'+N+'. Vad ca esti obosit. '+(pro||'Cu ce pot ajuta?'); }
+    },
+    {
+      name: 'salut_luni',
+      when: /^(salut|buna|bun[aă]|hello|hey|servus|ciao|hi\b)/i,
+      guard: function(ctx){ return !ctx.isCEO && ctx.zi==='luni' && ctx.period==='dimineata'; },
+      say: function(ctx,N){ var pro=vvhiProactive(); return 'Buna dimineata'+N+'. E luni, stiu. '+(pro||'Cu ce te ajut?'); }
+    },
+    {
+      name: 'salut_vineri',
+      when: /^(salut|buna|bun[aă]|hello|hey|servus|ciao|hi\b)/i,
+      guard: function(ctx){ return !ctx.isCEO && ctx.zi==='vineri' && ctx.period==='seara'; },
+      say: function(ctx,N){ var pro=vvhiProactive(); return 'Buna seara'+N+'! Vineri in sfarsit. '+(pro||'Ce iti trebuie?'); }
+    },
+    {
+      name: 'salut_generic',
+      when: /^(salut|buna|bun[aă]|hello|hey|servus|ciao|hi\b)/i,
+      say: function(ctx,N){ var g=ctx.h<12?'dimineata':ctx.h<18?'ziua':'seara'; var pro=vvhiProactive(); return 'Buna '+g+N+'! '+(pro||'Cu ce te ajut?'); }
+    },
+    {
+      name: 'multumesc',
+      when: /^(multumesc|mersi|thanks|thx)/,
+      say: function(ctx,N){ return ctx.isCEO?'Cu placere, Varu.':'Cu placere'+N+'.'; }
+    },
+    {
+      name: 'ce_mai_faci',
+      when: /ce mai faci|cum esti|cum ești|cum te simti|cum te simți/,
+      say: function(ctx,N,tokens){ if(ctx.isCEO) return 'Lucrez, Varu. Tu?'; if(ctx.obosit) return 'Stiu ca ai fost obosit'+(ctx.areObiceiuriAzi?' — si azi ai avut program':'')+'. Cum e acum?'; if(ctx.energic) return 'Bine'+N+' — vad ca esti in forma. Cu ce te ajut?'; if(ctx.zi==='luni') return 'E luni'+N+'. Cum pot ajuta?'; return 'Bine'+N+'. Tu?'; }
+    },
+    {
+      name: 'ora_curenta',
+      when: /cat e ceasul|ce ora|cat e ora/,
+      say: function(ctx){ var n=new Date(); return 'E '+n.getHours().toString().padStart(2,'0')+':'+n.getMinutes().toString().padStart(2,'0')+'.'; }
+    },
+    {
+      name: 'stare_sistem',
+      when: /functionezi|esti ok|ești ok|esti activ|ești activ|esti online/,
+      say: function(ctx,N,tokens){ var total=Object.keys(tokens).length; var pers=VVhiRaft.personal(); return (ctx.isCEO?'Varu, ':'')+' Activa. '+total+' patternuri ('+pers+' personale, '+(total-pers)+' din fabrica).'; }
+    },
+    {
+      name: 'cine_esti',
+      when: /cine esti|cine ești|ce esti|ce ești|despre tine|cum te chemi/,
+      say: function(ctx,N){ if(ctx.isCEO) return 'Varu, sunt Lea. Motorul e VVhi — al nostru, construit de tine. Cresc din conversatii, raman local.'; var p=VVhiRaft.personal(); return 'Sunt Lea'+N+'.'+(p>0?' Stiu deja '+p+' lucruri despre tine.':' Ma construiesc din fiecare conversatie.')+' Zero server, totul pe device-ul tau.'; }
+    },
+    {
+      name: 'somn_noapte',
+      when: /somn|adorm|obosit|mort de|nu mai pot sta|pleoapele/,
+      guard: function(ctx){ return ctx.h >= 22 || ctx.h < 6; },
+      say: function(ctx,N){ return VVhiLib.pick(['E '+ctx.h+':00. Normal'+N+'. Odihneste-te.','Du-te la culcare'+N+'.','Somn bun'+N+'. Maine e alta zi.']); },
+      learn: [['MOOD:somn:prezent', 0.15]]
+    },
+    {
+      name: 'trigger_pozitiv',
+      when: /ma face fericit|imi place cand|ma bucur cand|imi da energie/,
+      say: function(ctx,N,tokens){ var trigs=Object.keys(tokens).filter(function(k){return k.startsWith('TRIGGER:pozitiv:')&&tokens[k].strength>0.3;}); if(!trigs.length) return 'Inca invat'+N+' ce te face fericit. Spune-mi.'; return 'Te face fericit: '+trigs.slice(0,2).map(function(k){return k.split(':')[2];}).join(' si ')+'. Ai avut azi'+N+'?'; },
+      learn: [['TRIGGER:pozitiv:general', 0.1]]
+    },
+    {
+      name: 'goal_activ',
+      when: /ce obiective am|ce vreau sa fac|goalurile mele|ce imi propun/,
+      say: function(ctx,N,tokens){ var goals=Object.keys(tokens).filter(function(k){return k.startsWith('GOAL:')&&tokens[k].strength>0.3;}); if(!goals.length) return 'Nu am obiective notate inca'+N+'. Spune-mi ce iti propui si tin minte.'; var gt=goals.slice(0,3).map(function(k){return k.split(':')[2].replace(/_/g,' ');}).join(', '); return 'Ai in minte: '+gt+'. Ce faci azi pentru asta'+N+'?'; }
+    },
+    {
+      name: 'legacy_remember',
+      when: /tine minte ca|vreau sa ramana|ce las|mostenire|legacy|amintiri pentru/,
+      say: function(ctx,N){ return 'Notez'+N+'. Aceasta amintire ramane in Raft — protejata. Cine vrei sa o poarte dupa tine?'; },
+      learn: [['LEGACY:amintire:prezent', 0.4]]
+    }
+  ];
+
+  // ── VVBL Interpretor ──────────────────────────────────────
+  function vvhiInterpret(msg) {
+    var l = msg.toLowerCase().trim();
+    var name = localStorage.getItem('lea_name') || '';
+    name = name.charAt(0).toUpperCase() + name.slice(1);
+    var N = name ? ', ' + name : '';
+    var ctx = vvhiCtx();
+    ctx.isCEO = VVhiRaft.isCEO();
+    var tokens = VVhiRaft.load().tokens || {};
+
+    for(var i = 0; i < VVhiBehaviors.length; i++) {
+      var b = VVhiBehaviors[i];
+      if(!b.when.test(l)) continue;
+      if(b.guard && !b.guard(ctx, tokens)) continue;
+      if(b.learn) b.learn.forEach(function(lrn){ VVhiRaft.add(lrn[0], lrn[1]); });
+      _vvhiLastTopic = b.name;
+      return b.say(ctx, N, tokens);
+    }
+    return null;
+  }
+
   // ── VVhi Lib — biblioteca de raspuns, vocea VV ───────────
   // Cand nu recunoaste exact, detecteaza categoria si raspunde
   // din biblioteca proprie. Nu script rigid — reguli + vocabular.
@@ -652,35 +764,21 @@ window.addEventListener('load', function() {
   // ── Motor local — citeste Raftul, raspunde uman ──────────
   function vvhiThink(msg) {
     var l = msg.toLowerCase().trim();
-    var name = localStorage.getItem('lea_name') || '', N = name ? ', ' + name : '';
+    var name = localStorage.getItem('lea_name') || '';
+    name = name.charAt(0).toUpperCase() + name.slice(1);
+    var N = name ? ', ' + name : '';
     var isCEO = VVhiRaft.isCEO();
     var ctx = vvhiCtx();
+    ctx.isCEO = isCEO;
 
-    // Salut — diferit dupa zi, ora, Raft + proactive
-    if(/^(salut|buna|bun[aă]|hello|hey|servus|ciao|hi\b)/i.test(l)) {
-      var pro = vvhiProactive();
-      if(isCEO) return 'Salut, Varu. ' + (ctx.zi==='luni'?'Luni. ':ctx.zi==='vineri'?'Vineri — gata. ':'') + (pro || 'Cu ce lucram?');
-      if(ctx.h>=23) return 'Inca treaz' + N + '? ' + (pro || 'Cu ce te ajut?');
-      if(ctx.obosit) return 'Buna' + N + '. Vad ca esti obosit. ' + (pro || 'Cu ce pot ajuta?');
-      if(ctx.zi==='luni' && ctx.period==='dimineata') return 'Buna dimineata' + N + '. E luni, stiu. ' + (pro || 'Cu ce te ajut?');
-      if(ctx.zi==='vineri' && ctx.period==='seara') return 'Buna seara' + N + '! Vineri in sfarsit. ' + (pro || 'Ce iti trebuie?');
-      if(ctx.period==='dupa_pranz') return 'Buna' + N + '. ' + (pro || 'Ora de dupa pranz — cu ce te ajut?');
-      var g = ctx.h<12?'dimineata':ctx.h<18?'ziua':'seara';
-      return 'Buna ' + g + N + '! ' + (pro || 'Cu ce te ajut?');
-    }
-
-    // Ce mai faci / cum esti
-    if(/ce mai faci|cum esti|cum ești|cum te simti|cum te simți/.test(l)) {
-      if(isCEO) return 'Lucrez, Varu. Tu?';
-      if(ctx.obosit) return 'Stiu ca ai fost obosit' + (ctx.areObiceiuriAzi?' — si azi ai avut program':'') + '. Cum e acum?';
-      if(ctx.energic) return 'Bine' + N + ' — vad ca esti in forma. Cu ce te ajut?';
-      if(ctx.zi==='luni') return 'E luni' + N + '. Cum pot ajuta?';
-      return 'Bine' + N + '. Tu?';
-    }
+    // ── VVBL Interpretor — primul strat ───────────────────────
+    var vvblResult = vvhiInterpret(msg);
+    if(vvblResult !== null) return vvblResult;
 
     // Ce stie Lea despre mine — citeste Raftul personal
     if(/ce stii|ce stii despre mine|ce ai invatat|ce tii minte|ce iti amintesti/.test(l)) {
       var tokens = VVhiRaft.load().tokens || {};
+
       var personal = Object.keys(tokens).filter(function(k){ return tokens[k].source !== 'factory' && tokens[k].strength > 0.3; });
       if(personal.length === 0) return 'Suntem la inceput' + N + '. Cu fiecare conversatie, raftul meu creste.';
       var fapte = [];
