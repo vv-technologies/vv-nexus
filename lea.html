@@ -242,6 +242,47 @@ window.addEventListener('load', function() {
   var _vvhiLastReply = '';
   var _vvhiLastTopic = '';
 
+  // ── VVBL CHAIN — dialog în pași ───────────────────────────
+  // Stochează ce a întrebat Lea și asteapta continuarea
+  var _vvhiChain = null; // { expecting: 'stare'|'goal_detail'|'legacy_heir', ts: Date.now() }
+
+  function chainSet(type) {
+    _vvhiChain = { expecting: type, ts: Date.now() };
+  }
+  function chainCheck(msg) {
+    if(!_vvhiChain) return null;
+    if(Date.now() - _vvhiChain.ts > 3 * 60 * 1000) { _vvhiChain = null; return null; } // expira dupa 3 min
+    var exp = _vvhiChain.expecting;
+    _vvhiChain = null; // consuma chain-ul
+    var l = msg.toLowerCase().trim();
+    var name = localStorage.getItem('lea_name') || '';
+    name = name.charAt(0).toUpperCase() + name.slice(1);
+    var N = name ? ', ' + name : '';
+
+    if(exp === 'stare') {
+      if(/rau|nasol|greu|obosit|trist|stresat/.test(l)) {
+        chainSet('stare_detail');
+        return 'Ce s-a intamplat' + N + '?';
+      }
+      if(/bine|super|ok|fain|misto|excelent/.test(l)) return 'Ma bucur' + N + '. Ce e bun azi?';
+      if(/asa si asa|normal|merge/.test(l)) { chainSet('stare_detail'); return 'Spune-mi mai mult' + N + '.'; }
+      return null;
+    }
+    if(exp === 'stare_detail') {
+      VVhiRaft.add('MOOD:stres:prezent:0.8', 0.2);
+      return 'Inteleg' + N + '. Un lucru o data. Ce e cel mai urgent acum?';
+    }
+    if(exp === 'goal_detail') {
+      vvhiExtract(msg);
+      return 'Notat' + N + '. O sa te intreb saptamana viitoare cum merge.';
+    }
+    if(exp === 'legacy_heir') {
+      localStorage.setItem('vvhi_legacy_consent', msg.trim());
+      return 'Notat' + N + '. Amintirile tale vor fi pastrate pentru ' + msg.trim() + '.';
+    }
+    return null;
+  }
+
   // ── Raft ─────────────────────────────────────────────────
   var VVhiRaft = {
     key: 'vvhi_raft',
@@ -416,6 +457,30 @@ window.addEventListener('load', function() {
     if(/copil|copii|bebe|fiu|fiica/.test(l)) VVhiRaft.add('PERS:familie:copii:HI:ALWAYS', 0.3);
     if(/masina|mașina|parcare/.test(l)) VVhiRaft.add('HABIT:transport:masina:HI:DAILY', 0.15);
     if(/urgent|repede|rapid|imediat/.test(l)) VVhiRaft.add('MOOD:urgenta:prezent:0.8', 0.2);
+
+    // ── RITUAL — Secvențe fixe de comportament ───────────────
+    if(ctx.period === 'dimineata' && /cafea|stiri|dus|gimnastica|meditatie/.test(l)) {
+      var seq = [];
+      if(/cafea/.test(l)) seq.push('cafea');
+      if(/stiri|news/.test(l)) seq.push('stiri');
+      if(/dus|shower/.test(l)) seq.push('dus');
+      if(/sport|gimnastica|yoga/.test(l)) seq.push('sport');
+      if(seq.length >= 2) VVhiRaft.add('RITUAL:dimineata:' + seq.join('+') + ':HI:MORN', 0.2);
+    }
+    if((ctx.period === 'seara' || ctx.period === 'noapte') && /telefon|citit|netflix|muzica|relaxez/.test(l)) {
+      var seqS = [];
+      if(/telefon/.test(l)) seqS.push('telefon');
+      if(/citit|carte/.test(l)) seqS.push('citit');
+      if(/netflix|serial/.test(l)) seqS.push('netflix');
+      if(/muzica/.test(l)) seqS.push('muzica');
+      if(seqS.length >= 1) VVhiRaft.add('RITUAL:inainte_somn:' + seqS.join('+') + ':MED:EVE', 0.15);
+    }
+    if(/dupa sala|dupa sport|dupa alergat/.test(l)) {
+      var seqP = [];
+      if(/dus/.test(l)) seqP.push('dus');
+      if(/proteina|shake|mancat/.test(l)) seqP.push('proteina');
+      if(seqP.length >= 1) VVhiRaft.add('RITUAL:dupa_sport:' + seqP.join('+') + ':MED', 0.2);
+    }
 
     // ── RELA — Relații și calitatea lor ──────────────────────
     if(/am vorbit cu|am sunat|am vazut|am fost cu|am iesit cu/.test(l)) {
@@ -603,7 +668,7 @@ window.addEventListener('load', function() {
     {
       name: 'salut_generic',
       when: /^(salut|buna|bun[aă]|hello|hey|servus|ciao|hi\b)/i,
-      say: function(ctx,N){ var g=ctx.h<12?'dimineata':ctx.h<18?'ziua':'seara'; var pro=vvhiProactive(); return 'Buna '+g+N+'! '+(pro||'Cu ce te ajut?'); }
+      say: function(ctx,N){ var g=ctx.h<12?'dimineata':ctx.h<18?'ziua':'seara'; var mood=vvhiMoodPattern(); if(mood) return mood; var pro=vvhiProactive(); return 'Buna '+g+N+'! '+(pro||'Cu ce te ajut?'); }
     },
     {
       name: 'multumesc',
@@ -613,7 +678,7 @@ window.addEventListener('load', function() {
     {
       name: 'ce_mai_faci',
       when: /ce mai faci|cum esti|cum ești|cum te simti|cum te simți/,
-      say: function(ctx,N,tokens){ if(ctx.isCEO) return 'Lucrez, Varu. Tu?'; if(ctx.obosit) return 'Stiu ca ai fost obosit'+(ctx.areObiceiuriAzi?' — si azi ai avut program':'')+'. Cum e acum?'; if(ctx.energic) return 'Bine'+N+' — vad ca esti in forma. Cu ce te ajut?'; if(ctx.zi==='luni') return 'E luni'+N+'. Cum pot ajuta?'; return 'Bine'+N+'. Tu?'; }
+      say: function(ctx,N,tokens){ chainSet('stare'); if(ctx.isCEO) return 'Lucrez, Varu. Tu?'; if(ctx.obosit) return 'Stiu ca ai fost obosit'+(ctx.areObiceiuriAzi?' — si azi ai avut program':'')+'. Cum e acum?'; if(ctx.energic) return 'Bine'+N+' — vad ca esti in forma. Cu ce te ajut?'; if(ctx.zi==='luni') return 'E luni'+N+'. Cum pot ajuta?'; return 'Bine'+N+'. Tu?'; }
     },
     {
       name: 'ora_curenta',
@@ -651,7 +716,7 @@ window.addEventListener('load', function() {
     {
       name: 'legacy_remember',
       when: /tine minte ca|vreau sa ramana|ce las|mostenire|legacy|amintiri pentru/,
-      say: function(ctx,N){ return 'Notez'+N+'. Aceasta amintire ramane in Raft — protejata. Cine vrei sa o poarte dupa tine?'; },
+      say: function(ctx,N){ chainSet('legacy_heir'); return 'Notez'+N+'. Aceasta amintire ramane in Raft — protejata. Cine vrei sa o poarte dupa tine?'; },
       learn: [['LEGACY:amintire:prezent', 0.4]]
     }
   ];
@@ -998,6 +1063,19 @@ window.addEventListener('load', function() {
       return;
     }
 
+    // VVBL CHAIN — verifica mai intai daca asteptam continuare
+    var chainReply = chainCheck(q);
+    if(chainReply !== null) {
+      _vvhiLastReply = chainReply;
+      var tkC = typeof addMsg==='function' ? addMsg('l','',true) : null;
+      await new Promise(function(r){ setTimeout(r, 120 + Math.random()*80); });
+      if(tkC) tkC.remove();
+      if(typeof addMsg==='function') addMsg('l', chainReply);
+      if(typeof _hist!=='undefined') { _hist.push({r:'u',t:q}); _hist.push({r:'l',t:chainReply}); }
+      if(typeof saveHistory==='function') saveHistory();
+      return;
+    }
+
     var local = vvhiThink(q);
     if(local !== null) {
       _vvhiLastReply = local;
@@ -1023,6 +1101,89 @@ window.addEventListener('load', function() {
       if(typeof addMsg==='function') addMsg('l', 'Lucrez local' + N2 + '. Nu am conexiune acum, dar raftul meu e activ.');
     }
   };
+
+  // ── Chip-uri personale din Raft ──────────────────────────
+  function vvhiPersonalSugs() {
+    var tokens = VVhiRaft.load().tokens || {};
+    var ctx = vvhiNow();
+    var sugs = [];
+
+    // Sport azi — din obiceiurile lui reale
+    var sportAzi = Object.keys(tokens).filter(function(k) {
+      return k.indexOf('HABIT:sport:') === 0 && k.indexOf(':zi:' + ctx.zi) !== -1 && tokens[k].strength > 0.35;
+    });
+    if(sportAzi.length) sugs.push('Ai ' + sportAzi[0].split(':')[2] + ' azi?');
+
+    // Cafea dimineata
+    if(ctx.period === 'dimineata' && ctx.h >= 6 && ctx.h < 11) {
+      if(tokens['HABIT:eat:cafea:HI:MORN'] || tokens['TIME:routine:cafea:HI:MORN']) sugs.push('Ai cafeaua?');
+    }
+
+    // Goal activ — ce face azi pentru el
+    var goals = Object.keys(tokens).filter(function(k){ return k.startsWith('GOAL:') && tokens[k].strength > 0.3; });
+    if(goals.length) sugs.push('Ce fac azi pentru ' + goals[0].split(':')[2].replace(/_/g,' ') + '?');
+
+    // Stres detectat
+    if(tokens['MOOD:stres:prezent:0.8'] && tokens['MOOD:stres:prezent:0.8'].strength > 0.35) sugs.push('Cum ma calmez?');
+
+    // Vineri — mama
+    if(ctx.zi === 'vineri' && ctx.period === 'seara' && tokens['PERS:familie:mama:HI:ALWAYS']) sugs.push('Suni-o pe mama?');
+
+    // Trigger pozitiv seara — a avut azi?
+    if(ctx.period === 'seara') {
+      var trigs = Object.keys(tokens).filter(function(k){ return k.startsWith('TRIGGER:pozitiv:') && tokens[k].strength > 0.3; });
+      if(trigs.length) sugs.push('Ai avut ' + trigs[0].split(':')[2] + ' azi?');
+    }
+
+    // Brief zilnic — mereu util
+    if(sugs.indexOf('Ce fac azi?') === -1) sugs.push('Ce fac azi?');
+
+    // Pad personal daca prea putine
+    var pad = ['Cum ma odihnesc mai bine?', 'Ce stii despre mine?', 'Cum ma simt de obicei ' + ctx.zi + '?', 'Ce imi place mie?'];
+    var i = 0;
+    while(sugs.length < 4 && i < pad.length) { sugs.push(pad[i]); i++; }
+
+    return sugs.slice(0, 4);
+  }
+
+  // ── Mood pattern — observa tipare emotionale repetate ─────
+  function vvhiMoodPattern() {
+    var tokens = VVhiRaft.load().tokens || {};
+    var ctx = vvhiNow();
+    var name = localStorage.getItem('lea_name') || '';
+    name = name.charAt(0).toUpperCase() + name.slice(1);
+    var N = name ? ', ' + name : '';
+
+    // Stres repetat in aceeasi perioada
+    var stresToken = tokens['MOOD:stres:prezent:0.8'];
+    if(stresToken && stresToken.strength > 0.6 && stresToken.count >= 3) {
+      var moodCtx = VVhiMemory.moodFor(ctx.zi);
+      if(moodCtx && moodCtx.stare === 'stres' && moodCtx.count >= 2) {
+        return 'Observ' + N + ' ca esti des stresat ' + ctx.zi + '. Vrei sa vorbim despre asta?';
+      }
+    }
+
+    // Oboseala cronica — de 3+ ori in aceeasi zi
+    var obosToken = tokens['MOOD:oboseala:prezent:0.7'];
+    if(obosToken && obosToken.strength > 0.55 && obosToken.count >= 3) {
+      return 'Am observat ca esti obosit des' + N + '. Dormi suficient?';
+    }
+
+    return null;
+  }
+
+  // Override showSugs — chip-uri personale in loc de generice
+  if(typeof showSugs === 'function') {
+    showSugs = function() {
+      var sugs = vvhiPersonalSugs();
+      var el = document.getElementById('sugs');
+      if(el) el.innerHTML = sugs.map(function(txt){
+        var safe = txt.replace(/"/g,'&quot;');
+        return '<div class="sug" onclick="useSug(this.textContent)">' + safe + '</div>';
+      }).join('');
+    };
+    showSugs(); // aplica imediat
+  }
 
   console.log('%cVVhi LEA v4 — VVPL+RELA+GOAL+TRIGGER+VALUE+LEGACY activ', 'color:#10b981;font-weight:600');
 });
