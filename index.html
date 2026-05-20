@@ -1,523 +1,235 @@
-﻿﻿﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ro">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#060608">
-<meta name="description" content="VV Hybrid Universe — Inteligență Urbană. Locală. Liberă.">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="VV">
+<title>Lea · AI personal. Local. Al tău.</title>
+<meta name="description" content="Îți vorbește. Îți amintește. Rămâne pe device-ul tău. Zero server.">
+<meta name="theme-color" content="#07070a">
 <link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="icons/icon.svg">
-<title>VV Hybrid Universe</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='40' fill='rgba(180,210,255,0.9)'/></svg>">
+
+<meta property="og:title" content="Lea · AI personal. Local. Al tău.">
+<meta property="og:description" content="Îți vorbește. Îți amintește. Rămâne pe device-ul tău. Zero server.">
+<meta property="og:url" content="https://hilea.eu">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://hilea.eu/og.png">
+<meta property="og:site_name" content="HILEA">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Lea · AI personal. Local. Al tău.">
+<meta name="twitter:description" content="Îți vorbește. Îți amintește. Rămâne pe device-ul tău. Zero server.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+
 <style>
-:root{
-  --bg:#060608;--gold:#C9A84C;--gold-dim:rgba(201,168,76,.12);--gold-bd:rgba(201,168,76,.28);
-  --green:#2db87a;--blue:#2997FF;--red:#FF453A;
-  --w:rgba(245,240,232,1);--w50:rgba(245,240,232,.5);--w30:rgba(245,240,232,.3);
-  --w15:rgba(245,240,232,.15);--w08:rgba(245,240,232,.08);
-  --surf:rgba(245,240,232,.04);--border:rgba(245,240,232,.08);--border2:rgba(245,240,232,.14);
-  --mono:'SF Mono','Fira Mono','Consolas',monospace;
-  --font:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-  --r:14px;--r-sm:10px;--r-lg:20px
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:#07070a;color:#fff;-webkit-font-smoothing:antialiased}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  min-height:100vh;position:relative;overflow:hidden;
 }
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;background:var(--bg);font-family:var(--font);color:var(--w);-webkit-font-smoothing:antialiased}
-.page{height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 0 calc(4.75rem + env(safe-area-inset-bottom));position:relative}
 
-/* GRAIN */
-body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='.04'/%3E%3C/svg%3E");opacity:.5;pointer-events:none;z-index:0}
-
-/* ── TOP NAV */
-.top-bar{display:flex;justify-content:space-between;align-items:center;padding:max(1.375rem,env(safe-area-inset-top)) 1.25rem 1rem;position:relative;z-index:1}
-.vv-logo{font-family:var(--mono);font-size:1.125rem;font-weight:700;letter-spacing:4px;color:var(--gold);line-height:1}
-.vv-sub{font-size:.5rem;font-family:var(--mono);letter-spacing:.22em;text-transform:uppercase;color:var(--w30);margin-top:4px}
-.coins-pill{display:flex;align-items:center;gap:5px;background:rgba(0,0,0,.7);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:.5px solid var(--gold-bd);border-radius:20px;padding:5px 12px;font-size:.625rem;font-family:var(--mono);color:var(--gold);font-weight:700;cursor:default}
-.coins-dot{width:5px;height:5px;border-radius:50%;background:var(--gold);flex-shrink:0;animation:gdot 2.5s ease-in-out infinite}
-@keyframes gdot{0%,100%{opacity:1}50%{opacity:.2}}
-
-/* ── RESUME BANNER */
-.resume-banner{margin:0 1.125rem .875rem;background:rgba(45,184,122,.07);border:.5px solid rgba(45,184,122,.2);border-radius:var(--r);padding:.875rem 1rem;display:none;align-items:center;justify-content:space-between;cursor:pointer;transition:background .2s;position:relative;z-index:1}
-.resume-banner.visible{display:flex}
-.resume-banner:active{background:rgba(45,184,122,.12)}
-.rb-left{display:flex;align-items:center;gap:.75rem}
-.rb-dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 10px rgba(45,184,122,.7);flex-shrink:0;animation:rbd 2s ease-in-out infinite}
-@keyframes rbd{0%,100%{box-shadow:0 0 10px rgba(45,184,122,.7)}50%{box-shadow:0 0 4px rgba(45,184,122,.3)}}
-.rb-text{font-size:.75rem;font-weight:600;color:var(--green);line-height:1.2}
-.rb-sub{font-size:.5rem;font-family:var(--mono);color:var(--w30);margin-top:3px}
-.rb-arrow{font-size:1.25rem;color:rgba(45,184,122,.5)}
-
-/* ── VV·ID CARD */
-.vvid-card{margin:0 1.125rem 1.125rem;background:var(--gold-dim);border:.5px solid var(--gold-bd);border-radius:var(--r-lg);padding:1.25rem 1.25rem;position:relative;overflow:hidden;z-index:1}
-.vvid-card::before{content:'';position:absolute;top:0;left:15%;right:15%;height:1px;background:linear-gradient(90deg,transparent,rgba(201,168,76,.6),transparent)}
-.vvid-label{font-size:.4375rem;font-family:var(--mono);letter-spacing:.22em;text-transform:uppercase;color:var(--gold);opacity:.55;margin-bottom:.625rem}
-.vvid-value{font-size:1.625rem;font-family:var(--mono);font-weight:700;color:var(--gold);letter-spacing:3px;margin-bottom:1rem;text-shadow:0 0 30px rgba(201,168,76,.2)}
-.vvid-cta{font-size:.6875rem;color:var(--w30);margin-bottom:.875rem;display:none}
-.vvid-chips{display:flex;gap:.5rem;flex-wrap:wrap}
-.chip{background:rgba(0,0,0,.4);border:.5px solid var(--gold-bd);border-radius:100px;padding:3px 11px;font-size:.5rem;font-family:var(--mono);color:var(--gold);opacity:.75;letter-spacing:.05em;white-space:nowrap}
-
-/* ── ACTIVATE CTA (no VV·ID) */
-.activate-btn{display:block;width:100%;background:var(--gold-dim);border:.5px solid var(--gold-bd);border-radius:var(--r);padding:.875rem;text-align:center;font-size:.75rem;font-weight:700;font-family:var(--mono);color:var(--gold);letter-spacing:.1em;text-decoration:none;margin-bottom:1.125rem;margin-left:auto;margin-right:auto;width:calc(100% - 2.25rem);transition:background .2s}
-.activate-btn:active{background:rgba(201,168,76,.2)}
-
-/* ── SECTION LABEL */
-.sect-label{font-size:.4375rem;font-family:var(--mono);letter-spacing:.22em;text-transform:uppercase;color:var(--w30);padding:0 1.125rem .625rem;position:relative;z-index:1}
-
-/* ── TILES GRID */
-.tiles{display:grid;grid-template-columns:1fr 1fr;gap:.625rem;padding:0 1.125rem 1.125rem;position:relative;z-index:1}
-.tile{background:var(--surf);border:.5px solid var(--border);border-radius:var(--r);padding:1rem;cursor:pointer;text-decoration:none;display:block;color:inherit;transition:transform .15s,background .2s;-webkit-user-select:none;user-select:none}
-.tile:active{transform:scale(.96);background:rgba(245,240,232,.07)}
-.t-lea{border-color:rgba(45,184,122,.22);background:rgba(45,184,122,.04)}
-.t-pulse{border-color:rgba(201,168,76,.22);background:rgba(201,168,76,.04)}
-.t-now{border-color:rgba(41,151,255,.22);background:rgba(41,151,255,.04)}
-.t-ghost{}
-.tile-ico{font-size:1.5rem;line-height:1;margin-bottom:.625rem}
-.tile-name{font-size:.8125rem;font-weight:700;letter-spacing:-.01em;margin-bottom:.25rem}
-.tile-desc{font-size:.5rem;font-family:var(--mono);color:var(--w30);line-height:1.5}
-.tile-foot{margin-top:.625rem;padding-top:.5rem;border-top:.5px solid var(--border);font-size:.4375rem;font-family:var(--mono);color:var(--w30);display:flex;align-items:center;gap:5px;min-height:1.25rem}
-.tile-foot b{color:var(--w50);font-size:.5rem}
-.tbadge{padding:1px 6px;border-radius:4px;font-size:.4375rem;font-family:var(--mono);font-weight:700;letter-spacing:.06em}
-.badge-live{background:rgba(45,184,122,.12);border:.5px solid rgba(45,184,122,.25);color:var(--green)}
-.badge-soon{background:rgba(245,240,232,.06);border:.5px solid var(--border);color:var(--w30)}
-
-/* ── GHOST TOGGLE */
-.ghost-wrap{margin:0 1.125rem 1.125rem;position:relative;z-index:1}
-.ghost-row{display:flex;align-items:center;justify-content:space-between;background:var(--surf);border:.5px solid var(--border);border-radius:var(--r);padding:.875rem 1rem}
-.ghost-left{display:flex;align-items:center;gap:.75rem}
-.ghost-ico{font-size:1.125rem;line-height:1}
-.ghost-lbl{font-size:.6875rem;font-weight:600;margin-bottom:2px}
-.ghost-sub{font-size:.5rem;font-family:var(--mono);color:var(--w30)}
-.g-toggle{width:44px;height:26px;border-radius:13px;background:var(--border2);position:relative;cursor:pointer;transition:background .25s;flex-shrink:0}
-.g-toggle.on{background:var(--green)}
-.g-thumb{position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform .25s;box-shadow:0 1px 4px rgba(0,0,0,.5)}
-.g-toggle.on .g-thumb{transform:translateX(18px)}
-
-/* ── APP INFO */
-.app-info{margin:0 1.125rem 1.125rem;position:relative;z-index:1}
-.info-row{display:flex;justify-content:space-between;align-items:center;padding:.5rem 0;border-bottom:.5px solid var(--border);font-size:.5625rem;font-family:var(--mono);color:var(--w30)}
-.info-row:last-child{border-bottom:none}
-.info-row span{color:var(--w50)}
-.app-footer{text-align:center;padding:1rem 0 .25rem;font-size:.4375rem;font-family:var(--mono);color:var(--w15);letter-spacing:.1em;position:relative;z-index:1}
-
-/* ── TAB BAR */
-.vv-tabs{position:fixed;bottom:0;left:0;right:0;z-index:1000;display:flex;background:rgba(6,6,8,.97);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-top:.5px solid var(--border);padding-bottom:env(safe-area-inset-bottom)}
-.vv-tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 0 9px;text-decoration:none;color:var(--w30);transition:color .2s;-webkit-user-select:none;user-select:none}
-.vv-tab.active{color:var(--gold)}
-.vt-icon{font-size:1.25rem;line-height:1}
-.vt-lbl{font-size:.375rem;font-family:var(--mono);letter-spacing:.2em;text-transform:uppercase}
-
-/* ── TOAST */
-.toast-pill{position:fixed;top:max(1rem,calc(env(safe-area-inset-top) + .5rem));left:50%;transform:translateX(-50%) translateY(-70px);z-index:2000;background:rgba(10,10,12,.96);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:.5px solid var(--border2);border-radius:100px;padding:.5rem 1.375rem;font-size:.5625rem;font-family:var(--mono);color:var(--w50);white-space:nowrap;transition:transform .35s cubic-bezier(.4,0,.2,1);pointer-events:none}
-.toast-pill.show{transform:translateX(-50%) translateY(0)}
-.now-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:1800;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);align-items:center;justify-content:center}
-.now-ov.open{display:flex}
-.now-card{background:rgba(6,6,8,.99);border:.5px solid var(--border2);border-radius:20px;padding:1.75rem;width:min(480px,90vw);position:relative}
-.now-card::before{content:'';position:absolute;top:0;left:20%;right:20%;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:.5}
-.now-ttl{font-size:.4375rem;font-family:var(--mono);letter-spacing:.3em;text-transform:uppercase;color:var(--gold);opacity:.6;margin-bottom:.5rem}
-.now-h{font-size:1.5rem;font-weight:700;color:var(--w);margin-bottom:1.25rem;letter-spacing:-.02em}
-.now-inp{width:100%;background:var(--surf);border:.5px solid var(--border2);border-radius:12px;padding:.875rem 1rem;color:var(--w);font-size:.875rem;font-family:var(--mono);outline:none;box-sizing:border-box;transition:border-color .2s}
-.now-inp:focus{border-color:var(--gold-bd)}
-.now-inp::placeholder{color:var(--w30)}
-.now-btns{display:flex;gap:.625rem;margin-top:.875rem}
-.now-b-lea{flex:1;padding:.625rem;background:var(--gold-dim);border:.5px solid var(--gold-bd);border-radius:10px;color:var(--gold);font-family:var(--mono);font-size:.5625rem;cursor:pointer;transition:background .2s}
-.now-b-pulse{flex:1;padding:.625rem;background:rgba(45,184,122,.07);border:.5px solid rgba(45,184,122,.2);border-radius:10px;color:#2db87a;font-family:var(--mono);font-size:.5625rem;cursor:pointer}
-.now-b-close{padding:.625rem 1rem;background:transparent;border:.5px solid var(--border);border-radius:10px;color:var(--w30);font-family:var(--mono);font-size:.5rem;cursor:pointer}
-.sb-sect{font-size:.375rem;font-family:var(--mono);letter-spacing:.22em;text-transform:uppercase;color:var(--w30);padding:.375rem .875rem .25rem;opacity:.6}
-.sb-pro-price{font-size:.3125rem;letter-spacing:.1em;color:var(--gold);margin-left:4px;font-family:var(--mono)}
-.sb-locked{opacity:.4;cursor:pointer;position:relative}
-.sb-locked:hover{opacity:.65;background:rgba(245,240,232,.03)!important}
-.sb-lock{margin-left:auto;font-size:.625rem;flex-shrink:0}
-/* Plan tile on EU hub */
-.plan-card{margin:0 1.125rem 1.125rem;background:rgba(201,168,76,.05);border:.5px solid rgba(201,168,76,.18);border-radius:var(--r);padding:1rem 1.125rem;display:flex;align-items:center;justify-content:space-between;position:relative;z-index:1}
-.plan-left{}
-.plan-tier{font-size:.4375rem;font-family:var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--gold);opacity:.6;margin-bottom:4px}
-.plan-name{font-size:.875rem;font-weight:700;font-family:var(--mono);color:var(--w);margin-bottom:.25rem}
-.plan-desc{font-size:.5rem;font-family:var(--mono);color:var(--w30)}
-.plan-btn{padding:.5rem 1rem;background:var(--gold-dim);border:.5px solid var(--gold-bd);border-radius:100px;font-size:.5rem;font-family:var(--mono);color:var(--gold);cursor:pointer;font-weight:700;letter-spacing:.06em;transition:background .2s;white-space:nowrap}
-.plan-btn:hover{background:rgba(201,168,76,.2)}
-/* upgrade modal */
-.upg-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:1900;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
-.upg-overlay.open{display:block}
-.upg-modal{display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-54%);z-index:2000;background:rgba(6,6,8,.99);border:.5px solid rgba(201,168,76,.3);border-radius:20px;padding:2rem 1.75rem;max-width:360px;width:calc(100% - 2rem);text-align:center;transition:transform .3s,opacity .3s;opacity:0}
-.upg-modal.open{display:block;transform:translate(-50%,-50%);opacity:1}
-.upg-modal::before{content:'';position:absolute;top:0;left:20%;right:20%;height:1px;background:linear-gradient(90deg,transparent,rgba(201,168,76,.5),transparent)}
-.upg-hex{font-size:2.25rem;margin-bottom:.5rem;line-height:1}
-.upg-lbl{font-size:.4375rem;font-family:var(--mono);letter-spacing:.3em;text-transform:uppercase;color:rgba(201,168,76,.6);margin-bottom:4px}
-.upg-tier{font-size:2.25rem;font-weight:900;font-family:var(--mono);color:rgba(201,168,76,1);letter-spacing:.05em;margin-bottom:.25rem}
-.upg-feat{font-size:.5625rem;color:rgba(245,240,232,.4);font-family:var(--mono);margin-bottom:1.25rem}
-.upg-price{font-size:1.375rem;font-weight:700;color:rgba(245,240,232,.9);margin-bottom:1.25rem}
-.upg-list{text-align:left;margin-bottom:1.5rem;background:rgba(255,255,255,.02);border-radius:var(--r);padding:.75rem}
-.upg-row{font-size:.5rem;font-family:var(--mono);color:rgba(245,240,232,.55);padding:3px 0;display:flex;align-items:center;gap:6px}
-.upg-row::before{content:'✓';color:rgba(201,168,76,.7);flex-shrink:0}
-.upg-btns{display:flex;gap:.625rem;margin-bottom:.875rem}
-.upg-free{flex:1;padding:.625rem;border-radius:var(--r);background:transparent;border:.5px solid rgba(255,255,255,.1);color:rgba(255,255,255,.3);font-family:var(--mono);font-size:.5rem;cursor:pointer}
-.upg-pro{flex:1.4;padding:.625rem;border-radius:var(--r);background:rgba(201,168,76,1);border:none;color:#000;font-family:var(--mono);font-size:.5rem;font-weight:700;cursor:pointer;letter-spacing:.06em}
-.upg-note{font-size:.375rem;font-family:var(--mono);color:rgba(255,255,255,.15);letter-spacing:.08em}
-/* ── SIDEBAR (laptop only) ── */
-.vv-sidebar{display:none;position:fixed;top:0;left:0;bottom:0;width:220px;background:rgba(4,4,6,.99);border-right:.5px solid var(--border);flex-direction:column;padding:max(1.75rem,env(safe-area-inset-top)) 1rem 1.25rem;z-index:800}
-.sb-brand{margin-bottom:2rem;padding:0 .25rem}
-.sb-logo{font-family:var(--mono);font-size:1.125rem;font-weight:700;letter-spacing:4px;color:var(--gold)}
-.sb-sub{font-size:.4375rem;font-family:var(--mono);letter-spacing:.22em;text-transform:uppercase;color:var(--w30);margin-top:4px}
-.sb-nav{display:flex;flex-direction:column;gap:3px;flex:1}
-.sb-item{display:flex;align-items:center;gap:.875rem;padding:.625rem .875rem;border-radius:var(--r-sm);text-decoration:none;color:var(--w30);font-size:.75rem;font-family:var(--mono);transition:background .15s,color .15s;-webkit-user-select:none;user-select:none}
-.sb-item:hover{background:var(--surf);color:var(--w50)}
-.sb-item.active{background:var(--gold-dim);color:var(--gold);border:.5px solid var(--gold-bd)}
-.sb-icon{font-size:1.0625rem;width:1.25rem;text-align:center;flex-shrink:0;line-height:1}
-.sb-lbl{letter-spacing:.05em}
-.sb-divider{height:.5px;background:var(--border);margin:.75rem 0}
-.sb-coins{display:flex;align-items:center;gap:6px;padding:.5rem .875rem;font-size:.5625rem;font-family:var(--mono);color:var(--gold);letter-spacing:.05em}
-.sb-cdot{width:5px;height:5px;border-radius:50%;background:var(--gold);flex-shrink:0}
-.sb-ghost-btn{display:flex;align-items:center;gap:.75rem;padding:.5rem .875rem;border-radius:var(--r-sm);cursor:pointer;font-size:.6875rem;font-family:var(--mono);color:var(--w30);transition:background .15s;-webkit-user-select:none}
-.sb-ghost-btn:hover{background:var(--surf)}
-.sb-ghost-btn.ghost-on{color:var(--green)}
-.sb-ver{font-size:.375rem;font-family:var(--mono);color:var(--w15);letter-spacing:.1em;text-align:center;margin-top:.75rem}
-/* ── LAPTOP RESPONSIVE ── */
-@media (min-width:768px){
-  .vv-tabs{display:none!important}
-  .vv-sidebar{display:flex!important}
-  .page{margin-left:220px;max-width:none;padding-left:2rem;padding-right:2rem;padding-bottom:2rem}
-  .top-bar{padding-top:1.5rem}
-  .tiles{grid-template-columns:repeat(4,1fr)}
-  .vvid-card,.resume-banner,.sect-label,.ghost-wrap,.app-info,.app-footer{max-width:800px}
-  .activate-btn{max-width:800px}
+/* grain */
+body::before{
+  content:'';position:fixed;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='.05'/%3E%3C/svg%3E");
+  pointer-events:none;z-index:0;opacity:.6
 }
+
+/* ambient glow */
+body::after{
+  content:'';position:fixed;top:50%;left:50%;transform:translate(-50%,-55%);
+  width:600px;height:600px;
+  background:radial-gradient(ellipse,rgba(120,160,255,0.055) 0%,transparent 65%);
+  pointer-events:none;z-index:0
+}
+
+.stage{
+  position:relative;z-index:1;
+  display:flex;flex-direction:column;align-items:center;
+  text-align:center;padding:2rem;
+  animation:fadeUp .9s cubic-bezier(.4,0,.2,1) both
+}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+
+/* dot */
+.dot{
+  width:9px;height:9px;border-radius:50%;
+  background:rgba(180,210,255,0.85);
+  box-shadow:0 0 16px rgba(180,210,255,0.5),0 0 40px rgba(180,210,255,0.15);
+  margin-bottom:2rem;
+  animation:pulse 3s ease-in-out infinite
+}
+@keyframes pulse{
+  0%,100%{opacity:1;box-shadow:0 0 16px rgba(180,210,255,0.5),0 0 40px rgba(180,210,255,0.15)}
+  50%{opacity:.6;box-shadow:0 0 8px rgba(180,210,255,0.3),0 0 20px rgba(180,210,255,0.08)}
+}
+
+/* headline */
+.lea{
+  font-family:'Cormorant Garamond',Georgia,serif;
+  font-size:clamp(80px,20vw,140px);
+  font-weight:300;
+  letter-spacing:-2px;
+  line-height:1;
+  color:#fff;
+  margin-bottom:1.25rem;
+}
+
+.tagline{
+  font-size:clamp(13px,2.5vw,17px);
+  font-weight:300;
+  color:rgba(255,255,255,0.45);
+  letter-spacing:.04em;
+  margin-bottom:2.5rem;
+}
+
+/* buttons */
+.btns{display:flex;gap:.75rem;flex-wrap:wrap;justify-content:center;margin-bottom:2.75rem}
+.btn-primary{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:13px 28px;border-radius:100px;
+  background:rgba(180,210,255,0.12);
+  border:.5px solid rgba(180,210,255,0.3);
+  color:rgba(180,210,255,0.9);
+  font-size:14px;font-weight:500;letter-spacing:.02em;
+  text-decoration:none;cursor:pointer;
+  transition:all .2s;
+}
+.btn-primary:hover{background:rgba(180,210,255,0.2);border-color:rgba(180,210,255,0.5)}
+.btn-primary:active{transform:scale(.97)}
+
+.btn-secondary{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:13px 28px;border-radius:100px;
+  background:transparent;
+  border:.5px solid rgba(255,255,255,0.1);
+  color:rgba(255,255,255,0.35);
+  font-size:14px;font-weight:400;letter-spacing:.02em;
+  text-decoration:none;cursor:pointer;
+  transition:all .2s;
+}
+.btn-secondary:hover{border-color:rgba(255,255,255,0.2);color:rgba(255,255,255,0.5)}
+.btn-secondary:active{transform:scale(.97)}
+
+/* pills */
+.pills{
+  display:flex;gap:.5rem;flex-wrap:wrap;justify-content:center;
+  margin-bottom:3rem
+}
+.pill{
+  font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+  color:rgba(255,255,255,0.18);
+  padding:4px 12px;border-radius:100px;
+  border:.5px solid rgba(255,255,255,0.07);
+}
+
+/* footer */
+footer{
+  position:fixed;bottom:0;left:0;right:0;z-index:1;
+  padding:1rem 1.5rem;
+  display:flex;justify-content:space-between;align-items:center;
+}
+.f-left{font-size:10px;letter-spacing:.15em;color:rgba(255,255,255,0.12);text-transform:uppercase}
+.f-right{font-size:10px;color:rgba(255,255,255,0.1);letter-spacing:.05em}
+
+/* download overlay */
+.dl-overlay{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:1000;
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  align-items:center;justify-content:center;padding:1.5rem
+}
+.dl-overlay.open{display:flex}
+.dl-box{
+  background:rgba(7,7,10,.98);border:.5px solid rgba(180,210,255,.2);
+  border-radius:20px;padding:2rem 1.75rem;width:min(420px,100%);
+  position:relative;text-align:left;
+  animation:fadeUp .3s both
+}
+.dl-box::before{
+  content:'';position:absolute;top:0;left:20%;right:20%;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(180,210,255,.4),transparent)
+}
+.dl-tag{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:rgba(180,210,255,.5);margin-bottom:.5rem}
+.dl-title{font-size:22px;font-weight:600;color:#fff;margin-bottom:.375rem}
+.dl-sub{font-size:12px;color:rgba(255,255,255,.35);margin-bottom:1.5rem}
+.dl-steps{margin-bottom:1.5rem}
+.dl-step{display:flex;gap:.75rem;align-items:flex-start;padding:.625rem 0;border-bottom:.5px solid rgba(255,255,255,.05)}
+.dl-step:last-child{border-bottom:none}
+.dl-n{
+  width:22px;height:22px;border-radius:50%;flex-shrink:0;
+  background:rgba(180,210,255,.1);border:.5px solid rgba(180,210,255,.2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;color:rgba(180,210,255,.7);font-weight:600;margin-top:1px
+}
+.dl-text{font-size:12px;color:rgba(255,255,255,.45);line-height:1.5}
+.dl-text b{color:rgba(255,255,255,.7)}
+.dl-btn{
+  display:block;width:100%;padding:.875rem;border-radius:12px;
+  background:rgba(180,210,255,.1);border:.5px solid rgba(180,210,255,.25);
+  color:rgba(180,210,255,.9);font-size:13px;font-weight:500;
+  text-align:center;text-decoration:none;cursor:pointer;
+  transition:background .2s;letter-spacing:.02em
+}
+.dl-btn:hover{background:rgba(180,210,255,.18)}
+.dl-note{font-size:10px;color:rgba(255,255,255,.2);text-align:center;margin-top:.75rem;letter-spacing:.05em}
+.dl-close{
+  position:absolute;top:1rem;right:1rem;
+  background:none;border:none;color:rgba(255,255,255,.25);
+  font-size:18px;cursor:pointer;padding:4px 8px;line-height:1
+}
+.dl-close:hover{color:rgba(255,255,255,.5)}
 </style>
 </head>
 <body>
-<!-- SIDEBAR (visible on laptop) -->
-<aside class="vv-sidebar">
-  <div class="sb-brand">
-    <div class="sb-logo">VV</div>
-    <div class="sb-sub">Hybrid Universe</div>
-  </div>
-  <nav class="sb-nav">
-    <a href="lea.html" class="sb-item"><span class="sb-icon">◎</span><span class="sb-lbl">LEA</span></a>
-    <a href="vv-pulse.html" class="sb-item"><span class="sb-icon">◉</span><span class="sb-lbl">PULSE</span></a>
-    <a href="#" onclick="openNow();return false;" class="sb-item"><span class="sb-icon">⊡</span><span class="sb-lbl">NOW</span></a>
-    <a href="index.html" class="sb-item active"><span class="sb-icon">⊙</span><span class="sb-lbl">EU</span></a>
-  </nav>
-  <div class="sb-divider"></div>
-  <div class="sb-divider"></div>
-  <div class="sb-sect">HOMME PRO <span class="sb-pro-price">9€/lună</span></div>
-  <div class="sb-item sb-locked" onclick="showUpgrade()"><span class="sb-icon">🎨</span><span class="sb-lbl">Studio</span><span class="sb-lock">🔒</span></div>
-  <div class="sb-item sb-locked" onclick="showUpgrade()"><span class="sb-icon">⚡</span><span class="sb-lbl">Moduri Pro</span><span class="sb-lock">🔒</span></div>
-  <div class="sb-item sb-locked" onclick="showUpgrade()"><span class="sb-icon">↗</span><span class="sb-lbl">Export</span><span class="sb-lock">🔒</span></div>
-  <div class="sb-divider"></div>
-  <div class="sb-coins"><div class="sb-cdot"></div><span id="sb-coins">⬡ 0</span></div>
-  <div class="sb-ghost-btn" id="sb-ghost" onclick="toggleGhost()"><span>👻</span><span id="sb-ghost-lbl">Ghost Mode</span></div>
-  <div class="sb-ver">v2.0 · Mai 2026</div>
-</aside>
-<div class="page">
 
-  <!-- TOP NAV -->
-  <div class="top-bar">
-    <div>
-      <div class="vv-logo">VV</div>
-      <div class="vv-sub">Hybrid Universe</div>
-    </div>
-    <div class="coins-pill">
-      <div class="coins-dot"></div>
-      <span id="coins-display">⬡ 0</span>
-    </div>
+<div class="stage">
+  <div class="dot"></div>
+
+  <div class="lea">Lea</div>
+
+  <div class="tagline">AI personal. Local. Al tău.</div>
+
+  <div class="btns">
+    <a class="btn-primary" href="lea-public.html">Începe &nbsp;→</a>
+    <button class="btn-secondary" onclick="openDl()">Descarcă</button>
   </div>
 
-  <!-- RESUME BANNER -->
-  <div class="resume-banner" id="resume-banner" onclick="window.location.href='lea.html'">
-    <div class="rb-left">
-      <div class="rb-dot"></div>
-      <div>
-        <div class="rb-text">Continuă conversația cu LEA</div>
-        <div class="rb-sub" id="resume-sub">sesiune recentă</div>
-      </div>
-    </div>
-    <div class="rb-arrow">›</div>
-  </div>
-
-  <!-- VV·ID CARD -->
-  <div class="vvid-card">
-    <div class="vvid-label">Identitate VV</div>
-    <div class="vvid-value" id="vvid-val">——</div>
-    <div class="vvid-cta" id="vvid-cta">Deschide LEA pentru a-ți activa identitatea VV.</div>
-    <div class="vvid-chips" id="vvid-chips">
-      <div class="chip" id="chip-tier">Insider</div>
-      <div class="chip" id="chip-coins">⬡ 0</div>
-      <div class="chip" id="chip-date">2026</div>
-    </div>
-  </div>
-
-  <!-- ACTIVATE CTA (if no VV·ID) -->
-  <a href="lea.html" class="activate-btn" id="activate-cta" style="display:none">◎ Activează LEA</a>
-
-  <!-- SECTION TILES -->
-  <div class="sect-label">SECȚIUNI</div>
-  <div class="tiles">
-    <a href="lea.html" class="tile t-lea">
-      <div class="tile-ico">◎</div>
-      <div class="tile-name">LEA</div>
-      <div class="tile-desc">Asistentul tău personal</div>
-      <div class="tile-foot">
-        <span class="tbadge badge-live">LIVE</span>
-        <b id="st-lea">activ</b>
-      </div>
-    </a>
-    <a href="vv-pulse.html" class="tile t-pulse">
-      <div class="tile-ico">◉</div>
-      <div class="tile-name">PULSE</div>
-      <div class="tile-desc">Harta Insider în timp real</div>
-      <div class="tile-foot">
-        <span class="tbadge badge-live">LIVE</span>
-        <b id="st-pulse">—</b>
-      </div>
-    </a>
-    <a href="#" onclick="openNow();return false;" class="tile t-now">
-      <div class="tile-ico">⊡</div>
-      <div class="tile-name">NOW</div>
-      <div class="tile-desc">Caută inteligent cu LEA</div>
-      <div class="tile-foot">
-        <span class="tbadge badge-soon">BETA</span>
-      </div>
-    </a>
-    <div class="tile t-ghost" id="ghost-tile" onclick="toggleGhost()">
-      <div class="tile-ico" id="ghost-ico">👻</div>
-      <div class="tile-name">GHOST</div>
-      <div class="tile-desc">Invizibil 30 min · ART-10</div>
-      <div class="tile-foot">
-        <b id="ghost-status">inactiv</b>
-      </div>
-    </div>
-  </div>
-
-  <!-- GHOST MODE ROW -->
-  <div class="ghost-wrap">
-    <div class="ghost-row">
-      <div class="ghost-left">
-        <div class="ghost-ico">👻</div>
-        <div>
-          <div class="ghost-lbl">Ghost Mode</div>
-          <div class="ghost-sub">ART-10 · Invizibilitate 30 min / sesiune</div>
-        </div>
-      </div>
-      <div class="g-toggle" id="g-toggle" onclick="toggleGhost()">
-        <div class="g-thumb"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- PLAN CARD -->
-  <div class="plan-card">
-    <div class="plan-left">
-      <div class="plan-tier">Plan curent</div>
-      <div class="plan-name">Free</div>
-      <div class="plan-desc">Personal · Local · Nelimitat</div>
-    </div>
-    <div class="plan-btn" onclick="showUpgrade()">Upgrade PRO →</div>
-  </div>  <!-- APP INFO -->
-  <div class="app-info">
-    <div class="info-row">Versiune <span>v2.0 · Mai 2026</span></div>
-    <div class="info-row">Mod stocare <span>Local · Privat</span></div>
-    <div class="info-row">Constituție VV <span>14 articole active</span></div>
-    <div class="info-row">VVhi <span id="vvhi-status">în formare</span></div>
-  </div>
-
-  <div class="app-footer">VV Hybrid Universe · Local-first · Etic · Liber</div>
-</div>
-
-<!-- TAB BAR -->
-<nav class="vv-tabs">
-  <a href="lea.html" class="vv-tab">
-    <div class="vt-icon">◎</div>
-    <div class="vt-lbl">LEA</div>
-  </a>
-  <a href="vv-pulse.html" class="vv-tab">
-    <div class="vt-icon">◉</div>
-    <div class="vt-lbl">PULSE</div>
-  </a>
-  <a href="#" onclick="openNow();return false;" class="vv-tab">
-    <div class="vt-icon">⊡</div>
-    <div class="vt-lbl">NOW</div>
-  </a>
-  <a href="index.html" class="vv-tab active">
-    <div class="vt-icon">⊙</div>
-    <div class="vt-lbl">EU</div>
-  </a>
-</nav>
-
-<div class="toast-pill" id="toast"></div>
-
-<script type="module">
-import{initializeApp}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-import{getFirestore,doc,getDoc,collection,getDocs,query,where,limit}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
-
-const FB={apiKey:'AIzaSyDGv4kEClO0RHCLvXVLOT-vyPHw6bsxYVc',authDomain:'vv-ep-beta.firebaseapp.com',projectId:'vv-ep-beta',storageBucket:'vv-ep-beta.firebasestorage.app',messagingSenderId:'641117018598',appId:'1:641117018598:web:7cd522ef48db46ad58de27'};
-const app=initializeApp(FB);
-const db=getFirestore(app);
-
-const myVvid=localStorage.getItem('lea_id')||localStorage.getItem('vv_citizen_code')||null;
-let ghostActive=false,ghostTimer=null;
-
-function boot(){
-  loadIdentity();
-  loadCoins();
-  checkResume();
-  loadPulseStats();
-  checkGhost();
-  registerSW();
-}
-
-function loadIdentity(){
-  if(!myVvid){
-    document.getElementById('vvid-val').textContent='——';
-    document.getElementById('vvid-cta').style.display='block';
-    document.getElementById('vvid-chips').style.display='none';
-    document.getElementById('activate-cta').style.display='block';
-    return;
-  }
-  const short=myVvid.slice(-8).toUpperCase();
-  document.getElementById('vvid-val').textContent=short;
-  const since=localStorage.getItem('vv_since')||'2026';
-  document.getElementById('chip-date').textContent=since;
-  const tier=localStorage.getItem('vv_tier')||'Insider';
-  document.getElementById('chip-tier').textContent=tier;
-}
-
-async function loadCoins(){
-  const local=parseInt(localStorage.getItem('vv_coins')||'0');
-  setCoins(local);
-  if(!myVvid) return;
-  try{
-    const snap=await getDoc(doc(db,'vv_coins',myVvid.slice(-16)));
-    if(snap.exists()){
-      const n=snap.data().total||0;
-      localStorage.setItem('vv_coins',n);
-      setCoins(n);
-    }
-  }catch(e){}
-}
-
-function setCoins(n){
-  var sbc=document.getElementById('sb-coins'); if(sbc) sbc.textContent='⬡ '+n;
-  document.getElementById('coins-display').textContent='⬡ '+n;
-  document.getElementById('chip-coins').textContent='⬡ '+n;
-}
-
-function checkResume(){
-  const last=parseInt(localStorage.getItem('lea_last_active')||'0');
-  if(!last) return;
-  const diff=Date.now()-last;
-  if(diff<7200000){
-    document.getElementById('resume-banner').classList.add('visible');
-    const m=Math.round(diff/60000);
-    document.getElementById('resume-sub').textContent=m<2?'acum':'acum '+m+' min';
-  }
-}
-
-async function loadPulseStats(){
-  try{
-    const snap=await getDocs(query(collection(db,'locations'),limit(200)));
-    document.getElementById('st-pulse').textContent=snap.size+' locații';
-  }catch(e){}
-}
-
-function checkGhost(){
-  const end=parseInt(localStorage.getItem('vv_ghost_end')||'0');
-  if(end>Date.now()){
-    setGhost(true,false);
-    ghostTimer=setTimeout(()=>setGhost(false),end-Date.now());
-  }
-}
-
-function setGhost(on,save=true){
-  ghostActive=on;
-  document.getElementById('g-toggle').classList.toggle('on',on);
-  var sbg=document.getElementById('sb-ghost'); if(sbg){ sbg.classList.toggle('ghost-on',on); }
-  var sbgl=document.getElementById('sb-ghost-lbl'); if(sbgl){ sbgl.textContent=on?'Ghost activ':'Ghost Mode'; }
-  document.getElementById('ghost-status').textContent=on?'activ 30 min':'inactiv';
-  document.getElementById('ghost-ico').textContent=on?'🕵️':'👻';
-  if(save){
-    if(on){
-      const end=Date.now()+30*60*1000;
-      localStorage.setItem('vv_ghost_end',end);
-      ghostTimer=setTimeout(()=>setGhost(false),30*60*1000);
-      showToast('👻 Ghost Mode activ · 30 min');
-    }else{
-      localStorage.removeItem('vv_ghost_end');
-      clearTimeout(ghostTimer);
-      showToast('Ghost Mode dezactivat');
-    }
-  }
-}
-
-function registerSW(){
-  if('serviceWorker' in navigator){
-    navigator.serviceWorker.register('/vv-nexus/sw.js',{scope:'/vv-nexus/',updateViaCache:'none'})
-      .then(reg=>{
-        reg.addEventListener('updatefound',()=>{
-          const newSW=reg.installing;
-          newSW.addEventListener('statechange',()=>{
-            if(newSW.state==='activated') window.location.reload();
-          });
-        });
-      }).catch(()=>{});
-    navigator.serviceWorker.addEventListener('message',e=>{
-      if(e.data&&e.data.type==='SW_UPDATED') window.location.reload();
-    });
-  }
-}
-
-function showToast(msg,ms=2400){
-  const t=document.getElementById('toast');
-  t.textContent=msg;
-  t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),ms);
-}
-
-window.toggleGhost=()=>setGhost(!ghostActive);
-window.showUpgrade=function(){ document.getElementById('upg-overlay').classList.add('open'); document.getElementById('upg-modal').classList.add('open'); };
-window.closeUpgrade=function(){ document.getElementById('upg-overlay').classList.remove('open'); document.getElementById('upg-modal').classList.remove('open'); };
-boot();
-</script>
-<div class="now-ov" id="now-ov" onclick="if(event.target===this)closeNow()">
-  <div class="now-card">
-    <div class="now-ttl">VV NOW</div>
-    <div class="now-h">Cauta inteligent</div>
-    <input class="now-inp" id="now-inp" placeholder="Restaurant, parc, ruta, idee..." onkeydown="if(event.key==='Enter')submitNow()">
-    <div class="now-btns">
-      <button class="now-b-lea" onclick="submitNow()">◎ Intreaba LEA</button>
-      <button class="now-b-pulse" onclick="window.location.href='vv-pulse.html?search='+encodeURIComponent(document.getElementById(''now-inp'').value)">◉ Cauta pe Pulse</button>
-      <button class="now-b-close" onclick="closeNow()">x</button>
-    </div>
+  <div class="pills">
+    <span class="pill">Zero server</span>
+    <span class="pill">Date locale</span>
+    <span class="pill">GDPR</span>
+    <span class="pill">Gratuit</span>
   </div>
 </div>
+
+<footer>
+  <span class="f-left">hilea.eu</span>
+  <span class="f-right">VV Technologies · 2026</span>
+</footer>
+
+<!-- Download overlay -->
+<div class="dl-overlay" id="dl-overlay" onclick="if(event.target===this)closeDl()">
+  <div class="dl-box">
+    <button class="dl-close" onclick="closeDl()">×</button>
+    <div class="dl-tag">Versiunea locală</div>
+    <div class="dl-title">Lea pe laptop-ul tău</div>
+    <div class="dl-sub">Un singur fișier. Se deschide fără internet.</div>
+    <div class="dl-steps">
+      <div class="dl-step"><div class="dl-n">1</div><div class="dl-text">Descarcă fișierul <b>lea.html</b> (butonul de mai jos)</div></div>
+      <div class="dl-step"><div class="dl-n">2</div><div class="dl-text">Pune-l într-un folder pe laptop</div></div>
+      <div class="dl-step"><div class="dl-n">3</div><div class="dl-text">Deschide <b>lea.html</b> în orice browser — Lea e a ta, pentru totdeauna</div></div>
+    </div>
+    <a class="dl-btn" href="lea.html" download="lea.html">Descarcă Lea →</a>
+    <div class="dl-note">Niciun cont · Niciun email · Nicio instalare</div>
+  </div>
+</div>
+
 <script>
-function openNow(){ document.getElementById('now-ov').classList.add('open'); setTimeout(function(){document.getElementById('now-inp').focus();},150); }
-function closeNow(){ document.getElementById('now-ov').classList.remove('open'); }
-function submitNow(){ var q=document.getElementById('now-inp').value.trim(); if(!q)return; closeNow(); window.location.href='lea.html?q='+encodeURIComponent(q); }
-</script><div class="upg-overlay" id="upg-overlay" onclick="closeUpgrade()"></div>
-<div class="upg-modal" id="upg-modal">
-  <div class="upg-hex">⬡</div>
-  <div class="upg-lbl">LEA HOMME</div>
-  <div class="upg-tier">PRO</div>
-  <div class="upg-feat">Deblocheaza tot potentialul LEA pe laptop</div>
-  <div class="upg-price">9€ / lună</div>
-  <div class="upg-list">
-    <div class="upg-row">Moduri Profesionale — Artist, Creator, Business</div>
-    <div class="upg-row">VV Studio — workspace creativ AI-powered</div>
-    <div class="upg-row">Export conversatii PDF si Markdown</div>
-    <div class="upg-row">Analytics personal — patterns si statistici</div>
-    <div class="upg-row">Prioritate AI — model si viteza superioare</div>
-    <div class="upg-row">Procesare locala offline — fara internet</div>
-  </div>
-  <div class="upg-btns">
-    <button class="upg-free" onclick="closeUpgrade()">Raman pe Free</button>
-    <button class="upg-pro" onclick="closeUpgrade()">Activeaza PRO</button>
-  </div>
-  <div class="upg-note">Local-first · GDPR-ready · Constitutia VV ART-6</div>
-</div></body>
+function openDl(){document.getElementById('dl-overlay').classList.add('open')}
+function closeDl(){document.getElementById('dl-overlay').classList.remove('open')}
+</script>
+</body>
 </html>
-
-
-
-
-
-

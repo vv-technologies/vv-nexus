@@ -1,11 +1,13 @@
 {
-  "name": "Lea · VV",
+  "id": "hilea.eu",
+  "name": "Lea · AI personal. Local. Al tău.",
   "short_name": "Lea",
-  "description": "Asistentul tău personal. Zero server. Totul pe device-ul tău.",
-  "start_url": "./lea.html",
+  "description": "Îți vorbește. Îți amintește. Rămâne pe device-ul tău. Zero server.",
+  "start_url": "/lea-public.html",
+  "scope": "/",
   "display": "standalone",
-  "background_color": "#000000",
-  "theme_color": "#000000",
+  "background_color": "#07070a",
+  "theme_color": "#07070a",
   "orientation": "portrait",
   "lang": "ro",
   "icons": [
