@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lea · VV Technologies</title>
+<meta name="description" content="Lea. AI personal local-first. Parte din ecosistemul VV Hybrid Universe.">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#07070f;
+  --bg2:rgba(255,255,255,0.03);
+  --glass:rgba(255,255,255,0.04);
+  --glass2:rgba(255,255,255,0.07);
+  --border:rgba(255,255,255,0.07);
+  --border2:rgba(255,255,255,0.12);
+  --text:rgba(255,255,255,0.85);
+  --text2:rgba(255,255,255,0.4);
+  --text3:rgba(255,255,255,0.2);
+  --accent:rgba(180,210,255,0.9);
+  --accent-d:rgba(180,210,255,0.15);
+  --shadow:0 8px 32px rgba(0,0,0,0.5);
+  --shadow-sm:0 2px 12px rgba(0,0,0,0.3);
+}
+html,body{height:100%;overflow:hidden;}
+body{
+  background:var(--bg);color:var(--text);
+  font-family:'Inter',sans-serif;font-size:14px;line-height:1.6;
+  display:flex;flex-direction:column;
+}
+
+/* AMBIENT */
+body::before{
+  content:'';position:fixed;top:-20%;left:50%;transform:translateX(-50%);
+  width:700px;height:700px;
+  background:radial-gradient(ellipse,rgba(100,140,255,0.04) 0%,transparent 65%);
+  pointer-events:none;z-index:0;
+}
+body::after{
+  content:'';position:fixed;bottom:-10%;right:10%;
+  width:400px;height:400px;
+  background:radial-gradient(ellipse,rgba(80,200,180,0.025) 0%,transparent 65%);
+  pointer-events:none;z-index:0;
+}
+
+/* NAV */
+nav{
+  position:relative;z-index:10;
+  padding:0 24px;height:52px;
+  display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid var(--border);
+  background:rgba(7,7,15,0.8);
+  backdrop-filter:blur(20px);
+  flex-shrink:0;
+}
+.nav-logo{
+  display:flex;align-items:center;gap:10px;
+  text-decoration:none;
+}
+.nav-dot{
+  width:7px;height:7px;border-radius:50%;
+  background:rgba(180,210,255,0.8);
+  box-shadow:0 0 8px rgba(180,210,255,0.4);
+}
+.nav-name{font-size:15px;font-weight:500;color:var(--text);letter-spacing:-0.3px;}
+.nav-right{display:flex;align-items:center;gap:8px;}
+.nav-eco-btn{
+  font-size:11px;letter-spacing:0.5px;color:var(--text2);
+  background:none;border:0.5px solid var(--border);
+  padding:6px 14px;border-radius:100px;cursor:pointer;
+  transition:all .2s;font-family:'Inter',sans-serif;
+}
+.nav-eco-btn:hover{color:var(--text);border-color:var(--border2);}
+.nav-install{
+  font-size:11px;letter-spacing:0.5px;
+  background:var(--glass2);border:0.5px solid var(--border2);
+  color:var(--text);padding:6px 16px;border-radius:100px;
+  text-decoration:none;transition:all .2s;
+}
+.nav-install:hover{background:rgba(255,255,255,0.1);}
+
+/* ECOSYSTEM PANEL */
+#eco-panel{
+  display:none;
+  position:fixed;top:52px;right:16px;z-index:50;
+  width:320px;max-height:480px;overflow-y:auto;
+  background:rgba(10,10,20,0.95);
+  backdrop-filter:blur(40px);
+  border:1px solid var(--border2);
+  border-radius:16px;
+  box-shadow:var(--shadow);
+  padding:20px;
+}
+#eco-panel.show{display:block;}
+.eco-title{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--text2);margin-bottom:16px;}
+.eco-item{
+  padding:12px 0;border-bottom:1px solid var(--border);
+  display:flex;align-items:flex-start;gap:12px;
+}
+.eco-item:last-child{border-bottom:none;}
+.eco-tag{
+  font-size:9px;letter-spacing:1px;text-transform:uppercase;
+  color:var(--accent);background:var(--accent-d);
+  padding:2px 7px;border-radius:100px;flex-shrink:0;margin-top:2px;
+}
+.eco-item-name{font-size:13px;color:var(--text);font-weight:500;margin-bottom:2px;}
+.eco-item-desc{font-size:11px;color:var(--text2);line-height:1.5;}
+
+/* CHAT AREA */
+#chat-wrap{
+  flex:1;overflow-y:auto;
+  padding:24px 16px 8px;
+  position:relative;z-index:1;
+  scroll-behavior:smooth;
+}
+#chat-wrap::-webkit-scrollbar{width:3px;}
+#chat-wrap::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+
+/* MESSAGES */
+.msg{display:flex;gap:10px;margin-bottom:16px;max-width:680px;margin-left:auto;margin-right:auto;}
+.msg.user{flex-direction:row-reverse;}
+.msg-avatar{
+  width:28px;height:28px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;letter-spacing:0.5px;margin-top:2px;
+}
+.msg.lea .msg-avatar{
+  background:rgba(180,210,255,0.1);border:0.5px solid rgba(180,210,255,0.2);
+  color:var(--accent);font-weight:500;
+}
+.msg.user .msg-avatar{
+  background:var(--glass2);border:0.5px solid var(--border2);
+  color:var(--text2);font-weight:400;
+}
+.msg-body{flex:1;}
+.msg-bubble{
+  display:inline-block;padding:12px 16px;border-radius:16px;
+  font-size:14px;line-height:1.65;font-weight:300;
+  max-width:100%;
+}
+.msg.lea .msg-bubble{
+  background:var(--glass);
+  backdrop-filter:blur(20px);
+  border:1px solid var(--border);
+  box-shadow:var(--shadow-sm);
+  border-radius:4px 16px 16px 16px;
+  color:var(--text);
+}
+.msg.user .msg-bubble{
+  background:var(--glass2);
+  backdrop-filter:blur(20px);
+  border:1px solid var(--border2);
+  border-radius:16px 4px 16px 16px;
+  color:var(--text);
+  float:right;
+}
+.msg-source{
+  font-size:10px;color:var(--text3);margin-top:6px;letter-spacing:0.3px;
+  padding:0 4px;
+}
+.msg-source span{color:rgba(180,210,255,0.4);}
+
+/* TYPING */
+.typing-dot{
+  display:inline-block;width:5px;height:5px;border-radius:50%;
+  background:var(--text2);margin:0 2px;
+  animation:td .8s infinite;
+}
+.typing-dot:nth-child(2){animation-delay:.15s;}
+.typing-dot:nth-child(3){animation-delay:.3s;}
+@keyframes td{0%,60%,100%{transform:translateY(0);}30%{transform:translateY(-5px);}}
+
+/* SEARCH RESULT */
+.search-result{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:12px;padding:14px;margin-top:8px;
+}
+.sr-title{font-size:12px;font-weight:500;color:var(--text);margin-bottom:4px;}
+.sr-text{font-size:12px;color:var(--text2);line-height:1.6;}
+.sr-source{font-size:10px;color:var(--text3);margin-top:6px;}
+.sr-source a{color:rgba(180,210,255,0.4);text-decoration:none;}
+
+/* CHIPS */
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;}
+.chip{
+  font-size:12px;color:var(--text2);
+  background:var(--glass);border:0.5px solid var(--border);
+  padding:6px 14px;border-radius:100px;cursor:pointer;
+  transition:all .2s;font-family:'Inter',sans-serif;
+  white-space:nowrap;
+}
+.chip:hover{color:var(--text);border-color:var(--border2);background:var(--glass2);}
+
+/* INPUT */
+#input-area{
+  position:relative;z-index:5;flex-shrink:0;
+  padding:12px 16px 20px;
+  background:rgba(7,7,15,0.7);
+  backdrop-filter:blur(20px);
+  border-top:1px solid var(--border);
+}
+#input-wrap{
+  max-width:680px;margin:0 auto;
+  display:flex;align-items:center;gap:8px;
+}
+#input{
+  flex:1;background:var(--glass);
+  border:1px solid var(--border);border-radius:100px;
+  padding:11px 20px;
+  font-size:14px;color:var(--text);font-family:'Inter',sans-serif;
+  outline:none;transition:all .2s;
+  backdrop-filter:blur(20px);
+}
+#input::placeholder{color:var(--text3);}
+#input:focus{border-color:var(--border2);background:var(--glass2);}
+#send{
+  width:38px;height:38px;border-radius:50%;flex-shrink:0;
+  background:rgba(180,210,255,0.15);border:0.5px solid rgba(180,210,255,0.25);
+  color:var(--accent);cursor:pointer;transition:all .2s;
+  display:flex;align-items:center;justify-content:center;font-size:16px;
+}
+#send:hover{background:rgba(180,210,255,0.25);}
+#hint{
+  text-align:center;font-size:10px;color:var(--text3);
+  margin-top:8px;letter-spacing:0.3px;
+}
+
+/* INSTALL BANNER */
+#install-banner{
+  display:none;
+  max-width:680px;margin:0 auto 12px;
+  background:var(--glass);backdrop-filter:blur(20px);
+  border:1px solid var(--border2);border-radius:14px;
+  padding:14px 18px;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+}
+#install-banner.show{display:flex;}
+.ib-text{font-size:12px;color:var(--text2);line-height:1.5;}
+.ib-text strong{color:var(--text);}
+.ib-btn{
+  font-size:11px;letter-spacing:0.5px;
+  background:rgba(180,210,255,0.1);border:0.5px solid rgba(180,210,255,0.2);
+  color:var(--accent);padding:7px 16px;border-radius:100px;
+  text-decoration:none;white-space:nowrap;transition:all .2s;
+}
+.ib-btn:hover{background:rgba(180,210,255,0.2);}
+.ib-close{background:none;border:none;color:var(--text3);cursor:pointer;font-size:16px;padding:4px;flex-shrink:0;}
+
+@media(max-width:600px){
+  nav{padding:0 16px;}
+  .nav-eco-btn{display:none;}
+  #eco-panel{right:8px;left:8px;width:auto;}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="#">
+    <div class="nav-dot"></div>
+    <span class="nav-name">Lea</span>
+  </a>
+  <div class="nav-right">
+    <button class="nav-eco-btn" onclick="toggleEco()">Ecosistem</button>
+    <a class="nav-install" href="lea.html">Versiunea personală →</a>
+  </div>
+</nav>
+
+<!-- ECOSYSTEM PANEL -->
+<div id="eco-panel">
+  <div class="eco-title">VV Hybrid Universe</div>
+  <div class="eco-item"><div class="eco-tag">Core</div><div><div class="eco-item-name">LEA</div><div class="eco-item-desc">AI personal local-first. Creierul ecosistemului. Te știe pe tine, nu pe toți.</div></div></div>
+  <div class="eco-item"><div class="eco-tag">Engine</div><div><div class="eco-item-name">VV Nexus</div><div class="eco-item-desc">Motorul invizibil. Procesează, filtrează prin Constituție, orchestrează totul.</div></div></div>
+  <div class="eco-item"><div class="eco-tag">Human</div><div><div class="eco-item-name">VV Pulse</div><div class="eco-item-desc">Misiuni de validare umană pe teren. Adevărul se validează pe stradă, nu pe ecran.</div></div></div>
+  <div class="eco-item"><div class="eco-tag">Map</div><div><div class="eco-item-name">VV Pulse Map</div><div class="eco-item-desc">Harta hibridă — AI + date validate fizic de oameni reali.</div></div></div>
+  <div class="eco-item"><div class="eco-tag">Search</div><div><div class="eco-item-name">VV NOW</div><div class="eco-item-desc">Motor de căutare 50% internet + 50% genomul tău. Rezultate care contează pentru tine.</div></div></div>
+  <div class="eco-item"><div class="eco-tag">Privacy</div><div><div class="eco-item-name">VVEil</div><div class="eco-item-desc">Blur automat logo-uri și date identificabile din fotografii Insider.</div></div></div>
+  <div class="eco-item"><div class="eco-tag">Legal</div><div><div class="eco-item-name">VVScout</div><div class="eco-item-desc">Căutare juridică: stradă → cartier → oraș → județ → țară → UE → internațional.</div></div></div>
+  <div class="eco-item"><div class="eco-tag">Create</div><div><div class="eco-item-name">VV Studio</div><div class="eco-item-desc">Workspace creativ AI-powered. LEA ca partener de creație, nu unealtă.</div></div></div>
+  <div class="eco-item"><div class="eco-tag">Identity</div><div><div class="eco-item-name">VV Me</div><div class="eco-item-desc">Identitate digitală privată. VV·ID — niciodată identitatea ta reală stocată.</div></div></div>
+  <div class="eco-item"><div class="eco-tag">Write</div><div><div class="eco-item-name">VV Write</div><div class="eco-item-desc">Editor personal minimalist cu Mod Flux — gânduri pure, nefiltrate.</div></div></div>
+</div>
+
+<div id="chat-wrap"></div>
+
+<div id="input-area">
+  <div id="install-banner">
+    <div class="ib-text"><strong>Vrei ca Lea să te cunoască cu adevărat?</strong><br>Versiunea personală învață cine ești. Zero server. Datele tale, ale tale.</div>
+    <a class="ib-btn" href="lea.html">Încearcă →</a>
+    <button class="ib-close" onclick="this.parentElement.classList.remove('show')">×</button>
+  </div>
+  <div id="input-wrap">
+    <input id="input" type="text" placeholder="Întreabă orice…" autocomplete="off" spellcheck="false"/>
+    <button id="send" onclick="send()">↑</button>
+  </div>
+  <div id="hint">Wikipedia · Date publice · Zero server · Zero tracking</div>
+</div>
+
+<script>
+(function(){
+
+var msgCount = 0;
+var chat = document.getElementById('chat-wrap');
+
+// ── ECOSYSTEM KNOWLEDGE ──
+var VV = {
+  apps: {
+    'lea': 'LEA este AI-ul personal local-first al ecosistemului VV. Trăiește pe device-ul tău, te știe pe tine — nu pe toți. Parte din VV Hybrid Universe.',
+    'nexus': 'VV Nexus este motorul invizibil al ecosistemului. Procesează, filtrează prin Constituția VV, orchestrează totul în fundal. Utilizatorul nu îl vede niciodată.',
+    'pulse': 'VV Pulse este platforma de misiuni de validare umană. Insiderii verifică fizic informații pe teren — adevărul se validează pe stradă, nu pe ecran.',
+    'pulse map': 'VV Pulse Map este harta hibridă VV — combină inteligența AI cu date validate fizic de oameni reali. Diferit de Google Maps: oamenii văd adevărul, algoritmii văd date.',
+    'now': 'VV NOW este motorul de căutare VV. Model 50/50 — 50% rezultate internet, 50% filtrate prin genomul tău personal. Rezultate care contează pentru tine, nu pentru toți.',
+    'vveil': 'VVEil aplică blur automat pe logo-uri, branduri și date identificabile din fotografiile Insiderilor. Privacy by design.',
+    'vvscout': 'VVScout este motorul de căutare juridică VV — scalabil de la nivel de stradă până la internațional.',
+    'studio': 'VV Studio este workspace-ul creativ AI-powered. LEA ca partener de creație, nu unealtă.',
+    'me': 'VV Me este identitatea digitală privată în ecosistemul VV. VV·ID unic — niciodată identitatea ta reală stocată.',
+    'write': 'VV Write este editorul personal minimalist VV, cu Mod Flux pentru gânduri pure nefiltrate.'
+  },
+  trilogy: 'VV Hi Trilogy este setul de trei invenții originale ale lui Cosmin Toma (Mai 2026): VV HiS (Hybrid Intelligence Script — limbajul), VV HiG (Hybrid Intelligence Genome — identitatea), VV HiB (Hybrid Intelligence Body — arhitectura). A patra: VV HiA — Autonomy.',
+  his: 'VV HiS (Hybrid Intelligence Script) este primul limbaj din lume construit să descrie oameni, nu mașini. Conține VVPL (tipare comportamentale), VVBL (personalitate ca date) și VVML (moștenirea memoriei după moarte).',
+  hig: 'VV HiG (Hybrid Intelligence Genome) tratează profilul tău AI nu ca o bază de date, ci ca ADN digital — unic, necopiabil, cu 5 straturi de identitate și decay natural ca memoria umană.',
+  hib: 'VV HiB (Hybrid Intelligence Body) este arhitectura biologică a sistemului — 4 organe: Transport, Monitor, Execute, Connect. Un organism complet, local-first.',
+  hia: 'VV HiA (Hybrid Intelligence Autonomy) înseamnă că fiecare nod supraviețuiește independent. Dacă serverul dispare, Lea ta continuă. Datele tale nu se pierd niciodată.',
+  founder: 'Cosmin Toma este fondatorul VV Technologies și al VV Hybrid Universe, România, 2026. A inventat VV Hi Trilogy — primul framework complet pentru AI personal local-first.',
+  philosophy: 'Filozofia VV: omul este platforma, nu serverul. AI-ul trăiește pe device-ul tău, te cunoaște pe tine, nu trimite datele tale nicăieri. Limitat prin Constituție, nu prin hardware.'
+};
+
+// ── RESPONSES ──
+var leaResponses = {
+  salut: ['Bună. Sunt Lea — versiunea publică, fără memorie personală. Ce vrei să știi?', 'Salut. Sunt Lea. Îți arăt ce pot. Ce te interesează?', 'Bună. Cu ce te pot ajuta azi?'],
+  multumesc: ['Cu plăcere.', 'Oricând.', 'De nimic.'],
+  cine: 'Sunt Lea — AI-ul personal din ecosistemul VV Hybrid Universe. Această versiune e publică, fără memorie. Versiunea personală te cunoaște, trăiește pe device-ul tău și nu trimite datele tale nicăieri.',
+  ce_poti: 'Pot căuta informații din surse publice (Wikipedia), îți spun tot despre ecosistemul VV și cum e construit, și demonstrez ce înseamnă un AI care funcționează fără server. Versiunea personală merge mai departe — te cunoaște.',
+  cum_construit: VV.trilogy + ' Implementarea live funcționează 100% în browser, fără server, fără API plătit.',
+  vv: 'VV Hybrid Universe este un ecosistem digital complet — primul construit pe principii de suveranitate digitală, local-first și adevăr validat de oameni. Fondator: Cosmin Toma, România, 2026.',
+  fallback: ['Încerc să aflu ceva despre asta.', 'Lasă-mă să caut.', 'Un moment.']
+};
+
+function pickRandom(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+// ── WIKIPEDIA SEARCH ──
+async function searchWiki(query) {
+  var langs = ['ro', 'en'];
+  for(var i = 0; i < langs.length; i++) {
+    try {
+      var url = 'https://' + langs[i] + '.wikipedia.org/api/rest_v1/page/summary/' + encodeURIComponent(query);
+      var res = await fetch(url);
+      if(!res.ok) continue;
+      var d = await res.json();
+      if(d.extract && d.extract.length > 50) {
+        return {
+          text: d.extract.length > 400 ? d.extract.slice(0,400) + '…' : d.extract,
+          title: d.title,
+          url: d.content_urls && d.content_urls.desktop ? d.content_urls.desktop.page : null,
+          lang: langs[i]
+        };
+      }
+    } catch(e){}
+  }
+  return null;
+}
+
+async function searchWikiQuery(query) {
+  try {
+    var url = 'https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=' + encodeURIComponent(query) + '&format=json&origin=*&srlimit=1';
+    var res = await fetch(url);
+    var d = await res.json();
+    if(d.query && d.query.search && d.query.search.length > 0) {
+      var top = d.query.search[0];
+      return await searchWiki(top.title);
+    }
+  } catch(e){}
+  return null;
+}
+
+// ── DETECT INTENT ──
+function detectIntent(msg) {
+  var l = msg.toLowerCase().trim();
+
+  if(/^(salut|buna|bun[aă]|hello|hey|hi\b|servus)/.test(l)) return 'salut';
+  if(/multumesc|mersi|thanks/.test(l)) return 'multumesc';
+  if(/cine ești|cine esti|ce ești|ce esti|despre tine|cum te chemi/.test(l)) return 'cine';
+  if(/ce (poți|poti) face|cum (mă|ma) ajuți|ajuți|ce stii|ce știi/.test(l)) return 'ce_poti';
+  if(/cum ești (construit|facut|facut)|cum funcționezi|cum functionezi|arhitectur|cum e construit/.test(l)) return 'cum_construit';
+  if(/vv his|vv hig|vv hib|vv hia|trilogy|limbaj vv|pattern language|behavior language/.test(l)) return 'trilogy';
+  if(/ce e vv|ce este vv|vv hybrid|ecosistem vv|vv technologies/.test(l)) return 'vv';
+  if(/\b(lea|nexus|pulse map|pulse|now|vveil|vvscout|studio|vv me|vv write)\b/.test(l)) return 'app';
+  if(/cosmin|fondator|inventor|inventat|cine a facut|cine a creat/.test(l)) return 'founder';
+  if(/filozofie|filosofie|principii|local.?first|suveranitate/.test(l)) return 'philosophy';
+
+  return 'search';
+}
+
+function getAppResponse(msg) {
+  var l = msg.toLowerCase();
+  for(var key in VV.apps) {
+    if(l.includes(key)) return VV.apps[key];
+  }
+  return null;
+}
+
+// ── THINK ──
+async function think(msg) {
+  var intent = detectIntent(msg);
+  var l = msg.toLowerCase();
+
+  if(intent === 'salut') return { text: pickRandom(leaResponses.salut) };
+  if(intent === 'multumesc') return { text: pickRandom(leaResponses.multumesc) };
+  if(intent === 'cine') return { text: leaResponses.cine };
+  if(intent === 'ce_poti') return { text: leaResponses.ce_poti };
+  if(intent === 'cum_construit') return { text: leaResponses.cum_construit };
+  if(intent === 'trilogy') {
+    if(l.includes('his')) return { text: VV.his };
+    if(l.includes('hig')) return { text: VV.hig };
+    if(l.includes('hib')) return { text: VV.hib };
+    if(l.includes('hia')) return { text: VV.hia };
+    return { text: VV.trilogy };
+  }
+  if(intent === 'vv') return { text: VV.philosophy };
+  if(intent === 'app') {
+    var r = getAppResponse(msg);
+    if(r) return { text: r };
+  }
+  if(intent === 'founder') return { text: VV.founder };
+  if(intent === 'philosophy') return { text: VV.philosophy };
+
+  // SEARCH
+  var result = await searchWiki(msg);
+  if(!result) result = await searchWikiQuery(msg);
+  if(result) return { text: null, wiki: result };
+
+  return { text: 'Nu am găsit nimic concret despre asta. Încearcă să reformulezi sau întreabă ceva despre ecosistemul VV.' };
+}
+
+// ── UI ──
+function addMsg(role, content, source) {
+  var el = document.createElement('div');
+  el.className = 'msg ' + role;
+  var avatar = role === 'lea' ? 'L' : 'Tu';
+  var bubbleHtml = '';
+
+  if(content && content.wiki) {
+    var w = content.wiki;
+    bubbleHtml = '<div class="msg-bubble">Am găsit ceva:<div class="search-result"><div class="sr-title">' + w.title + '</div><div class="sr-text">' + w.text + '</div>' + (w.url ? '<div class="sr-source">Sursă: <a href="' + w.url + '" target="_blank">Wikipedia</a></div>' : '') + '</div></div>';
+  } else {
+    var text = typeof content === 'string' ? content : (content && content.text ? content.text : '');
+    bubbleHtml = '<div class="msg-bubble">' + text.replace(/\n/g,'<br>') + '</div>';
+  }
+
+  if(source) bubbleHtml += '<div class="msg-source">via <span>' + source + '</span></div>';
+
+  el.innerHTML = '<div class="msg-avatar">' + avatar + '</div><div class="msg-body">' + bubbleHtml + '</div>';
+  chat.appendChild(el);
+  chat.scrollTop = chat.scrollHeight;
+  return el;
+}
+
+function addTyping() {
+  var el = document.createElement('div');
+  el.className = 'msg lea';
+  el.id = 'typing';
+  el.innerHTML = '<div class="msg-avatar">L</div><div class="msg-body"><div class="msg-bubble"><span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span></div></div>';
+  chat.appendChild(el);
+  chat.scrollTop = chat.scrollHeight;
+  return el;
+}
+
+function removeTyping() {
+  var t = document.getElementById('typing');
+  if(t) t.remove();
+}
+
+function addChips(list) {
+  var last = chat.querySelector('.msg:last-child .msg-body');
+  if(!last) return;
+  var div = document.createElement('div');
+  div.className = 'chips';
+  list.forEach(function(c) {
+    var btn = document.createElement('button');
+    btn.className = 'chip';
+    btn.textContent = c;
+    btn.onclick = function() {
+      document.getElementById('input').value = c;
+      send();
+    };
+    div.appendChild(btn);
+  });
+  last.appendChild(div);
+}
+
+// ── SEND ──
+window.send = async function() {
+  var inp = document.getElementById('input');
+  var msg = inp.value.trim();
+  if(!msg) return;
+  inp.value = '';
+  msgCount++;
+
+  addMsg('user', msg);
+  var typing = addTyping();
+
+  var delay = 400 + Math.random() * 300;
+  var result = await think(msg);
+  await new Promise(function(r){ setTimeout(r, delay); });
+  removeTyping();
+
+  addMsg('lea', result);
+
+  // chips contextual
+  if(msgCount === 1) {
+    addChips(['Cum ești construită?', 'Ce e VV?', 'Caută ceva']);
+  } else if(msg.toLowerCase().includes('vv') || msg.toLowerCase().includes('lea')) {
+    addChips(['Ce e VV NOW?', 'Ce e VV HiG?', 'Cine a inventat asta?']);
+  }
+
+  // install banner după 4 mesaje
+  if(msgCount === 4) {
+    document.getElementById('install-banner').classList.add('show');
+  }
+};
+
+// ── ECOSYSTEM PANEL ──
+window.toggleEco = function() {
+  document.getElementById('eco-panel').classList.toggle('show');
+};
+document.addEventListener('click', function(e) {
+  var panel = document.getElementById('eco-panel');
+  if(panel.classList.contains('show') && !panel.contains(e.target) && !e.target.closest('.nav-eco-btn')) {
+    panel.classList.remove('show');
+  }
+});
+
+// ── ENTER ──
+document.getElementById('input').addEventListener('keydown', function(e) {
+  if(e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
+});
+
+// ── INIT ──
+setTimeout(function() {
+  addMsg('lea', 'Bună. Sunt Lea — versiunea publică.\n\nÎți demonstrez ce poate un AI local-first. Fără cont. Fără date stocate. Caută orice sau întreabă despre cum sunt construită.');
+  addChips(['Cine ești?', 'Ce poți face?', 'Ce e VV Hybrid Universe?', 'Cum ești construită?']);
+}, 300);
+
+})();
+</script>
+</body>
+</html>
