@@ -1185,13 +1185,40 @@ window.addEventListener('load', function() {
   function vvhilSearchRO(subject) {
     return fetch('https://ro.wikipedia.org/api/rest_v1/page/summary/' + encodeURIComponent(subject))
       .then(function(r){ return r.ok ? r.json() : null; })
+      .then(function(d){ return (d && d.type === 'disambiguation') ? null : d; })
       .catch(function(){ return null; });
   }
 
   function vvhilSearchEN(subject) {
     return fetch('https://en.wikipedia.org/api/rest_v1/page/summary/' + encodeURIComponent(subject))
       .then(function(r){ return r.ok ? r.json() : null; })
+      .then(function(d){ return (d && d.type === 'disambiguation') ? null : d; })
       .catch(function(){ return null; });
+  }
+
+  function vvhilDetectCategory(question, subject) {
+    var q = question.toLowerCase().trim();
+    var s = subject.toLowerCase().trim();
+    if(/^cine\s/.test(q) || /\b(a inventat|a creat|a fondat|a scris|a descoperit|a compus|a condus)\b/.test(q)) return 'person';
+    if(/biografie|data na[sș]terii|s-a n[aă]scut|a murit/.test(q)) return 'person';
+    if(/^unde\s/.test(q) || /\b(ora[sș]|[tț]ar[aă]|munte|r[aâ]u|lac|capital[aă]|insul[aă]|continent)\b/.test(s)) return 'place';
+    if(/^c[aâ]nd\s/.test(q) || /\b(r[aă]zboi|revolu[tț]ie|b[aă]t[aă]lie|tratat|invazi[ei])\b/.test(s)) return 'event';
+    return null;
+  }
+
+  function vvhilIsRelevant(subject, d, category) {
+    if(!d || !d.title) return false;
+    var words = subject.toLowerCase().split(/\s+/).filter(function(w){ return w.length > 3; });
+    var title = d.title.toLowerCase();
+    var desc  = (d.description || '').toLowerCase();
+    if(words.length && !words.some(function(w){ return title.includes(w); })) return false;
+    if(category === 'person' && desc) {
+      if(!/born|politician|scriitor|writer|general|artist|ruler|composer|philosopher|inventor|scientist|actor|director|rege|imparat|presedinte/.test(desc)) return false;
+    }
+    if(category === 'place' && desc) {
+      if(!/city|town|village|country|mountain|river|lake|capital|region|municipiu|oras|sat|commune/.test(desc)) return false;
+    }
+    return true;
   }
 
   function vvhilSearchQuery(q) {
@@ -1283,10 +1310,20 @@ window.addEventListener('load', function() {
     if(_wikiTrigger.test(q.trim())) {
       var subj = vvhilExtractSubject(q);
       if(subj.length > 1) {
+        var catHiL = vvhilDetectCategory(q, subj);
         var tkW = typeof addMsg==='function' ? addMsg('l','',true) : null;
         var wd = await vvhilSearchRO(subj);
-        if(!wd || !wd.extract) wd = await vvhilSearchQuery(subj);
-        if(!wd || !wd.extract) wd = await vvhilSearchEN(subj);
+        if(wd && !vvhilIsRelevant(subj, wd, catHiL)) wd = null;
+        if(!wd || !wd.extract) { wd = await vvhilSearchQuery(subj); if(wd && !vvhilIsRelevant(subj, wd, catHiL)) wd = null; }
+        if(!wd || !wd.extract) { wd = await vvhilSearchEN(subj); if(wd && !vvhilIsRelevant(subj, wd, catHiL)) wd = null; }
+        // Variante din categorie dacă totul a eșuat
+        if((!wd || !wd.extract) && catHiL) {
+          var catVars = catHiL === 'person' ? [subj+' biografie', subj+' politician'] : catHiL === 'place' ? [subj+' România', subj+' city'] : [subj+' istoric'];
+          for(var cvi2=0; cvi2<catVars.length && (!wd||!wd.extract); cvi2++) {
+            wd = await vvhilSearchRO(catVars[cvi2]);
+            if(wd && !vvhilIsRelevant(subj, wd, null)) wd = null;
+          }
+        }
         if(tkW) { var el=document.getElementById('tk-msg'); if(el) el.remove(); }
         if(wd && wd.extract) {
           var fmt = vvhilFormatWiki(wd);

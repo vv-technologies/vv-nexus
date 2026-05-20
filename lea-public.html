@@ -445,10 +445,12 @@ async function searchWiki(query) {
       var res = await fetch(url);
       if(!res.ok) continue;
       var d = await res.json();
+      if(d.type === 'disambiguation') continue;
       if(d.extract && d.extract.length > 50) {
         return {
           text: d.extract.length > 400 ? d.extract.slice(0,400) + '…' : d.extract,
           title: d.title,
+          description: d.description || '',
           url: d.content_urls && d.content_urls.desktop ? d.content_urls.desktop.page : null,
           lang: langs[i]
         };
@@ -506,12 +508,37 @@ function extractSubject(msg) {
   return l;
 }
 
-function isRelevant(subject, result) {
+function isRelevant(subject, result, category) {
   if(!result || !result.title) return false;
   var words = subject.toLowerCase().split(/\s+/).filter(function(w){ return w.length > 3; });
-  if(!words.length) return true;
   var title = result.title.toLowerCase();
-  return words.some(function(w){ return title.includes(w); });
+  var desc  = (result.description || '').toLowerCase();
+  if(words.length && !words.some(function(w){ return title.includes(w); })) return false;
+  if(category === 'person' && desc) {
+    if(!/born|politician|scriitor|writer|general|artist|ruler|composer|philosopher|inventor|scientist|actor|director|rege|imparat|presedinte/.test(desc)) return false;
+  }
+  if(category === 'place' && desc) {
+    if(!/city|town|village|country|mountain|river|lake|capital|region|municipiu|oras|sat|commune|district/.test(desc)) return false;
+  }
+  return true;
+}
+
+// ── CATEGORY DETECTION — filtru semantic VVBL ──
+function detectCategory(question, subject) {
+  var q = question.toLowerCase().trim();
+  var s = subject.toLowerCase().trim();
+  if(/^cine\s/.test(q) || /\b(a inventat|a creat|a fondat|a scris|a descoperit|a compus|a condus|a domnit)\b/.test(q)) return 'person';
+  if(/biografie|data na[sș]terii|v[aâ]rsta|s-a n[aă]scut|a murit/.test(q)) return 'person';
+  if(/^unde\s/.test(q) || /\b(ora[sș]|sat|jude[tț]|[tț]ar[aă]|munte|r[aâ]u|lac|ocean|mare|capital[aă]|insul[aă]|peninsul[aă]|continent)\b/.test(s)) return 'place';
+  if(/^c[aâ]nd\s/.test(q) || /\b(r[aă]zboi|revolu[tț]ie|b[aă]t[aă]lie|tratat|invazi[ei]|independen[tț][aă])\b/.test(s)) return 'event';
+  return null;
+}
+
+function buildCategoryVariants(subject, category) {
+  if(category === 'person')  return [subject + ' biografie', subject + ' politician', subject + ' scriitor'];
+  if(category === 'place')   return [subject + ' România', subject + ' city', subject + ' country'];
+  if(category === 'event')   return [subject + ' istoric', subject + ' war', subject + ' revolution'];
+  return [];
 }
 
 // ── DETECT INTENT ──
@@ -592,8 +619,9 @@ async function think(msg) {
   if(intent === 'founder') return { text: VV.founder };
   if(intent === 'philosophy') return { text: VV.philosophy };
 
-  // SEARCH — extrage subiectul cu VVBL, apoi caută
+  // SEARCH — extrage subiectul cu VVBL, detects category, caută
   var subject = extractSubject(msg);
+  var category = detectCategory(msg, subject);
 
   // Nu căuta în Wikipedia pentru timp real (vreme, oră, prețuri)
   if(/^(ora|cât e|ceas|vreme|vremea|meteo|azi e|azi este|prețul|pretul|curs valutar)/.test(subject.toLowerCase())) {
@@ -601,13 +629,23 @@ async function think(msg) {
   }
 
   var result = await searchWiki(subject);
-  if(result && !isRelevant(subject, result)) result = null;
+  if(result && !isRelevant(subject, result, category)) result = null;
   if(!result) result = await searchWikiQuery(subject);
-  if(result && !isRelevant(subject, result)) result = null;
+  if(result && !isRelevant(subject, result, category)) result = null;
+
+  // Variante specifice categoriei dacă cautarea directă a eșuat
+  if(!result && category) {
+    var catVariants = buildCategoryVariants(subject, category);
+    for(var cvi = 0; cvi < catVariants.length && !result; cvi++) {
+      result = await searchWiki(catVariants[cvi]);
+      if(result && !isRelevant(subject, result, null)) result = null;
+    }
+  }
+
   if(!result && subject !== msg.replace(/\?+$/,'').trim()) {
     var msgClean = msg.replace(/\?+$/,'').trim();
     result = await searchWiki(msgClean);
-    if(result && !isRelevant(subject, result)) result = null;
+    if(result && !isRelevant(subject, result, category)) result = null;
   }
 
   if(result) {
