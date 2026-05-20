@@ -432,6 +432,10 @@ var leaResponses = {
 
 function pickRandom(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
 
+// ── SEARCH STATE — memoria ultimei căutări ──
+var _lastSearchSubject = '';
+var _lastSearchResult  = null;
+
 // ── WIKIPEDIA SEARCH ──
 async function searchWiki(query) {
   var langs = ['ro', 'en'];
@@ -451,6 +455,21 @@ async function searchWiki(query) {
       }
     } catch(e){}
   }
+  return null;
+}
+
+// ── DUCKDUCKGO FALLBACK ──
+async function searchDDG(query) {
+  try {
+    var url = 'https://api.duckduckgo.com/?q=' + encodeURIComponent(query) + '&format=json&no_redirect=1&no_html=1&skip_disambig=1';
+    var res = await fetch(url);
+    var d = await res.json();
+    if(d.AbstractText && d.AbstractText.length > 60) {
+      return { text: d.AbstractText, url: d.AbstractURL || null, source: 'DuckDuckGo', topics: [] };
+    }
+    var topics = (d.RelatedTopics || []).filter(function(t){ return t.Text && t.Text.length > 10; }).slice(0,3);
+    if(topics.length) return { text: null, url: null, source: 'DuckDuckGo', topics: topics.map(function(t){ return t.Text.split(' - ')[0]; }) };
+  } catch(e) {}
   return null;
 }
 
@@ -501,6 +520,7 @@ function detectIntent(msg) {
 
   if(/^(salut|buna|bun[aă]|hello|hey|hi\b|servus)/.test(l)) return 'salut';
   if(/multumesc|mersi|thanks/.test(l)) return 'multumesc';
+  if(_lastSearchSubject && /^(mai mult|detalii|continua|continuă|extinde|si ce|și ce altceva|spune mai mult|mai multe|mai info|explica|explică|aprofundeaz|ce mai stii|ce mai știi)/.test(l)) return 'depth';
   if(/date personale|datele mele|ce stochezi|ce tii|ce ai despre mine|privacy|confidential|gdpr|sigur|sigura|esti sigura|protejat|protectia datelor|ce salvezi|ce pastrezi/.test(l)) return 'privacy';
   if(/descarc|download|instala|instalez|pun pe laptop|pun pe telefon|pe pc|îl am offline|o am offline/.test(l)) return 'install';
   if(/cine ești|cine esti|ce ești|ce esti|despre tine|cum te chemi/.test(l)) return 'cine';
@@ -524,14 +544,13 @@ function getAppResponse(msg) {
   return null;
 }
 
-// ── FORMAT WIKI — Lea structurează în vocea ei ──
-function formatWiki(result) {
+// ── FORMAT WIKI ──
+function formatWiki(result, extended) {
   var text = result.text;
-  // ia primele 2 propoziții
   var sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
-  var short = sentences.slice(0,2).join(' ').trim();
-  // elimină paranteze lungi
-  short = short.replace(/\([^)]{30,}\)/g,'').trim();
+  var count = extended ? 5 : 2;
+  var short = sentences.slice(0, count).join(' ').trim();
+  short = short.replace(/\([^)]{30,}\)/g, '').replace(/\s{2,}/g,' ').trim();
   return short;
 }
 
@@ -542,6 +561,16 @@ async function think(msg) {
 
   if(intent === 'salut') return { text: pickRandom(leaResponses.salut) };
   if(intent === 'multumesc') return { text: pickRandom(leaResponses.multumesc) };
+  if(intent === 'depth') {
+    var extWiki = _lastSearchResult ? { text: null, wiki: _lastSearchResult, formatted: formatWiki(_lastSearchResult, true) } : null;
+    var ddg = await searchDDG(_lastSearchSubject);
+    if(extWiki && ddg && ddg.text) {
+      return { text: formatWiki(_lastSearchResult, true) + '\n\n' + ddg.text, depthSource: true };
+    }
+    if(extWiki) return { text: null, wiki: _lastSearchResult, formatted: formatWiki(_lastSearchResult, true), depthSource: true };
+    if(ddg && ddg.text) return { text: ddg.text, source: 'DuckDuckGo' };
+    return { text: 'Nu am mai multe informații despre "' + _lastSearchSubject + '".' };
+  }
   if(intent === 'privacy') { setTimeout(openPrivacy, 400); return { text: 'Transparență completă. Nu stochează nimic pe server. Tot ce știu despre tine trăiește exclusiv pe device-ul tău — eu nu pot accesa nimic din exterior.' }; }
   if(intent === 'install') return { text: leaResponses.install };
   if(intent === 'weather') return { text: leaResponses.weather };
@@ -580,7 +609,24 @@ async function think(msg) {
     result = await searchWiki(msgClean);
     if(result && !isRelevant(subject, result)) result = null;
   }
-  if(result) return { text: null, wiki: result, formatted: formatWiki(result) };
+
+  if(result) {
+    _lastSearchSubject = subject;
+    _lastSearchResult  = result;
+    return { text: null, wiki: result, formatted: formatWiki(result) };
+  }
+
+  // Wikipedia a eșuat — încearcă DuckDuckGo
+  var ddgFallback = await searchDDG(subject);
+  if(ddgFallback && ddgFallback.text) {
+    _lastSearchSubject = subject;
+    _lastSearchResult  = null;
+    return { text: ddgFallback.text, source: 'DuckDuckGo' };
+  }
+  if(ddgFallback && ddgFallback.topics && ddgFallback.topics.length) {
+    _lastSearchSubject = subject;
+    return { text: 'Nu am o definiție exactă, dar am găsit subiecte legate: ' + ddgFallback.topics.join(' · '), source: 'DuckDuckGo' };
+  }
 
   return { text: 'Nu am găsit nimic despre "' + subject + '". Încearcă un termen mai simplu sau întreabă despre ecosistemul VV.' };
 }
@@ -595,10 +641,12 @@ function addMsg(role, content, source) {
   if(content && content.wiki) {
     var w = content.wiki;
     var display = content.formatted || w.text;
-    bubbleHtml = '<div class="msg-bubble">' + display + '</div><div class="msg-source">via <span><a href="' + (w.url||'#') + '" target="_blank" style="color:rgba(180,210,255,0.4);text-decoration:none;">Wikipedia</a></span></div>';
+    var srcLabel = content.depthSource ? 'Wikipedia · extins' : 'Wikipedia';
+    bubbleHtml = '<div class="msg-bubble">' + display.replace(/\n/g,'<br>') + '</div><div class="msg-source">via <span><a href="' + (w.url||'#') + '" target="_blank" style="color:rgba(180,210,255,0.4);text-decoration:none;">' + srcLabel + '</a></span></div>';
   } else {
     var text = typeof content === 'string' ? content : (content && content.text ? content.text : '');
-    bubbleHtml = '<div class="msg-bubble">' + text.replace(/\n/g,'<br>') + '</div>';
+    var srcLine = content && content.source ? '<div class="msg-source">via <span style="color:rgba(180,210,255,0.35);">' + content.source + '</span></div>' : '';
+    bubbleHtml = '<div class="msg-bubble">' + text.replace(/\n/g,'<br>') + '</div>' + srcLine;
   }
 
   if(source) bubbleHtml += '<div class="msg-source">via <span>' + source + '</span></div>';
@@ -661,7 +709,10 @@ window.send = async function() {
   addMsg('lea', result);
 
   // chips contextual
-  if(msgCount === 1) {
+  if(result && (result.wiki || (result.source && result.text))) {
+    // Răspuns din Wikipedia sau DDG — chip "Mai mult"
+    addChips(['Mai mult', 'Spune mai mult', 'Detalii']);
+  } else if(msgCount === 1) {
     addChips(['Cum ești construită?', 'Ce e VV?', 'Caută ceva']);
   } else if(msg.toLowerCase().includes('vv') || msg.toLowerCase().includes('lea')) {
     addChips(['Ce e VV NOW?', 'Ce e VV HiG?', 'Cine a inventat asta?']);

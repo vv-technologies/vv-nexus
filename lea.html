@@ -1206,7 +1206,10 @@ window.addEventListener('load', function() {
       .catch(function(){ return null; });
   }
 
-  var _wikiTrigger = /^(cine |ce (este|e|înseamnă|inseamna|sunt|a |reprezinta)|când |unde (este|e|se |era)|cum (funcț|function|se )|cauta|caută|gaseste|găsește|spune.mi despre|ce stii despre|informatii despre)/i;
+  var _wikiTrigger  = /^(cine |ce (este|e|înseamnă|inseamna|sunt|a |reprezinta)|când |unde (este|e|se |era)|cum (funcț|function|se )|cauta|caută|gaseste|găsește|spune.mi despre|ce stii despre|informatii despre)/i;
+  var _depthTrigger = /^(mai mult|detalii|continua|continuă|extinde|si ce|și ce altceva|spune mai mult|mai multe|mai info|explica|explică|ce mai stii|ce mai știi)\b/i;
+  var _lastHiLSubject = '';
+  var _lastHiLResult  = null;
 
   // ── Wrap processLea ───────────────────────────────────────
   if(typeof processLea !== 'function') return;
@@ -1257,6 +1260,25 @@ window.addEventListener('load', function() {
       return;
     }
 
+    // ── VV HiL — Depth mode: "mai mult" după Wikipedia ───────
+    if(_lastHiLSubject && _depthTrigger.test(q.trim())) {
+      var tkD = typeof addMsg==='function' ? addMsg('l','',true) : null;
+      var wdD = _lastHiLResult ? _lastHiLResult : await vvhilSearchRO(_lastHiLSubject);
+      if(!wdD || !wdD.extract) wdD = await vvhilSearchQuery(_lastHiLSubject);
+      if(tkD) { var elD=document.getElementById('tk-msg'); if(elD) elD.remove(); }
+      if(wdD && wdD.extract) {
+        var textD = wdD.extract.replace(/\([^)]{0,80}\)/g,'').replace(/\s{2,}/g,' ').trim();
+        var sentD = textD.match(/[^.!?]+[.!?]/g) || [textD];
+        var fmtD  = sentD.slice(0, 5).join(' ').trim();
+        _vvhiLastReply = fmtD;
+        if(typeof addMsg==='function') addMsg('l', fmtD);
+        var bD = document.querySelectorAll('.msg-b'); if(bD.length) { var lD=bD[bD.length-1]; var aD=document.createElement('a'); aD.href=(wdD.content_urls&&wdD.content_urls.mobile)?wdD.content_urls.mobile.page:'#'; aD.target='_blank'; aD.rel='noopener'; aD.textContent='· Wikipedia · extins'; aD.style.cssText='display:block;margin-top:5px;color:rgba(212,175,55,0.4);font-size:10px;text-decoration:none;font-family:var(--mono);'; lD.appendChild(aD); }
+        if(typeof _hist!=='undefined') { _hist.push({r:'u',t:q}); _hist.push({r:'l',t:fmtD}); }
+        if(typeof saveHistory==='function') saveHistory();
+        return;
+      }
+    }
+
     // ── VV HiL — Wikipedia înainte de API ────────────────────
     if(_wikiTrigger.test(q.trim())) {
       var subj = vvhilExtractSubject(q);
@@ -1270,6 +1292,8 @@ window.addEventListener('load', function() {
           var fmt = vvhilFormatWiki(wd);
           if(fmt) {
             _vvhiLastReply = fmt;
+            _lastHiLSubject = subj;
+            _lastHiLResult  = wd;
             if(typeof addMsg==='function') addMsg('l', fmt);
             // Adauga link Wikipedia sub mesaj
             var allBubs = document.querySelectorAll('.msg-b');
