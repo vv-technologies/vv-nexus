@@ -547,6 +547,32 @@ nav{
 var msgCount = 0;
 var chat = document.getElementById('chat-wrap');
 
+// ── DIAGNOSTIC ENGINE ──
+var _dbg = false;
+var _dbgTrace = [];
+function dbg(step, ok, detail) {
+  if(!_dbg) return;
+  _dbgTrace.push({ step: step, ok: ok, detail: String(detail||'') });
+}
+function dbgReset() { _dbgTrace = []; }
+function addDebugCard(trace) {
+  if(!trace || !trace.length) return;
+  var el = document.createElement('div');
+  el.style.cssText = 'max-width:680px;margin:4px auto 16px;font-family:\'SF Mono\',\'Fira Mono\',monospace;font-size:11px;background:rgba(255,200,80,0.04);border:0.5px solid rgba(255,200,80,0.18);border-radius:10px;overflow:hidden;';
+  var rows = trace.map(function(t){
+    var icon = t.ok === true ? '✓' : t.ok === false ? '✗' : '·';
+    var col  = t.ok === true ? 'rgba(100,220,120,0.8)' : t.ok === false ? 'rgba(255,100,80,0.7)' : 'rgba(255,200,80,0.6)';
+    return '<div style="display:flex;gap:8px;padding:4px 12px;border-bottom:0.5px solid rgba(255,255,255,0.04);">'
+      +'<span style="color:'+col+';flex-shrink:0;width:12px">'+icon+'</span>'
+      +'<span style="color:rgba(255,200,80,0.55);flex-shrink:0;min-width:120px">'+t.step+'</span>'
+      +'<span style="color:rgba(255,255,255,0.35);word-break:break-all">'+t.detail+'</span>'
+      +'</div>';
+  }).join('');
+  el.innerHTML = '<div style="padding:6px 12px;background:rgba(255,200,80,0.06);color:rgba(255,200,80,0.5);letter-spacing:.12em;font-size:9px;">DIAGNOSTIC · LEA</div>'+rows;
+  chat.appendChild(el);
+  chat.scrollTop = chat.scrollHeight;
+}
+
 // ── ECOSYSTEM KNOWLEDGE ──
 var VV = {
   apps: {
@@ -789,6 +815,7 @@ function buildCategoryVariants(subject, category) {
 function detectIntent(msg) {
   var l = msg.toLowerCase().trim();
 
+  if(/^(debug|diagnostic|diag|depanare)\s*$/.test(l)) return 'debug';
   if(/^(traduce|translate|übersetz|traduire|traduci|traduza)\s/i.test(l)) return 'translate';
   if(/^(salut|buna|bun[aă]|hello|hey|hi\b|servus|bonjour|hola|ciao|hallo|good morning|good evening)/.test(l)) return 'salut';
   if(/multumesc|mersi|thanks/.test(l)) return 'multumesc';
@@ -858,6 +885,10 @@ async function think(msg) {
     return { text: 'Nu am putut traduce. Încearcă un text mai scurt.' };
   }
 
+  if(intent === 'debug') {
+    _dbg = !_dbg;
+    return { text: _dbg ? 'Mod diagnostic activ. Voi arăta traseul intern după fiecare răspuns. Scrie iar "debug" să oprești.' : 'Mod diagnostic oprit.' };
+  }
   if(intent === 'salut') return { text: leaText('salut') };
   if(intent === 'multumesc') return { text: leaText('multumesc') };
   if(intent === 'depth') {
@@ -908,6 +939,9 @@ async function think(msg) {
   var msgNorm = normalizeTypos(msg);
   var subject = extractSubject(msgNorm);
   var category = detectCategory(msgNorm, subject);
+  dbg('Intent', null, intent);
+  dbg('Subject extras', null, '"' + subject + '"');
+  dbg('Categorie', null, category || 'null');
 
   // Nu căuta în Wikipedia pentru timp real (vreme, oră, prețuri)
   if(/^(ora|cât e|ceas|vreme|vremea|meteo|azi e|azi este|prețul|pretul|curs valutar)/.test(subject.toLowerCase())) {
@@ -917,30 +951,55 @@ async function think(msg) {
   var result = null;
   var hasOrdinal = /^(primul|prima|cel mai|cea mai|ultimul|ultima|al doilea|a doua|al treilea)\b/i.test(msgNorm.trim());
 
+  dbg('Ordinal detectat', null, hasOrdinal ? 'DA' : 'nu');
+
   if(!hasOrdinal) {
     // 1. Lookup direct (RO + EN) — cu relevance check strict
-    result = await searchWiki(subject);
-    if(result && !isRelevant(subject, result, category)) result = null;
+    var r1 = await searchWiki(subject);
+    if(r1 && !isRelevant(subject, r1, category)) {
+      dbg('Pas 1 · direct lookup', false, '"' + r1.title + '" — respins de isRelevant');
+      r1 = null;
+    } else if(r1) {
+      dbg('Pas 1 · direct lookup', true, '"' + r1.title + '"');
+    } else {
+      dbg('Pas 1 · direct lookup', false, '404 RO+EN');
+    }
+    result = r1;
 
     // 2. Variante din categorie (persoana/loc/eveniment)
     if(!result && category) {
       var catVariants = buildCategoryVariants(subject, category);
       for(var cvi = 0; cvi < catVariants.length && !result; cvi++) {
-        result = await searchWiki(catVariants[cvi]);
-        if(result && !isRelevant(subject, result, null)) result = null;
+        var r2 = await searchWiki(catVariants[cvi]);
+        if(r2 && !isRelevant(subject, r2, null)) {
+          dbg('Pas 2 · varianta ' + (cvi+1), false, '"' + r2.title + '" — respins');
+          r2 = null;
+        } else if(r2) {
+          dbg('Pas 2 · varianta ' + (cvi+1), true, '"' + r2.title + '"');
+        }
+        result = r2;
       }
     }
 
     // 3. Lookup cu mesajul original normalizat
     if(!result && subject !== msgNorm.replace(/\?+$/,'').trim()) {
       var msgClean = msgNorm.replace(/\?+$/,'').trim();
-      result = await searchWiki(msgClean);
-      if(result && !isRelevant(subject, result, category)) result = null;
+      var r3 = await searchWiki(msgClean);
+      if(r3 && !isRelevant(subject, r3, category)) {
+        dbg('Pas 3 · msg original', false, '"' + r3.title + '" — respins');
+        r3 = null;
+      } else if(r3) {
+        dbg('Pas 3 · msg original', true, '"' + r3.title + '"');
+      }
+      result = r3;
     }
   }
 
   // 4. Full-text RO Wikipedia
-  if(!result) result = await searchWikiRoQuery(subject);
+  if(!result) {
+    result = await searchWikiRoQuery(subject);
+    dbg('Pas 4 · RO fulltext', !!result, result ? '"' + result.title + '"' : 'nimic');
+  }
 
   // 5. Full-text EN Wikipedia (cu ordinale traduse daca e cazul)
   if(!result || (hasOrdinal && result && (result.title||'').split(' ').length > 5)) {
@@ -949,11 +1008,19 @@ async function think(msg) {
       .replace(/\bpreș?edinte\b/gi,'president').replace(/\bamerican[aă]?\b/gi,'american')
       .replace(/\brege\b|\bîmpărat\b/gi,'king').replace(/\broman[aă]?\b/gi,'romanian');
     var enResult = await searchWikiQuery(enSubject);
-    if(enResult && (!result || (result.title||'').split(' ').length > (enResult.title||'').split(' ').length)) result = enResult;
+    if(enResult && (!result || (result.title||'').split(' ').length > (enResult.title||'').split(' ').length)) {
+      dbg('Pas 5 · EN ordinal', true, '"' + enResult.title + '" (din "' + enSubject + '")');
+      result = enResult;
+    } else {
+      dbg('Pas 5 · EN ordinal', false, enResult ? '"' + enResult.title + '" mai slab' : 'nimic');
+    }
   }
 
   // 6. Full-text EN cu subiectul original
-  if(!result) result = await searchWikiQuery(subject);
+  if(!result) {
+    result = await searchWikiQuery(subject);
+    dbg('Pas 6 · EN fulltext', !!result, result ? '"' + result.title + '"' : 'nimic');
+  }
 
   if(result) {
     _lastSearchSubject = subject;
@@ -1050,6 +1117,7 @@ window.send = async function() {
 
   addMsg('user', msg);
   var typing = addTyping();
+  dbgReset();
 
   var delay = 400 + Math.random() * 300;
   var result = await think(msg);
@@ -1057,6 +1125,7 @@ window.send = async function() {
   removeTyping();
 
   addMsg('lea', result);
+  if(_dbg) addDebugCard(_dbgTrace);
 
   // chips contextual
   if(result && (result.wiki || (result.source && result.text))) {
