@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lea · VV Technologies</title>
+<title>Lea · hilea.eu</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⬡</text></svg>">
 <meta name="description" content="Lea. AI personal local-first. Parte din ecosistemul VV Hybrid Universe.">
 <meta name="theme-color" content="#07070f">
@@ -62,11 +62,15 @@ body::after{
 nav{
   position:relative;z-index:10;
   padding:0 24px;height:52px;
-  display:flex;align-items:center;justify-content:space-between;
+  display:flex;align-items:center;justify-content:center;
   border-bottom:1px solid var(--border);
   background:rgba(7,7,15,0.8);
   backdrop-filter:blur(20px);
   flex-shrink:0;
+}
+.nav-inner{
+  width:100%;max-width:760px;
+  display:flex;align-items:center;justify-content:space-between;
 }
 .nav-logo{
   display:flex;align-items:center;gap:10px;
@@ -78,6 +82,7 @@ nav{
   box-shadow:0 0 8px rgba(180,210,255,0.4);
 }
 .nav-name{font-size:15px;font-weight:500;color:var(--text);letter-spacing:-0.3px;}
+.nav-domain{font-size:10px;color:rgba(255,255,255,0.2);letter-spacing:.04em;margin-left:2px;}
 .nav-right{display:flex;align-items:center;gap:8px;}
 .nav-eco-btn{
   font-size:11px;letter-spacing:0.5px;color:var(--text2);
@@ -213,12 +218,13 @@ nav{
 .priv-contact{font-size:11px;color:rgba(255,255,255,0.2);text-align:center;margin-top:16px;letter-spacing:0.3px;}
 
 .nav-install{
-  font-size:11px;letter-spacing:0.5px;
-  background:var(--glass2);border:0.5px solid var(--border2);
-  color:var(--text);padding:6px 16px;border-radius:100px;
-  text-decoration:none;transition:all .2s;
+  display:none;
+  font-size:11px;letter-spacing:0.3px;font-weight:500;
+  background:rgba(180,210,255,0.08);border:0.5px solid rgba(180,210,255,0.25);
+  color:rgba(180,210,255,0.9);padding:6px 16px;border-radius:100px;
+  cursor:pointer;transition:all .2s;font-family:'Inter',sans-serif;
 }
-.nav-install:hover{background:rgba(255,255,255,0.1);}
+.nav-install:hover{background:rgba(180,210,255,0.16);}
 
 /* ECOSYSTEM PANEL */
 #eco-panel{
@@ -388,23 +394,32 @@ nav{
 .ib-close{background:none;border:none;color:var(--text3);cursor:pointer;font-size:16px;padding:4px;flex-shrink:0;}
 
 @media(max-width:600px){
-  nav{padding:0 16px;}
+  nav{padding:0 12px;}
   .nav-eco-btn{display:none;}
+  .nav-domain{display:none;}
   #eco-panel{right:8px;left:8px;width:auto;}
+}
+@media(min-width:760px){
+  #chat-wrap{padding:32px 24px 8px;}
+  #input-area{padding:14px 24px 24px;}
 }
 </style>
 </head>
 <body>
 
 <nav>
-  <a class="nav-logo" href="#">
-    <div class="nav-dot"></div>
-    <span class="nav-name">Lea</span>
-  </a>
-  <div class="nav-right">
-    <button class="nav-priv-btn" onclick="openPrivacy()">🔒</button>
-    <button class="nav-eco-btn" onclick="toggleEco()">Ecosistem</button>
-    <button class="nav-dl-btn" onclick="openDownload()">Descarcă LEA</button>
+  <div class="nav-inner">
+    <a class="nav-logo" href="https://hilea.eu">
+      <div class="nav-dot"></div>
+      <span class="nav-name">Lea</span>
+      <span class="nav-domain">hilea.eu</span>
+    </a>
+    <div class="nav-right">
+      <button id="btn-install" class="nav-install" onclick="installPWA()">+ Instalează</button>
+      <button class="nav-priv-btn" onclick="openPrivacy()">🔒</button>
+      <button class="nav-eco-btn" onclick="toggleEco()">Ecosistem</button>
+      <button class="nav-dl-btn" onclick="openDownload()">Descarcă</button>
+    </div>
   </div>
 </nav>
 
@@ -1080,6 +1095,31 @@ document.addEventListener('click', function(e) {
 document.getElementById('input').addEventListener('keydown', function(e) {
   if(e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
 });
+
+// ── PWA INSTALL ──
+var _installPrompt = null;
+window.addEventListener('beforeinstallprompt', function(e) {
+  e.preventDefault();
+  _installPrompt = e;
+  var btn = document.getElementById('btn-install');
+  if(btn) btn.style.display = 'inline-flex';
+});
+window.addEventListener('appinstalled', function() {
+  var btn = document.getElementById('btn-install');
+  if(btn) btn.style.display = 'none';
+  _installPrompt = null;
+});
+window.installPWA = function() {
+  if(!_installPrompt) return;
+  _installPrompt.prompt();
+  _installPrompt.userChoice.then(function(r) {
+    if(r.outcome === 'accepted') {
+      var btn = document.getElementById('btn-install');
+      if(btn) btn.style.display = 'none';
+    }
+    _installPrompt = null;
+  });
+};
 
 // ── INIT ──
 setTimeout(function() {
