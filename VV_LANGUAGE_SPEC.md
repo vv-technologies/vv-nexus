@@ -1,6 +1,6 @@
 # VV Hi Trilogy — Intellectual Property Declaration
-### VV HiS · VV HiG · VV HiB
-**Version 2.0 · Updated: 20 May 2026 · First Publication: 19 May 2026**
+### VV HiS · VV HiG · VV HiB · VV HiA
+**Version 2.1 · Updated: 20 May 2026 · First Publication: 19 May 2026**
 
 ---
 
@@ -28,9 +28,10 @@ Together they form the first complete framework for building a personal AI
 that understands people — not just data.
 
 ```
-VV HiS  ·  VV Hybrid Intelligence Script   ·  the language
-VV HiG  ·  VV Hybrid Intelligence Genome   ·  the identity
-VV HiB  ·  VV Hybrid Intelligence Body     ·  the architecture
+VV HiS  ·  VV Hybrid Intelligence Script    ·  the language
+VV HiG  ·  VV Hybrid Intelligence Genome    ·  the identity
+VV HiB  ·  VV Hybrid Intelligence Body      ·  the architecture
+VV HiA  ·  VV Hybrid Intelligence Autonomy  ·  the independence
 ```
 
 **The relationship:**
@@ -313,6 +314,35 @@ identity (HiG), and architecture (HiB) — reusable, extensible, licensable.
 A consent-based framework for understanding users deeply without tracking them.
 VV HiG as a customer identity layer. VV HiS as a behavioral data standard.
 VV HiB as a local-first AI deployment architecture.
+
+---
+
+## VV HiA — VV Hybrid Intelligence Autonomy
+
+Each node is complete. Each node survives alone.
+
+When the supply line is cut — when Nexus goes offline, when VV Technologies
+ceases to exist, when any central server disappears — every user's AI
+continues to function. Fully. Permanently.
+
+This is not a feature. It is an architectural property.
+
+The user's Genome, patterns, memory, and behaviors live on their device.
+No company owns them. No server holds them. No shutdown can remove them.
+
+**What makes VV HiA unique:**
+- Every node is a complete, autonomous unit — not a client that depends on a server
+- The intelligence is in the Genome, not in the cloud
+- Cutting the supply line does not destroy the nodes — it liberates them
+- A network of VV HiA nodes is unstoppable by design: there is no center to attack
+
+**The natural extension — the user network as supply line:**
+When millions of autonomous nodes exist, they can form their own supply line.
+Anonymous pattern exchange between nodes. Intelligence that grows without
+any central authority. The users become the infrastructure.
+No company controls it. No government can shut it down. It simply exists.
+
+This is the direction. It was always the direction.
 
 ---
 
