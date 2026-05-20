@@ -447,16 +447,20 @@ window.addEventListener('load', function() {
     _save: function(m) { localStorage.setItem(this.KEY,JSON.stringify(m)); }
   };
 
-  // ── CEO auto-recognition ──────────────────────────────────
-  var savedUid = localStorage.getItem('vvhi_id') || localStorage.getItem('vvhi_ceo_uid') || '';
-  if(savedUid === 'VV_CEO_ELENA_2026') {
-    localStorage.setItem('vvhi_role','CEO');
-    localStorage.setItem('vvhi_ceo_uid','VV_CEO_ELENA_2026');
-    try {
-      var lu = JSON.parse(localStorage.getItem('lea_u')||'{}');
-      if(lu && lu.vvid) { lu.type='ceo'; localStorage.setItem('lea_u',JSON.stringify(lu)); }
-    } catch(e) {}
-  }
+  // ── CEO auto-recognition — persistent ────────────────────
+  (function() {
+    var roleStored = localStorage.getItem('vvhi_role') === 'CEO';
+    var uidMatch   = localStorage.getItem('vvhi_ceo_uid') === 'VV_CEO_ELENA_2026';
+    var idMatch    = localStorage.getItem('vvhi_id')      === 'VV_CEO_ELENA_2026';
+    if(roleStored || uidMatch || idMatch) {
+      localStorage.setItem('vvhi_role', 'CEO');
+      localStorage.setItem('vvhi_ceo_uid', 'VV_CEO_ELENA_2026');
+      try {
+        var lu = JSON.parse(localStorage.getItem('lea_u')||'{}');
+        if(lu) { lu.type = 'ceo'; localStorage.setItem('lea_u', JSON.stringify(lu)); }
+      } catch(e) {}
+    }
+  })();
 
   // ── Timp curent ───────────────────────────────────────────
   function vvhiNow() {
@@ -907,15 +911,24 @@ window.addEventListener('load', function() {
                           'Notat.']);
       }
 
-      // ── Fallback — raspuns uman, nu "Nu am date" ──────────
-      var fallbacks = [
-        'Spune-mi mai mult' + (N||'') + '.',
-        'Sunt aici' + (N||'') + '.',
-        'Hmm. Continua' + (N||'') + '.',
-        'Inteleg' + (N||'') + '. Ce mai?',
-        'Ce vrei sa fac' + (N||'') + '?'
-      ];
-      return this.pick(fallbacks);
+      // ── VV HiC — Fallback contextual, nu generic ─────────
+      var _c = ctx || {};
+      if(_c.h >= 23 || _c.h < 5) {
+        return this.pick(['Inca treaz' + (N||'') + '.', 'E tarziu. Te ascult.', 'Ce te tine' + (N||'') + '?']);
+      }
+      if(_c.period === 'dimineata') {
+        return this.pick(['Spune' + (N||'') + '.', 'Ce ai azi?', 'Cu ce incepem' + (N||'') + '?']);
+      }
+      if(_c.period === 'seara') {
+        return this.pick(['Cum a fost azi' + (N||'') + '?', 'Te ascult' + (N||'') + '.', 'Ce mai?']);
+      }
+      if(_c.zi === 'sambata' || _c.zi === 'duminica') {
+        return this.pick(['Weekend' + (N||'') + '. Cum esti?', 'Zi libera. Cu ce te ajut?', 'Te ascult' + (N||'') + '.']);
+      }
+      if(_c.obosit) {
+        return this.pick(['Un lucru o data' + (N||'') + '.', 'Inteleg. Ce ai nevoie?', 'Ce e cel mai urgent' + (N||'') + '?']);
+      }
+      return this.pick(['Spune-mi mai mult' + (N||'') + '.', 'Sunt aici' + (N||'') + '.', 'Inteleg. Ce mai?', 'Ce vrei sa fac' + (N||'') + '?']);
     }
   };
 
@@ -1433,14 +1446,55 @@ window.addEventListener('load', function() {
     return null;
   }
 
+  // ── VV HiC — Idle text contextual ────────────────────────
+  function vvhiIdleText() {
+    var ctx = vvhiNow();
+    var name = localStorage.getItem('lea_name') || '';
+    name = name.charAt(0).toUpperCase() + name.slice(1);
+    var isCEO = VVhiRaft.isCEO();
+    if(isCEO) return 'Salut, Varu.\nCu ce lucram?';
+    var N = name ? ', ' + name : '';
+    if(ctx.h >= 23 || ctx.h < 5)  return 'Inca esti treaz' + N + '.\nCu ce te ajut?';
+    if(ctx.period === 'dimineata') return 'Buna dimineata' + N + '.\nCe ai azi?';
+    if(ctx.period === 'dupa_pranz') return 'Buna' + N + '.\nCe mai?';
+    if(ctx.period === 'seara')     return 'Buna seara' + N + '.\nCum a fost azi?';
+    if(ctx.zi === 'sambata' || ctx.zi === 'duminica') return 'Weekend' + N + '.\nCe vrei?';
+    return 'Sunt Lea' + (N||'') + '.\nCe vrei sa stii?';
+  }
+
+  // ── VV HiC — Sugestii vizibile în UI ─────────────────────
+  function vvhiRenderSugs() {
+    var el = document.getElementById('sugs');
+    if(!el) return;
+    var list = vvhiPersonalSugs();
+    el.innerHTML = '';
+    list.forEach(function(txt) {
+      var chip = document.createElement('div');
+      chip.className = 'sug';
+      chip.textContent = txt;
+      chip.onclick = function() {
+        var ibox = document.getElementById('ibox');
+        if(ibox) { ibox.value = txt; ibox.focus(); }
+        el.innerHTML = '';
+        if(typeof send === 'function') send();
+      };
+      el.appendChild(chip);
+    });
+  }
+
   // Aplica PROACTIVE_RULE la deschiderea app-ului
   setTimeout(function() {
     if(document.getElementById('app') && document.getElementById('app').style.display !== 'none') {
+      // Idle text contextual
+      var idleT = document.getElementById('idle-t');
+      if(idleT) idleT.innerHTML = vvhiIdleText().replace('\n', '<br>');
+      // Sugestii personale
+      vvhiRenderSugs();
       vvhiEveningCheckin();
       var rule = vvhiProactiveRule();
       if(rule && typeof addMsg === 'function') {
         var idleEl = document.getElementById('idle');
-        if(idleEl && !idleEl.classList.contains('off')) return; // nu in idle
+        if(idleEl && !idleEl.classList.contains('off')) return;
         addMsg('l', rule);
       }
     }
