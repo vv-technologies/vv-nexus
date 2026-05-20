@@ -432,6 +432,53 @@ var leaResponses = {
 
 function pickRandom(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
 
+// ── LANGUAGE DETECTION & TRANSLATION ──
+var _userLang = 'ro';
+
+function detectLang(text) {
+  if(/[ăâîșşțţ]/i.test(text)) return 'ro';
+  var t = text.toLowerCase();
+  var en = (t.match(/\b(the|this|that|what|who|where|when|how|why|is|are|was|were|have|has|will|would|can|could|and|but|with|for|not|it|he|she|they|we|you|i|my|your)\b/g)||[]).length;
+  var fr = (t.match(/\b(le|la|les|un|une|des|est|sont|avec|pour|mais|pas|je|tu|il|elle|nous|vous|qui|que|quoi|comment|pourquoi|quel|quelle)\b/g)||[]).length;
+  var de = (t.match(/\b(der|die|das|ein|eine|ist|sind|mit|für|von|zu|und|nicht|ich|du|er|sie|wir|ihr|was|wie|wer|wo|warum)\b/g)||[]).length;
+  var es = (t.match(/\b(el|la|los|las|un|una|unos|unas|es|son|está|están|con|para|pero|no|yo|tu|él|ella|nosotros|qué|cómo|quién|cuándo|dónde)\b/g)||[]).length;
+  var max = Math.max(en, fr, de, es);
+  if(max < 2) return 'ro';
+  if(max === en) return 'en';
+  if(max === fr) return 'fr';
+  if(max === de) return 'de';
+  if(max === es) return 'es';
+  return 'ro';
+}
+
+async function translateMyMemory(text, from, to) {
+  try {
+    var url = 'https://api.mymemory.translated.net/get?q=' + encodeURIComponent(text.slice(0,500)) + '&langpair=' + from + '|' + to;
+    var res = await fetch(url);
+    var d = await res.json();
+    if(d.responseStatus === 200 && d.responseData && d.responseData.translatedText) {
+      return d.responseData.translatedText;
+    }
+  } catch(e){}
+  return null;
+}
+
+var leaResponsesEN = {
+  salut: ['Hi. I\'m Lea — the public version, no personal memory. What would you like to know?', 'Hello. I\'m Lea. Let me show you what I can do.', 'Hi. How can I help you today?'],
+  multumesc: ['You\'re welcome.', 'Anytime.', 'No problem.'],
+  cine: 'I\'m Lea — the personal AI from the VV Hybrid Universe ecosystem. This public version has no memory. The personal version knows you, lives on your device, and never sends your data anywhere.',
+  ce_poti: 'I can search public information (Wikipedia), explain everything about the VV ecosystem, and demonstrate what a server-free AI looks like. The personal version goes further — it actually knows you.',
+  install: 'Yes. Open lea.html on any device — works directly in the browser. On mobile: add to home screen (PWA). On desktop: works offline after the first load. No account, no email.',
+  weather: 'I don\'t have real-time data access. Try Google or weather.com for weather. I know what\'s in Wikipedia and the VV ecosystem.',
+  fallback: ['Let me look that up.', 'One moment.', 'Let me search for that.']
+};
+
+function leaText(key) {
+  var pool = _userLang !== 'ro' && leaResponsesEN[key] ? leaResponsesEN[key] : leaResponses[key];
+  if(!pool) return null;
+  return Array.isArray(pool) ? pickRandom(pool) : pool;
+}
+
 // ── SEARCH STATE — memoria ultimei căutări ──
 var _lastSearchSubject = '';
 var _lastSearchResult  = null;
@@ -488,6 +535,34 @@ async function searchWikiQuery(query) {
   return null;
 }
 
+async function searchWikiRoQuery(query) {
+  try {
+    var url = 'https://ro.wikipedia.org/w/api.php?action=query&list=search&srsearch=' + encodeURIComponent(query) + '&format=json&origin=*&srlimit=1';
+    var res = await fetch(url);
+    var d = await res.json();
+    if(d.query && d.query.search && d.query.search.length > 0) {
+      return await searchWiki(d.query.search[0].title);
+    }
+  } catch(e){}
+  return null;
+}
+
+function stripDiacritics(s) {
+  return (s||'').toLowerCase()
+    .replace(/[ăâ]/g,'a').replace(/î/g,'i')
+    .replace(/[șş]/g,'s').replace(/[țţ]/g,'t');
+}
+
+function normalizeTypos(text) {
+  return text
+    .replace(/\bptimul\b/gi,'primul').replace(/\bprimu\b/gi,'primul')
+    .replace(/\bamerici\b/gi,'americii').replace(/\bamericia\b/gi,'americii')
+    .replace(/\binventaru\b/gi,'inventatorul').replace(/\bfondatoru\b/gi,'fondatorul')
+    .replace(/\bpresedintele\b/gi,'presedintele').replace(/\bpresidente\b/gi,'presedinte')
+    .replace(/\bfrancezei\b/gi,'franceze').replace(/\bromanie\b/gi,'romaniei')
+    .replace(/\bitaliei\b/gi,'italiei').replace(/\bgermaniei\b/gi,'germaniei');
+}
+
 // ── VVBL PUBLIC BEHAVIORS — extrag subiectul din întrebare ──
 var publicBehaviors = [
   { name:'search_who',   when:/^(cine (a fost|este|e|era|sunt|a inventat|a creat|a facut|a făcut))\s*/i },
@@ -510,15 +585,16 @@ function extractSubject(msg) {
 
 function isRelevant(subject, result, category) {
   if(!result || !result.title) return false;
-  var words = subject.toLowerCase().split(/\s+/).filter(function(w){ return w.length > 3; });
-  var title = result.title.toLowerCase();
+  var normSubj = stripDiacritics(subject);
+  var words = normSubj.split(/\s+/).filter(function(w){ return w.length > 3; });
+  var title = stripDiacritics(result.title);
   var desc  = (result.description || '').toLowerCase();
   if(words.length && !words.some(function(w){ return title.includes(w); })) return false;
   if(category === 'person' && desc) {
-    if(!/born|politician|scriitor|writer|general|artist|ruler|composer|philosopher|inventor|scientist|actor|director|rege|imparat|presedinte/.test(desc)) return false;
+    if(!/born|politician|scriitor|writer|general|artist|ruler|composer|philosopher|inventor|scientist|actor|director|rege|imparat|presedinte|statesman|leader|commander|mathematician|physicist/.test(desc)) return false;
   }
   if(category === 'place' && desc) {
-    if(!/city|town|village|country|mountain|river|lake|capital|region|municipiu|oras|sat|commune|district/.test(desc)) return false;
+    if(!/city|town|village|country|mountain|river|lake|capital|region|municipiu|oras|sat|commune|district|peninsula|island/.test(desc)) return false;
   }
   return true;
 }
@@ -545,9 +621,11 @@ function buildCategoryVariants(subject, category) {
 function detectIntent(msg) {
   var l = msg.toLowerCase().trim();
 
-  if(/^(salut|buna|bun[aă]|hello|hey|hi\b|servus)/.test(l)) return 'salut';
+  if(/^(traduce|translate|übersetz|traduire|traduci|traduza)\s/i.test(l)) return 'translate';
+  if(/^(salut|buna|bun[aă]|hello|hey|hi\b|servus|bonjour|hola|ciao|hallo|good morning|good evening)/.test(l)) return 'salut';
   if(/multumesc|mersi|thanks/.test(l)) return 'multumesc';
   if(_lastSearchSubject && /^(mai mult|detalii|continua|continuă|extinde|si ce|și ce altceva|spune mai mult|mai multe|mai info|explica|explică|aprofundeaz|ce mai stii|ce mai știi)/.test(l)) return 'depth';
+  if(_lastSearchSubject && /^(c[aâ][tț]i ani are|c[aâ]nd s-a n[aă]scut|de unde e|unde s-a nascut|ce a f[aă]cut|ce a inventat|cine e|cum arat|e viu|mai tr[aă]ie[sș]te|a murit|mai stii ceva|mai stii despre|mai mult despre)/.test(l)) return 'follow_up';
   if(/date personale|datele mele|ce stochezi|ce tii|ce ai despre mine|privacy|confidential|gdpr|sigur|sigura|esti sigura|protejat|protectia datelor|ce salvezi|ce pastrezi/.test(l)) return 'privacy';
   if(/descarc|download|instala|instalez|pun pe laptop|pun pe telefon|pe pc|îl am offline|o am offline/.test(l)) return 'install';
   if(/cine ești|cine esti|ce ești|ce esti|despre tine|cum te chemi/.test(l)) return 'cine';
@@ -583,11 +661,33 @@ function formatWiki(result, extended) {
 
 // ── THINK ──
 async function think(msg) {
+  _userLang = detectLang(msg);
   var intent = detectIntent(msg);
   var l = msg.toLowerCase();
 
-  if(intent === 'salut') return { text: pickRandom(leaResponses.salut) };
-  if(intent === 'multumesc') return { text: pickRandom(leaResponses.multumesc) };
+  if(intent === 'translate') {
+    var tParts = msg.replace(/^(traduce|translate|übersetz|traduire|traduci|traduza)\s+/i,'');
+    var tTarget = 'ro';
+    var tMatch = tParts.match(/\s+(in|to|în|en|auf|en|a)\s+(rom[aâ]n[aă]|english|engleza|french|franceza|german[aă]|german|french|española|spanish|italiana|italian[aă])\s*$/i);
+    if(tMatch) {
+      var tLang = tMatch[2].toLowerCase();
+      if(/english|engleza/.test(tLang)) tTarget = 'en';
+      else if(/french|franceza/.test(tLang)) tTarget = 'fr';
+      else if(/german/.test(tLang)) tTarget = 'de';
+      else if(/spanish|española/.test(tLang)) tTarget = 'es';
+      tParts = tParts.slice(0, tParts.length - tMatch[0].length).trim();
+    } else {
+      tTarget = _userLang === 'ro' ? 'en' : 'ro';
+    }
+    var tFrom = detectLang(tParts);
+    if(tFrom === tTarget) tFrom = 'auto';
+    var translated = await translateMyMemory(tParts, tFrom === 'auto' ? 'en' : tFrom, tTarget);
+    if(translated) return { text: translated, source: 'MyMemory' };
+    return { text: 'Nu am putut traduce. Încearcă un text mai scurt.' };
+  }
+
+  if(intent === 'salut') return { text: leaText('salut') };
+  if(intent === 'multumesc') return { text: leaText('multumesc') };
   if(intent === 'depth') {
     var extWiki = _lastSearchResult ? { text: null, wiki: _lastSearchResult, formatted: formatWiki(_lastSearchResult, true) } : null;
     var ddg = await searchDDG(_lastSearchSubject);
@@ -598,11 +698,11 @@ async function think(msg) {
     if(ddg && ddg.text) return { text: ddg.text, source: 'DuckDuckGo' };
     return { text: 'Nu am mai multe informații despre "' + _lastSearchSubject + '".' };
   }
-  if(intent === 'privacy') { setTimeout(openPrivacy, 400); return { text: 'Transparență completă. Nu stochează nimic pe server. Tot ce știu despre tine trăiește exclusiv pe device-ul tău — eu nu pot accesa nimic din exterior.' }; }
-  if(intent === 'install') return { text: leaResponses.install };
-  if(intent === 'weather') return { text: leaResponses.weather };
-  if(intent === 'cine') return { text: leaResponses.cine };
-  if(intent === 'ce_poti') return { text: leaResponses.ce_poti };
+  if(intent === 'privacy') { setTimeout(openPrivacy, 400); return { text: _userLang === 'en' ? 'Full transparency. Nothing is stored on a server. Everything Lea knows about you lives exclusively on your device — I can\'t access anything from the outside.' : 'Transparență completă. Nu stochează nimic pe server. Tot ce știu despre tine trăiește exclusiv pe device-ul tău — eu nu pot accesa nimic din exterior.' }; }
+  if(intent === 'install') return { text: leaText('install') };
+  if(intent === 'weather') return { text: leaText('weather') };
+  if(intent === 'cine') return { text: leaText('cine') };
+  if(intent === 'ce_poti') return { text: leaText('ce_poti') };
   if(intent === 'cum_construit') return { text: leaResponses.cum_construit };
   if(intent === 'trilogy') {
     if(l.includes('his')) return { text: VV.his };
@@ -612,28 +712,36 @@ async function think(msg) {
     return { text: VV.trilogy };
   }
   if(intent === 'vv') return { text: VV.philosophy };
+  if(intent === 'follow_up') {
+    var fRes = await searchWiki(_lastSearchSubject);
+    if(fRes) { _lastSearchResult = fRes; return { text: null, wiki: fRes, formatted: formatWiki(fRes) }; }
+    return { text: 'Nu am date exacte despre ' + _lastSearchSubject + '. Încearcă o întrebare mai specifică.' };
+  }
   if(intent === 'app') {
     var r = getAppResponse(msg);
     if(r) return { text: r };
   }
-  if(intent === 'founder') return { text: VV.founder };
+  if(intent === 'founder') {
+    _lastSearchSubject = 'Cosmin Toma';
+    return { text: VV.founder };
+  }
   if(intent === 'philosophy') return { text: VV.philosophy };
 
-  // SEARCH — extrage subiectul cu VVBL, detects category, caută
-  var subject = extractSubject(msg);
-  var category = detectCategory(msg, subject);
+  // SEARCH — normalizare typos, extrage subiectul, detecteaza categoria
+  var msgNorm = normalizeTypos(msg);
+  var subject = extractSubject(msgNorm);
+  var category = detectCategory(msgNorm, subject);
 
   // Nu căuta în Wikipedia pentru timp real (vreme, oră, prețuri)
   if(/^(ora|cât e|ceas|vreme|vremea|meteo|azi e|azi este|prețul|pretul|curs valutar)/.test(subject.toLowerCase())) {
     return { text: leaResponses.weather };
   }
 
+  // 1. Lookup direct (RO + EN) — cu relevance check strict
   var result = await searchWiki(subject);
   if(result && !isRelevant(subject, result, category)) result = null;
-  if(!result) result = await searchWikiQuery(subject);
-  if(result && !isRelevant(subject, result, category)) result = null;
 
-  // Variante specifice categoriei dacă cautarea directă a eșuat
+  // 2. Variante din categorie (persoana/loc/eveniment)
   if(!result && category) {
     var catVariants = buildCategoryVariants(subject, category);
     for(var cvi = 0; cvi < catVariants.length && !result; cvi++) {
@@ -642,11 +750,18 @@ async function think(msg) {
     }
   }
 
-  if(!result && subject !== msg.replace(/\?+$/,'').trim()) {
-    var msgClean = msg.replace(/\?+$/,'').trim();
+  // 3. Lookup cu mesajul original normalizat
+  if(!result && subject !== msgNorm.replace(/\?+$/,'').trim()) {
+    var msgClean = msgNorm.replace(/\?+$/,'').trim();
     result = await searchWiki(msgClean);
     if(result && !isRelevant(subject, result, category)) result = null;
   }
+
+  // 4. Full-text RO Wikipedia — fara title check (motorul de cautare stie)
+  if(!result) result = await searchWikiRoQuery(subject);
+
+  // 5. Full-text EN Wikipedia
+  if(!result) result = await searchWikiQuery(subject);
 
   if(result) {
     _lastSearchSubject = subject;
