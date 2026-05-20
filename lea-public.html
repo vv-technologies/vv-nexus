@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Lea · VV Technologies</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⬡</text></svg>">
 <meta name="description" content="Lea. AI personal local-first. Parte din ecosistemul VV Hybrid Universe.">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
@@ -334,6 +335,8 @@ var leaResponses = {
   ce_poti: 'Pot căuta informații din surse publice (Wikipedia), îți spun tot despre ecosistemul VV și cum e construit, și demonstrez ce înseamnă un AI care funcționează fără server. Versiunea personală merge mai departe — te cunoaște.',
   cum_construit: VV.trilogy + ' Implementarea live funcționează 100% în browser, fără server, fără API plătit.',
   vv: 'VV Hybrid Universe este un ecosistem digital complet — primul construit pe principii de suveranitate digitală, local-first și adevăr validat de oameni. Fondator: Cosmin Toma, România, 2026.',
+  install: 'Da. Deschide lea.html pe orice device — funcționează direct în browser, fără instalare. Pe telefon: adaugă la ecranul principal din meniu (PWA). Pe laptop: funcționează offline după prima încărcare. Niciun cont, niciun email.',
+  weather: 'Nu am acces la date în timp real — nu pot spune vremea sau ora exactă. Încearcă Google sau weather.com pentru asta. Eu știu ce e în Wikipedia și ce e în ecosistemul VV.',
   fallback: ['Încerc să aflu ceva despre asta.', 'Lasă-mă să caut.', 'Un moment.']
 };
 
@@ -376,21 +379,30 @@ async function searchWikiQuery(query) {
 
 // ── VVBL PUBLIC BEHAVIORS — extrag subiectul din întrebare ──
 var publicBehaviors = [
-  { name:'search_who',   when:/^(cine (a fost|este|e|era|sunt|a inventat|a creat|a facut|a făcut))\b/i },
-  { name:'search_what',  when:/^(ce (este|e|înseamnă|inseamna|sunt|a fost|a))\b/i },
-  { name:'search_when',  when:/^(când (a|au|s-a|este|e|a avut loc))\b/i },
-  { name:'search_where', when:/^(unde (este|e|se află|se afla|era))\b/i },
-  { name:'search_how',   when:/^(cum (funcționează|functioneaza|se face|a ajuns|a devenit))\b/i },
-  { name:'search_find',  when:/^(cauta|caută|gaseste|găsește|spune.mi despre|info despre|vorbeste.mi despre)\b/i },
+  { name:'search_who',   when:/^(cine (a fost|este|e|era|sunt|a inventat|a creat|a facut|a făcut))\s*/i },
+  { name:'search_what',  when:/^(ce (este|e|înseamnă|inseamna|sunt|a fost|reprezinta|a))\s*/i },
+  { name:'search_when',  when:/^(când (a|au|s-a|este|e|a avut loc|s-a nascut|a murit))\s*/i },
+  { name:'search_where', when:/^(unde (este|e|se află|se afla|era|se gaseste))\s*/i },
+  { name:'search_how',   when:/^(cum (funcționează|functioneaza|se face|a ajuns|a devenit|se numeste))\s*/i },
+  { name:'search_know',  when:/^(ce stii despre|ce știi despre|spune.mi despre|informatii despre|info despre|vorbeste.mi despre|mai mult despre)\s*/i },
+  { name:'search_find',  when:/^(cauta|caută|gaseste|găsește)\s*/i },
 ];
 
 function extractSubject(msg) {
-  var l = msg.trim();
+  var l = msg.trim().replace(/\?+$/, '').trim();
   for(var i = 0; i < publicBehaviors.length; i++) {
     var m = l.match(publicBehaviors[i].when);
-    if(m) return l.slice(m[0].length).trim();
+    if(m) return l.slice(m[0].length).trim().replace(/\?+$/, '').trim();
   }
   return l;
+}
+
+function isRelevant(subject, result) {
+  if(!result || !result.title) return false;
+  var words = subject.toLowerCase().split(/\s+/).filter(function(w){ return w.length > 3; });
+  if(!words.length) return true;
+  var title = result.title.toLowerCase();
+  return words.some(function(w){ return title.includes(w); });
 }
 
 // ── DETECT INTENT ──
@@ -399,14 +411,16 @@ function detectIntent(msg) {
 
   if(/^(salut|buna|bun[aă]|hello|hey|hi\b|servus)/.test(l)) return 'salut';
   if(/multumesc|mersi|thanks/.test(l)) return 'multumesc';
+  if(/descarc|download|instala|instalez|pun pe laptop|pun pe telefon|pe pc|îl am offline|o am offline/.test(l)) return 'install';
   if(/cine ești|cine esti|ce ești|ce esti|despre tine|cum te chemi/.test(l)) return 'cine';
-  if(/ce (poți|poti) face|cum (mă|ma) ajuți|ajuți|ce stii|ce știi/.test(l)) return 'ce_poti';
+  if(/ce (poți|poti) face|cum (mă|ma) ajuți|ajuți/.test(l)) return 'ce_poti';
   if(/cum ești (construit|facut)|cum funcționezi|cum functionezi|arhitectur|cum e construit/.test(l)) return 'cum_construit';
   if(/vv his|vv hig|vv hib|vv hia|trilogy|limbaj vv|pattern language|behavior language/.test(l)) return 'trilogy';
   if(/ce e vv|ce este vv|vv hybrid|ecosistem vv|vv technologies/.test(l)) return 'vv';
-  if(/\b(lea|nexus|pulse map|pulse|now|vveil|vvscout|studio|vv me|vv write)\b/.test(l)) return 'app';
+  if(/\b(lea|nexus|pulse map|vv pulse|vv write|vv now|vv me)\b|vvpulse|vvwrite|vvscout|vveil|vv studio/.test(l)) return 'app';
   if(/cosmin|fondator|inventor|inventat|cine a facut|cine a creat/.test(l)) return 'founder';
   if(/filozofie|filosofie|principii|local.?first|suveranitate/.test(l)) return 'philosophy';
+  if(/^(vremea|vreme|meteo|temperatura|ploua|ninge|prognoza|forecast)/.test(l)) return 'weather';
 
   return 'search';
 }
@@ -437,6 +451,8 @@ async function think(msg) {
 
   if(intent === 'salut') return { text: pickRandom(leaResponses.salut) };
   if(intent === 'multumesc') return { text: pickRandom(leaResponses.multumesc) };
+  if(intent === 'install') return { text: leaResponses.install };
+  if(intent === 'weather') return { text: leaResponses.weather };
   if(intent === 'cine') return { text: leaResponses.cine };
   if(intent === 'ce_poti') return { text: leaResponses.ce_poti };
   if(intent === 'cum_construit') return { text: leaResponses.cum_construit };
@@ -457,13 +473,24 @@ async function think(msg) {
 
   // SEARCH — extrage subiectul cu VVBL, apoi caută
   var subject = extractSubject(msg);
+
+  // Nu căuta în Wikipedia pentru timp real (vreme, oră, prețuri)
+  if(/^(ora|cât e|ceas|vreme|vremea|meteo|azi e|azi este|prețul|pretul|curs valutar)/.test(subject.toLowerCase())) {
+    return { text: leaResponses.weather };
+  }
+
   var result = await searchWiki(subject);
-  if(!result && subject !== msg) result = await searchWiki(msg);
+  if(result && !isRelevant(subject, result)) result = null;
   if(!result) result = await searchWikiQuery(subject);
-  if(!result && subject !== msg) result = await searchWikiQuery(msg);
+  if(result && !isRelevant(subject, result)) result = null;
+  if(!result && subject !== msg.replace(/\?+$/,'').trim()) {
+    var msgClean = msg.replace(/\?+$/,'').trim();
+    result = await searchWiki(msgClean);
+    if(result && !isRelevant(subject, result)) result = null;
+  }
   if(result) return { text: null, wiki: result, formatted: formatWiki(result) };
 
-  return { text: 'Nu am găsit nimic concret despre asta. Încearcă să reformulezi sau întreabă ceva despre ecosistemul VV.' };
+  return { text: 'Nu am găsit nimic despre "' + subject + '". Încearcă un termen mai simplu sau întreabă despre ecosistemul VV.' };
 }
 
 // ── UI ──
