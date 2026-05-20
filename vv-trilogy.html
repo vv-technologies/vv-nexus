@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VV Hi Trilogy — Cosmin Toma · VV Technologies</title>
+<meta name="description" content="Three original inventions. One ecosystem. VV HiS · VV HiG · VV HiB — by Cosmin Toma, Romania, May 2026.">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --gold:#C9A84C;
+  --gold-l:rgba(201,168,76,0.15);
+  --gold-d:rgba(201,168,76,0.25);
+  --bg:#06060a;
+  --bg2:#0d0d14;
+  --text:#c8c4bc;
+  --text-d:rgba(200,196,188,0.4);
+  --border:rgba(201,168,76,0.12);
+  --white:#ffffff;
+}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-size:14px;line-height:1.7;overflow-x:hidden;}
+
+/* ── AMBIENT ── */
+body::before{
+  content:'';position:fixed;top:-30%;left:50%;transform:translateX(-50%);
+  width:900px;height:900px;
+  background:radial-gradient(ellipse,rgba(201,168,76,0.035) 0%,transparent 65%);
+  pointer-events:none;z-index:0;
+}
+
+/* ── NAV ── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  background:rgba(6,6,10,0.85);backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  padding:0 40px;
+  display:flex;align-items:center;justify-content:space-between;height:56px;
+}
+.nav-logo{font-size:11px;letter-spacing:3px;color:var(--gold);text-transform:uppercase;font-weight:400;text-decoration:none;}
+.nav-links{display:flex;gap:32px;list-style:none;}
+.nav-links a{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--text-d);text-decoration:none;transition:color .2s;}
+.nav-links a:hover{color:var(--gold);}
+.nav-cta{
+  font-size:11px;letter-spacing:1px;text-transform:uppercase;
+  background:var(--gold-l);border:0.5px solid var(--gold-d);
+  color:var(--gold);padding:8px 20px;border-radius:100px;
+  text-decoration:none;transition:all .2s;
+}
+.nav-cta:hover{background:rgba(201,168,76,0.25);}
+
+/* ── CONTAINER ── */
+.wrap{max-width:960px;margin:0 auto;padding:0 40px;position:relative;z-index:1;}
+
+/* ── HERO ── */
+#hero{
+  min-height:100vh;display:flex;align-items:center;justify-content:center;
+  text-align:center;padding:120px 40px 80px;
+}
+.hero-badge{
+  display:inline-block;font-size:10px;letter-spacing:3px;text-transform:uppercase;
+  color:var(--gold);border:0.5px solid var(--gold-d);padding:6px 18px;border-radius:100px;
+  margin-bottom:40px;opacity:0.8;
+}
+.hero-h1{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(52px,8vw,96px);font-weight:300;color:var(--white);
+  letter-spacing:-0.02em;line-height:1.0;margin-bottom:16px;
+}
+.hero-h1 em{color:var(--gold);font-style:italic;}
+.hero-sub{
+  font-size:clamp(14px,2vw,18px);color:var(--text-d);font-weight:300;
+  margin-bottom:56px;letter-spacing:0.02em;line-height:1.6;max-width:600px;margin-left:auto;margin-right:auto;
+}
+.trilogy-chips{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-bottom:64px;}
+.tc{
+  font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:400;
+  color:var(--gold);border:0.5px solid var(--gold-d);
+  background:var(--gold-l);padding:10px 24px;border-radius:100px;
+  letter-spacing:1px;
+}
+.hero-actions{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;}
+.btn-primary{
+  font-size:12px;letter-spacing:2px;text-transform:uppercase;
+  background:var(--gold);color:#06060a;padding:14px 32px;border-radius:100px;
+  text-decoration:none;font-weight:500;transition:all .2s;
+}
+.btn-primary:hover{background:#e2c97e;}
+.btn-secondary{
+  font-size:12px;letter-spacing:2px;text-transform:uppercase;
+  background:transparent;color:var(--text-d);padding:14px 32px;border-radius:100px;
+  text-decoration:none;border:0.5px solid rgba(255,255,255,0.1);transition:all .2s;
+}
+.btn-secondary:hover{color:var(--white);border-color:rgba(255,255,255,0.3);}
+
+/* ── SECTIONS ── */
+section{padding:100px 0;border-top:1px solid rgba(201,168,76,0.06);}
+.s-tag{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);opacity:0.6;margin-bottom:12px;}
+.s-h2{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(32px,5vw,56px);font-weight:300;color:var(--white);
+  letter-spacing:-0.01em;line-height:1.1;margin-bottom:24px;
+}
+.s-h2 em{color:var(--gold);font-style:italic;}
+.s-lead{font-size:16px;color:var(--text);line-height:1.8;max-width:640px;margin-bottom:48px;font-weight:300;}
+
+/* ── PROBLEM ── */
+.problem-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px;margin:48px 0;}
+.pg-cell{background:var(--bg2);border:1px solid var(--border);padding:32px;position:relative;}
+.pg-cell:first-child{border-radius:12px 0 0 12px;}
+.pg-cell:last-child{border-radius:0 12px 12px 0;}
+.pg-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-d);margin-bottom:12px;}
+.pg-text{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:300;color:var(--text);line-height:1.5;}
+.pg-text strong{color:var(--white);}
+.pg-arrow{
+  position:absolute;right:-20px;top:50%;transform:translateY(-50%);
+  width:40px;height:40px;background:var(--bg);border:1px solid var(--border);
+  border-radius:50%;display:flex;align-items:center;justify-content:center;
+  color:var(--gold);font-size:16px;z-index:1;
+}
+
+/* ── INVENTION CARDS ── */
+.inv-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;margin:48px 0;}
+@media(max-width:768px){.inv-grid{grid-template-columns:1fr;}}
+.inv-card{
+  background:var(--bg2);border:1px solid var(--border);padding:40px 32px;
+  position:relative;overflow:hidden;transition:all .3s;
+}
+.inv-card:first-child{border-radius:12px 0 0 12px;}
+.inv-card:last-child{border-radius:0 12px 12px 0;}
+.inv-card:hover{background:rgba(201,168,76,0.04);}
+.inv-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);
+  opacity:0;transition:opacity .3s;
+}
+.inv-card:hover::before{opacity:1;}
+.inv-num{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);opacity:0.5;margin-bottom:16px;}
+.inv-name{
+  font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:300;
+  color:var(--white);margin-bottom:8px;letter-spacing:-0.01em;
+}
+.inv-full{font-size:11px;color:var(--gold);letter-spacing:1px;margin-bottom:20px;opacity:0.7;}
+.inv-desc{font-size:13px;color:var(--text-d);line-height:1.8;}
+.inv-tags{margin-top:24px;display:flex;flex-wrap:wrap;gap:6px;}
+.itag{
+  font-size:10px;letter-spacing:1px;text-transform:uppercase;
+  color:var(--text-d);border:0.5px solid var(--border);
+  padding:4px 10px;border-radius:100px;
+}
+
+/* ── PROOF ── */
+.proof-box{
+  background:var(--bg2);border:1px solid var(--border);border-radius:16px;
+  padding:48px;margin:48px 0;text-align:center;position:relative;overflow:hidden;
+}
+.proof-box::before{
+  content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);
+  width:200px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);
+}
+.proof-eyebrow{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);opacity:0.6;margin-bottom:16px;}
+.proof-name{
+  font-family:'Cormorant Garamond',serif;font-size:clamp(40px,6vw,72px);
+  font-weight:300;color:var(--white);margin-bottom:8px;font-style:italic;
+}
+.proof-tagline{font-size:16px;color:var(--text-d);margin-bottom:32px;font-weight:300;}
+.proof-btn{
+  display:inline-block;font-size:12px;letter-spacing:2px;text-transform:uppercase;
+  background:var(--gold);color:#06060a;padding:14px 40px;border-radius:100px;
+  text-decoration:none;font-weight:500;transition:all .2s;
+}
+.proof-btn:hover{background:#e2c97e;}
+.proof-note{font-size:11px;color:var(--text-d);margin-top:16px;opacity:0.6;}
+
+/* ── ECOSYSTEM ── */
+.eco-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1px;margin:48px 0;}
+.eco-item{
+  background:var(--bg2);border:1px solid var(--border);
+  padding:24px;transition:all .2s;
+}
+.eco-item:first-child{border-radius:12px 0 0 0;}
+.eco-item:nth-child(5){border-radius:0 12px 0 0;}
+.eco-item:nth-child(6){border-radius:0 0 0 12px;}
+.eco-item:last-child{border-radius:0 0 12px 0;}
+.eco-item:hover{background:rgba(201,168,76,0.04);}
+.eco-name{font-size:13px;color:var(--white);margin-bottom:6px;font-weight:500;}
+.eco-desc{font-size:11px;color:var(--text-d);line-height:1.6;}
+.eco-badge{
+  display:inline-block;font-size:9px;letter-spacing:1px;text-transform:uppercase;
+  color:var(--gold);border:0.5px solid var(--gold-d);padding:2px 8px;border-radius:100px;
+  margin-bottom:10px;
+}
+
+/* ── AUTHORSHIP ── */
+.auth-box{
+  background:var(--bg2);border:1px solid var(--border);border-radius:16px;
+  padding:48px;margin:48px 0;
+  display:grid;grid-template-columns:1fr 1fr;gap:48px;
+}
+@media(max-width:640px){.auth-box{grid-template-columns:1fr;}}
+.auth-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-d);margin-bottom:8px;}
+.auth-value{font-size:15px;color:var(--white);font-weight:300;}
+.auth-value a{color:var(--gold);text-decoration:none;}
+.auth-value a:hover{text-decoration:underline;}
+.hash-box{
+  background:rgba(0,0,0,0.3);border:0.5px solid var(--border);
+  border-radius:8px;padding:12px 16px;margin-top:8px;
+  font-family:'Geist Mono',monospace,monospace;font-size:12px;
+  color:var(--gold);letter-spacing:0.5px;word-break:break-all;
+}
+
+/* ── QUOTE ── */
+.quote-section{padding:80px 0;text-align:center;}
+.quote-text{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(22px,3.5vw,38px);font-weight:300;
+  color:var(--white);font-style:italic;line-height:1.4;
+  max-width:720px;margin:0 auto 24px;
+}
+.quote-text em{color:var(--gold);}
+.quote-author{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--text-d);}
+
+/* ── FOOTER ── */
+footer{
+  border-top:1px solid var(--border);padding:40px;
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;
+}
+.footer-copy{font-size:11px;color:var(--text-d);}
+.footer-copy strong{color:var(--gold);}
+.footer-links{display:flex;gap:24px;}
+.footer-links a{font-size:11px;color:var(--text-d);text-decoration:none;letter-spacing:1px;text-transform:uppercase;}
+.footer-links a:hover{color:var(--gold);}
+
+@media(max-width:768px){
+  nav{padding:0 20px;}
+  .nav-links{display:none;}
+  .wrap{padding:0 20px;}
+  .problem-grid{grid-template-columns:1fr;}
+  .pg-arrow{display:none;}
+  .pg-cell:first-child,.pg-cell:last-child{border-radius:12px;}
+  .inv-card:first-child,.inv-card:last-child{border-radius:12px;}
+  footer{flex-direction:column;text-align:center;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="#">VV Technologies</a>
+  <ul class="nav-links">
+    <li><a href="#inventii">Invenții</a></li>
+    <li><a href="#lea">LEA</a></li>
+    <li><a href="#ecosistem">Ecosistem</a></li>
+    <li><a href="#authorship">Authorship</a></li>
+  </ul>
+  <a class="nav-cta" href="lea.html">Încearcă LEA →</a>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div style="position:relative;z-index:1;text-align:center;">
+    <div class="hero-badge">Intellectual Property · Romania · Mai 2026</div>
+    <h1 class="hero-h1">VV Hi<em> Trilogy</em></h1>
+    <p class="hero-sub">
+      Trei invenții originale. Un ecosistem complet.<br>
+      Primul framework din lume construit să înțeleagă oameni — nu date.
+    </p>
+    <div class="trilogy-chips">
+      <div class="tc">VV HiS</div>
+      <div class="tc">VV HiG</div>
+      <div class="tc">VV HiB</div>
+    </div>
+    <div class="hero-actions">
+      <a href="lea.html" class="btn-primary">Încearcă LEA</a>
+      <a href="#inventii" class="btn-secondary">Descoperă invenția</a>
+    </div>
+  </div>
+</section>
+
+<!-- PROBLEMA -->
+<section>
+  <div class="wrap">
+    <div class="s-tag">§ 0 — Problema</div>
+    <h2 class="s-h2">AI-ul actual știe <em>despre</em> tine.<br>Nu te știe <em>pe tine</em>.</h2>
+    <p class="s-lead">
+      ChatGPT, Gemini, Claude — sunt mari pentru că trebuie să știe totul pentru toți.
+      Niciun AI din lume nu a rezolvat problema fundamentală: cum construiești un AI
+      care cunoaște o singură persoană în profunzime, trăiește pe device-ul ei
+      și crește odată cu ea — fără server, fără tracking, fără să trimită datele ei undeva.
+    </p>
+    <div class="problem-grid">
+      <div class="pg-cell">
+        <div class="pg-label">Înainte</div>
+        <div class="pg-text">AI-ul știe totul despre <strong>lume</strong>. Nu știe nimic despre <strong>tine</strong>. Ești un user anonim cu un ID.</div>
+        <div class="pg-arrow">→</div>
+      </div>
+      <div class="pg-cell">
+        <div class="pg-label">VV Hi Trilogy</div>
+        <div class="pg-text">AI-ul știe <strong>cine ești tu</strong>. Tiparele tale. Valorile tale. Amintirile tale. Pe device-ul tău. Ale tale.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- INVENTIILE -->
+<section id="inventii">
+  <div class="wrap">
+    <div class="s-tag">§ 1 — Invenții</div>
+    <h2 class="s-h2">Trei invenții.<br><em>Un sistem complet.</em></h2>
+    <p class="s-lead">
+      Fiecare invenție rezolvă o dimensiune diferită a problemei.
+      Împreună formează primul framework complet pentru AI personal local-first.
+    </p>
+    <div class="inv-grid">
+
+      <div class="inv-card">
+        <div class="inv-num">Invenție 01</div>
+        <div class="inv-name">VV HiS</div>
+        <div class="inv-full">Hybrid Intelligence Script</div>
+        <div class="inv-desc">
+          Primul limbaj din lume construit să descrie oameni, nu mașini.
+          Nu programezi o mașină — descrii o persoană.<br><br>
+          Trei sub-limbaje: <strong>VVPL</strong> (cine ești),
+          <strong>VVBL</strong> (cum răspunde AI-ul),
+          <strong>VVML</strong> (ce rămâne după tine).
+        </div>
+        <div class="inv-tags">
+          <span class="itag">VVPL</span>
+          <span class="itag">VVBL</span>
+          <span class="itag">VVML</span>
+          <span class="itag">19 Mai 2026</span>
+        </div>
+      </div>
+
+      <div class="inv-card">
+        <div class="inv-num">Invenție 02</div>
+        <div class="inv-name">VV HiG</div>
+        <div class="inv-full">Hybrid Intelligence Genome</div>
+        <div class="inv-desc">
+          Profilul tău AI nu e o bază de date. E ADN-ul tău digital.
+          Unic. Necopiabil. Mai personal decât o amprentă.<br><br>
+          Cinci straturi de identitate, gene permanente,
+          decay natural — exact ca memoria umană.
+        </div>
+        <div class="inv-tags">
+          <span class="itag">5 Layers</span>
+          <span class="itag">Genome Signature</span>
+          <span class="itag">20 Mai 2026</span>
+        </div>
+      </div>
+
+      <div class="inv-card">
+        <div class="inv-num">Invenție 03</div>
+        <div class="inv-name">VV HiB</div>
+        <div class="inv-full">Hybrid Intelligence Body</div>
+        <div class="inv-desc">
+          Prima arhitectură AI modelată biologic.
+          Nu layers. Nu microservices. Un organism complet.<br><br>
+          Patru organe: Transport, Monitor, Execute, Connect.
+          Trăiește pe device-ul tău. Zero cost marginal.
+        </div>
+        <div class="inv-tags">
+          <span class="itag">Local-First</span>
+          <span class="itag">4 Organs</span>
+          <span class="itag">20 Mai 2026</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- LEA — DOVADA -->
+<section id="lea">
+  <div class="wrap">
+    <div class="s-tag">§ 2 — Implementarea</div>
+    <h2 class="s-h2">Nu e teorie.<br><em>Funcționează acum.</em></h2>
+    <p class="s-lead">
+      LEA este implementarea live a VV Hi Trilogy.
+      Rulează complet în browser, fără server, fără API extern.
+      VV HiS extrage tiparele tale. VV HiG construiește identitatea ta.
+      VV HiB leagă totul.
+    </p>
+    <div class="proof-box">
+      <div class="proof-eyebrow">Implementarea Live</div>
+      <div class="proof-name">LEA</div>
+      <div class="proof-tagline">Lea nu știe totul. Te știe pe tine.</div>
+      <a href="lea.html" class="proof-btn">Deschide LEA →</a>
+      <p class="proof-note">Zero server · Zero tracking · Totul pe device-ul tău</p>
+    </div>
+  </div>
+</section>
+
+<!-- ECOSISTEM -->
+<section id="ecosistem">
+  <div class="wrap">
+    <div class="s-tag">§ 3 — Ecosistemul</div>
+    <h2 class="s-h2">LEA nu e singură.<br><em>E arhitectul unui ecosistem.</em></h2>
+    <p class="s-lead">
+      Toate aplicațiile VV comunică prin LEA. LEA e singurul punct de contact
+      al utilizatorului cu întreaga lume VV.
+    </p>
+    <div class="eco-grid">
+      <div class="eco-item">
+        <div class="eco-badge">Core</div>
+        <div class="eco-name">LEA</div>
+        <div class="eco-desc">AI personal local-first. Creierul și fața ecosistemului.</div>
+      </div>
+      <div class="eco-item">
+        <div class="eco-badge">Engine</div>
+        <div class="eco-name">VV Nexus</div>
+        <div class="eco-desc">Motorul invizibil. Procesează, sincronizează, orchestrează.</div>
+      </div>
+      <div class="eco-item">
+        <div class="eco-badge">Human</div>
+        <div class="eco-name">VV Pulse</div>
+        <div class="eco-desc">Misiuni de validare umană pe teren. Adevărul se validează pe stradă.</div>
+      </div>
+      <div class="eco-item">
+        <div class="eco-badge">Map</div>
+        <div class="eco-name">VV Pulse Map</div>
+        <div class="eco-desc">Harta hibridă AI + date validate de oameni reali.</div>
+      </div>
+      <div class="eco-item">
+        <div class="eco-badge">Search</div>
+        <div class="eco-name">VV NOW</div>
+        <div class="eco-desc">Motor de căutare personalizat. Nu pentru toți — pentru tine.</div>
+      </div>
+      <div class="eco-item">
+        <div class="eco-badge">Privacy</div>
+        <div class="eco-name">VVEil</div>
+        <div class="eco-desc">Blur automat logo-uri și date identificabile din fotografii.</div>
+      </div>
+      <div class="eco-item">
+        <div class="eco-badge">Legal</div>
+        <div class="eco-name">VVScout</div>
+        <div class="eco-desc">Căutare juridică pe nivele geografice: stradă → internațional.</div>
+      </div>
+      <div class="eco-item">
+        <div class="eco-badge">Create</div>
+        <div class="eco-name">VV Studio</div>
+        <div class="eco-desc">Spațiu creativ AI-powered. LEA ca co-creator, nu unealtă.</div>
+      </div>
+      <div class="eco-item">
+        <div class="eco-badge">Identity</div>
+        <div class="eco-name">VV Me</div>
+        <div class="eco-desc">Identitate digitală privată. VV·ID — niciodată identitatea reală.</div>
+      </div>
+      <div class="eco-item">
+        <div class="eco-badge">Write</div>
+        <div class="eco-name">VV Write</div>
+        <div class="eco-desc">Editor personal minimalist. Mod Flux — gânduri pure, nefiltrate.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- AUTHORSHIP -->
+<section id="authorship">
+  <div class="wrap">
+    <div class="s-tag">§ 4 — Proprietate Intelectuală</div>
+    <h2 class="s-h2">Inventat în <em>România.</em><br>Timestampat pe lume.</h2>
+    <p class="s-lead">
+      Fiecare commit GitHub are un hash SHA criptografic — o amprentă imuabilă
+      recunoscută internațional ca prior art. Nu poate fi falsificat. Nu poate fi antedatat.
+    </p>
+    <div class="auth-box">
+      <div>
+        <div style="margin-bottom:28px;">
+          <div class="auth-label">Inventator</div>
+          <div class="auth-value">Cosmin Toma</div>
+        </div>
+        <div style="margin-bottom:28px;">
+          <div class="auth-label">Organizație</div>
+          <div class="auth-value">VV Technologies · VV Hybrid Universe</div>
+        </div>
+        <div style="margin-bottom:28px;">
+          <div class="auth-label">Țara de origine</div>
+          <div class="auth-value">România</div>
+        </div>
+        <div>
+          <div class="auth-label">Contact licențiere</div>
+          <div class="auth-value"><a href="mailto:vv.ep.team@gmail.com">vv.ep.team@gmail.com</a></div>
+        </div>
+      </div>
+      <div>
+        <div style="margin-bottom:28px;">
+          <div class="auth-label">VV HiS — Prima publicare</div>
+          <div class="auth-value">19 Mai 2026</div>
+          <div class="hash-box">d1d3535aa913e9574d3163099be5890f8bc53aca</div>
+        </div>
+        <div>
+          <div class="auth-label">VV Hi Trilogy v2.0 — HiG + HiB adăugate</div>
+          <div class="auth-value">20 Mai 2026 · 07:58 UTC</div>
+          <div class="hash-box">a789071e738c9b989cadbad4d6d36b3edfc9b206</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- QUOTE -->
+<div class="quote-section">
+  <div class="wrap">
+    <p class="quote-text">
+      "Nu am construit un chatbot.<br>
+      Am construit un <em>limbaj pentru a înțelege oameni</em>,<br>
+      un genom pentru a păstra cine sunt,<br>
+      și un corp pentru a purta totul."
+    </p>
+    <p class="quote-author">— Cosmin Toma · Fondator · VV Technologies · Mai 2026</p>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-copy">
+    <strong>© 2026 Cosmin Toma · VV Technologies</strong><br>
+    VV HiS · VV HiG · VV HiB — All rights reserved · Romania
+  </div>
+  <div class="footer-links">
+    <a href="lea.html">LEA</a>
+    <a href="VV_LANGUAGE_SPEC.md">Spec</a>
+    <a href="VV_HYBRID_UNIVERSE.html">Ecosistem</a>
+    <a href="mailto:vv.ep.team@gmail.com">Contact</a>
+  </div>
+</footer>
+
+</body>
+</html>
