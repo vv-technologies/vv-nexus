@@ -802,6 +802,8 @@ function detectIntent(msg) {
   if(/ce (poți|poti) face|cum (mă|ma) ajuți|ajuți/.test(l)) return 'ce_poti';
   if(/cum ești (construit|facut)|cum funcționezi|cum functionezi|arhitectur|cum e construit/.test(l)) return 'cum_construit';
   if(/vv his|vv hig|vv hib|vv hia|trilogy|limbaj vv|pattern language|behavior language/.test(l)) return 'trilogy';
+  if(/^(f[aă].?mi|scrie.?mi|gen[e]?reaz[aă]|cre[ae]z[aă]|compune|inventeaz[aă]).*(o |un |ceva )?(poezie|poem|text|mesaj|articol|eseu|scrisoare|poveste|idee|glum[aă]|banc)/i.test(l)) return 'creative';
+  if(/^(fa|scrie|genereaza|creeaza|compune|inventeaza)\b.*(poem|song|story|joke|essay)/i.test(l)) return 'creative';
   if(/\b(lea|nexus|pulse map|vv pulse|vv write|vv now|vv me)\b|vvpulse|vvwrite|vvscout|vveil|vv studio/.test(l)) return 'app';
   if(/ce e vv|ce este vv|vv hybrid|ecosistem vv|vv technologies/.test(l)) return 'vv';
   if(/cosmin|fondator|inventor|inventat|cine a facut|cine a creat/.test(l)) return 'founder';
@@ -861,12 +863,13 @@ async function think(msg) {
   if(intent === 'depth') {
     if(_lastSearchResult && _lastSearchResult.title) {
       var fullText = await searchWikiFullIntro(_lastSearchResult.title);
-      if(fullText && fullText.length > (_lastSearchResult.text || '').length + 50) {
+      if(fullText && fullText.length > 80) {
         var sents = fullText.match(/[^.!?]+[.!?]+/g) || [fullText];
-        return { text: sents.slice(0, 6).join(' ').trim(), wiki: _lastSearchResult, depthSource: true };
+        var moreText = sents.slice(0, 6).join(' ').trim();
+        return { formatted: moreText, wiki: _lastSearchResult, depthSource: true };
       }
     }
-    if(_lastSearchResult) return { text: null, wiki: _lastSearchResult, formatted: formatWiki(_lastSearchResult, true), depthSource: true };
+    if(_lastSearchResult) return { formatted: formatWiki(_lastSearchResult, true), wiki: _lastSearchResult, depthSource: true };
     return { text: 'Nu am mai multe informații despre "' + _lastSearchSubject + '".' };
   }
   if(intent === 'download_local') { setTimeout(openDownload, 400); return { text: _userLang === 'en' ? 'LEA Local lives on your laptop — knows you, works offline, zero upload. Opening the download guide.' : 'LEA Local trăiește pe laptopul tău — te cunoaște, funcționează offline, niciun document nu pleacă nicăieri. Deschid ghidul.' }; }
@@ -899,6 +902,7 @@ async function think(msg) {
     return { text: VV.founder };
   }
   if(intent === 'philosophy') return { text: VV.philosophy };
+  if(intent === 'creative') return { text: 'Nu pot genera text creativ în versiunea publică — am nevoie să te cunosc: stilul tău, tonul, ce apreciezi. Versiunea locală poate face asta după câteva conversații.' };
 
   // SEARCH — normalizare typos, extrage subiectul, detecteaza categoria
   var msgNorm = normalizeTypos(msg);
@@ -935,14 +939,21 @@ async function think(msg) {
     }
   }
 
-  // 4. Full-text RO Wikipedia — fara title check (motorul de cautare stie)
+  // 4. Full-text RO Wikipedia
   if(!result) result = await searchWikiRoQuery(subject);
 
-  // 5. Full-text EN Wikipedia
-  if(!result) result = await searchWikiQuery(subject);
+  // 5. Full-text EN Wikipedia (cu ordinale traduse daca e cazul)
+  if(!result || (hasOrdinal && result && (result.title||'').split(' ').length > 5)) {
+    var enSubject = subject
+      .replace(/\bprimul\b|\bprima\b/gi,'first').replace(/\bultimul\b|\bultima\b/gi,'last')
+      .replace(/\bpreș?edinte\b/gi,'president').replace(/\bamerican[aă]?\b/gi,'american')
+      .replace(/\brege\b|\bîmpărat\b/gi,'king').replace(/\broman[aă]?\b/gi,'romanian');
+    var enResult = await searchWikiQuery(enSubject);
+    if(enResult && (!result || (result.title||'').split(' ').length > (enResult.title||'').split(' ').length)) result = enResult;
+  }
 
-  // 6. Fallback cu mesajul original complet
-  if(!result) result = await searchWikiRoQuery(msgNorm.replace(/\?+$/,'').trim());
+  // 6. Full-text EN cu subiectul original
+  if(!result) result = await searchWikiQuery(subject);
 
   if(result) {
     _lastSearchSubject = subject;
