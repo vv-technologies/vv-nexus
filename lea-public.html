@@ -754,7 +754,10 @@ function normalizeTypos(text) {
     .replace(/\binventaru\b/gi,'inventatorul').replace(/\bfondatoru\b/gi,'fondatorul')
     .replace(/\bpresedintele\b/gi,'presedintele').replace(/\bpresidente\b/gi,'presedinte')
     .replace(/\bfrancezei\b/gi,'franceze').replace(/\bromanie\b/gi,'romaniei')
-    .replace(/\bitaliei\b/gi,'italiei').replace(/\bgermaniei\b/gi,'germaniei');
+    .replace(/\bitaliei\b/gi,'italiei').replace(/\bgermaniei\b/gi,'germaniei')
+    .replace(/\bvreama\b/gi,'vremea').replace(/\bvreme[ae]\b/gi,'vremea')
+    .replace(/\bvrema\b/gi,'vremea').replace(/\btempratura\b/gi,'temperatura')
+    .replace(/\bmeteo[ua]\b/gi,'meteo');
 }
 
 // ── VVBL PUBLIC BEHAVIORS — extrag subiectul din întrebare ──
@@ -835,7 +838,9 @@ function detectIntent(msg) {
   if(/ce e vv|ce este vv|vv hybrid|ecosistem vv|vv technologies/.test(l)) return 'vv';
   if(/cosmin|fondator|inventor|inventat|cine a facut|cine a creat/.test(l)) return 'founder';
   if(/filozofie|filosofie|principii|local.?first|suveranitate/.test(l)) return 'philosophy';
-  if(/^(vremea|vreme|meteo|temperatura|ploua|ninge|prognoza|forecast)/.test(l)) return 'weather';
+  if(/\b(vremea|vreme|meteo|temperatura|ploua|ninge|prognoza|forecast)\b/.test(l) || /cum (e|este|o fi|va fi) (vremea|vreme|temperatura|timpul)/.test(l)) return 'weather';
+  if(/\b(ieri|azi-noapte|azi dimineata|in aceasta seara|in seara asta|weekend-ul trecut|luna trecuta|saptamana trecuta|acum [0-9]|acum cateva|ce s-a intamplat|ce s-a întâmplat|stiri|știri|news|trending|viral|ultima ora)\b/.test(l)) return 'realtime';
+  if(/^(ce (a fost|e|este) (azi|astazi|acum|ieri)|ce (film|piesa|concert|meci|eveniment).*(azi|ieri|acum|astazi|saptamana|luna))/.test(l)) return 'realtime';
 
   return 'search';
 }
@@ -908,6 +913,7 @@ async function think(msg) {
   if(intent === 'privacy') { setTimeout(openPrivacy, 400); return { text: _userLang === 'en' ? 'Full transparency. Nothing is stored on a server. Everything Lea knows about you lives exclusively on your device — I can\'t access anything from the outside.' : 'Transparență completă. Nu stochează nimic pe server. Tot ce știu despre tine trăiește exclusiv pe device-ul tău — eu nu pot accesa nimic din exterior.' }; }
   if(intent === 'install') return { text: leaText('install') };
   if(intent === 'weather') return { text: leaText('weather') };
+  if(intent === 'realtime') return { text: 'Nu am acces la date în timp real — nu știu ce s-a întâmplat ieri, azi sau acum. Încearcă Google sau o aplicație de știri. Eu știu ce e în Wikipedia (fapte stabile, nu evenimente recente).' };
   if(intent === 'cine') return { text: leaText('cine') };
   if(intent === 'ce_poti') return { text: leaText('ce_poti') };
   if(intent === 'cum_construit') return { text: leaResponses.cum_construit };
