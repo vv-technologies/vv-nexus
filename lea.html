@@ -1135,6 +1135,52 @@ window.addEventListener('load', function() {
     return VVhiLib.respond(msg, N, ctx, tokens4);
   }
 
+  // ── VV HiL — Wikipedia search helpers ────────────────────
+  function vvhilExtractSubject(msg) {
+    return msg
+      .replace(/^(cine (a fost|este|e|era|sunt|a inventat|a creat|a scris|a fondat|a descoperit)\s*)/i, '')
+      .replace(/^(ce (este|e|înseamnă|inseamna|sunt|a fost|reprezinta)\s*)/i, '')
+      .replace(/^(când (a|au|s-a|este|e|a avut loc|a murit|s-a nascut|a inceput)\s*)/i, '')
+      .replace(/^(unde (este|e|se află|se afla|era|se gaseste)\s*)/i, '')
+      .replace(/^(cum (funcționează|functioneaza|se face|se numeste)\s*)/i, '')
+      .replace(/^(cauta|caută|gaseste|găsește|spune[- ]mi despre|ce stii despre|informatii despre)\s*/i, '')
+      .replace(/\?$/, '')
+      .trim();
+  }
+
+  function vvhilFormatWiki(data) {
+    if(!data || !data.extract) return null;
+    var text = data.extract.replace(/\([^)]{0,80}\)/g, '').replace(/\s{2,}/g, ' ').trim();
+    var sentences = text.match(/[^.!?]+[.!?]/g) || [text];
+    return sentences.slice(0, 2).join(' ').trim();
+  }
+
+  function vvhilSearchRO(subject) {
+    return fetch('https://ro.wikipedia.org/api/rest_v1/page/summary/' + encodeURIComponent(subject))
+      .then(function(r){ return r.ok ? r.json() : null; })
+      .catch(function(){ return null; });
+  }
+
+  function vvhilSearchEN(subject) {
+    return fetch('https://en.wikipedia.org/api/rest_v1/page/summary/' + encodeURIComponent(subject))
+      .then(function(r){ return r.ok ? r.json() : null; })
+      .catch(function(){ return null; });
+  }
+
+  function vvhilSearchQuery(q) {
+    return fetch('https://ro.wikipedia.org/w/api.php?action=query&list=search&srsearch=' + encodeURIComponent(q) + '&format=json&origin=*&srlimit=1')
+      .then(function(r){ return r.json(); })
+      .then(function(d){
+        if(d.query && d.query.search && d.query.search[0]) {
+          return vvhilSearchRO(d.query.search[0].title);
+        }
+        return null;
+      })
+      .catch(function(){ return null; });
+  }
+
+  var _wikiTrigger = /^(cine |ce (este|e|înseamnă|inseamna|sunt|a |reprezinta)|când |unde (este|e|se |era)|cum (funcț|function|se )|cauta|caută|gaseste|găsește|spune.mi despre|ce stii despre|informatii despre)/i;
+
   // ── Wrap processLea ───────────────────────────────────────
   if(typeof processLea !== 'function') return;
   var _orig = processLea;
@@ -1182,6 +1228,47 @@ window.addEventListener('load', function() {
       if(typeof _hist!=='undefined') { _hist.push({r:'u',t:q}); _hist.push({r:'l',t:local}); }
       if(typeof saveHistory==='function') saveHistory();
       return;
+    }
+
+    // ── VV HiL — Wikipedia înainte de API ────────────────────
+    if(_wikiTrigger.test(q.trim())) {
+      var subj = vvhilExtractSubject(q);
+      if(subj.length > 1) {
+        var tkW = typeof addMsg==='function' ? addMsg('l','',true) : null;
+        var wd = await vvhilSearchRO(subj);
+        if(!wd || !wd.extract) wd = await vvhilSearchQuery(subj);
+        if(!wd || !wd.extract) wd = await vvhilSearchEN(subj);
+        if(tkW) { var el=document.getElementById('tk-msg'); if(el) el.remove(); }
+        if(wd && wd.extract) {
+          var fmt = vvhilFormatWiki(wd);
+          if(fmt) {
+            _vvhiLastReply = fmt;
+            if(typeof addMsg==='function') addMsg('l', fmt);
+            // Adauga link Wikipedia sub mesaj
+            var allBubs = document.querySelectorAll('.msg-b');
+            if(allBubs.length) {
+              var lastB = allBubs[allBubs.length-1];
+              var lnk = document.createElement('a');
+              lnk.href = (wd.content_urls && wd.content_urls.mobile) ? wd.content_urls.mobile.page : '#';
+              lnk.target = '_blank';
+              lnk.rel = 'noopener';
+              lnk.textContent = '· Wikipedia';
+              lnk.style.cssText = 'display:block;margin-top:5px;color:rgba(212,175,55,0.4);font-size:10px;text-decoration:none;font-family:var(--mono);letter-spacing:.5px;';
+              lastB.appendChild(lnk);
+            }
+            // VV HiL corpus — log anonim
+            try {
+              var corp = JSON.parse(localStorage.getItem('vvhil_corpus')||'[]');
+              corp.push({s:subj.toLowerCase(), ts:Date.now()});
+              if(corp.length > 500) corp = corp.slice(-500);
+              localStorage.setItem('vvhil_corpus', JSON.stringify(corp));
+            } catch(e) {}
+            if(typeof _hist!=='undefined') { _hist.push({r:'u',t:q}); _hist.push({r:'l',t:fmt}); }
+            if(typeof saveHistory==='function') saveHistory();
+            return;
+          }
+        }
+      }
     }
 
     // Ajunge la API — numara doar aceste mesaje
