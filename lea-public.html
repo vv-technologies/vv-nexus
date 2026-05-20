@@ -79,6 +79,91 @@ nav{
   transition:all .2s;font-family:'Inter',sans-serif;
 }
 .nav-priv-btn:hover{color:rgba(180,210,255,0.9);}
+.nav-dl-btn{
+  font-size:11px;font-weight:500;letter-spacing:0.3px;
+  color:rgba(180,210,255,0.95);
+  background:rgba(180,210,255,0.08);
+  border:0.5px solid rgba(180,210,255,0.3);
+  padding:7px 18px;border-radius:100px;cursor:pointer;
+  transition:all .2s;font-family:'Inter',sans-serif;
+}
+.nav-dl-btn:hover{background:rgba(180,210,255,0.15);border-color:rgba(180,210,255,0.5);box-shadow:0 0 16px rgba(180,210,255,0.1);}
+
+/* DOWNLOAD MODAL */
+#dl-modal{
+  display:none;position:fixed;inset:0;z-index:200;
+  background:rgba(3,4,14,0.92);backdrop-filter:blur(16px);
+  overflow-y:auto;padding:40px 20px;
+}
+#dl-modal.show{display:flex;justify-content:center;}
+.dl-box{
+  width:100%;max-width:580px;background:rgba(255,255,255,0.03);
+  border:0.5px solid rgba(255,255,255,0.08);border-radius:24px;
+  padding:44px 40px;height:fit-content;
+}
+.dl-close{
+  float:right;background:none;border:none;color:rgba(255,255,255,0.3);
+  font-size:20px;cursor:pointer;line-height:1;padding:0;margin-top:-4px;
+}
+.dl-close:hover{color:rgba(255,255,255,0.7);}
+.dl-tag{font-size:10px;letter-spacing:3px;color:rgba(180,210,255,0.5);text-transform:uppercase;margin-bottom:8px;}
+.dl-h{font-size:26px;font-weight:300;color:#e8e2d8;margin-bottom:8px;line-height:1.2;}
+.dl-sub{font-size:13px;color:rgba(255,255,255,0.35);margin-bottom:36px;line-height:1.6;}
+.dl-compare{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:36px;}
+.dl-col{
+  background:rgba(255,255,255,0.03);border:0.5px solid rgba(255,255,255,0.07);
+  border-radius:16px;padding:20px;
+}
+.dl-col.local{
+  background:rgba(180,210,255,0.04);
+  border-color:rgba(180,210,255,0.15);
+}
+.dl-col-tag{font-size:9px;letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;}
+.dl-col-name{font-size:15px;font-weight:500;color:var(--text);margin-bottom:16px;}
+.dl-feat{font-size:12px;color:rgba(255,255,255,0.45);padding:6px 0;border-bottom:0.5px solid rgba(255,255,255,0.05);display:flex;align-items:center;gap:8px;}
+.dl-feat:last-child{border-bottom:none;}
+.dl-feat b{color:rgba(255,255,255,0.75);}
+.dl-feat .df-yes{color:rgba(120,220,150,0.8);font-size:13px;}
+.dl-feat .df-no{color:rgba(255,100,100,0.4);font-size:13px;}
+.dl-col.local .dl-feat b{color:rgba(180,210,255,0.9);}
+.dl-steps{margin-bottom:32px;}
+.dl-steps-title{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.25);margin-bottom:16px;}
+.dl-step{display:flex;align-items:flex-start;gap:14px;margin-bottom:12px;}
+.dl-step-n{
+  width:24px;height:24px;border-radius:50%;flex-shrink:0;
+  background:rgba(180,210,255,0.1);border:0.5px solid rgba(180,210,255,0.2);
+  font-size:11px;font-weight:500;color:rgba(180,210,255,0.7);
+  display:flex;align-items:center;justify-content:center;margin-top:1px;
+}
+.dl-step-text{font-size:13px;color:rgba(255,255,255,0.55);line-height:1.5;}
+.dl-step-text b{color:rgba(255,255,255,0.85);}
+.dl-cta{
+  display:block;width:100%;padding:14px;
+  background:rgba(180,210,255,0.1);border:0.5px solid rgba(180,210,255,0.25);
+  border-radius:12px;text-align:center;
+  font-size:14px;font-weight:500;color:rgba(180,210,255,0.95);
+  text-decoration:none;cursor:pointer;transition:all .2s;
+  font-family:'Inter',sans-serif;letter-spacing:-0.2px;
+}
+.dl-cta:hover{background:rgba(180,210,255,0.18);border-color:rgba(180,210,255,0.4);box-shadow:0 4px 20px rgba(180,210,255,0.08);}
+.dl-note{font-size:11px;color:rgba(255,255,255,0.2);text-align:center;margin-top:14px;}
+
+/* GATEWAY CARD in chat */
+.gw-card{
+  background:rgba(180,210,255,0.04);
+  border:0.5px solid rgba(180,210,255,0.15);
+  border-radius:14px;padding:18px 20px;margin-top:10px;
+}
+.gw-card-title{font-size:12px;font-weight:500;color:rgba(180,210,255,0.7);margin-bottom:8px;}
+.gw-card-text{font-size:13px;color:rgba(255,255,255,0.5);line-height:1.6;margin-bottom:14px;}
+.gw-card-btn{
+  display:inline-block;
+  font-size:12px;font-weight:500;color:rgba(180,210,255,0.9);
+  background:rgba(180,210,255,0.08);border:0.5px solid rgba(180,210,255,0.25);
+  padding:8px 20px;border-radius:100px;cursor:pointer;
+  transition:all .2s;font-family:'Inter',sans-serif;
+}
+.gw-card-btn:hover{background:rgba(180,210,255,0.15);}
 
 /* PRIVACY MODAL */
 #priv-modal{
@@ -304,9 +389,9 @@ nav{
     <span class="nav-name">Lea</span>
   </a>
   <div class="nav-right">
-    <button class="nav-priv-btn" onclick="openPrivacy()">🔒 Date</button>
+    <button class="nav-priv-btn" onclick="openPrivacy()">🔒</button>
     <button class="nav-eco-btn" onclick="toggleEco()">Ecosistem</button>
-    <a class="nav-install" href="lea.html">Versiunea personală →</a>
+    <button class="nav-dl-btn" onclick="openDownload()">Descarcă LEA</button>
   </div>
 </nav>
 
@@ -373,19 +458,59 @@ nav{
   <div class="eco-item"><div class="eco-tag">Write</div><div><div class="eco-item-name">VV Write</div><div class="eco-item-desc">Editor personal minimalist cu Mod Flux — gânduri pure, nefiltrate.</div></div></div>
 </div>
 
+<!-- DOWNLOAD MODAL -->
+<div id="dl-modal">
+  <div class="dl-box">
+    <button class="dl-close" onclick="closeDownload()">✕</button>
+    <div class="dl-tag">VV Hybrid Universe</div>
+    <div class="dl-h">LEA pe laptopul tău.</div>
+    <div class="dl-sub">Tot ce faci rămâne la tine. Zero upload. Zero abonament. Funcționează și fără internet.</div>
+
+    <div class="dl-compare">
+      <div class="dl-col">
+        <div class="dl-col-tag" style="color:rgba(255,255,255,0.3);">Acum — Online</div>
+        <div class="dl-col-name">LEA Public</div>
+        <div class="dl-feat"><span class="df-yes">✓</span> <b>Căutare</b> Wikipedia + DDG</div>
+        <div class="dl-feat"><span class="df-yes">✓</span> <b>Traducere</b> automată</div>
+        <div class="dl-feat"><span class="df-yes">✓</span> <b>Info VV</b> Ecosistem</div>
+        <div class="dl-feat"><span class="df-no">✗</span> <span>Memorie — nu te știe</span></div>
+        <div class="dl-feat"><span class="df-no">✗</span> <span>PDF / Documente</span></div>
+        <div class="dl-feat"><span class="df-no">✗</span> <span>Offline complet</span></div>
+      </div>
+      <div class="dl-col local">
+        <div class="dl-col-tag" style="color:rgba(180,210,255,0.6);">Download — Local</div>
+        <div class="dl-col-name" style="color:rgba(180,210,255,0.95);">LEA Local</div>
+        <div class="dl-feat"><span class="df-yes">✓</span> <b>Tot ce e online</b></div>
+        <div class="dl-feat"><span class="df-yes">✓</span> <b>Te cunoaște</b> — memorie reală</div>
+        <div class="dl-feat"><span class="df-yes">✓</span> <b>PDF & Documente</b> local</div>
+        <div class="dl-feat"><span class="df-yes">✓</span> <b>Offline</b> complet</div>
+        <div class="dl-feat"><span class="df-yes">✓</span> <b>Tiparele tale</b> — VVPL Genome</div>
+        <div class="dl-feat"><span class="df-yes">✓</span> <b>Gratuit</b> pentru totdeauna</div>
+      </div>
+    </div>
+
+    <div class="dl-steps">
+      <div class="dl-steps-title">3 pași — gata în 2 minute</div>
+      <div class="dl-step"><div class="dl-step-n">1</div><div class="dl-step-text">Descarcă fișierele de pe GitHub — <b>lea.html, lea.js, lea.css</b></div></div>
+      <div class="dl-step"><div class="dl-step-n">2</div><div class="dl-step-text">Pune-le într-un folder pe laptop</div></div>
+      <div class="dl-step"><div class="dl-step-n">3</div><div class="dl-step-text">Deschide <b>lea.html</b> în orice browser — LEA e a ta, pentru totdeauna</div></div>
+    </div>
+
+    <a class="dl-cta" href="https://github.com/vv-technologies/vv-nexus" target="_blank" rel="noopener">
+      Descarcă LEA de pe GitHub →
+    </a>
+    <div class="dl-note">Niciun cont · Niciun email · Nicio instalare · Open source</div>
+  </div>
+</div>
+
 <div id="chat-wrap"></div>
 
 <div id="input-area">
-  <div id="install-banner">
-    <div class="ib-text"><strong>Vrei ca Lea să te cunoască cu adevărat?</strong><br>Versiunea personală învață cine ești. Zero server. Datele tale, ale tale.</div>
-    <a class="ib-btn" href="lea.html">Încearcă →</a>
-    <button class="ib-close" onclick="this.parentElement.classList.remove('show')">×</button>
-  </div>
   <div id="input-wrap">
     <input id="input" type="text" placeholder="Întreabă orice…" autocomplete="off" spellcheck="false"/>
     <button id="send" onclick="send()">↑</button>
   </div>
-  <div id="hint">Wikipedia · Date publice · Zero server · Zero tracking</div>
+  <div id="hint">Zero server · Zero tracking · Wikipedia + date publice</div>
 </div>
 
 <script>
@@ -627,7 +752,9 @@ function detectIntent(msg) {
   if(_lastSearchSubject && /^(mai mult|detalii|continua|continuă|extinde|si ce|și ce altceva|spune mai mult|mai multe|mai info|explica|explică|aprofundeaz|ce mai stii|ce mai știi)/.test(l)) return 'depth';
   if(_lastSearchSubject && /^(c[aâ][tț]i ani are|c[aâ]nd s-a n[aă]scut|de unde e|unde s-a nascut|ce a f[aă]cut|ce a inventat|cine e|cum arat|e viu|mai tr[aă]ie[sș]te|a murit|mai stii ceva|mai stii despre|mai mult despre)/.test(l)) return 'follow_up';
   if(/date personale|datele mele|ce stochezi|ce tii|ce ai despre mine|privacy|confidential|gdpr|sigur|sigura|esti sigura|protejat|protectia datelor|ce salvezi|ce pastrezi/.test(l)) return 'privacy';
+  if(/versiunea local|versiunea personala|versiunea personală|descarca lea|download lea|lea local|cum descarc|unde descarc|cum iau lea|cum obtin lea/.test(l)) return 'download_local';
   if(/descarc|download|instala|instalez|pun pe laptop|pun pe telefon|pe pc|îl am offline|o am offline/.test(l)) return 'install';
+  if(/(am (un|o|niste)|mi-a venit|am primit|am de (analizat|citit|verificat)|vreau sa analizez|pot analiza|analizeaza.mi|citeste.mi).*(contract|pdf|document|factur|dosar|fisier|ofert|chitant|declarat|certificat|eseu|cv\b)/i.test(l) || /(contract|pdf|document|factur[aă]|dosar|fisier|ofert[aă]).*(privat|local|fara server|fara upload|confidential)/i.test(l)) return 'private_doc';
   if(/cine ești|cine esti|ce ești|ce esti|despre tine|cum te chemi/.test(l)) return 'cine';
   if(/ce (poți|poti) face|cum (mă|ma) ajuți|ajuți/.test(l)) return 'ce_poti';
   if(/cum ești (construit|facut)|cum funcționezi|cum functionezi|arhitectur|cum e construit/.test(l)) return 'cum_construit';
@@ -698,6 +825,8 @@ async function think(msg) {
     if(ddg && ddg.text) return { text: ddg.text, source: 'DuckDuckGo' };
     return { text: 'Nu am mai multe informații despre "' + _lastSearchSubject + '".' };
   }
+  if(intent === 'download_local') { setTimeout(openDownload, 400); return { text: _userLang === 'en' ? 'LEA Local lives on your laptop — knows you, works offline, zero upload. Opening the download guide.' : 'LEA Local trăiește pe laptopul tău — te cunoaște, funcționează offline, niciun document nu pleacă nicăieri. Deschid ghidul.' }; }
+  if(intent === 'private_doc') { return { gateway: true }; }
   if(intent === 'privacy') { setTimeout(openPrivacy, 400); return { text: _userLang === 'en' ? 'Full transparency. Nothing is stored on a server. Everything Lea knows about you lives exclusively on your device — I can\'t access anything from the outside.' : 'Transparență completă. Nu stochează nimic pe server. Tot ce știu despre tine trăiește exclusiv pe device-ul tău — eu nu pot accesa nimic din exterior.' }; }
   if(intent === 'install') return { text: leaText('install') };
   if(intent === 'weather') return { text: leaText('weather') };
@@ -791,7 +920,16 @@ function addMsg(role, content, source) {
   var avatar = role === 'lea' ? 'L' : 'Tu';
   var bubbleHtml = '';
 
-  if(content && content.wiki) {
+  if(content && content.gateway) {
+    var gwText = _userLang === 'en'
+      ? 'For that, your document needs to stay entirely on your laptop — no upload, no server.'
+      : 'Pentru asta, documentul tău trebuie să rămână complet pe laptopul tău — zero upload, zero server.';
+    var gwBtn = _userLang === 'en' ? 'Download LEA Local →' : 'Descarcă LEA Local →';
+    var gwSub = _userLang === 'en'
+      ? 'LEA Local reads PDFs, analyzes documents and contracts privately. Free, forever.'
+      : 'LEA Local citește PDF-uri, analizează documente și contracte privat. Gratuit, pentru totdeauna.';
+    bubbleHtml = '<div class="msg-bubble">' + gwText + '<div class="gw-card"><div class="gw-card-title">LEA Local</div><div class="gw-card-text">' + gwSub + '</div><button class="gw-card-btn" onclick="openDownload()">' + gwBtn + '</button></div></div>';
+  } else if(content && content.wiki) {
     var w = content.wiki;
     var display = content.formatted || w.text;
     var srcLabel = content.depthSource ? 'Wikipedia · extins' : 'Wikipedia';
@@ -889,6 +1027,20 @@ window.closePrivacy = function() {
 document.addEventListener('click', function(e) {
   var pm = document.getElementById('priv-modal');
   if(pm.classList.contains('show') && e.target === pm) closePrivacy();
+});
+
+// ── DOWNLOAD MODAL ──
+window.openDownload = function() {
+  document.getElementById('dl-modal').classList.add('show');
+  document.body.style.overflow = 'hidden';
+};
+window.closeDownload = function() {
+  document.getElementById('dl-modal').classList.remove('show');
+  document.body.style.overflow = '';
+};
+document.addEventListener('click', function(e) {
+  var dm = document.getElementById('dl-modal');
+  if(dm.classList.contains('show') && e.target === dm) closeDownload();
 });
 
 // ── ECOSYSTEM PANEL ──
