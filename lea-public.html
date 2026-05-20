@@ -73,6 +73,47 @@ nav{
   transition:all .2s;font-family:'Inter',sans-serif;
 }
 .nav-eco-btn:hover{color:var(--text);border-color:var(--border2);}
+.nav-priv-btn{
+  font-size:11px;letter-spacing:0.5px;color:rgba(180,210,255,0.5);
+  background:none;border:none;cursor:pointer;padding:6px 10px;
+  transition:all .2s;font-family:'Inter',sans-serif;
+}
+.nav-priv-btn:hover{color:rgba(180,210,255,0.9);}
+
+/* PRIVACY MODAL */
+#priv-modal{
+  display:none;position:fixed;inset:0;z-index:200;
+  background:rgba(3,4,14,0.92);backdrop-filter:blur(16px);
+  overflow-y:auto;padding:40px 20px;
+}
+#priv-modal.show{display:flex;justify-content:center;}
+.priv-box{
+  width:100%;max-width:560px;background:rgba(255,255,255,0.04);
+  border:0.5px solid rgba(255,255,255,0.08);border-radius:20px;
+  padding:40px;height:fit-content;
+}
+.priv-close{
+  float:right;background:none;border:none;color:rgba(255,255,255,0.3);
+  font-size:20px;cursor:pointer;line-height:1;padding:0;margin-top:-4px;
+}
+.priv-close:hover{color:rgba(255,255,255,0.7);}
+.priv-title{font-size:11px;letter-spacing:3px;color:rgba(180,210,255,0.6);text-transform:uppercase;margin-bottom:6px;}
+.priv-h{font-size:22px;font-weight:300;color:#e8e2d8;margin-bottom:28px;font-family:'Cormorant Garamond',serif;font-style:italic;}
+.priv-section{margin-bottom:24px;}
+.priv-section-title{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:10px;}
+.priv-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:7px;}
+.priv-row .priv-icon{font-size:13px;flex-shrink:0;margin-top:1px;}
+.priv-row .priv-text{font-size:13px;color:rgba(232,226,216,0.7);line-height:1.5;}
+.priv-row .priv-text b{color:rgba(232,226,216,0.95);font-weight:500;}
+.priv-ok{
+  width:100%;margin-top:28px;padding:13px;border-radius:100px;
+  background:rgba(180,210,255,0.08);border:0.5px solid rgba(180,210,255,0.2);
+  color:rgba(180,210,255,0.8);font-size:12px;letter-spacing:1px;
+  cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s;
+}
+.priv-ok:hover{background:rgba(180,210,255,0.14);}
+.priv-contact{font-size:11px;color:rgba(255,255,255,0.2);text-align:center;margin-top:16px;letter-spacing:0.3px;}
+
 .nav-install{
   font-size:11px;letter-spacing:0.5px;
   background:var(--glass2);border:0.5px solid var(--border2);
@@ -263,10 +304,59 @@ nav{
     <span class="nav-name">Lea</span>
   </a>
   <div class="nav-right">
+    <button class="nav-priv-btn" onclick="openPrivacy()">🔒 Date</button>
     <button class="nav-eco-btn" onclick="toggleEco()">Ecosistem</button>
     <a class="nav-install" href="lea.html">Versiunea personală →</a>
   </div>
 </nav>
+
+<!-- PRIVACY MODAL -->
+<div id="priv-modal">
+  <div class="priv-box">
+    <button class="priv-close" onclick="closePrivacy()">✕</button>
+    <div class="priv-title">Transparență completă</div>
+    <div class="priv-h">Datele tale — numai ale tale.</div>
+
+    <div class="priv-section">
+      <div class="priv-section-title">Ce stochează Lea (local, pe device-ul tău)</div>
+      <div class="priv-row"><span class="priv-icon">✓</span><div class="priv-text"><b>Tipare comportamentale VVPL</b> — ce îți place, obiceiuri, stări, valori. Salvate în browser, nu pe server.</div></div>
+      <div class="priv-row"><span class="priv-icon">✓</span><div class="priv-text"><b>Amintiri din conversații</b> — indexate pe zi și stare. Niciodată trimise nicăieri.</div></div>
+      <div class="priv-row"><span class="priv-icon">✓</span><div class="priv-text"><b>Preferințe și obiective</b> — salvate opțional din conversații naturale.</div></div>
+      <div class="priv-row"><span class="priv-icon">✓</span><div class="priv-text"><b>Legacy tokens</b> — doar dacă alegi explicit să salvezi amintiri pentru cineva.</div></div>
+    </div>
+
+    <div class="priv-section">
+      <div class="priv-section-title">Ce nu există niciodată</div>
+      <div class="priv-row"><span class="priv-icon" style="color:rgba(255,100,100,0.7)">✗</span><div class="priv-text">Adresă de email, parolă sau cont</div></div>
+      <div class="priv-row"><span class="priv-icon" style="color:rgba(255,100,100,0.7)">✗</span><div class="priv-text">Număr de telefon sau locație GPS</div></div>
+      <div class="priv-row"><span class="priv-icon" style="color:rgba(255,100,100,0.7)">✗</span><div class="priv-text">IP address, cookie-uri de tracking, identificator de device</div></div>
+      <div class="priv-row"><span class="priv-icon" style="color:rgba(255,100,100,0.7)">✗</span><div class="priv-text">Google Analytics, Facebook Pixel sau orice script de tracking terț</div></div>
+    </div>
+
+    <div class="priv-section">
+      <div class="priv-section-title">Ce nu face Lea niciodată</div>
+      <div class="priv-row"><span class="priv-icon" style="color:rgba(255,100,100,0.7)">✗</span><div class="priv-text">Nu trimite date pe niciun server — nici al VV Technologies</div></div>
+      <div class="priv-row"><span class="priv-icon" style="color:rgba(255,100,100,0.7)">✗</span><div class="priv-text">Nu vinde, nu partajează, nu exportă date cu terțe companii</div></div>
+      <div class="priv-row"><span class="priv-icon" style="color:rgba(255,100,100,0.7)">✗</span><div class="priv-text">Nu folosește conversațiile tale pentru antrenament AI extern</div></div>
+      <div class="priv-row"><span class="priv-icon" style="color:rgba(255,100,100,0.7)">✗</span><div class="priv-text">Nu te urmărește dacă schimbi device-ul sau browser-ul</div></div>
+    </div>
+
+    <div class="priv-section">
+      <div class="priv-section-title">Drepturile tale — garantate tehnic</div>
+      <div class="priv-row"><span class="priv-icon">⬡</span><div class="priv-text"><b>Descarcă orice</b> — butonul "Descarcă datele mele" din Setări exportă tot în JSON.</div></div>
+      <div class="priv-row"><span class="priv-icon">⬡</span><div class="priv-text"><b>Șterge tot</b> — butonul "Deconectare · Resetează" din Setări șterge complet.</div></div>
+      <div class="priv-row"><span class="priv-icon">⬡</span><div class="priv-text"><b>Ștergerea completă</b> — dacă ștergi localStorage din browser, toate datele dispar definitiv. VV Technologies nu poate recupera nimic.</div></div>
+    </div>
+
+    <div class="priv-section" style="margin-bottom:0;">
+      <div class="priv-section-title">Baza tehnică (GDPR by design)</div>
+      <div class="priv-row"><span class="priv-icon">⬡</span><div class="priv-text">Toate datele trăiesc exclusiv în localStorage al browser-ului tău. VV Technologies nu are server unde să ajungă datele tale. Nu există procesare de date personale pe niciun server — nu este nevoie de bază legală GDPR.</div></div>
+    </div>
+
+    <button class="priv-ok" onclick="closePrivacy()">Am înțeles</button>
+    <div class="priv-contact">VV Technologies · România · 2026 · vv.ep.team@gmail.com</div>
+  </div>
+</div>
 
 <!-- ECOSYSTEM PANEL -->
 <div id="eco-panel">
@@ -411,6 +501,7 @@ function detectIntent(msg) {
 
   if(/^(salut|buna|bun[aă]|hello|hey|hi\b|servus)/.test(l)) return 'salut';
   if(/multumesc|mersi|thanks/.test(l)) return 'multumesc';
+  if(/date personale|datele mele|ce stochezi|ce tii|ce ai despre mine|privacy|confidential|gdpr|sigur|sigura|esti sigura|protejat|protectia datelor|ce salvezi|ce pastrezi/.test(l)) return 'privacy';
   if(/descarc|download|instala|instalez|pun pe laptop|pun pe telefon|pe pc|îl am offline|o am offline/.test(l)) return 'install';
   if(/cine ești|cine esti|ce ești|ce esti|despre tine|cum te chemi/.test(l)) return 'cine';
   if(/ce (poți|poti) face|cum (mă|ma) ajuți|ajuți/.test(l)) return 'ce_poti';
@@ -451,6 +542,7 @@ async function think(msg) {
 
   if(intent === 'salut') return { text: pickRandom(leaResponses.salut) };
   if(intent === 'multumesc') return { text: pickRandom(leaResponses.multumesc) };
+  if(intent === 'privacy') { setTimeout(openPrivacy, 400); return { text: 'Transparență completă. Nu stochează nimic pe server. Tot ce știu despre tine trăiește exclusiv pe device-ul tău — eu nu pot accesa nimic din exterior.' }; }
   if(intent === 'install') return { text: leaResponses.install };
   if(intent === 'weather') return { text: leaResponses.weather };
   if(intent === 'cine') return { text: leaResponses.cine };
@@ -580,6 +672,20 @@ window.send = async function() {
     document.getElementById('install-banner').classList.add('show');
   }
 };
+
+// ── PRIVACY MODAL ──
+window.openPrivacy = function() {
+  document.getElementById('priv-modal').classList.add('show');
+  document.body.style.overflow = 'hidden';
+};
+window.closePrivacy = function() {
+  document.getElementById('priv-modal').classList.remove('show');
+  document.body.style.overflow = '';
+};
+document.addEventListener('click', function(e) {
+  var pm = document.getElementById('priv-modal');
+  if(pm.classList.contains('show') && e.target === pm) closePrivacy();
+});
 
 // ── ECOSYSTEM PANEL ──
 window.toggleEco = function() {

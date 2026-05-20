@@ -1441,6 +1441,17 @@ function openSett(){
     if(r)r.textContent=rm[_u.type]||'Standard';
     if(c)c.textContent=_city||'—';
   }
+  // Date & Privacy — populează contoarele live
+  try {
+    var raft = JSON.parse(localStorage.getItem('vvhi_raft')||'{"tokens":{}}');
+    var raftNr = Object.keys(raft.tokens||{}).length;
+    var persNr = Object.keys(raft.tokens||{}).filter(function(k){ return raft.tokens[k].source !== 'factory'; }).length;
+    var raftEl = document.getElementById('ss-raft-nr');
+    if(raftEl) raftEl.textContent = raftNr + ' total (' + persNr + ' personale)';
+    var mem = JSON.parse(localStorage.getItem('vvhi_memories')||'[]');
+    var memEl = document.getElementById('ss-mem-nr');
+    if(memEl) memEl.textContent = mem.length + ' momente';
+  } catch(e) {}
   document.getElementById('sett').classList.add('on');
 }
 function closeSett(){document.getElementById('sett').classList.remove('on');}
