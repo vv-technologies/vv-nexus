@@ -1004,14 +1004,23 @@ window.send = async function() {
     // Răspuns din Wikipedia sau DDG — chip "Mai mult"
     addChips(['Mai mult', 'Spune mai mult', 'Detalii']);
   } else if(msgCount === 1) {
-    addChips(['Cum ești construită?', 'Ce e VV?', 'Caută ceva']);
+    addChips(['Cum ești construită?', 'Caută ceva']);
   } else if(msg.toLowerCase().includes('vv') || msg.toLowerCase().includes('lea')) {
-    addChips(['Ce e VV NOW?', 'Ce e VV HiG?', 'Cine a inventat asta?']);
+    addChips(['Ce e VV NOW?', 'Cine a inventat asta?']);
   }
 
-  // install banner după 4 mesaje
-  if(msgCount === 4) {
-    document.getElementById('install-banner').classList.add('show');
+  // Nudge discret după 4 mesaje — o singură dată
+  if(msgCount === 4 && !sessionStorage.getItem('lea_nudge_shown')) {
+    sessionStorage.setItem('lea_nudge_shown', '1');
+    setTimeout(function() {
+      var nudge = document.createElement('div');
+      nudge.style.cssText = 'max-width:680px;margin:0 auto 8px;padding:0 4px;display:flex;align-items:center;justify-content:space-between;';
+      nudge.innerHTML = '<span style="font-size:11px;color:rgba(255,255,255,0.25);">Versiunea locală te va cunoaște și mâine.</span>'
+        + '<button onclick="openDownload();this.parentElement.remove();" style="font-size:11px;color:rgba(180,210,255,0.55);background:none;border:none;cursor:pointer;padding:4px 8px;font-family:Inter,sans-serif;white-space:nowrap;">Descarcă →</button>';
+      var inputArea = document.getElementById('input-area');
+      inputArea.insertBefore(nudge, inputArea.firstChild);
+      setTimeout(function(){ if(nudge.parentElement) nudge.style.transition='opacity .6s'; nudge.style.opacity='0'; setTimeout(function(){ nudge.remove(); }, 700); }, 8000);
+    }, 1200);
   }
 };
 
@@ -1062,7 +1071,7 @@ document.getElementById('input').addEventListener('keydown', function(e) {
 // ── INIT ──
 setTimeout(function() {
   addMsg('lea', 'Bună. Sunt Lea — versiunea publică.\n\nÎți demonstrez ce poate un AI local-first. Fără cont. Fără date stocate. Caută orice sau întreabă despre cum sunt construită.');
-  addChips(['Cine ești?', 'Ce poți face?', 'Ce e VV Hybrid Universe?', 'Cum ești construită?']);
+  addChips(['Ce poți face?', 'Caută ceva']);
 }, 300);
 
 })();
