@@ -660,11 +660,26 @@ async function searchWiki(query) {
   return null;
 }
 
-// ── DUCKDUCKGO FALLBACK ──
+// ── WIKIPEDIA FULL INTRO (pentru Mai mult) ──
+async function searchWikiFullIntro(title) {
+  try {
+    var url = 'https://ro.wikipedia.org/w/api.php?action=query&prop=extracts&titles=' +
+      encodeURIComponent(title) + '&exintro=true&explaintext=true&exsentences=8&origin=*&format=json';
+    var res = await fetch(url);
+    var d = await res.json();
+    var pages = d.query && d.query.pages;
+    if(!pages) return null;
+    var page = Object.values(pages)[0];
+    if(page && page.extract && page.extract.length > 80) return page.extract.trim();
+  } catch(e) {}
+  return null;
+}
+
+// ── DUCKDUCKGO FALLBACK (dezactivat CORS pe hilea.eu — kept for localhost) ──
 async function searchDDG(query) {
   try {
     var url = 'https://api.duckduckgo.com/?q=' + encodeURIComponent(query) + '&format=json&no_redirect=1&no_html=1&skip_disambig=1';
-    var res = await fetch(url);
+    var res = await fetch(url, {signal: AbortSignal.timeout ? AbortSignal.timeout(3000) : undefined});
     var d = await res.json();
     if(d.AbstractText && d.AbstractText.length > 60) {
       return { text: d.AbstractText, url: d.AbstractURL || null, source: 'DuckDuckGo', topics: [] };
@@ -787,8 +802,8 @@ function detectIntent(msg) {
   if(/ce (poți|poti) face|cum (mă|ma) ajuți|ajuți/.test(l)) return 'ce_poti';
   if(/cum ești (construit|facut)|cum funcționezi|cum functionezi|arhitectur|cum e construit/.test(l)) return 'cum_construit';
   if(/vv his|vv hig|vv hib|vv hia|trilogy|limbaj vv|pattern language|behavior language/.test(l)) return 'trilogy';
-  if(/ce e vv|ce este vv|vv hybrid|ecosistem vv|vv technologies/.test(l)) return 'vv';
   if(/\b(lea|nexus|pulse map|vv pulse|vv write|vv now|vv me)\b|vvpulse|vvwrite|vvscout|vveil|vv studio/.test(l)) return 'app';
+  if(/ce e vv|ce este vv|vv hybrid|ecosistem vv|vv technologies/.test(l)) return 'vv';
   if(/cosmin|fondator|inventor|inventat|cine a facut|cine a creat/.test(l)) return 'founder';
   if(/filozofie|filosofie|principii|local.?first|suveranitate/.test(l)) return 'philosophy';
   if(/^(vremea|vreme|meteo|temperatura|ploua|ninge|prognoza|forecast)/.test(l)) return 'weather';
@@ -844,13 +859,14 @@ async function think(msg) {
   if(intent === 'salut') return { text: leaText('salut') };
   if(intent === 'multumesc') return { text: leaText('multumesc') };
   if(intent === 'depth') {
-    var extWiki = _lastSearchResult ? { text: null, wiki: _lastSearchResult, formatted: formatWiki(_lastSearchResult, true) } : null;
-    var ddg = await searchDDG(_lastSearchSubject);
-    if(extWiki && ddg && ddg.text) {
-      return { text: formatWiki(_lastSearchResult, true) + '\n\n' + ddg.text, depthSource: true };
+    if(_lastSearchResult && _lastSearchResult.title) {
+      var fullText = await searchWikiFullIntro(_lastSearchResult.title);
+      if(fullText && fullText.length > (_lastSearchResult.text || '').length + 50) {
+        var sents = fullText.match(/[^.!?]+[.!?]+/g) || [fullText];
+        return { text: sents.slice(0, 6).join(' ').trim(), wiki: _lastSearchResult, depthSource: true };
+      }
     }
-    if(extWiki) return { text: null, wiki: _lastSearchResult, formatted: formatWiki(_lastSearchResult, true), depthSource: true };
-    if(ddg && ddg.text) return { text: ddg.text, source: 'DuckDuckGo' };
+    if(_lastSearchResult) return { text: null, wiki: _lastSearchResult, formatted: formatWiki(_lastSearchResult, true), depthSource: true };
     return { text: 'Nu am mai multe informații despre "' + _lastSearchSubject + '".' };
   }
   if(intent === 'download_local') { setTimeout(openDownload, 400); return { text: _userLang === 'en' ? 'LEA Local lives on your laptop — knows you, works offline, zero upload. Opening the download guide.' : 'LEA Local trăiește pe laptopul tău — te cunoaște, funcționează offline, niciun document nu pleacă nicăieri. Deschid ghidul.' }; }
@@ -894,24 +910,29 @@ async function think(msg) {
     return { text: leaResponses.weather };
   }
 
-  // 1. Lookup direct (RO + EN) — cu relevance check strict
-  var result = await searchWiki(subject);
-  if(result && !isRelevant(subject, result, category)) result = null;
+  var result = null;
+  var hasOrdinal = /^(primul|prima|cel mai|cea mai|ultimul|ultima|al doilea|a doua|al treilea)\b/i.test(msgNorm.trim());
 
-  // 2. Variante din categorie (persoana/loc/eveniment)
-  if(!result && category) {
-    var catVariants = buildCategoryVariants(subject, category);
-    for(var cvi = 0; cvi < catVariants.length && !result; cvi++) {
-      result = await searchWiki(catVariants[cvi]);
-      if(result && !isRelevant(subject, result, null)) result = null;
-    }
-  }
-
-  // 3. Lookup cu mesajul original normalizat
-  if(!result && subject !== msgNorm.replace(/\?+$/,'').trim()) {
-    var msgClean = msgNorm.replace(/\?+$/,'').trim();
-    result = await searchWiki(msgClean);
+  if(!hasOrdinal) {
+    // 1. Lookup direct (RO + EN) — cu relevance check strict
+    result = await searchWiki(subject);
     if(result && !isRelevant(subject, result, category)) result = null;
+
+    // 2. Variante din categorie (persoana/loc/eveniment)
+    if(!result && category) {
+      var catVariants = buildCategoryVariants(subject, category);
+      for(var cvi = 0; cvi < catVariants.length && !result; cvi++) {
+        result = await searchWiki(catVariants[cvi]);
+        if(result && !isRelevant(subject, result, null)) result = null;
+      }
+    }
+
+    // 3. Lookup cu mesajul original normalizat
+    if(!result && subject !== msgNorm.replace(/\?+$/,'').trim()) {
+      var msgClean = msgNorm.replace(/\?+$/,'').trim();
+      result = await searchWiki(msgClean);
+      if(result && !isRelevant(subject, result, category)) result = null;
+    }
   }
 
   // 4. Full-text RO Wikipedia — fara title check (motorul de cautare stie)
@@ -920,22 +941,21 @@ async function think(msg) {
   // 5. Full-text EN Wikipedia
   if(!result) result = await searchWikiQuery(subject);
 
+  // 6. Fallback cu mesajul original complet
+  if(!result) result = await searchWikiRoQuery(msgNorm.replace(/\?+$/,'').trim());
+
   if(result) {
     _lastSearchSubject = subject;
     _lastSearchResult  = result;
     return { text: null, wiki: result, formatted: formatWiki(result) };
   }
 
-  // Wikipedia a eșuat — încearcă DuckDuckGo
+  // Ultimul fallback — DDG (poate esuaza CORS pe domenii custom)
   var ddgFallback = await searchDDG(subject);
   if(ddgFallback && ddgFallback.text) {
     _lastSearchSubject = subject;
     _lastSearchResult  = null;
     return { text: ddgFallback.text, source: 'DuckDuckGo' };
-  }
-  if(ddgFallback && ddgFallback.topics && ddgFallback.topics.length) {
-    _lastSearchSubject = subject;
-    return { text: 'Nu am o definiție exactă, dar am găsit subiecte legate: ' + ddgFallback.topics.join(' · '), source: 'DuckDuckGo' };
   }
 
   return { text: 'Nu am găsit nimic despre "' + subject + '". Încearcă un termen mai simplu sau întreabă despre ecosistemul VV.' };
