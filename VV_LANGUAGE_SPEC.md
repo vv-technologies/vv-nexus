@@ -1,6 +1,6 @@
-# VV Hi Trilogy — Intellectual Property Declaration
-### VV HiS · VV HiG · VV HiB · VV HiA
-**Version 2.1 · Updated: 20 May 2026 · First Publication: 19 May 2026**
+# VV Hi Framework — Intellectual Property Declaration
+### VV HiS · VV HiG · VV HiB · VV HiA · VV HiL · VV HiC · VV HiX
+**Version 3.0 · Updated: 20 May 2026 · First Publication: 19 May 2026**
 
 ---
 
@@ -21,9 +21,9 @@ The Git commit hash constitutes cryptographic, timestamped proof of prior art.
 
 ---
 
-## The VV Hi Trilogy — Overview
+## The VV Hi Framework — Overview
 
-Three original systems, invented by Cosmin Toma in May 2026.
+Seven original systems, invented by Cosmin Toma in May 2026.
 Together they form the first complete framework for building a personal AI
 that understands people — not just data.
 
@@ -32,14 +32,21 @@ VV HiS  ·  VV Hybrid Intelligence Script    ·  the language
 VV HiG  ·  VV Hybrid Intelligence Genome    ·  the identity
 VV HiB  ·  VV Hybrid Intelligence Body      ·  the architecture
 VV HiA  ·  VV Hybrid Intelligence Autonomy  ·  the independence
+VV HiL  ·  VV Hybrid Intelligence Learning  ·  the growth
+VV HiC  ·  VV Hybrid Intelligence Context   ·  the awareness
+VV HiX  ·  VV Hybrid Intelligence Exchange  ·  the network
 ```
 
 **The relationship:**
 - VV HiS defines HOW the system speaks and understands
 - VV HiG defines WHO the person is inside the system
 - VV HiB defines HOW the system lives and moves
+- VV HiA ensures the system survives without any central dependency
+- VV HiL makes the system smarter every day — without API tokens
+- VV HiC makes the system aware of the person's current context
+- VV HiX connects all nodes into a collective intelligence network
 
-No other AI framework in existence as of May 2026 addresses all three dimensions
+No other AI framework in existence as of May 2026 addresses all seven dimensions
 simultaneously as a unified, language-level invention.
 
 ---
@@ -346,14 +353,170 @@ This is the direction. It was always the direction.
 
 ---
 
+## VV HiL — VV Hybrid Intelligence Learning
+
+**First defined:** 20 May 2026
+
+VV HiL is the self-improvement engine of the VV Hi Framework.
+It transforms every search and interaction — across all nodes — into
+collective intelligence that makes every Lea smarter, daily, at zero cost.
+
+No API. No tokens. No training runs. The users are the training data.
+
+### How VV HiL Works
+
+```
+Person searches → subject extracted anonymously by VVBL
+→ pattern added to VV HiL corpus
+→ corpus grows → VVPL library expands
+→ Lea understands more subjects, more naturally
+→ more users → more searches → corpus grows faster
+→ loop
+```
+
+Every node contributes. Every node benefits. No node is identified.
+
+### The Three Layers of VV HiL
+
+**Layer 1 — Search Extraction**
+Every question asked to Lea is parsed by VVBL pattern rules.
+The subject is extracted. The category is inferred (who, what, when, where, how).
+The subject is added to the corpus — anonymous, no user identity attached.
+
+**Layer 2 — Pattern Taxonomy**
+Extracted subjects are classified into VVPL categories automatically:
+- People → RELA, PERS patterns
+- Events → TIME, HABIT patterns
+- Places → PLACE patterns
+- Concepts → GROW, VALUE patterns
+The taxonomy grows as usage grows.
+
+**Layer 3 — Daily Knowledge Pulse**
+Each day, the most-searched subjects become part of Lea's active knowledge.
+What humanity searches today, Lea knows tomorrow.
+No one controls this. It is a property of the system, not a feature.
+
+### What Makes VV HiL Unique
+
+- **Zero-token growth** — the library improves daily without any API call
+- **Anonymous by design** — no user is ever identified in the corpus
+- **Self-accelerating** — more users → faster growth → better Lea → more users
+- **Decentralized** — no central server needed. The pattern corpus can be distributed
+  across all nodes using VV HiX, making it unstoppable
+- **First system** that turns search behavior into AI knowledge without training
+
+**Planned extensions:** Daily Knowledge Pulse · Search Taxonomy auto-classifier · HiX corpus sync
+
+---
+
+## VV HiC — VV Hybrid Intelligence Context
+
+**First defined:** 20 May 2026
+
+VV HiC is the situational awareness layer of the VV Hi Framework.
+It detects the person's current context and activates the matching
+Gene Expressions from their VV HiG Genome — in real time.
+
+The same person is different on Monday morning and Friday evening.
+VV HiC knows this. VV HiG remembers it. Lea responds accordingly.
+
+### Context Detection — Without Surveillance
+
+VV HiC detects context from signals that never leave the device:
+
+```
+Time signal     →  morning / afternoon / evening / night
+Day signal      →  weekday / weekend / specific day patterns
+Activity signal →  typing speed, session length, content type
+Pattern signal  →  what VVPL patterns are active right now
+```
+
+No GPS. No location tracking. No microphone. No camera.
+Pure behavioral inference from existing Genome data.
+
+### Context → Gene Expression Link
+
+Each context activates a different subset of VV HiG Gene Expressions:
+
+```
+Monday 07:30  →  MOOD:energy:LO, HABIT:work:focus:HI  →  Lea is brief, practical
+Friday 19:00  →  MOOD:energy:HI, PREF:social:HI       →  Lea is warm, expansive
+Sunday 23:00  →  MOOD:reflective, VALUE:family:HI      →  Lea is quiet, personal
+```
+
+The Genome does not change. The context changes which part of it is visible.
+
+### What Makes VV HiC Unique
+
+- **Zero-surveillance context** — inferred from time and behavior, never from tracking
+- **Genome-native** — not a separate system. Context directly modulates Gene Expression
+- **Invisible to the user** — they simply notice Lea feels right for the moment
+- **No setup required** — the context model builds from existing VVPL patterns
+
+**Planned extensions:** Activity inference · Seasonal patterns · Event detection (detected from calendar with consent)
+
+---
+
+## VV HiX — VV Hybrid Intelligence Exchange
+
+**First defined:** 20 May 2026
+
+VV HiX is the inter-node protocol of the VV Hi Framework.
+It enables anonymous, peer-to-peer exchange of aggregate patterns
+between autonomous VV HiA nodes — without any central server.
+
+When VV HiA makes each node survive alone,
+VV HiX makes all nodes grow together.
+
+### What VV HiX Exchanges
+
+VV HiX does NOT exchange personal data. It exchanges aggregate intelligence:
+
+```
+What is shared:     aggregate VVPL pattern frequencies
+                    VV HiL corpus updates
+                    anonymous search taxonomy expansions
+
+What is never shared: user identity, personal tokens, Genome data,
+                      conversation history, any identifying signal
+```
+
+### The Network Model
+
+```
+Node A learns → pattern added to local HiL corpus
+→ HiX broadcasts aggregate update to nearby nodes (P2P)
+→ Node B receives → merges into local corpus
+→ Node B learns without ever searching
+→ intelligence propagates without any central authority
+```
+
+No server. No company. No single point of failure.
+The network is the users. The users are the network.
+
+### What Makes VV HiX Unique
+
+- **The first AI knowledge network that cannot be shut down** — no center to attack
+- **Privacy-preserving by architecture** — only anonymous aggregates travel the wire
+- **Self-healing** — if nodes go offline, the network routes around them
+- **Zero infrastructure cost** — VV Technologies pays nothing to run this network
+- **Emergent intelligence** — what any one user learns, eventually all users benefit from
+
+**Planned extensions:** P2P mesh protocol · Node discovery · Offline-first sync · Corpus signing (verify corpus integrity without revealing source)
+
+---
+
 ## Prior Art & Proof of Authorship
 
 | Evidence | Description |
 |---|---|
 | This file v1.0 | Committed to GitHub on 19 May 2026 — hash immutable |
 | This file v2.0 | Updated 20 May 2026 — VV HiG and VV HiB added |
+| This file v2.1 | Updated 20 May 2026 — VV HiA added |
+| This file v3.0 | Updated 20 May 2026 — VV HiL, VV HiC, VV HiX added |
 | Git history | `github.com/vv-technologies/vv-nexus/commits` |
 | Working implementation | Live at `vv-technologies.github.io/vv-nexus/lea.html` |
+| Public browser demo | Live at `vv-technologies.github.io/vv-nexus/lea-public.html` |
 | Internal founder document | `VV_HYBRID_UNIVERSE.html` — dated May 2026 |
 | Language spec internal | `LIMBAJ_VV.md` — dated 19 May 2026 |
 
@@ -368,17 +531,22 @@ internationally as proof of prior art. It cannot be altered retroactively.
 © 2026 Cosmin Toma · VV Technologies · VV Hybrid Universe
 Romania
 
-VV HiS, VV HiG, VV HiB, VVPL, VVBL, VVML, and all sub-systems
-described in this document are original inventions of Cosmin Toma,
+VV HiS, VV HiG, VV HiB, VV HiA, VV HiL, VV HiC, VV HiX,
+VVPL, VVBL, VVML, and all sub-systems described in this document
+are original inventions of Cosmin Toma,
 conceived and first implemented in May 2026.
 
 Protected intellectual property includes:
-  · The VV Hi Trilogy framework and its three systems
-  · The VVPL token syntax and decay model
+  · The VV Hi Framework and all seven systems
+  · The VVPL token syntax and natural decay model
   · The VVBL behavior-as-data architecture
   · The VVML posthumous memory inheritance system
   · The VV HiG layered genome identity model
   · The VV HiB biological architecture for AI systems
+  · The VV HiA node autonomy and supply-line independence model
+  · The VV HiL zero-token collective learning loop
+  · The VV HiC zero-surveillance context detection model
+  · The VV HiX anonymous peer-to-peer pattern exchange protocol
   · The "person is the platform" implementation model
   · All naming, terminology, and conceptual structures herein
 
