@@ -1089,5 +1089,82 @@ setTimeout(function() {
 
 })();
 </script>
+
+<!-- UPDATE BANNER -->
+<div id="update-bar" style="
+  display:none;position:fixed;bottom:0;left:0;right:0;z-index:9999;
+  background:rgba(7,7,15,0.97);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-top:.5px solid rgba(180,210,255,0.18);
+  box-shadow:0 -20px 60px rgba(100,140,255,0.08);
+  padding:13px 20px;display:none;align-items:center;justify-content:space-between;gap:12px;
+">
+  <div style="display:flex;align-items:center;gap:10px;">
+    <div id="update-dot" style="
+      width:7px;height:7px;border-radius:50%;flex-shrink:0;
+      background:rgba(180,210,255,0.85);
+      box-shadow:0 0 10px rgba(180,210,255,0.5);
+      animation:updpulse 2s ease-in-out infinite;
+    "></div>
+    <span style="font-size:12px;color:rgba(255,255,255,0.45);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+      Lea s-a actualizat — <span id="update-ver" style="color:rgba(180,210,255,0.7);"></span>
+    </span>
+  </div>
+  <button onclick="applyUpdate()" style="
+    background:rgba(180,210,255,0.1);border:.5px solid rgba(180,210,255,0.28);
+    border-radius:100px;color:rgba(180,210,255,0.9);
+    font-size:11px;font-weight:500;padding:7px 18px;cursor:pointer;
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    letter-spacing:.03em;transition:background .2s;white-space:nowrap;
+  " onmouseover="this.style.background='rgba(180,210,255,0.18)'" onmouseout="this.style.background='rgba(180,210,255,0.1)'">
+    Actualizează →
+  </button>
+</div>
+<style>
+@keyframes updpulse{0%,100%{opacity:1;box-shadow:0 0 10px rgba(180,210,255,.5)}50%{opacity:.4;box-shadow:0 0 4px rgba(180,210,255,.2)}}
+</style>
+
+<script>
+(function(){
+  if(!('serviceWorker' in navigator)) return;
+  var _reg = null;
+
+  navigator.serviceWorker.register('/sw.js').then(function(reg){
+    _reg = reg;
+    reg.update();
+    if(reg.waiting) showBar(reg, '');
+    reg.addEventListener('updatefound', function(){
+      var sw = reg.installing;
+      sw.addEventListener('statechange', function(){
+        if(sw.state === 'installed' && navigator.serviceWorker.controller) showBar(reg, '');
+      });
+    });
+  }).catch(function(){});
+
+  var refreshing = false;
+  navigator.serviceWorker.addEventListener('controllerchange', function(){
+    if(!refreshing){ refreshing = true; window.location.reload(); }
+  });
+
+  navigator.serviceWorker.addEventListener('message', function(e){
+    if(e.data && e.data.type === 'SW_UPDATED') showBar(null, e.data.version || '');
+  });
+
+  function showBar(reg, ver){
+    if(reg) _reg = reg;
+    var bar = document.getElementById('update-bar');
+    var vEl = document.getElementById('update-ver');
+    if(vEl && ver) vEl.textContent = ver;
+    bar.style.display = 'flex';
+  }
+
+  window.applyUpdate = function(){
+    if(_reg && _reg.waiting){
+      _reg.waiting.postMessage({type:'SKIP_WAITING'});
+    } else {
+      window.location.reload(true);
+    }
+  };
+})();
+</script>
 </body>
 </html>
