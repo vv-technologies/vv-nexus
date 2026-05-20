@@ -374,6 +374,25 @@ async function searchWikiQuery(query) {
   return null;
 }
 
+// ── VVBL PUBLIC BEHAVIORS — extrag subiectul din întrebare ──
+var publicBehaviors = [
+  { name:'search_who',   when:/^(cine (a fost|este|e|era|sunt|a inventat|a creat|a facut|a făcut))\b/i },
+  { name:'search_what',  when:/^(ce (este|e|înseamnă|inseamna|sunt|a fost|a))\b/i },
+  { name:'search_when',  when:/^(când (a|au|s-a|este|e|a avut loc))\b/i },
+  { name:'search_where', when:/^(unde (este|e|se află|se afla|era))\b/i },
+  { name:'search_how',   when:/^(cum (funcționează|functioneaza|se face|a ajuns|a devenit))\b/i },
+  { name:'search_find',  when:/^(cauta|caută|gaseste|găsește|spune.mi despre|info despre|vorbeste.mi despre)\b/i },
+];
+
+function extractSubject(msg) {
+  var l = msg.trim();
+  for(var i = 0; i < publicBehaviors.length; i++) {
+    var m = l.match(publicBehaviors[i].when);
+    if(m) return l.slice(m[0].length).trim();
+  }
+  return l;
+}
+
 // ── DETECT INTENT ──
 function detectIntent(msg) {
   var l = msg.toLowerCase().trim();
@@ -382,7 +401,7 @@ function detectIntent(msg) {
   if(/multumesc|mersi|thanks/.test(l)) return 'multumesc';
   if(/cine ești|cine esti|ce ești|ce esti|despre tine|cum te chemi/.test(l)) return 'cine';
   if(/ce (poți|poti) face|cum (mă|ma) ajuți|ajuți|ce stii|ce știi/.test(l)) return 'ce_poti';
-  if(/cum ești (construit|facut|facut)|cum funcționezi|cum functionezi|arhitectur|cum e construit/.test(l)) return 'cum_construit';
+  if(/cum ești (construit|facut)|cum funcționezi|cum functionezi|arhitectur|cum e construit/.test(l)) return 'cum_construit';
   if(/vv his|vv hig|vv hib|vv hia|trilogy|limbaj vv|pattern language|behavior language/.test(l)) return 'trilogy';
   if(/ce e vv|ce este vv|vv hybrid|ecosistem vv|vv technologies/.test(l)) return 'vv';
   if(/\b(lea|nexus|pulse map|pulse|now|vveil|vvscout|studio|vv me|vv write)\b/.test(l)) return 'app';
@@ -398,6 +417,17 @@ function getAppResponse(msg) {
     if(l.includes(key)) return VV.apps[key];
   }
   return null;
+}
+
+// ── FORMAT WIKI — Lea structurează în vocea ei ──
+function formatWiki(result) {
+  var text = result.text;
+  // ia primele 2 propoziții
+  var sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
+  var short = sentences.slice(0,2).join(' ').trim();
+  // elimină paranteze lungi
+  short = short.replace(/\([^)]{30,}\)/g,'').trim();
+  return short;
 }
 
 // ── THINK ──
@@ -425,10 +455,13 @@ async function think(msg) {
   if(intent === 'founder') return { text: VV.founder };
   if(intent === 'philosophy') return { text: VV.philosophy };
 
-  // SEARCH
-  var result = await searchWiki(msg);
-  if(!result) result = await searchWikiQuery(msg);
-  if(result) return { text: null, wiki: result };
+  // SEARCH — extrage subiectul cu VVBL, apoi caută
+  var subject = extractSubject(msg);
+  var result = await searchWiki(subject);
+  if(!result && subject !== msg) result = await searchWiki(msg);
+  if(!result) result = await searchWikiQuery(subject);
+  if(!result && subject !== msg) result = await searchWikiQuery(msg);
+  if(result) return { text: null, wiki: result, formatted: formatWiki(result) };
 
   return { text: 'Nu am găsit nimic concret despre asta. Încearcă să reformulezi sau întreabă ceva despre ecosistemul VV.' };
 }
@@ -442,7 +475,8 @@ function addMsg(role, content, source) {
 
   if(content && content.wiki) {
     var w = content.wiki;
-    bubbleHtml = '<div class="msg-bubble">Am găsit ceva:<div class="search-result"><div class="sr-title">' + w.title + '</div><div class="sr-text">' + w.text + '</div>' + (w.url ? '<div class="sr-source">Sursă: <a href="' + w.url + '" target="_blank">Wikipedia</a></div>' : '') + '</div></div>';
+    var display = content.formatted || w.text;
+    bubbleHtml = '<div class="msg-bubble">' + display + '</div><div class="msg-source">via <span><a href="' + (w.url||'#') + '" target="_blank" style="color:rgba(180,210,255,0.4);text-decoration:none;">Wikipedia</a></span></div>';
   } else {
     var text = typeof content === 'string' ? content : (content && content.text ? content.text : '');
     bubbleHtml = '<div class="msg-bubble">' + text.replace(/\n/g,'<br>') + '</div>';
