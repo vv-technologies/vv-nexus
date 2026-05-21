@@ -903,6 +903,7 @@ function normalizeTypos(text) {
     .replace(/\bamerici\b/gi,'americii').replace(/\bamericia\b/gi,'americii')
     .replace(/\binventaru\b/gi,'inventatorul').replace(/\bfondatoru\b/gi,'fondatorul')
     .replace(/\bpresedintele\b/gi,'presedintele').replace(/\bpresidente\b/gi,'presedinte')
+    .replace(/\bpesedinte[le]?\b/gi,'presedinte')
     .replace(/\bfrancezei\b/gi,'franceze').replace(/\bromanie\b/gi,'romaniei')
     .replace(/\bitaliei\b/gi,'italiei').replace(/\bgermaniei\b/gi,'germaniei')
     .replace(/\bvreama\b/gi,'vremea').replace(/\bvreme[ae]\b/gi,'vremea')
@@ -923,6 +924,7 @@ var publicBehaviors = [
 
 function extractSubject(msg) {
   var l = msg.trim().replace(/\?+$/, '').trim();
+  l = l.replace(/\s+(mai\s+tr[aă]ie[sș]te|e\s+viu|este\s+viu|e\s+vie|a\s+murit|mai\s+e\s+în\s+via[tț][aă]|mai\s+e\s+viu|mai\s+trăia|mai\s+exist[aă]|mai\s+e\s+activ[aă]?|unde\s+e\s+acum|cum\s+ar[aă]t[aă])$/i, '').trim();
   for(var i = 0; i < publicBehaviors.length; i++) {
     var m = l.match(publicBehaviors[i].when);
     if(m) return l.slice(m[0].length).trim().replace(/\?+$/, '').trim();
@@ -989,8 +991,8 @@ function detectIntent(msg) {
   if(/cosmin|fondator|inventor|inventat|cine a facut|cine a creat/.test(l)) return 'founder';
   if(/filozofie|filosofie|principii|local.?first|suveranitate/.test(l)) return 'philosophy';
   if(/\d+\s*[\+\-\*\/]\s*\d/.test(l) || (/\b(c[aâ]t\s+e|c[aâ]t\s+face|calculeaz[aă])\b/.test(l) && /\d/.test(l)) || /\d+\s*%\s*din\s*\d/.test(l)) return 'calculator';
-  if(/\b(urgenta|urgentă|smurd|salvamont|telefonul copilului|violenta domestica|violenț[aă]\s+domestic[aă]|sinucid|suicid|antisuicid|anti.otrav|numar.?urgent|număr.?urgent)\b/.test(l) || /\b(num[aă]r|numar)\b.*\b(urgent[aă]|salvare|ajutor)\b/.test(l)) return 'emergency';
-  if(/\b(spital|spitale|farmacie|farmacii|hotel[uri]*|hostel|cazare|restaurant[e]*|muzeu|muzee|monument[e]*|aeroport|gar[aă]|parc)\b/.test(l) && /(din|în|la|lângă|langa|unde sunt|unde se|unde e|cel mai apropiat|aproape de)/.test(l)) return 'location';
+  if(/\b(urgenta|urgentă|smurd|salvamont|telefonul copilului|violenta domestica|violenț[aă]\s+domestic[aă]|sinucid|suicid|antisuicid|anti.otrav|numar.?urgent|număr.?urgent|pompieri|ambulanț[aă]|ambulanta)\b/.test(l) || /\b(num[aă]r|numar|nr|telefon)\b.*\b(urgent[aă]|salvare|ajutor|pompieri|ambulanț[aă]|ambulanta|poliți[ei]|politie|smurd)\b/.test(l)) return 'emergency';
+  if(/\b(spital[e]?|farmaci[ei]|hotel[uri]*|hostel|cazare|restaurant[e]?|muzeu|muzee|monument[e]?|aeroport|gar[aă]|parc)\b/.test(l) && (/(din|în|la|lângă|langa|unde sunt|unde se|unde e|cel mai|aproape de)/.test(l) || /\b(bucuresti|bucurești|cluj|timisoara|timișoara|iasi|iași|constanta|constanța|brasov|brașov|craiova|oradea|sibiu|pitesti|pitești|bacau|bacău|suceava|galati|galați|ploiesti|ploiești|baia mare|arad|buzau|buzău|alba iulia|targu mures|focsani|satu mare|slobozia|giurgiu|vaslui|deva|tulcea|arad)\b/.test(l) || /\b(num[aă]r|numar|nr|telefon)\b.*\b(farmacie|farmacii|spital[e]?|hotel|restaurant)\b/.test(l) || /\b(farmacie|farmacii|spital[e]?|hotel|restaurant)\b.*\b(num[aă]r|numar|nr|telefon)\b/.test(l))) return 'location';
   if(/\b(vremea|vreme|meteo|temperatura|ploua|ninge|prognoza|forecast)\b/.test(l) || /cum (e|este|o fi|va fi) (vremea|vreme|temperatura|timpul)/.test(l)) return 'weather';
   if(/\b(ieri|azi-noapte|azi dimineata|in aceasta seara|in seara asta|weekend-ul trecut|luna trecuta|saptamana trecuta|acum [0-9]|acum cateva|ce s-a intamplat|ce s-a întâmplat|stiri|știri|news|trending|viral|ultima ora)\b/.test(l)) return 'realtime';
   if(/^(ce (a fost|e|este) (azi|astazi|acum|ieri)|ce (film|piesa|concert|meci|eveniment).*(azi|ieri|acum|astazi|saptamana|luna))/.test(l)) return 'realtime';
@@ -1176,7 +1178,7 @@ async function think(msg) {
   }
 
   // 5. Full-text EN Wikipedia (cu ordinale traduse daca e cazul)
-  if(!result || (hasOrdinal && result && (result.title||'').split(' ').length > 5)) {
+  if(!result || hasOrdinal) {
     var enSubject = subject
       .replace(/\bprimul\b|\bprima\b/gi,'first').replace(/\bultimul\b|\bultima\b/gi,'last')
       .replace(/\bpreș?edinte\b/gi,'president').replace(/\bamerican[aă]?\b/gi,'american')
