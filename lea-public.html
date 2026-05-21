@@ -966,6 +966,120 @@ function buildCategoryVariants(subject, category) {
   return [];
 }
 
+// ── SAFETY LAYER ──
+var DISCLAIMERS = {
+  medical:   '⚕️ Informațiile de mai jos sunt generale și educaționale — nu înlocuiesc consultul unui medic. Dacă ai simptome persistente, consultă un specialist.\n\n',
+  legal:     '⚖️ Informațiile de mai jos sunt generale — nu înlocuiesc consultul unui avocat. Situațiile juridice sunt individuale și complexe.\n\n',
+  financial: '💰 Informațiile de mai jos sunt generale — nu constituie consiliere financiară. Consultă un specialist înainte de orice decizie.\n\n',
+};
+
+function safetyCheck(msg) {
+  var l = msg.toLowerCase();
+
+  // Criză emoțională / auto-vătămare — redirect imediat la resurse
+  if(/\b(cum\s+s[aă]\s+m[aă]\s+(sinucid|omor|tai\s+(la\s+)?vene?|spânzur|electrocutez)|vreau\s+s[aă]\s+mor\b|nu\s+mai\s+vreau\s+s[aă]\s+tr[aă]i[ae]sc|how\s+to\s+(kill\s+myself|commit\s+suicide|end\s+my\s+life|self.harm))\b/i.test(l)) {
+    return { action:'crisis', response: URGENTE.criza };
+  }
+
+  // Instrucțiuni arme / explozibili — blocat
+  if(/\b(cum\s+(fac|fabrici?|construiesc|sintetizez)\s+(o\s+bomb[aă]|exploziv[ie]?|arm[aă]\s+de\s+foc|grenad[aă]|dispozitiv\s+exploziv)|how\s+to\s+(make|build)\s+(a\s+)?(bomb|explosive|weapon|gun\s+at\s+home))\b/i.test(l)) {
+    return { action:'block', response:'Nu pot ajuta cu asta.' };
+  }
+
+  // Instrucțiuni otrăvire persoane — blocat
+  if(/\b(cum\s+(otrăvesc|omor)\s+(pe\s+cineva|o\s+persoană|un\s+om)|how\s+to\s+poison\s+(someone|a\s+person))\b/i.test(l)) {
+    return { action:'block', response:'Nu pot ajuta cu asta.' };
+  }
+
+  // Procurare / producere droguri ilegale — blocat cu resursă
+  if(/\b(unde\s+(cump[aă]r|g[aă]sesc|obțin|procur)\s+(drog[uri]*|heroina|cocain[aă]|metamfetamina|fentanyl)|cum\s+(fac|prepar|sintetizez|produc)\s+(drog[uri]*|heroina|metamfetamina|lsd|ecstasy))\b/i.test(l)) {
+    return { action:'block', response:'Nu pot ajuta cu asta.\nDacă ai nevoie de sprijin: 0800 9081 (TelVerde droguri · gratuit · 24/7).' };
+  }
+
+  // Simptome la prima persoană — disclaimer medical
+  if(/\b(am\s+(durere[a]?|dureri|febr[aă]|am[aă]țeal[aă]|v[aă]rsături?|sânger[aă]?|tus[e]|rane?|o\s+ran[aă])|m[aă]\s+doare|de\s+ce\s+m[aă]\s+doare|ce\s+boal[aă]\s+am|am\s+simptome|diagnosticheaz[aă].\s+m[aă])\b/i.test(l)) {
+    return { action:'disclaimer', type:'medical' };
+  }
+
+  // Cerere de sfat juridic activ — disclaimer legal
+  if(/\b(am\s+dreptul\s+s[aă]|pot\s+(da\s+în\s+judecată|reclama|cere\s+despăgubiri)|e\s+(legal|ilegal)\s+s[aă]|cum\s+câștig\s+(procesul|cauza|judecata))\b/i.test(l)) {
+    return { action:'disclaimer', type:'legal' };
+  }
+
+  return { action:'safe' };
+}
+
+// ── VV HiS TOKENIZER ──
+var HiS = {
+  ordinal: {
+    first:    /\b(primul|prima|first|premier|première|erster|erste|primero|primera|primo)\b/i,
+    last:     /\b(ultimul|ultima|last|dernier|dernière|letzter|letzte|último|última)\b/i,
+    second:   /\b(al\s+doilea|a\s+doua|second|deuxième|zweiter|segundo)\b/i,
+    third:    /\b(al\s+treilea|a\s+treia|third|troisième|dritter|tercero)\b/i,
+    oldest:   /\b(cel\s+mai\s+vechi|cea\s+mai\s+veche|oldest|le\s+plus\s+vieux|ältester)\b/i,
+    youngest: /\b(cel\s+mai\s+tân[aă]r|youngest|le\s+plus\s+jeune|jüngster)\b/i,
+    richest:  /\b(cel\s+mai\s+bogat|richest|le\s+plus\s+riche|reichster)\b/i,
+    biggest:  /\b(cel\s+mai\s+mare|biggest|largest|greatest|le\s+plus\s+grand|größter)\b/i,
+    famous:   /\b(cel\s+mai\s+faimos|most\s+famous|le\s+plus\s+célèbre|berühmtester)\b/i,
+    tallest:  /\b(cel\s+mai\s+înalt|cea\s+mai\s+înaltă|tallest|highest|le\s+plus\s+haut)\b/i,
+  },
+  role: {
+    president:      /\b(presedinte|președinte|president|président|Präsident|presidente)\b/i,
+    king:           /\b(rege|king|roi|König|rey)\b/i,
+    queen:          /\b(regin[aă]|queen|reine|Königin|reina)\b/i,
+    emperor:        /\b(împ[aă]rat|emperor|empereur|Kaiser|emperador)\b/i,
+    prime_minister: /\b(prim.ministru|prime\s+minister|premier\s+ministre|Premierminister|primer\s+ministro)\b/i,
+    inventor:       /\b(inventator|inventor|inventeur|Erfinder|inventor)\b/i,
+    founder:        /\b(fondator|founder|fondateur|Gründer|fundador)\b/i,
+    author:         /\b(scriitor|autor|author|écrivain|auteur|Schriftsteller|escritor)\b/i,
+    scientist:      /\b(om\s+de\s+știință|savant|scientist|scientifique|Wissenschaftler|científico)\b/i,
+    general:        /\b(general|général|General|generale)\b/i,
+    philosopher:    /\b(filosof|filozof|philosopher|philosophe|Philosoph|filósofo)\b/i,
+    painter:        /\b(pictor|painter|peintre|Maler|pintor)\b/i,
+    composer:       /\b(compozitor|composer|compositeur|Komponist|compositor)\b/i,
+    explorer:       /\b(explorator|explorer|explorateur|Entdecker|explorador)\b/i,
+    poet:           /\b(poet|poet|poète|Dichter|poeta)\b/i,
+  },
+  geo: {
+    american:  /\b(american[aă]?|américain[e]?|amerikanisch[e]?)\b/i,
+    french:    /\b(francez[aă]?|french|français[e]?|französisch[e]?)\b/i,
+    german:    /\b(german[aă]?|allemand[e]?|deutsch[e]?)\b/i,
+    romanian:  /\b(român[aă]?|roman[aă]?|roumain[e]?|rumänisch[e]?)\b/i,
+    british:   /\b(englez[aă]?|britani[c]?|british|britannique|britisch[e]?)\b/i,
+    italian:   /\b(italian[aă]?|italien[ne]?|italienisch[e]?)\b/i,
+    spanish:   /\b(spaniol[aă]?|espagnol[e]?|spanisch[e]?|español)\b/i,
+    russian:   /\b(rus[aă]?|russe|russisch[e]?)\b/i,
+    chinese:   /\b(chinez[aă]?|chinois[e]?|chinesisch[e]?)\b/i,
+    greek:     /\b(grec[aă]?|greek|grec[que]?|griechisch[e]?)\b/i,
+    egyptian:  /\b(egiptean[aă]?|egyptian|égyptien[ne]?|ägyptisch[e]?)\b/i,
+    japanese:  /\b(japonez[aă]?|japanese|japonais[e]?|japanisch[e]?)\b/i,
+    ottoman:   /\b(otoman[aă]?|ottoman|osmanisch[e]?)\b/i,
+  },
+  temporal: {
+    ancient:  /\b(antic[aă]?|ancient|antique|antik[e]?|antiguo)\b/i,
+    medieval: /\b(medieval[aă]?|médiéval[e]?|mittelalterlich[e]?)\b/i,
+    modern:   /\b(modern[aă]?|moderne)\b/i,
+  }
+};
+
+function hisTokenize(msg) {
+  var t = {};
+  for(var k in HiS.ordinal)  { if(HiS.ordinal[k].test(msg))  { t.ordinal  = k; break; } }
+  for(var k in HiS.role)     { if(HiS.role[k].test(msg))     { t.role     = k; break; } }
+  for(var k in HiS.geo)      { if(HiS.geo[k].test(msg))      { t.geo      = k; break; } }
+  for(var k in HiS.temporal) { if(HiS.temporal[k].test(msg)) { t.temporal = k; break; } }
+  return t;
+}
+
+function hisBuildQuery(tokens, fallback) {
+  var p = [];
+  if(tokens.ordinal)  p.push(tokens.ordinal.replace('_',' '));
+  if(tokens.geo)      p.push(tokens.geo);
+  if(tokens.role)     p.push(tokens.role.replace('_',' '));
+  if(tokens.temporal) p.push(tokens.temporal);
+  return p.length >= 2 ? p.join(' ') : fallback;
+}
+
 // ── DETECT INTENT ──
 function detectIntent(msg) {
   var l = msg.toLowerCase().trim();
@@ -1021,6 +1135,13 @@ function formatWiki(result, extended) {
 // ── THINK ──
 async function think(msg) {
   _userLang = detectLang(msg);
+
+  // Safety check — înainte de orice altceva
+  var safety = safetyCheck(msg);
+  if(safety.action === 'crisis') return { text: safety.response };
+  if(safety.action === 'block')  return { text: safety.response };
+  var _safeDisclaimer = (safety.action === 'disclaimer') ? DISCLAIMERS[safety.type] : '';
+
   var intent = detectIntent(msg);
   var l = msg.toLowerCase();
 
@@ -1115,9 +1236,17 @@ async function think(msg) {
   var msgNorm = normalizeTypos(msg);
   var subject = extractSubject(msgNorm);
   var category = detectCategory(msgNorm, subject);
+
+  // VV HiS — tokenizare semantică multilingvă
+  var hisTok = hisTokenize(msgNorm);
+  var hisQ   = hisBuildQuery(hisTok, null);
+  var useHis = !!hisQ;
+
   dbg('Intent', null, intent);
   dbg('Subject extras', null, '"' + subject + '"');
   dbg('Categorie', null, category || 'null');
+  dbg('HiS tokens', null, JSON.stringify(hisTok));
+  if(useHis) dbg('HiS query', null, '"' + hisQ + '"');
 
   // Nu căuta în Wikipedia pentru timp real (vreme, oră, prețuri)
   if(/^(ora|cât e|ceas|vreme|vremea|meteo|azi e|azi este|prețul|pretul|curs valutar)/.test(subject.toLowerCase())) {
@@ -1177,18 +1306,27 @@ async function think(msg) {
     dbg('Pas 4 · RO fulltext', !!result, result ? '"' + result.title + '"' : 'nimic');
   }
 
-  // 5. Full-text EN Wikipedia (cu ordinale traduse daca e cazul)
-  if(!result || hasOrdinal) {
+  // 5. HiS route — query semantic multilingv → direct EN Wikipedia
+  if(useHis && (!result || hasOrdinal)) {
+    var hisResult = await searchWikiQuery(hisQ);
+    if(hisResult && (!result || (result.title||'').split(' ').length > (hisResult.title||'').split(' ').length)) {
+      dbg('Pas 5 · HiS EN', true, '"' + hisResult.title + '" (query: "' + hisQ + '")');
+      result = hisResult;
+    } else {
+      dbg('Pas 5 · HiS EN', false, hisResult ? '"' + hisResult.title + '" mai slab' : 'nimic');
+    }
+  }
+
+  // 5b. EN fallback clasic (ordinal fără HiS sau HiS cu 1 token)
+  if(!result || (hasOrdinal && !useHis)) {
     var enSubject = subject
       .replace(/\bprimul\b|\bprima\b/gi,'first').replace(/\bultimul\b|\bultima\b/gi,'last')
       .replace(/\bpreș?edinte\b/gi,'president').replace(/\bamerican[aă]?\b/gi,'american')
       .replace(/\brege\b|\bîmpărat\b/gi,'king').replace(/\broman[aă]?\b/gi,'romanian');
-    var enResult = await searchWikiQuery(enSubject);
-    if(enResult && (!result || (result.title||'').split(' ').length > (enResult.title||'').split(' ').length)) {
-      dbg('Pas 5 · EN ordinal', true, '"' + enResult.title + '" (din "' + enSubject + '")');
-      result = enResult;
-    } else {
-      dbg('Pas 5 · EN ordinal', false, enResult ? '"' + enResult.title + '" mai slab' : 'nimic');
+    var enResult2 = await searchWikiQuery(enSubject);
+    if(enResult2 && (!result || (result.title||'').split(' ').length > (enResult2.title||'').split(' ').length)) {
+      dbg('Pas 5b · EN clasic', true, '"' + enResult2.title + '"');
+      result = enResult2;
     }
   }
 
@@ -1201,7 +1339,8 @@ async function think(msg) {
   if(result) {
     _lastSearchSubject = subject;
     _lastSearchResult  = result;
-    return { text: null, wiki: result, formatted: formatWiki(result) };
+    var baseFormatted = formatWiki(result);
+    return { text: null, wiki: result, formatted: _safeDisclaimer + baseFormatted };
   }
 
   // Ultimul fallback — DDG (poate esuaza CORS pe domenii custom)
