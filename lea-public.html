@@ -701,6 +701,156 @@ async function searchWikiFullIntro(title) {
   return null;
 }
 
+// ── CALCULATOR ──
+function calcExpr(msg) {
+  var l = msg.toLowerCase()
+    .replace(/\bplus\b/g,'+').replace(/\bminus\b|\bscade\b/g,'-')
+    .replace(/\bînmulțit cu\b|\binmultit cu\b|\bori\b|\btimes\b/g,'*')
+    .replace(/\bîmpărțit la\b|\bimpartit la\b|\bdivizat\b/g,'/')
+    .replace(/\bla puterea\b|\bridicata la\b/g,'**').replace(/\bpatrat\b|\bpătrat\b/g,'**2')
+    .replace(/,/g,'.');
+  l = l.replace(/(\d+(?:\.\d+)?)\s*%\s+din\s+(\d+(?:\.\d+)?)/g,'($1/100)*$2');
+  var m = l.match(/([\d\s\+\-\*\/\.\(\)\*]+)/);
+  if(!m) return null;
+  var expr = m[1].trim().replace(/\s+/g,'');
+  if(!expr || !/\d/.test(expr) || expr.length < 3) return null;
+  try {
+    var r = Function('"use strict";return('+expr+')')();
+    return (typeof r==='number' && isFinite(r)) ? r : null;
+  } catch(e){ return null; }
+}
+function formatNum(n) {
+  if(!isFinite(n)) return String(n);
+  if(Number.isInteger(n)) return n.toLocaleString('ro-RO');
+  return parseFloat(n.toFixed(8)).toLocaleString('ro-RO');
+}
+
+// ── WEATHER (Open-Meteo + Nominatim geocode) ──
+var CITIES_RO = {
+  'bucurești':[44.4268,26.1025],'bucuresti':[44.4268,26.1025],'bucharest':[44.4268,26.1025],
+  'cluj':[46.7712,23.6236],'cluj-napoca':[46.7712,23.6236],
+  'timișoara':[45.7489,21.2087],'timisoara':[45.7489,21.2087],
+  'iași':[47.1585,27.6014],'iasi':[47.1585,27.6014],
+  'constanța':[44.1598,28.6348],'constanta':[44.1598,28.6348],
+  'brașov':[45.6427,25.5887],'brasov':[45.6427,25.5887],
+  'craiova':[44.3302,23.7949],'galați':[45.4353,28.0080],'galati':[45.4353,28.0080],
+  'oradea':[47.0722,21.9210],'ploiești':[44.9455,26.0365],'ploiesti':[44.9455,26.0365],
+  'sibiu':[45.7983,24.1256],'pitești':[44.8565,24.8693],'pitesti':[44.8565,24.8693],
+  'baia mare':[47.6604,23.5843],'arad':[46.1865,21.3123],
+  'buzău':[45.1522,26.8200],'buzau':[45.1522,26.8200],
+  'bacău':[46.5670,26.9146],'bacau':[46.5670,26.9146],
+  'suceava':[47.6514,26.2556],'târgu mureș':[46.5502,24.5664],'targu mures':[46.5502,24.5664],
+  'focșani':[45.6942,27.1853],'focsani':[45.6942,27.1853],
+  'satu mare':[47.7930,22.8857],'alba iulia':[46.0700,23.5700],
+  'deva':[45.8800,22.9100],'tulcea':[45.1752,28.7986],
+  'reșița':[45.3005,21.8882],'resita':[45.3005,21.8882],
+  'giurgiu':[43.9000,25.9667],'vaslui':[46.6419,27.7289],'alexandria':[43.9767,25.3339],
+  'sfântu gheorghe':[45.8667,25.7833],'sfantu gheorghe':[45.8667,25.7833],
+  'târgoviște':[44.9275,25.4564],'targoviste':[44.9275,25.4564],
+  'miercurea ciuc':[46.3517,25.8011],'slobozia':[44.5681,27.3656],
+  'rm. vâlcea':[45.1000,24.3833],'ramnicu valcea':[45.1000,24.3833],
+  'zalău':[47.1919,23.0569],'zalau':[47.1919,23.0569],
+};
+var WMO = {
+  0:'Cer senin ☀️',1:'Predominant senin 🌤️',2:'Parțial înnorat ⛅',3:'Înnorat ☁️',
+  45:'Ceață 🌫️',48:'Ceață cu chiciură 🌫️',
+  51:'Burniță ușoară 🌦️',53:'Burniță moderată 🌦️',55:'Burniță densă 🌦️',
+  61:'Ploaie ușoară 🌧️',63:'Ploaie moderată 🌧️',65:'Ploaie puternică 🌧️',
+  71:'Ninsoare ușoară ❄️',73:'Ninsoare moderată ❄️',75:'Ninsoare puternică ❄️',
+  77:'Boabe de gheață 🌨️',
+  80:'Averse ușoare 🌦️',81:'Averse moderate 🌦️',82:'Averse puternice ⛈️',
+  95:'Furtună ⛈️',96:'Furtună cu grindină ⛈️',99:'Furtună severă cu grindină ⛈️',
+};
+async function getWeather(msg) {
+  var l = stripDiacritics(msg).toLowerCase();
+  var lat=null,lon=null,cityDisp='București';
+  var ck = Object.keys(CITIES_RO).sort(function(a,b){return b.length-a.length;});
+  for(var i=0;i<ck.length;i++){
+    if(l.includes(stripDiacritics(ck[i]))){lat=CITIES_RO[ck[i]][0];lon=CITIES_RO[ck[i]][1];cityDisp=ck[i].charAt(0).toUpperCase()+ck[i].slice(1);break;}
+  }
+  if(!lat){
+    var cm=msg.match(/(?:în|in|la|din|pentru)\s+([A-ZĂÂÎȘȚ][a-zăâîșț]+(?:[\s-][A-ZĂÂÎȘȚ][a-zăâîșț]+)*)/);
+    if(cm){try{var gr=await fetch('https://nominatim.openstreetmap.org/search?q='+encodeURIComponent(cm[1])+'&format=json&limit=1&accept-language=ro',{headers:{'User-Agent':'Lea/hilea.eu'}});var gd=await gr.json();if(gd&&gd[0]){lat=parseFloat(gd[0].lat);lon=parseFloat(gd[0].lon);cityDisp=cm[1];}}catch(e){}}
+  }
+  if(!lat){lat=44.4268;lon=26.1025;cityDisp='București';}
+  try {
+    var url='https://api.open-meteo.com/v1/forecast?latitude='+lat+'&longitude='+lon+'&current=temperature_2m,apparent_temperature,weathercode,windspeed_10m,relativehumidity_2m&timezone=auto';
+    var res=await fetch(url);var d=await res.json();
+    if(d&&d.current){
+      var c=d.current;
+      var cond=WMO[c.weathercode]||'Condiții necunoscute';
+      return 'Vremea în '+cityDisp+' acum:\n'+cond+'\nTemperatură: '+Math.round(c.temperature_2m)+'°C (resimțit: '+Math.round(c.apparent_temperature)+'°C)\nVânt: '+Math.round(c.windspeed_10m)+' km/h · Umiditate: '+c.relativehumidity_2m+'%';
+    }
+  } catch(e){}
+  return null;
+}
+
+// ── URGENTE ROMANIA ──
+var URGENTE = {
+  general:  '🚨 Numere de urgență România:\n112 — Urgențe generale (ambulanță, pompieri, poliție)\nSalvamont: 0725 826 668',
+  politie:  '👮 Poliție: 112\nInfo poliție: 021 9595\nDNA (anticorupție): 021 312 44 29',
+  ambulanta:'🚑 Ambulanță / SMURD: 112\nTelVerde droguri: 0800 9081',
+  pompieri: '🔥 Pompieri: 112',
+  salvamont:'⛰️ Salvamont: 0725 826 668\nSalvaspeo (peșteri): 0725 826 668\nÎnainte de orice traseu montan — înregistrează-te la Salvamont.',
+  copii:    '👶 Telefonul Copilului: 116 111 (gratuit, 24/7)\nCASE (abuz copii): 021 9321',
+  violenta: '💜 Violență domestică: 0800 500 333 (gratuit)\nLinie antiviolență: 116 006',
+  criza:    '🤍 Criză emoțională / suicid: 0800 801 200 (AntiSuicid, gratuit, 24/7)\nTelVerde depresie: 0800 0800 20',
+  otraviri: '💊 Intoxicații / supradoze: 021 318 36 06 (Centrul Anti-Otraviri)\nFarmacii de gardă: harta.farmacii.ro',
+  gaze:     '🔥 Avarii gaze: 0800 800 800 (Distrigaz/E.ON)\nAvarii electrice: 0800 800 111',
+};
+function getUrgenta(msg) {
+  var l = msg.toLowerCase();
+  if(/poliți[ei]|politie|jaf\b|tâlhărie|talharie|infracțiu|crimă\b/.test(l)) return URGENTE.politie;
+  if(/ambulanț[aă]|ambulanta|smurd|urgentă\s+medic|urgenta\s+medic/.test(l)) return URGENTE.ambulanta;
+  if(/pompieri|incendi[u]|foc\b/.test(l)) return URGENTE.pompieri;
+  if(/salvamont|munte|traseu|pierdut|alpinism|mont[aă]n/.test(l)) return URGENTE.salvamont;
+  if(/copil|abuz|minor|telefonul copilului/.test(l)) return URGENTE.copii;
+  if(/violen[tț][aă]|domestic|partener|bătut|lovit/.test(l)) return URGENTE.violenta;
+  if(/sinucid|suicid|criz[aă]\s+emo|depres|vreau\s+s[aă]\s+mor|nu\s+mai\s+vreau\s+s[aă]\s+trăi/.test(l)) return URGENTE.criza;
+  if(/intoxica|otrav|supradoz|overdos|am\s+luat\s+prea\s+mult/.test(l)) return URGENTE.otraviri;
+  if(/gaze|gaz natural|electric[aă]|curent\s+electric|avarie/.test(l)) return URGENTE.gaze;
+  return URGENTE.general;
+}
+
+// ── NOMINATIM LOCURI ──
+async function getNominatim(query, city) {
+  try {
+    var q = city ? query+' '+city+' Romania' : query+' Romania';
+    var url='https://nominatim.openstreetmap.org/search?q='+encodeURIComponent(q)+'&format=json&limit=5&accept-language=ro&addressdetails=1&countrycodes=ro';
+    var res=await fetch(url,{headers:{'User-Agent':'Lea/hilea.eu'}});
+    return await res.json();
+  } catch(e){ return []; }
+}
+async function handleLocation(msg) {
+  var l = msg.toLowerCase();
+  var locType=null,searchQ='';
+  if(/spital|spitale|clinică|clinica|urgențe\s+medicale/.test(l)){locType='spital';searchQ='spital';}
+  else if(/farmacie|farmacii/.test(l)){locType='farmacie';searchQ='farmacie';}
+  else if(/hotel|hoteluri|cazare|hostel/.test(l)){locType='hotel';searchQ='hotel';}
+  else if(/restaurant|restaurante|pizzerie|fast.food/.test(l)){locType='restaurant';searchQ='restaurant';}
+  else if(/muzeu|muzee/.test(l)){locType='muzeu';searchQ='muzeu';}
+  else if(/monument|monumente|statuie/.test(l)){locType='monument';searchQ='monument';}
+  else if(/aeroport/.test(l)){locType='aeroport';searchQ='aeroport';}
+  else if(/gar[aă]/.test(l)){locType='gară';searchQ='gara CFR';}
+  else if(/parc\b/.test(l)){locType='parc';searchQ='parc';}
+  if(!locType) return null;
+  var city='București';
+  var ck=Object.keys(CITIES_RO).sort(function(a,b){return b.length-a.length;});
+  var ls=stripDiacritics(l);
+  for(var i=0;i<ck.length;i++){if(ls.includes(stripDiacritics(ck[i]))){city=ck[i];break;}}
+  var results=await getNominatim(searchQ,city);
+  if(!results||!results.length) return 'Nu am găsit '+locType+' în '+city+'. Încearcă Google Maps sau maps.apple.com.';
+  var cityDisp=city.charAt(0).toUpperCase()+city.slice(1);
+  var lines=['📍 '+locType.charAt(0).toUpperCase()+locType.slice(1)+' în '+cityDisp+':'];
+  results.filter(function(r){return r.name||r.display_name;}).slice(0,3).forEach(function(r,i){
+    var name=r.name||r.display_name.split(',')[0];
+    var addr=r.address?[r.address.road,r.address.suburb].filter(Boolean).join(', '):r.display_name.split(',').slice(1,3).join(',').trim();
+    lines.push((i+1)+'. '+name+(addr?' · '+addr:''));
+  });
+  lines.push('\nPentru mai multe → Google Maps');
+  return lines.join('\n');
+}
+
 // ── DUCKDUCKGO FALLBACK (dezactivat CORS pe hilea.eu — kept for localhost) ──
 async function searchDDG(query) {
   try {
@@ -838,6 +988,9 @@ function detectIntent(msg) {
   if(/ce e vv|ce este vv|vv hybrid|ecosistem vv|vv technologies/.test(l)) return 'vv';
   if(/cosmin|fondator|inventor|inventat|cine a facut|cine a creat/.test(l)) return 'founder';
   if(/filozofie|filosofie|principii|local.?first|suveranitate/.test(l)) return 'philosophy';
+  if(/\d+\s*[\+\-\*\/]\s*\d/.test(l) || (/\b(c[aâ]t\s+e|c[aâ]t\s+face|calculeaz[aă])\b/.test(l) && /\d/.test(l)) || /\d+\s*%\s*din\s*\d/.test(l)) return 'calculator';
+  if(/\b(urgenta|urgentă|smurd|salvamont|telefonul copilului|violenta domestica|violenț[aă]\s+domestic[aă]|sinucid|suicid|antisuicid|anti.otrav|numar.?urgent|număr.?urgent)\b/.test(l) || /\b(num[aă]r|numar)\b.*\b(urgent[aă]|salvare|ajutor)\b/.test(l)) return 'emergency';
+  if(/\b(spital|spitale|farmacie|farmacii|hotel[uri]*|hostel|cazare|restaurant[e]*|muzeu|muzee|monument[e]*|aeroport|gar[aă]|parc)\b/.test(l) && /(din|în|la|lângă|langa|unde sunt|unde se|unde e|cel mai apropiat|aproape de)/.test(l)) return 'location';
   if(/\b(vremea|vreme|meteo|temperatura|ploua|ninge|prognoza|forecast)\b/.test(l) || /cum (e|este|o fi|va fi) (vremea|vreme|temperatura|timpul)/.test(l)) return 'weather';
   if(/\b(ieri|azi-noapte|azi dimineata|in aceasta seara|in seara asta|weekend-ul trecut|luna trecuta|saptamana trecuta|acum [0-9]|acum cateva|ce s-a intamplat|ce s-a întâmplat|stiri|știri|news|trending|viral|ultima ora)\b/.test(l)) return 'realtime';
   if(/^(ce (a fost|e|este) (azi|astazi|acum|ieri)|ce (film|piesa|concert|meci|eveniment).*(azi|ieri|acum|astazi|saptamana|luna))/.test(l)) return 'realtime';
@@ -912,7 +1065,22 @@ async function think(msg) {
   if(intent === 'private_doc') { return { gateway: true }; }
   if(intent === 'privacy') { setTimeout(openPrivacy, 400); return { text: _userLang === 'en' ? 'Full transparency. Nothing is stored on a server. Everything Lea knows about you lives exclusively on your device — I can\'t access anything from the outside.' : 'Transparență completă. Nu stochează nimic pe server. Tot ce știu despre tine trăiește exclusiv pe device-ul tău — eu nu pot accesa nimic din exterior.' }; }
   if(intent === 'install') return { text: leaText('install') };
-  if(intent === 'weather') return { text: leaText('weather') };
+  if(intent === 'calculator') {
+    var calcVal = calcExpr(msg);
+    if(calcVal !== null) return { text: '= ' + formatNum(calcVal) };
+    return { text: 'Nu am putut calcula asta. Încearcă: "cât e 5 + 3" sau "cât face 20% din 150".' };
+  }
+  if(intent === 'emergency') return { text: getUrgenta(msg) };
+  if(intent === 'location') {
+    var locResult = await handleLocation(msg);
+    if(locResult) return { text: locResult, source: 'OpenStreetMap' };
+    return { text: 'Nu am găsit locația. Încearcă forma: "spitale în Cluj" sau "hotel în Brașov".' };
+  }
+  if(intent === 'weather') {
+    var wx = await getWeather(msg);
+    if(wx) return { text: wx, source: 'Open-Meteo' };
+    return { text: leaText('weather') };
+  }
   if(intent === 'realtime') return { text: 'Nu am acces la date în timp real — nu știu ce s-a întâmplat ieri, azi sau acum. Încearcă Google sau o aplicație de știri. Eu știu ce e în Wikipedia (fapte stabile, nu evenimente recente).' };
   if(intent === 'cine') return { text: leaText('cine') };
   if(intent === 'ce_poti') return { text: leaText('ce_poti') };
