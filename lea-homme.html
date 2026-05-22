@@ -2983,6 +2983,37 @@ function lea_soul_wrap(text){
   return text;
 }
 
+// ── Lea întreabă cum ești ──
+var _lastAskHowTs = 0;
+function lea_maybe_ask_how_you_are(){
+  if(_kbState) return;                          // nu întrerupe KB flow
+  if(_chatMsgCount<4) return;                   // prea devreme în sesiune
+  if(_chatMsgCount%7!==0) return;               // o dată la 7 mesaje
+  var now=Date.now();
+  if(now-_lastAskHowTs < 30*60*1000) return;    // cel puțin 30 min între întrebări
+  var mood=vvpl_get_mood();
+  if(mood==='stresat'||mood==='obosit') {
+    // știe deja că ești stresat — nu mai întreabă, comentează
+    var name=localStorage.getItem('homme_name')||'';
+    var empathy=pickRandom([
+      (name?name+', ':'')+'ai mai luat o pauză azi?',
+      'Ești de ceva timp aici. Totul ok?',
+      'Nu uita să respiri uneori.'
+    ]);
+    _lastAskHowTs=now;
+    setTimeout(function(){ homme_addMsg('lea',{text:empathy}); },1200);
+    return;
+  }
+  var name=localStorage.getItem('homme_name')||'';
+  var questions=pickRandom([
+    (name?name+', c':'C')+'um ești azi?',
+    'O întrebare de la mine — totul bine?',
+    (name?name+', s':'S')+'ăptămâna cum merge?'
+  ]);
+  _lastAskHowTs=now;
+  setTimeout(function(){ homme_addMsg('lea',{text:questions}); },1200);
+}
+
 // ── VV KB — Knowledge Base personal ──
 var _kbState  = null;   // null | 'teach' | 'confirm'
 var _kbPending = null;  // {subject, answer}
@@ -3084,6 +3115,30 @@ async function think(msg){
   if(intent==='debug'){_dbg=!_dbg;return{text:_dbg?'Mod diagnostic activ. Scrie din nou "debug" să oprești.':'Mod diagnostic oprit.'};}
   if(intent==='salut') return{text:leaText('salut')};
   if(intent==='multumesc') return{text:leaText('multumesc')};
+  // răspuns la "cum ești" — detectează starea și salvează în VVPL
+  if(/^(bine|ok|merge|super|excelent|obosit|obosită|stresat|stresată|trist|tristă|fericit|fericită|nu prea|mai mult sau mai puțin|rău|nu e bine)\b/i.test(l)&&_chatMsgCount>3){
+    var stare=l.match(/^(bine|ok|merge|super|excelent|obosit|obosită|stresat|stresată|trist|tristă|fericit|fericită|rău)/i);
+    if(stare){
+      var name=localStorage.getItem('homme_name')||'';
+      var s=stare[1].toLowerCase();
+      var raspuns={
+        'bine':   pickRandom(['Bine de auzit.','Mă bucur.','Perfect.']),
+        'ok':     pickRandom(['Ok e suficient uneori.','Înțeleg.']),
+        'merge':  'Merge e bun.',
+        'super':  pickRandom(['Super!','Asta îmi place să aud.']),
+        'obosit': (name?name+', o':'O')+'dihnește-te când poți. Sunt aici și mâine.',
+        'obosită':(name?name+', o':'O')+'dihnește-te când poți.',
+        'stresat': 'Respiră. O problemă o dată.',
+        'stresată':'Respiră. O problemă o dată.',
+        'trist':   (name?name+', s':'S')+'unt aici.',
+        'tristă':  (name?name+', s':'S')+'unt aici.',
+        'rău':     'Îmi pare rău. Vrei să vorbim?',
+        'fericit': 'Asta contează.',
+        'fericită':'Asta contează.'
+      };
+      return{text:raspuns[s]||'Înțeleg.'};
+    }
+  }
   // uită / șterge din KB
   var forgetM=msg.match(/^(?:uit[aă]|șterge|sterge|uita|scoate din memorie|nu mai știi|nu mai stii)\s+(.+)/i);
   if(forgetM){ var toForget=forgetM[1].replace(/\?+$/,'').trim(); kb_delete(toForget); return{text:'Am uitat "'+toForget+'". Nu mai știu asta.'}; }
@@ -3397,11 +3452,12 @@ async function sendChat(){
   homme_addTyping();
   var delay=350+Math.random()*250;
   var result=await think(msg);
-  // soul wrap — modulare după ton și timp
   if(result&&result.text) result.text=lea_soul_wrap(result.text);
   await new Promise(function(r){setTimeout(r,delay);});
   homme_removeTyping();
   homme_addMsg('lea',result);
+  // Lea întreabă cum ești — rar, natural, doar după răspuns normal
+  lea_maybe_ask_how_you_are();
 }
 
 // wire send button + Enter key
