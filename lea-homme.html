@@ -987,7 +987,7 @@ textarea::placeholder{color:rgba(255,255,255,.2)}
     <div class="icon-label">VV Galerie<br><span style="color:rgba(var(--ac),.42)">amintiri</span></div>
   </div>
 
-  <div class="icon" id="icon-ask" onclick="window.open('vv-lea-ask.html','_blank')" ondragstart="return false" style="cursor:pointer">
+  <div class="icon" id="icon-ask" onmousedown="icon_down(event,'ask')" ondragstart="return false">
     <div class="icon-emoji">🔍</div>
     <div class="icon-label">Lea Ask<br><span style="color:rgba(var(--gold),.55)">învaț-o</span></div>
   </div>
@@ -1172,6 +1172,20 @@ textarea::placeholder{color:rgba(255,255,255,.2)}
     <div style="width:44px"></div>
   </div>
   <iframe id="stories-frame" src="vv-stories.html" style="flex:1;border:none;min-height:0;height:0;border-radius:0 0 14px 14px" allowfullscreen></iframe>
+</div>
+
+<!-- LEA ASK WINDOW -->
+<div class="win" id="win-ask" style="width:580px;max-height:82vh">
+  <div class="win-bar" onmousedown="win_drag(event,'ask')" ondblclick="win_maximize('ask')">
+    <div class="win-btns">
+      <button class="win-btn cls" onclick="win_close('ask')"></button>
+      <button class="win-btn min" onclick="win_minimize('ask')"></button>
+      <button class="win-btn max" onclick="win_maximize('ask')"></button>
+    </div>
+    <div><div class="win-title">🔍 Lea Ask</div><div class="win-sub">Caută · Traduce · Trimite la Lea</div></div>
+    <div style="width:44px"></div>
+  </div>
+  <iframe src="vv-lea-ask.html" style="flex:1;border:none;min-height:0;height:0;border-radius:0 0 14px 14px" allowfullscreen></iframe>
 </div>
 
 <!-- VV WRITE WINDOW -->
@@ -1652,7 +1666,7 @@ updateClock(); setInterval(updateClock,10000);
 
 // ── ICON POSITIONS ──
 var ICON_W = 100, ICON_H = 90, ICON_GAP = 14;
-var ICONS = ['chat','rafturi','taskuri','vreme','fisiere','urgente','note','write','stories','galerie'];
+var ICONS = ['chat','rafturi','taskuri','vreme','fisiere','urgente','note','write','stories','galerie','ask'];
 
 function defaultIconPos(){
   var cols=3, rows=Math.ceil(ICONS.length/cols);
@@ -1729,8 +1743,9 @@ var WINS = {
   setari:  {label:'⚙️ Setări',  open:false,minimized:false,x:-1,y:-1},
   genom:   {label:'🧬 Genom',   open:false,minimized:false,x:-1,y:-1},
   galerie: {label:'📸 Galerie', open:false,minimized:false,x:-1,y:-1},
+  ask:     {label:'🔍 Lea Ask', open:false,minimized:false,x:-1,y:-1},
 };
-var WIN_W  = {chat:460,rafturi:460,taskuri:460,vreme:300,fisiere:460,urgente:460,note:360,write:640,stories:1020,setari:400,genom:460,galerie:660};
+var WIN_W  = {chat:460,rafturi:460,taskuri:460,vreme:300,fisiere:460,urgente:460,note:360,write:640,stories:1020,setari:400,genom:460,galerie:660,ask:580};
 var WIN_CASCADE = [0,28,56,84,112,140,168];
 
 function win_open(id, fromX, fromY){
