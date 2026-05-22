@@ -1757,6 +1757,7 @@ function win_open(id, fromX, fromY){
   if(id==='genom')   setTimeout(genom_render,60);
   if(id==='galerie') setTimeout(galerie_render,60);
   if(id==='fisiere') setTimeout(files_init,60);
+  if(id==='chat')    setTimeout(lea_on_chat_open,400);
 }
 
 function win_maximize(id){
@@ -2809,8 +2810,203 @@ function detectIntent(msg){
   return'search';
 }
 
+// ══════════════════════════════════════
+// VV SOUL — HiC · HiL · VVPL · Prezență
+// ══════════════════════════════════════
+
+// ── VV HiC — Context temporal ──
+function hic_time(){
+  var h=new Date().getHours();
+  if(h>=6&&h<12)  return{slot:'dimineață',tone:'scurt'};
+  if(h>=12&&h<18) return{slot:'după-amiază',tone:'normal'};
+  if(h>=18&&h<23) return{slot:'seară',tone:'cald'};
+  return{slot:'noapte',tone:'cald'};
+}
+
+// ── Prezență — știe când ai lipsit ──
+function lea_mark_seen(){
+  localStorage.setItem('homme_last_seen', Date.now().toString());
+}
+function lea_check_absence(){
+  var last=parseInt(localStorage.getItem('homme_last_seen')||'0');
+  if(!last) return null;
+  var diff=Date.now()-last;
+  var days=Math.floor(diff/(1000*60*60*24));
+  var hours=Math.floor(diff/(1000*60*60));
+  if(days>=7)          return{type:'lung',  days:days};
+  if(days>=2)          return{type:'mediu', days:days};
+  if(hours>=8&&days<1) return{type:'scurt', hours:hours};
+  return null;
+}
+function lea_absence_greeting(absence){
+  var name=localStorage.getItem('homme_name')||'';
+  var n=name?name+', ':'';
+  if(absence.type==='lung')  return n+'au trecut '+absence.days+' zile. Ai fost bine?';
+  if(absence.type==='mediu') return (name?'Bună, '+name+'! ':'')+''+absence.days+' zile fără noi. Ce s-a mai întâmplat?';
+  if(absence.type==='scurt') return 'Bună revenire. '+absence.hours+' ore — ai rezolvat ce aveai?';
+  return null;
+}
+function lea_on_chat_open(){
+  var absence=lea_check_absence();
+  if(!absence) return;
+  var msg=lea_absence_greeting(absence);
+  if(!msg) return;
+  setTimeout(function(){ homme_addMsg('lea',{text:msg}); },700);
+}
+
+// ── Ton — citește cum ești ──
+var _userTone='normal';
+function lea_detect_tone(msg){
+  var hasDiacr=/[ăîâșțĂÎÂȘȚ]/.test(msg);
+  var hasPunct=/[.,!?;]/.test(msg);
+  var words=msg.trim().split(/\s+/).length;
+  if(words<=3&&!hasDiacr&&!hasPunct) return'grăbit';
+  if(words>=12&&(hasDiacr||hasPunct)) return'relaxat';
+  return'normal';
+}
+
+// ── Continuitate — ultima sesiune ──
+function lea_save_topic(subject){
+  if(!subject||subject.length<3) return;
+  localStorage.setItem('homme_last_topic',JSON.stringify({subject:subject,ts:Date.now()}));
+}
+function lea_get_topic(){
+  try{
+    var d=JSON.parse(localStorage.getItem('homme_last_topic')||'null');
+    if(!d) return null;
+    if(Date.now()-d.ts>7*24*60*60*1000) return null;
+    return d;
+  }catch(e){ return null; }
+}
+
+// ── VVPL — extrage tipare automat din conversație ──
+function vvpl_extract(msg){
+  var l=msg.toLowerCase();
+  var tokens=[];
+  var mPref=l.match(/(?:îmi place|îmi plac|ador|prefer|iubesc)\s+([a-zA-ZăîâșțĂÎÂȘȚ ]{2,20})/);
+  if(mPref) tokens.push({cat:'PREF',val:mPref[1].trim(),intensity:'HI',ts:Date.now()});
+  var mAnti=l.match(/(?:nu(?:\s+îmi)? place|nu suport|urăsc|detestez)\s+([a-zA-ZăîâșțĂÎÂȘȚ ]{2,20})/);
+  if(mAnti) tokens.push({cat:'BLOCK',val:mAnti[1].trim(),intensity:'HI',ts:Date.now()});
+  var mHabit=l.match(/(?:în fiecare|mereu|zilnic|de obicei)\s+([a-zA-ZăîâșțĂÎÂȘȚ ]{2,20})/);
+  if(mHabit) tokens.push({cat:'HABIT',val:mHabit[1].trim(),intensity:'MED',ts:Date.now()});
+  var mMood=l.match(/(?:sunt|mă simt|azi sunt)\s+(obosit|fericit|trist|stresat|energic|plictisit|nervos|bine|rău)/);
+  if(mMood) tokens.push({cat:'MOOD',val:mMood[1].trim(),intensity:'HI',ts:Date.now()});
+  var mGoal=l.match(/(?:vreau să|îmi doresc să|scopul meu)\s+([a-zA-ZăîâșțĂÎÂȘȚ ]{2,25})/);
+  if(mGoal) tokens.push({cat:'GOAL',val:mGoal[1].trim(),intensity:'HI',ts:Date.now()});
+  if(!tokens.length) return;
+  var vvpl=[];
+  try{ vvpl=JSON.parse(localStorage.getItem('homme_vvpl')||'[]'); }catch(e){}
+  tokens.forEach(function(t){
+    var idx=vvpl.findIndex(function(x){return x.cat===t.cat&&x.val===t.val;});
+    if(idx>=0) vvpl[idx].ts=Date.now();
+    else vvpl.push(t);
+  });
+  if(vvpl.length>300) vvpl=vvpl.slice(vvpl.length-300);
+  localStorage.setItem('homme_vvpl',JSON.stringify(vvpl));
+}
+function vvpl_get_mood(){
+  try{
+    var vvpl=JSON.parse(localStorage.getItem('homme_vvpl')||'[]');
+    var moods=vvpl.filter(function(x){return x.cat==='MOOD';});
+    if(!moods.length) return null;
+    moods.sort(function(a,b){return b.ts-a.ts;});
+    return moods[0].val;
+  }catch(e){ return null; }
+}
+
+// ── Decay KB ──
+function kb_age_label(ts){
+  if(!ts) return null;
+  var days=Math.floor((Date.now()-ts)/(1000*60*60*24));
+  if(days>30) return'acum mult timp';
+  if(days>7)  return'acum '+days+' zile';
+  return null;
+}
+
+// ── VV HiC — modulare răspuns după ton + timp ──
+function lea_soul_wrap(text){
+  if(!text) return text;
+  var tone=_userTone;
+  var time=hic_time();
+  var mood=vvpl_get_mood();
+  // dacă e grăbit — scurtăm răspunsul lung
+  if(tone==='grăbit'&&text.length>300){
+    var sentences=text.split(/[.!?]\s+/);
+    text=sentences.slice(0,2).join('. ')+(sentences.length>2?'.' :'');
+  }
+  // prefix contextual seara/noapte cu mood
+  if((time.slot==='seară'||time.slot==='noapte')&&mood==='stresat'&&Math.random()<0.3){
+    text='Ești stresat — ia-o mai ușor cu tine. '+text;
+  }
+  return text;
+}
+
+// ── VV KB — Knowledge Base personal ──
+var _kbState  = null;   // null | 'teach' | 'confirm'
+var _kbPending = null;  // {subject, answer}
+
+function kb_load(){
+  try{ return JSON.parse(localStorage.getItem('homme_kb')||'[]'); }catch(e){ return []; }
+}
+function kb_save(arr){
+  try{ localStorage.setItem('homme_kb', JSON.stringify(arr)); }catch(e){}
+}
+function kb_find(subject){
+  var kb=kb_load();
+  var s=(subject||'').toLowerCase().trim();
+  if(!s) return null;
+  for(var i=0;i<kb.length;i++){
+    if(kb[i].subject.toLowerCase()===s) return kb[i];
+  }
+  return null;
+}
+function kb_add(subject, answer){
+  var kb=kb_load();
+  var s=(subject||'').toLowerCase().trim();
+  var idx=kb.findIndex(function(x){return x.subject.toLowerCase()===s;});
+  var entry={subject:s, answer:answer, ts:Date.now()};
+  if(idx>=0) kb[idx]=entry; else kb.push(entry);
+  kb_save(kb);
+}
+function kb_speak(entry){
+  var name=localStorage.getItem('homme_name')||'';
+  var s=entry.subject;
+  var a=entry.answer;
+  var age=kb_age_label(entry.ts||0);
+  var agePart=age?' ('+age+')':'';
+  var templates=[
+    function(){ return (name?name+', m':'M')+'i-ai spus tu'+agePart+' că '+s+' înseamnă: '+a; },
+    function(){ return 'Dacă îmi amintesc bine ce mi-ai explicat'+(age?' '+age:'')+'... '+a+'. Asta voiai?'; },
+    function(){ return 'Am asta în memorie de la tine'+agePart+': '+a; },
+    function(){ return s.charAt(0).toUpperCase()+s.slice(1)+'... da, știu'+agePart+'. Mi-ai spus: '+a; },
+    function(){ return 'Din ce am învățat de la tine'+(age?' '+age:'')+' — '+a+'.'; }
+  ];
+  return{text:pickRandom(templates)()};
+}
+
 async function think(msg){
   _userLang=detectLang(msg);
+
+  // ── KB state machine — înainte de orice altceva ──
+  if(_kbState==='teach'){
+    var teachAnswer=msg.trim();
+    _kbPending.answer=teachAnswer;
+    _kbState='confirm';
+    var preview=teachAnswer.length>120?teachAnswer.substring(0,120)+'...':teachAnswer;
+    return{text:'Am înțeles. Uite ce am reținut despre "'+_kbPending.subject+'":\n\n'+preview+'\n\nE corect? (scrie "da" sau corectează direct)'};
+  }
+  if(_kbState==='confirm'){
+    var isOk=/^(da|corect|exact|perfect|bun|ok|yes|e bine|e ok)\b/i.test(msg.trim());
+    if(isOk){
+      kb_add(_kbPending.subject, _kbPending.answer);
+    } else {
+      kb_add(_kbPending.subject, msg.trim());
+    }
+    var savedSubject=_kbPending.subject;
+    _kbState=null; _kbPending=null;
+    return{text:'✓ Salvat în KB-ul tău. Data viitoare când te întrebi despre "'+savedSubject+'" — știu.'};
+  }
+
   var safety=safetyCheck(msg);
   if(safety.action==='crisis') return{text:safety.response};
   if(safety.action==='block')  return{text:safety.response};
@@ -2914,6 +3110,11 @@ async function think(msg){
   if(intent==='philosophy') return{text:VV.philosophy};
   if(intent==='creative') return lea_creative(msg);
 
+  // ── KB lookup — înainte de Wikipedia ──
+  var kbHit=kb_find(msg.trim());
+  if(!kbHit) kbHit=kb_find(extractSubject(msg.toLowerCase()));
+  if(kbHit) return{text:kb_speak(kbHit)};
+
   // SEARCH
   if(!featureEnabled('wiki')) return{text:'Wikipedia e dezactivat. Îl poți reactiva din ⚙️ Setări.'};
   var msgNorm=normalizeTypos(msg);
@@ -2969,13 +3170,17 @@ async function think(msg){
 
   if(result){
     _lastSearchSubject=subject;_lastSearchResult=result;
+    lea_save_topic(subject);
     return{text:null,wiki:result,formatted:_safeDisclaimer+formatWiki(result)};
   }
 
   var ddg=await searchDDG(subject);
   if(ddg&&ddg.text){_lastSearchSubject=subject;return{text:ddg.text,source:'DuckDuckGo'};}
 
-  return{text:'Nu am găsit nimic despre "'+subject+'". Încearcă un termen mai simplu sau întreabă despre ecosistemul VV.'};
+  var name=localStorage.getItem('homme_name')||'';
+  _kbState='teach';
+  _kbPending={subject:subject||msg.trim()};
+  return{text:(name?name+', n':'N')+'u știu despre "'+(_kbPending.subject)+'". Vrei să mă înveți? Spune-mi ce e și rețin pentru data viitoare.'};
 }
 
 // ── CHAT PERSISTENȚĂ ──
@@ -3093,10 +3298,15 @@ async function sendChat(){
   var msg=(inp&&inp.value||'').trim(); if(!msg) return;
   inp.value=''; inp.style.height='auto';
   _chatMsgCount++;
+  _userTone=lea_detect_tone(msg);
+  lea_mark_seen();
+  vvpl_extract(msg);
   homme_addMsg('user',msg);
   homme_addTyping();
   var delay=350+Math.random()*250;
   var result=await think(msg);
+  // soul wrap — modulare după ton și timp
+  if(result&&result.text) result.text=lea_soul_wrap(result.text);
   await new Promise(function(r){setTimeout(r,delay);});
   homme_removeTyping();
   homme_addMsg('lea',result);
