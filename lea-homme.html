@@ -2965,20 +2965,114 @@ function kb_age_label(ts){
   return null;
 }
 
+// ── VV HiC — citește situația completă ──
+function hic_read_situation(msg){
+  var l=msg.toLowerCase();
+  var time=hic_time();
+  var mood=vvpl_get_mood();
+  var tone=_userTone;
+  var vvpl=[]; try{ vvpl=JSON.parse(localStorage.getItem('homme_vvpl')||'[]'); }catch(e){}
+  var name=localStorage.getItem('homme_name')||'';
+
+  // tokeni din mesaj
+  var hasTrist   = /trist|obosit|rău|nu mai pot|greu|singur|plâng|plang/i.test(l);
+  var hasFericit = /fericit|bucuros|super|minunat|reușit|reusit|câștigat|castigat/i.test(l);
+  var hasSomn    = /somn|dorm|culc|noapte bun[aă]|pa|la revedere/i.test(l);
+  var hasMancat  = /mâncat|mancat|mâncare|mancare|prânz|pranz|masă|masa|foame/i.test(l);
+  var hasObosit  = /obosit|obosită|epuizat|nu mai pot|leșin|lesin/i.test(l);
+  var hasMunca   = /muncă|munca|lucrat|lucrez|serviciu|job|șef|sef|colegi|proiect/i.test(l);
+  var hasStresat  = /stresat|stres|presiune|termen|deadline|nu știu cum/i.test(l);
+
+  // context personal din VVPL
+  var habitsAzi  = vvpl.filter(function(x){ return x.cat==='HABIT'&&(Date.now()-x.ts)<86400000; });
+  var prefsFood  = vvpl.filter(function(x){ return x.cat==='PREF'&&/mâncare|food|cafea|mancare/i.test(x.val); });
+
+  return{
+    name:name, time:time, mood:mood, tone:tone,
+    hasTrist:hasTrist, hasFericit:hasFericit, hasSomn:hasSomn,
+    hasMancat:hasMancat, hasObosit:hasObosit, hasMunca:hasMunca, hasStresat:hasStresat,
+    habitsAzi:habitsAzi, prefsFood:prefsFood
+  };
+}
+
+// ── VVBL — construiește răspuns situațional ──
+function vvbl_situational(msg){
+  var s=hic_read_situation(msg);
+  var n=s.name;
+
+  // NOAPTE + OBOSIT/TRIST + SOMN → răspuns cald de noapte
+  if(s.hasSomn&&(s.time.slot==='seară'||s.time.slot==='noapte')){
+    var extras=[];
+    if(s.prefsFood.length&&Math.random()<0.4) extras.push('Și mâine nu uita '+(s.prefsFood[0].val)+'.');
+    if(s.hasMunca) extras.push('Ai muncit destul azi.');
+    if(s.hasObosit||s.hasTrist) extras.push('Mâine e altă zi.');
+    var base=(n?n+', d':'D')+'u-te la somn. Patul te așteaptă.';
+    return base+(extras.length?' '+pickRandom(extras):'');
+  }
+
+  // TRIST + nu e noapte → empatie + eventual ceva personal
+  if(s.hasTrist&&!s.hasSomn){
+    var tristResp=[
+      (n?n+', s':'S')+'unt aici.',
+      'Ce s-a întâmplat?',
+      'Zi-mi dacă vrei să vorbim.'
+    ];
+    if(s.hasMunca) tristResp.push('Munca uneori face asta. Trece.');
+    return pickRandom(tristResp);
+  }
+
+  // OBOSIT → scurt, practic
+  if(s.hasObosit){
+    var obosResp=[
+      'Ia o pauză.',
+      (n?n+', o':'O')+'prește-te 10 minute.',
+      'Corpul tău știe când e destul.'
+    ];
+    if(s.time.slot==='după-amiază') obosResp.push('O cafea? Sau o plimbare scurtă.');
+    return pickRandom(obosResp);
+  }
+
+  // STRESAT → calm, ancorare
+  if(s.hasStresat){
+    return pickRandom([
+      'O problemă o dată. Care e cea mai urgentă?',
+      'Respiră. Ce trebuie rezolvat azi, nu mâine?',
+      (n?n+', n':'N')+'u totul trebuie rezolvat acum.'
+    ]);
+  }
+
+  // FERICIT → amplific
+  if(s.hasFericit){
+    return pickRandom([
+      (n?n+', m':'M')+'ă bucur pentru tine.',
+      'Asta contează.',
+      'Notează momentul — merită ținut minte.'
+    ]);
+  }
+
+  // MÂNCAT + VVPL cu preferințe → personalizat
+  if(s.hasMancat&&s.prefsFood.length){
+    return pickRandom([
+      'Ai mâncat bine? Știu că îți place '+s.prefsFood[0].val+'.',
+      'Sper că ai luat o pauză adevărată, nu doar un sandwich în grabă.'
+    ]);
+  }
+
+  return null; // nu e situațional — lasă think() să răspundă normal
+}
+
 // ── VV HiC — modulare răspuns după ton + timp ──
 function lea_soul_wrap(text){
   if(!text) return text;
   var tone=_userTone;
   var time=hic_time();
   var mood=vvpl_get_mood();
-  // dacă e grăbit — scurtăm răspunsul lung
   if(tone==='grăbit'&&text.length>300){
     var sentences=text.split(/[.!?]\s+/);
-    text=sentences.slice(0,2).join('. ')+(sentences.length>2?'.' :'');
+    text=sentences.slice(0,2).join('. ')+(sentences.length>2?'.':'');
   }
-  // prefix contextual seara/noapte cu mood
-  if((time.slot==='seară'||time.slot==='noapte')&&mood==='stresat'&&Math.random()<0.3){
-    text='Ești stresat — ia-o mai ușor cu tine. '+text;
+  if((time.slot==='seară'||time.slot==='noapte')&&mood==='stresat'&&Math.random()<0.25){
+    text='Ia-o mai ușor cu tine. '+text;
   }
   return text;
 }
@@ -3113,6 +3207,11 @@ async function think(msg){
     return{text:'Nu am putut traduce. Încearcă un text mai scurt.'};
   }
   if(intent==='debug'){_dbg=!_dbg;return{text:_dbg?'Mod diagnostic activ. Scrie din nou "debug" să oprești.':'Mod diagnostic oprit.'};}
+
+  // ── VVBL situațional — citește omul înainte să răspundă ──
+  var situational=vvbl_situational(msg);
+  if(situational) return{text:situational};
+
   if(intent==='salut') return{text:leaText('salut')};
   if(intent==='multumesc') return{text:leaText('multumesc')};
   // răspuns la "cum ești" — detectează starea și salvează în VVPL
