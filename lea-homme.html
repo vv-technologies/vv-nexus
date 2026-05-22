@@ -2807,6 +2807,12 @@ function detectIntent(msg){
   if(/\b(ieri|azi-noapte|ce s-a intamplat|ce s-a întâmplat|stiri|știri|news|trending|viral|ultima ora)\b/.test(l)) return'realtime';
   if(/\b(taskuri|task|sarcin[iae]|ce am de facut|ce mai am|lista de task|am ceva de facut|ce trebuie sa fac)\b/.test(l)) return'tasks';
   if(/^descrie.?mi aceast[aă] fotografie|fotografie din galerie|am.*fotografi.*galerie|ce e [iî]n fotografie|am o fotografie din galerie/i.test(l)) return'photo_describe';
+  // notițe — "notează X", "note despre X", "scrie o notiță"
+  if(/^(noteaz[aă]|notează|scrie\s+o\s+noti[tț][aă]|adaug[aă]\s+noti[tț][aă]|note\s+despre|note\s+rapid|note\s+de\s+)/i.test(l)) return'quick_note';
+  // întrebări personale/reflexive — nu Wikipedia
+  if(/^(ce\s+am\s+realizat|ce\s+am\s+f[aă]cut|cum\s+a\s+fost\s+ziua|ce\s+știu|ce\s+am\s+[iî]nv[aă][tț]at|ce\s+am\s+discutat|ce\s+[tș]tii\s+despre\s+mine|ce\s+știi\s+tu\s+despre\s+mine)\b/i.test(l)) return'personal_reflect';
+  // definiție directă — "ce e ala X", "ce înseamnă X" → extrage corect subiectul
+  if(/^ce\s+e\s+(ala|aia|acela|aceea|ăla|ăia)\s+/i.test(l)) return'define_direct';
   return'search';
 }
 
@@ -3109,6 +3115,36 @@ async function think(msg){
   if(intent==='founder'){_lastSearchSubject='Cosmin Toma';return{text:VV.founder};}
   if(intent==='philosophy') return{text:VV.philosophy};
   if(intent==='creative') return lea_creative(msg);
+  if(intent==='quick_note'){
+    var noteText=msg.replace(/^(noteaz[aă]|notează|scrie\s+o\s+noti[tț][aă]|adaug[aă]\s+noti[tț][aă]|note\s+despre|note\s+rapid|note\s+de\s+)/i,'').trim();
+    if(noteText){ note_quick_add(noteText); return{text:'📝 Am notat: "'+noteText+'". O găsești în Notițe.'}; }
+    win_open('note'); return{text:'Am deschis Notițele. Scrie ce vrei să reținem.'};
+  }
+  if(intent==='personal_reflect'){
+    var name=localStorage.getItem('homme_name')||'';
+    var vvpl=[]; try{ vvpl=JSON.parse(localStorage.getItem('homme_vvpl')||'[]'); }catch(e){}
+    var kb=kb_load();
+    var lastTopic=lea_get_topic();
+    var parts=[];
+    if(kb.length)       parts.push('ai în KB-ul tău '+kb.length+' lucru'+(kb.length===1?'':'ri')+' pe care mi le-ai explicat');
+    if(vvpl.length)     parts.push('am reținut '+vvpl.length+' tipare despre tine');
+    if(lastTopic)       parts.push('ultima dată am vorbit despre "'+lastTopic.subject+'"');
+    if(!parts.length)   return{text:(name?name+', î':'Î')+'ncă te cunosc puțin. Vorbim mai mult și cresc.'};
+    return{text:(name?name+', i':'I')+'ată ce știu: '+parts.join(', ')+'.'};
+  }
+  if(intent==='define_direct'){
+    var directSubj=msg.replace(/^ce\s+e\s+(ala|aia|acela|aceea|ăla|ăia)\s+/i,'').replace(/\?+$/,'').trim();
+    if(directSubj.length>1){
+      var kbD=kb_find(directSubj);
+      if(kbD) return kb_speak(kbD);
+    }
+    // fallback — lasă search să ruleze cu subiectul corect
+    var fakeMsg=directSubj;
+    var r=await searchWiki(fakeMsg);
+    if(r){ _lastSearchSubject=fakeMsg; _lastSearchResult=r; lea_save_topic(fakeMsg); return{text:null,wiki:r,formatted:formatWiki(r)}; }
+    _kbState='teach'; _kbPending={subject:directSubj};
+    return{text:'Nu știu despre "'+directSubj+'". Vrei să mă înveți?'};
+  }
 
   // ── KB lookup — înainte de Wikipedia ──
   var kbHit=kb_find(msg.trim());
