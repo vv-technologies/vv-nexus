@@ -1663,6 +1663,7 @@ function updateClock(){
     n.getHours().toString().padStart(2,'0')+':'+n.getMinutes().toString().padStart(2,'0');
 }
 updateClock(); setInterval(updateClock,10000);
+reminders_tick(); setInterval(reminders_tick,30000);
 
 // ── ICON POSITIONS ──
 var ICON_W = 100, ICON_H = 90, ICON_GAP = 14;
@@ -2702,50 +2703,50 @@ function getAppResponse(msg){
 
 
 function detectIntent(msg){
-  var l=msg.toLowerCase().trim();
+  var l=stripDiacritics(msg.toLowerCase().trim());
+  // l e fara diacritice — regex-urile nu mai au nevoie de [aă][tț] etc.
   if(/^(debug|diagnostic|diag|depanare)\s*$/.test(l)) return'debug';
-  if(/^(traduce|translate|übersetz|traduire|traduci|traduza)\s/i.test(l)) return'translate';
-  if(/^(salut|buna|bun[aă]|hello|hey|hi\b|servus|bonjour|hola|ciao|hallo|good morning|good evening)/.test(l)) return'salut';
-  if(/^a+lo+\b|^h+e+i+\b|^yo+\b|^o+h+\b|^a+h+\b|^e+h+\b|^m+d+a+\b|^o+k+\b|^o+k+a+y/i.test(l)) return'salut';
+  if(/^(traduce|translate|ubersetz|traduire|traduci|traduza)\s/.test(l)) return'translate';
+  if(/^(salut|buna|hello|hey|hi\b|servus|bonjour|hola|ciao|hallo|good morning|good evening)/.test(l)) return'salut';
+  if(/^a+lo+\b|^h+e+i+\b|^yo+\b|^o+h+\b|^a+h+\b|^e+h+\b|^m+d+a+\b|^o+k+\b|^o+k+a+y/.test(l)) return'salut';
   if(/multumesc|mersi|thanks/.test(l)) return'multumesc';
-  if(_lastSearchSubject&&/^(mai mult|detalii|continua|continuă|extinde|si ce|și ce altceva|spune mai mult|mai multe|mai info|explica|explică|aprofundeaz|ce mai stii|ce mai știi)/.test(l)) return'depth';
-  if(_lastSearchSubject&&/^(c[aâ][tț]i ani are|c[aâ]nd s-a n[aă]scut|de unde e|unde s-a nascut|ce a f[aă]cut|ce a inventat|cine e|cum arat|e viu|mai tr[aă]ie[sș]te|a murit|mai stii ceva|mai stii despre|mai mult despre)/.test(l)) return'follow_up';
+  if(_lastSearchSubject&&/^(mai mult|detalii|continua|extinde|si ce|spune mai mult|mai multe|mai info|explica|aprofundeaz|ce mai stii)/.test(l)) return'depth';
+  if(_lastSearchSubject&&/^(cati ani are|cand s-a nascut|de unde e|unde s-a nascut|ce a facut|ce a inventat|cine e|cum arata|e viu|mai traieste|a murit|mai stii ceva|mai stii despre|mai mult despre)/.test(l)) return'follow_up';
   if(/date personale|datele mele|ce stochezi|ce tii|ce ai despre mine|privacy|confidential|gdpr|sigur|esti sigura|protejat|protectia datelor|ce salvezi/.test(l)) return'privacy';
-  if(/versiunea local|versiunea personala|versiunea personală|descarca lea|download lea|lea local|cum descarc|unde descarc/.test(l)) return'download_local';
-  if(/descarc|download|instala|instalez|pun pe laptop|pun pe telefon|pe pc|îl am offline|o am offline/.test(l)) return'install';
-  if(/(am (un|o|niste)|mi-a venit|am primit|am de (analizat|citit|verificat)|vreau sa analizez|pot analiza|analizeaza.mi|citeste.mi).*(contract|pdf|document|factur|dosar|fisier|ofert|chitant|declarat|certificat|eseu|cv\b)/i.test(l)||(/(contract|pdf|document|factur[aă]|dosar|fisier|ofert[aă]).*(privat|local|fara server|fara upload|confidential)/i.test(l))) return'private_doc';
-  if(/cine ești|cine esti|ce ești|ce esti|despre tine|cum te chemi/.test(l)) return'cine';
-  if(/vreu?\s+s[aă]\s+m[aă]\s+aju[tț]|am\s+nevoie\s+de\s+tine|m[aă]\s+aju[tț]i|te\s+rog\s+s[aă]\s+m[aă]\s+aju[tț]|pot\s+s[aă]\s+te\s+rog|am\s+o\s+rugă/.test(l)) return'help_request';
-  if(/ce (poți|poti) face|cum (mă|ma) aju[tț]i|aju[tț]i\b/.test(l)) return'ce_poti';
-  if(/cum ești (construit|facut)|cum funcționezi|cum functionezi|arhitectur|cum e construit/.test(l)) return'cum_construit';
+  if(/versiunea local|versiunea personala|descarca lea|download lea|lea local|cum descarc|unde descarc/.test(l)) return'download_local';
+  if(/descarc|download|instala|instalez|pun pe laptop|pun pe telefon|pe pc|il am offline|o am offline/.test(l)) return'install';
+  if(/(am (un|o|niste)|mi-a venit|am primit|am de (analizat|citit|verificat)|vreau sa analizez|pot analiza|analizeaza.mi|citeste.mi).*(contract|pdf|document|factur|dosar|fisier|ofert|chitant|declarat|certificat|eseu|cv\b)/.test(l)||/(contract|pdf|document|factura|dosar|fisier|oferta).*(privat|local|fara server|fara upload|confidential)/.test(l)) return'private_doc';
+  if(/cine esti|ce esti|despre tine|cum te chemi/.test(l)) return'cine';
+  // ajutor / nevoie — inainte de creative ca sa nu scape
+  if(/vr(?:eau|eu)\s+sa\s+(?:imi\s+|ma\s+)?aju|am\s+nevoie\s+de\s+tine|ma\s+ajuti|te\s+rog\s+sa\s+ma\s+aju|am\s+o\s+ruga/.test(l)) return'help_request';
+  if(/ce\s+poti\s+face|cum\s+(?:ma\s+)?ajuti\b/.test(l)) return'ce_poti';
+  if(/cum\s+esti\s+(construit|facut)|cum\s+functionezi|arhitectur|cum\s+e\s+construit/.test(l)) return'cum_construit';
   if(/vv his|vv hig|vv hib|vv hia|trilogy|limbaj vv|pattern language|behavior language/.test(l)) return'trilogy';
-  if(/^(f[aă].?mi|scrie.?mi|gen[e]?reaz[aă]|cre[ae]z[aă]|compune|inventeaz[aă]).*(o |un |ceva )?(poezie|poem|text|mesaj|articol|eseu|scrisoare|poveste|idee|glum[aă]|banc)/i.test(l)) return'creative';
-  if(/^(fa|scrie|genereaza|creeaza|compune|inventeaza)\b.*(poem|song|story|joke|essay)/i.test(l)) return'creative';
-  if(/(?:vreu?|vrei|hai)\s+(?:s[aă]\s+)?(?:[iî]mi\s+)?(?:spui?|spune.?mi|zici?)\s+(?:o\s+)?(?:glum[aă]|banc|poezi[e]|poveste)/i.test(l)) return'creative';
-  if(/^spune.?mi\s+(?:o\s+)?(?:glum[aă]|banc|poezi[e]|poveste|mesaj)/i.test(l)) return'creative';
-  if(/\b(?:glum[aă]|bancuri?)\b.*\b(?:spune|zice|dai?|f[aă]|scrie)\b|\b(?:spune|zice|dai?|f[aă]|scrie)\b.*\b(?:glum[aă]|bancuri?)\b/i.test(l)) return'creative';
+  // remindere — inainte de note ca sa nu scape
+  if(/reamintest?e.?mi|reminder|reaminte|pune.?mi\s+un\s+(reminder|alarm|semnal)|seteaza\s+un\s+(reminder|alarm)|notita\s+pentru\s+(?:maine|azi|ora\s+\d)|salveaza.*(pentru\s+(maine|azi|ora)|la\s+ora\s+\d)|la\s+ora\s+\d.*(reaminteste|spune.?mi|anunta)/.test(l)) return'set_reminder';
+  if(/vr(?:eau|eu)\s+(?:sa\s+)?(?:imi\s+)?(?:salvezi|creezi|faci)\s+o\s+notita/.test(l)) return'lea_write_note';
+  if(/^(fa.?mi|scrie.?mi|genereaza|creeaza|compune|inventeaza).*(o |un |ceva )?(poezie|poem|text|mesaj|articol|eseu|scrisoare|poveste|idee|gluma|banc)/.test(l)) return'creative';
+  if(/^(fa|scrie|genereaza|creeaza|compune|inventeaza)\b.*(poem|song|story|joke|essay)/.test(l)) return'creative';
+  if(/vr(?:eau|eu|ei)\s+(?:sa\s+)?(?:imi\s+)?(?:spui?|spune.?mi|zici?)\s+(?:o\s+)?(?:gluma|banc|poezie|poveste)/.test(l)) return'creative';
+  if(/^spune.?mi\s+(?:o\s+)?(?:gluma|banc|poezie|poveste|mesaj)/.test(l)) return'creative';
+  if(/\b(?:gluma|bancuri?)\b.*\b(?:spune|zice|dai?|fa|scrie)\b|\b(?:spune|zice|dai?|fa|scrie)\b.*\b(?:gluma|bancuri?)\b/.test(l)) return'creative';
   if(/\b(lea|nexus|pulse map|vv pulse|vv write|vv now|vv me)\b|vvpulse|vvwrite|vvscout|vveil|vv studio/.test(l)) return'app';
   if(/ce e vv|ce este vv|vv hybrid|ecosistem vv|vv technologies/.test(l)) return'vv';
   if(/\bcosmin\b/.test(l)||/\bcine a (facut|creat|fondat)\s+(vv|lea|hilea|asta|asa ceva)\b/.test(l)) return'founder';
   if(/filozofie|filosofie|principii|local.?first|suveranitate/.test(l)) return'philosophy';
-  if(/\d+\s*[\+\-\*\/]\s*\d/.test(l)||(/\b(c[aâ]t\s+e|c[aâ]t\s+face|calculeaz[aă])\b/.test(l)&&/\d/.test(l))||/\d+\s*%\s*din\s*\d/.test(l)) return'calculator';
-  if(/\b(urgenta|urgentă|smurd|salvamont|telefonul copilului|violenta domestica|sinucid|suicid|antisuicid|numar.?urgent|număr.?urgent|pompieri|ambulanț[aă]|ambulanta)\b/.test(l)||/\b(num[aă]r|numar|nr|telefon)\b.*\b(urgent[aă]|salvare|ajutor|pompieri|ambulanț[aă]|ambulanta|poliți[ei]|politie|smurd)\b/.test(l)) return'emergency';
-  if(/\b(spital[e]?|farmaci[ei]|hotel[uri]*|hostel|cazare|restaurant[e]?|muzeu|muzee|monument[e]?|aeroport|gar[aă]|parc)\b/.test(l)&&(/(din|în|la|lângă|langa|unde sunt|unde se|unde e|cel mai|aproape de)/.test(l)||/\b(bucuresti|bucurești|cluj|timisoara|timișoara|iasi|iași|constanta|constanța|brasov|brașov|craiova|oradea|sibiu|pitesti|pitești|bacau|bacău|suceava|galati|galați|ploiesti|ploiești|baia mare|arad|buzau|buzău|alba iulia|targu mures)\b/.test(l))) return'location';
-  if(/\b(vremea|vreme|meteo|temperatura|ploua|ninge|prognoza|forecast)\b/.test(l)||/cum (e|este|o fi|va fi) (vremea|vreme|temperatura|timpul)/.test(l)) return'weather';
-  if(/\b(ieri|azi-noapte|ce s-a intamplat|ce s-a întâmplat|stiri|știri|news|trending|viral|ultima ora)\b/.test(l)) return'realtime';
-  if(/\b(taskuri|task|sarcin[iae]|ce am de facut|ce mai am|lista de task|am ceva de facut|ce trebuie sa fac)\b/.test(l)) return'tasks';
-  if(/^descrie.?mi aceast[aă] fotografie|fotografie din galerie|am.*fotografi.*galerie|ce e [iî]n fotografie|am o fotografie din galerie/i.test(l)) return'photo_describe';
-  // notițe — "notează X", "note despre X", "scrie o notiță"
-  if(/^(noteaz[aă]|notează|scrie\s+o\s+noti[tț][aă]|adaug[aă]\s+noti[tț][aă]|note\s+despre|note\s+rapid|note\s+de\s+)/i.test(l)) return'quick_note';
-  // întrebări personale/reflexive — nu Wikipedia
-  if(/^(ce\s+am\s+realizat|ce\s+am\s+f[aă]cut|cum\s+a\s+fost\s+ziua|ce\s+știu|ce\s+am\s+[iî]nv[aă][tț]at|ce\s+am\s+discutat|ce\s+[tș]tii\s+despre\s+mine|ce\s+știi\s+tu\s+despre\s+mine)\b/i.test(l)) return'personal_reflect';
-  // definiție directă — "ce e ala X", "ce e un X", "ce înseamnă X"
-  if(/^ce\s+(?:e|este|[iî]nseamn[aă])\s+(?:ala|aia|acela|aceea|ăla|ăia|un|o|cel|cea)?\s*\S/i.test(l)) return'define_direct';
-  // Lea scrie în fișiere
-  if(/^(scrie[- ]?[tț]i|noteaz[aă][- ]?[tț]i|f[aă][- ]?[tț]i\s+o\s+noti[tț][aă]|creeaz[aă][- ]?o\s+noti[tț][aă])\b/i.test(l)) return'lea_write_note';
-  if(/^(f[aă]\s+un\s+folder|creeaz[aă]\s+un\s+folder|folder\s+nou|dosar\s+nou)\b/i.test(l)) return'lea_make_folder';
-  if(/^(arat[aă][- ]?mi\s+jurnalul|ce\s+ai\s+scris|jurnal(ul)?\s+(t[aă]u|lea)|deschide\s+jurnalul)\b/i.test(l)) return'lea_show_journal';
-  if(/^(salveaz[aă]\s+asta|salveaz[aă]\s+r[aă]spunsul|pune\s+[iî]n\s+fi[sș]iere|salveaz[aă]\s+[iî]n\s+fi[sș]iere)\b/i.test(l)) return'lea_save_last';
+  if(/\d+\s*[\+\-\*\/]\s*\d/.test(l)||(/\b(cat\s+e|cat\s+face|calculeaza)\b/.test(l)&&/\d/.test(l))||/\d+\s*%\s*din\s*\d/.test(l)) return'calculator';
+  if(/\b(urgenta|smurd|salvamont|telefonul copilului|violenta domestica|sinucid|suicid|numar.?urgent|pompieri|ambulanta)\b/.test(l)||/\b(numar|nr|telefon)\b.*\b(urgenta|salvare|ajutor|pompieri|ambulanta|politie|smurd)\b/.test(l)) return'emergency';
+  if(/\b(spital|farmacie|hotel|hostel|cazare|restaurant|muzeu|monument|aeroport|gara|parc)\b/.test(l)&&/(din|in|la|langa|unde sunt|unde se|unde e|cel mai|aproape de)/.test(l)) return'location';
+  if(/\b(vremea|vreme|meteo|temperatura|ploua|ninge|prognoza|forecast)\b/.test(l)||/cum\s+(e|este|o\s+fi|va\s+fi)\s+(vremea|vreme|temperatura|timpul)/.test(l)) return'weather';
+  if(/\b(ieri|azi-noapte|ce s-a intamplat|stiri|news|trending|viral|ultima ora)\b/.test(l)) return'realtime';
+  if(/\b(taskuri|task|sarcini|ce am de facut|ce mai am|lista de task|am ceva de facut|ce trebuie sa fac)\b/.test(l)) return'tasks';
+  if(/^(noteaza|scrie\s+o\s+notita|adauga\s+notita|note\s+despre|note\s+rapid|note\s+de\s+)/.test(l)) return'quick_note';
+  if(/^(ce\s+am\s+realizat|ce\s+am\s+facut|cum\s+a\s+fost\s+ziua|ce\s+stiu|ce\s+am\s+invatat|ce\s+am\s+discutat|ce\s+stii\s+despre\s+mine)\b/.test(l)) return'personal_reflect';
+  if(/^ce\s+(?:e|este|inseamna)\s+(?:ala|aia|acela|aceea|un|o|cel|cea)?\s*\S/.test(l)) return'define_direct';
+  if(/^(scrie.?ti|noteaza.?ti|fa.?ti\s+o\s+notita|creeaza.?o\s+notita)\b/.test(l)) return'lea_write_note';
+  if(/^(fa\s+un\s+folder|creeaza\s+un\s+folder|folder\s+nou|dosar\s+nou)\b/.test(l)) return'lea_make_folder';
+  if(/^(arata.?mi\s+jurnalul|ce\s+ai\s+scris|jurnalul\s+(tau|lea)|deschide\s+jurnalul)\b/.test(l)) return'lea_show_journal';
+  if(/^(salveaza\s+asta|salveaza\s+raspunsul|pune\s+in\s+fisiere|salveaza\s+in\s+fisiere)\b/.test(l)) return'lea_save_last';
   return'search';
 }
 
@@ -3012,6 +3013,8 @@ function lea_maybe_ask_how_you_are(){
   setTimeout(function(){ homme_addMsg('lea',{text:questions}); },1200);
 }
 
+// ── Reminder state machine ──
+var _remState=null, _remPendingTs=null, _remPendingContent=null;
 // ── VV KB — Knowledge Base personal ──
 var _kbState  = null;   // null | 'teach' | 'confirm'
 var _kbPending = null;  // {subject, answer}
@@ -3079,6 +3082,25 @@ async function think(msg){
     lea_journal_entry('Am aflat despre "'+savedSubject+'": '+finalAns.substring(0,100)+(finalAns.length>100?'...':''));
     _kbState=null; _kbPending=null;
     return{text:'✓ Salvat în KB-ul tău. Data viitoare când te întrebi despre "'+savedSubject+'" — știu.'};
+  }
+
+  // ── Reminder state machine ──
+  if(_remState==='pending_content'){
+    var remText=msg.trim();
+    reminder_add(remText, _remPendingTs);
+    var remWhen=reminders_format_ts(_remPendingTs);
+    _remState=null; _remPendingTs=null;
+    lea_journal_entry('Reminder setat: "'+remText+'" pentru '+remWhen+'.');
+    return{text:'⏰ Setat — îți amintesc "'+remText+'" '+remWhen+'.'};
+  }
+  if(_remState==='pending_time'){
+    var rTs2=reminder_parse_time(msg);
+    if(!rTs2) return{text:'Nu am înțeles ora. Încearcă: "la ora 9" sau "mâine la 14".'};
+    reminder_add(_remPendingContent, rTs2);
+    var remWhen2=reminders_format_ts(rTs2);
+    _remState=null; _remPendingContent=null;
+    lea_journal_entry('Reminder setat: "'+_remPendingContent+'" pentru '+remWhen2+'.');
+    return{text:'⏰ Setat — îți amintesc "'+_remPendingContent+'" '+remWhen2+'.'};
   }
 
   var safety=safetyCheck(msg);
@@ -3149,6 +3171,27 @@ async function think(msg){
   if(intent==='download_local'){setTimeout(openDownload,400);return{text:'LEA Local trăiește pe laptopul tău — te cunoaște, funcționează offline, niciun document nu pleacă nicăieri.'};}
   if(intent==='private_doc'){return{gateway:true};}
   if(intent==='privacy'){setTimeout(openPrivacy,400);return{text:'Transparență completă. Nimic pe server. Tot ce știu despre tine trăiește exclusiv pe device-ul tău — nu pot accesa nimic din exterior.'};}
+  // ── Reminder ──
+  if(intent==='set_reminder'){
+    var rTs=reminder_parse_time(msg);
+    var rContent=reminder_parse_content(msg);
+    if(rTs&&rContent){
+      reminder_add(rContent, rTs);
+      var rWhen=reminders_format_ts(rTs);
+      lea_journal_entry('Reminder setat: "'+rContent+'" pentru '+rWhen+'.');
+      return{text:'⏰ Setat — îți amintesc "'+rContent+'" '+rWhen+'.'};
+    }
+    if(rTs&&!rContent){
+      _remState='pending_content'; _remPendingTs=rTs;
+      return{text:'Ok, la '+reminders_format_ts(rTs)+'. Ce vrei să-ți amintesc?'};
+    }
+    if(rContent&&!rTs){
+      _remState='pending_time'; _remPendingContent=rContent;
+      return{text:'Am notat "'+rContent+'". La ce oră? (ex: "la ora 9" sau "mâine la 14")'};
+    }
+    _remState='pending_content'; _remPendingTs=Date.now()+3600000;
+    return{text:'Când vrei să-ți amintesc? (ex: "la ora 9", "mâine la 8")'};
+  }
   // ── Lea scrie singură ──
   if(intent==='lea_write_note'){
     var noteRaw=msg.replace(/^(scrie[- ]?[tț]i|noteaz[aă][- ]?[tț]i|f[aă][- ]?[tț]i\s+o\s+noti[tț][aă]|creeaz[aă][- ]?o\s+noti[tț][aă])\s*(o\s+noti[tț][aă]\s+)?(despre\s+)?/i,'').replace(/\?+$/,'').trim();
@@ -4766,6 +4809,62 @@ function files_load(){
 }
 function files_save_all(arr){
   try{ localStorage.setItem('homme_files', JSON.stringify(arr)); }catch(e){ toast('⚠️ Stocaj plin'); }
+}
+// ── Remindere ──
+function reminders_load(){ try{return JSON.parse(localStorage.getItem('homme_reminders')||'[]');}catch(e){return[];} }
+function reminders_save(arr){ try{localStorage.setItem('homme_reminders',JSON.stringify(arr));}catch(e){} }
+function reminder_add(text, ts){
+  var arr=reminders_load();
+  arr.push({id:'r'+Date.now(), text:text, ts:ts, done:false});
+  reminders_save(arr);
+}
+function reminder_parse_time(msg){
+  var l=stripDiacritics(msg.toLowerCase());
+  var d=new Date(); var h=null,min=0;
+  var mHour=l.match(/la\s+ora\s+(\d{1,2})(?:[:\.](\d{2}))?/)||l.match(/ora\s+(\d{1,2})(?:[:\.](\d{2}))?/)||l.match(/\bla\s+(\d{1,2}):(\d{2})\b/)||l.match(/\bla\s+(\d{1,2})\b/);
+  if(mHour){h=parseInt(mHour[1]);min=mHour[2]?parseInt(mHour[2]):0;}
+  var mTime=l.match(/\b(\d{1,2}):(\d{2})\b/);
+  if(mTime&&h===null){h=parseInt(mTime[1]);min=parseInt(mTime[2]);}
+  if(h===null) return null;
+  var target=new Date();
+  if(/maine/.test(l)) target.setDate(target.getDate()+1);
+  target.setHours(h,min,0,0);
+  if(target<=new Date()&&!/maine/.test(l)) target.setDate(target.getDate()+1);
+  return target.getTime();
+}
+function reminder_parse_content(msg){
+  var l=stripDiacritics(msg.toLowerCase());
+  var clean=l
+    .replace(/reaminteste.?mi\s+(?:sa\s+)?/,'')
+    .replace(/pune.?mi\s+un\s+(?:reminder|alarm)\s+(?:sa\s+|pentru\s+|ca\s+)?/,'')
+    .replace(/seteaza\s+un\s+(?:reminder|alarm)\s+(?:sa\s+|pentru\s+|ca\s+)?/,'')
+    .replace(/vr(?:eau|eu)\s+(?:sa\s+)?(?:imi\s+)?(?:salvezi|creezi|faci)\s+o\s+notita\s+(?:pentru\s+)?/,'')
+    .replace(/salveaza.*?(?:pentru\s+)?/,'')
+    .replace(/(?:pentru\s+)?(?:maine|azi)\s+(?:dimineata\s+)?(?:la\s+ora\s+\d{1,2}(?:[:\.]?\d{0,2})?)?/g,'')
+    .replace(/(?:la\s+ora\s+\d{1,2}(?:[:\.]?\d{0,2})?)/g,'')
+    .replace(/\s{2,}/g,' ').trim();
+  return clean&&clean.length>2?clean:null;
+}
+function reminders_format_ts(ts){
+  var d=new Date(ts);
+  var azi=new Date(); var maine=new Date(); maine.setDate(azi.getDate()+1);
+  var timeStr=d.toLocaleTimeString('ro-RO',{hour:'2-digit',minute:'2-digit'});
+  if(d.toDateString()===azi.toDateString()) return 'azi la '+timeStr;
+  if(d.toDateString()===maine.toDateString()) return 'mâine la '+timeStr;
+  return d.toLocaleDateString('ro-RO',{day:'2-digit',month:'short'})+' la '+timeStr;
+}
+function reminders_tick(){
+  var arr=reminders_load(); var now=Date.now(); var changed=false;
+  arr.forEach(function(r){
+    if(!r.done&&r.ts<=now){
+      r.done=true; changed=true;
+      win_open('chat');
+      homme_addMsg('lea',{text:'⏰ Reminder: '+r.text});
+      toast('⏰ '+r.text);
+      lea_journal_entry('Reminder declansat: "'+r.text+'".');
+    }
+  });
+  if(changed) reminders_save(arr);
 }
 // ── Lea scrie singură în fișiere ──
 function lea_file_write(name, content){
