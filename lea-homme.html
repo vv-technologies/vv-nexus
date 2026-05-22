@@ -987,6 +987,11 @@ textarea::placeholder{color:rgba(255,255,255,.2)}
     <div class="icon-label">VV Galerie<br><span style="color:rgba(var(--ac),.42)">amintiri</span></div>
   </div>
 
+  <div class="icon" id="icon-ask" onclick="window.open('vv-lea-ask.html','_blank')" ondragstart="return false" style="cursor:pointer">
+    <div class="icon-emoji">🔍</div>
+    <div class="icon-label">Lea Ask<br><span style="color:rgba(var(--gold),.55)">învaț-o</span></div>
+  </div>
+
 
 </div>
 
@@ -3235,7 +3240,8 @@ async function think(msg){
   cleanSubject=ro_normalize(cleanSubject||msg.trim());
   _kbState='teach';
   _kbPending={subject:cleanSubject};
-  return{text:(name?name+', n':'N')+'u știu despre "'+cleanSubject+'". Vrei să mă înveți? Spune-mi ce e și rețin pentru data viitoare.'};
+  localStorage.setItem('vv_ask_subject', cleanSubject);
+  return{text:(name?name+', n':'N')+'u știu despre "'+cleanSubject+'". Spune-mi tu, sau caută în <b>🔍 Lea Ask</b> și trimite-mi răspunsul de acolo.'};
 }
 
 // ── CHAT PERSISTENȚĂ ──
@@ -4836,6 +4842,22 @@ function files_init(){
   if(files.length) files_open(files[0].id);
   else files_render();
 }
+
+// ── Lea Ask listener — preia răspunsul când revii din Ask ──
+window.addEventListener('focus', function(){
+  var pending = localStorage.getItem('vv_ask_pending');
+  if(!pending) return;
+  try{
+    var p = JSON.parse(pending);
+    localStorage.removeItem('vv_ask_pending');
+    if(!p.subject||!p.answer) return;
+    kb_add(p.subject, p.answer);
+    _kbState=null; _kbPending=null;
+    setTimeout(function(){
+      homme_addMsg('lea',{text:'📚 Am primit de la Ask! Am reținut ce înseamnă "'+p.subject+'". Mulțumesc.'});
+    },400);
+  }catch(e){}
+});
 
 // keyboard ESC pentru voice + lightbox
 document.addEventListener('keydown',function(e){
