@@ -2815,6 +2815,7 @@ function detectIntent(msg){
   if(/^(debug|diagnostic|diag|depanare)\s*$/.test(l)) return'debug';
   if(/^(traduce|translate|übersetz|traduire|traduci|traduza)\s/i.test(l)) return'translate';
   if(/^(salut|buna|bun[aă]|hello|hey|hi\b|servus|bonjour|hola|ciao|hallo|good morning|good evening)/.test(l)) return'salut';
+  if(/^a+lo+\b|^h+e+i+\b|^yo+\b|^o+h+\b|^a+h+\b|^e+h+\b|^m+d+a+\b|^o+k+\b|^o+k+a+y/i.test(l)) return'salut';
   if(/multumesc|mersi|thanks/.test(l)) return'multumesc';
   if(_lastSearchSubject&&/^(mai mult|detalii|continua|continuă|extinde|si ce|și ce altceva|spune mai mult|mai multe|mai info|explica|explică|aprofundeaz|ce mai stii|ce mai știi)/.test(l)) return'depth';
   if(_lastSearchSubject&&/^(c[aâ][tț]i ani are|c[aâ]nd s-a n[aă]scut|de unde e|unde s-a nascut|ce a f[aă]cut|ce a inventat|cine e|cum arat|e viu|mai tr[aă]ie[sș]te|a murit|mai stii ceva|mai stii despre|mai mult despre)/.test(l)) return'follow_up';
@@ -3001,6 +3002,11 @@ function kb_find(subject){
   }
   return null;
 }
+function kb_delete(subject){
+  var kb=kb_load();
+  var s=(subject||'').toLowerCase().trim();
+  kb_save(kb.filter(function(x){return x.subject.toLowerCase()!==s;}));
+}
 function kb_add(subject, answer){
   var kb=kb_load();
   var s=(subject||'').toLowerCase().trim();
@@ -3078,6 +3084,9 @@ async function think(msg){
   if(intent==='debug'){_dbg=!_dbg;return{text:_dbg?'Mod diagnostic activ. Scrie din nou "debug" să oprești.':'Mod diagnostic oprit.'};}
   if(intent==='salut') return{text:leaText('salut')};
   if(intent==='multumesc') return{text:leaText('multumesc')};
+  // uită / șterge din KB
+  var forgetM=msg.match(/^(?:uit[aă]|șterge|sterge|uita|scoate din memorie|nu mai știi|nu mai stii)\s+(.+)/i);
+  if(forgetM){ var toForget=forgetM[1].replace(/\?+$/,'').trim(); kb_delete(toForget); return{text:'Am uitat "'+toForget+'". Nu mai știu asta.'}; }
   if(intent==='depth'){
     if(_lastSearchResult&&_lastSearchResult.title){
       var fullText=await searchWikiFullIntro(_lastSearchResult.title);
@@ -3253,6 +3262,13 @@ async function think(msg){
   var name=localStorage.getItem('homme_name')||'';
   var cleanSubject=(subject&&subject.length>2&&subject.split(' ').length<=5)?subject:extractSubject(msg.toLowerCase());
   cleanSubject=ro_normalize(cleanSubject||msg.trim());
+  // nu intra in KB pentru expresii sociale, cuvinte scurte, frustrari
+  var isSocial=/^(ok|da|nu|aha|mda|hmm+|uh+|ah+|oh+|alo+|hei+|hey+|hai|bine|super|tare|merge|gata|stop|pauza|ajutor|salut|ciao|pa|bb)\b/i.test(cleanSubject.trim());
+  var isTooShort=cleanSubject.trim().length<3;
+  var isCommand=/^(opreste|inceteaza|încetează|taci|gata|stop|ajunge|destul|nu mai|lasa|lasă)/i.test(msg.trim());
+  if(isSocial||isTooShort||isCommand){
+    return{text:(name?name+', s':'S')+'unt aici. Ce vrei să știi?'};
+  }
   _kbState='teach';
   _kbPending={subject:cleanSubject};
   localStorage.setItem('vv_ask_subject', cleanSubject);
