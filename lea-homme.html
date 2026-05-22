@@ -2715,7 +2715,8 @@ function detectIntent(msg){
   if(/descarc|download|instala|instalez|pun pe laptop|pun pe telefon|pe pc|îl am offline|o am offline/.test(l)) return'install';
   if(/(am (un|o|niste)|mi-a venit|am primit|am de (analizat|citit|verificat)|vreau sa analizez|pot analiza|analizeaza.mi|citeste.mi).*(contract|pdf|document|factur|dosar|fisier|ofert|chitant|declarat|certificat|eseu|cv\b)/i.test(l)||(/(contract|pdf|document|factur[aă]|dosar|fisier|ofert[aă]).*(privat|local|fara server|fara upload|confidential)/i.test(l))) return'private_doc';
   if(/cine ești|cine esti|ce ești|ce esti|despre tine|cum te chemi/.test(l)) return'cine';
-  if(/ce (poți|poti) face|cum (mă|ma) ajuți|ajuți/.test(l)) return'ce_poti';
+  if(/vreu?\s+s[aă]\s+m[aă]\s+aju[tț]|am\s+nevoie\s+de\s+tine|m[aă]\s+aju[tț]i|te\s+rog\s+s[aă]\s+m[aă]\s+aju[tț]|pot\s+s[aă]\s+te\s+rog|am\s+o\s+rugă/.test(l)) return'help_request';
+  if(/ce (poți|poti) face|cum (mă|ma) aju[tț]i|aju[tț]i\b/.test(l)) return'ce_poti';
   if(/cum ești (construit|facut)|cum funcționezi|cum functionezi|arhitectur|cum e construit/.test(l)) return'cum_construit';
   if(/vv his|vv hig|vv hib|vv hia|trilogy|limbaj vv|pattern language|behavior language/.test(l)) return'trilogy';
   if(/^(f[aă].?mi|scrie.?mi|gen[e]?reaz[aă]|cre[ae]z[aă]|compune|inventeaz[aă]).*(o |un |ceva )?(poezie|poem|text|mesaj|articol|eseu|scrisoare|poveste|idee|glum[aă]|banc)/i.test(l)) return'creative';
@@ -3183,6 +3184,7 @@ async function think(msg){
     var _list=_actT.slice(0,6).map(function(t,i){return (i+1)+'. '+t.text+' ['+t.tag+']';}).join('\n');
     return{text:'Taskuri active ('+_actT.length+'):\n\n'+_list+(_actT.length>6?'\n…și '+(_actT.length-6)+' mai multe':'')};
   }
+  if(intent==='help_request'){var _hn=localStorage.getItem('homme_name')||'';return{text:(_hn?_hn+', s':'S')+'unt aici. Spune-mi ce vrei să faci.'};}
   if(intent==='cine') return{text:leaText('cine')};
   if(intent==='ce_poti') return{text:leaText('ce_poti')};
   if(intent==='cum_construit') return{text:leaResponses.cum_construit};
@@ -3244,7 +3246,7 @@ async function think(msg){
   var cleanSubject=(subject&&subject.length>2&&subject.split(' ').length<=5)?subject:extractSubject(msg.toLowerCase());
   cleanSubject=ro_normalize(cleanSubject||msg.trim());
   // nu intra in KB pentru expresii sociale, cuvinte scurte, frustrari
-  var isSocial=/^(ok|da|nu|aha|mda|hmm+|uh+|ah+|oh+|alo+|hei+|hey+|hai|bine|super|tare|merge|gata|stop|pauza|ajutor|salut|ciao|pa|bb)\b/i.test(cleanSubject.trim());
+  var isSocial=/^(ok|da|nu|aha|mda|hmm+|uh+|ah+|oh+|alo+|hei+|hey+|hai|bine|super|tare|merge|gata|stop|pauza|ajutor|salut|ciao|pa|bb)\b/i.test(cleanSubject.trim())||/vreu?\s+s[aă]\s+m[aă]\s+aju[tț]|am\s+nevoie\s+de\s+tine|am\s+nevoie\s+de\s+ajutor/i.test(msg.trim());
   var isTooShort=cleanSubject.trim().length<3;
   var isCommand=/^(opreste|inceteaza|încetează|taci|gata|stop|ajunge|destul|nu mai|lasa|lasă)/i.test(msg.trim());
   if(isSocial||isTooShort||isCommand){
