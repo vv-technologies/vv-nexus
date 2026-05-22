@@ -2308,7 +2308,7 @@ function openDownload(){ toast('💾 Descarcă LEA locală: deschide lea.html pe
 function openPrivacy() { toast('🔒 Zero server · Zero tracking · 100% local pe device-ul tău'); }
 
 // engine state
-var _userLang='ro', _lastSearchSubject='', _lastSearchResult=null;
+var _userLang='ro', _lastSearchSubject='', _lastSearchResult=null, _lastLeaText='';
 var _dbg=false, _dbgTrace=[], _chatMsgCount=0;
 
 function pickRandom(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
@@ -2741,6 +2741,11 @@ function detectIntent(msg){
   if(/^(ce\s+am\s+realizat|ce\s+am\s+f[aă]cut|cum\s+a\s+fost\s+ziua|ce\s+știu|ce\s+am\s+[iî]nv[aă][tț]at|ce\s+am\s+discutat|ce\s+[tș]tii\s+despre\s+mine|ce\s+știi\s+tu\s+despre\s+mine)\b/i.test(l)) return'personal_reflect';
   // definiție directă — "ce e ala X", "ce e un X", "ce înseamnă X"
   if(/^ce\s+(?:e|este|[iî]nseamn[aă])\s+(?:ala|aia|acela|aceea|ăla|ăia|un|o|cel|cea)?\s*\S/i.test(l)) return'define_direct';
+  // Lea scrie în fișiere
+  if(/^(scrie[- ]?[tț]i|noteaz[aă][- ]?[tț]i|f[aă][- ]?[tț]i\s+o\s+noti[tț][aă]|creeaz[aă][- ]?o\s+noti[tț][aă])\b/i.test(l)) return'lea_write_note';
+  if(/^(f[aă]\s+un\s+folder|creeaz[aă]\s+un\s+folder|folder\s+nou|dosar\s+nou)\b/i.test(l)) return'lea_make_folder';
+  if(/^(arat[aă][- ]?mi\s+jurnalul|ce\s+ai\s+scris|jurnal(ul)?\s+(t[aă]u|lea)|deschide\s+jurnalul)\b/i.test(l)) return'lea_show_journal';
+  if(/^(salveaz[aă]\s+asta|salveaz[aă]\s+r[aă]spunsul|pune\s+[iî]n\s+fi[sș]iere|salveaz[aă]\s+[iî]n\s+fi[sș]iere)\b/i.test(l)) return'lea_save_last';
   return'search';
 }
 
@@ -3068,12 +3073,10 @@ async function think(msg){
   }
   if(_kbState==='confirm'){
     var isOk=/^(da|corect|exact|perfect|bun|ok|yes|e bine|e ok)\b/i.test(msg.trim());
-    if(isOk){
-      kb_add(_kbPending.subject, _kbPending.answer);
-    } else {
-      kb_add(_kbPending.subject, msg.trim());
-    }
+    var finalAns=isOk?_kbPending.answer:msg.trim();
+    kb_add(_kbPending.subject, finalAns);
     var savedSubject=_kbPending.subject;
+    lea_journal_entry('Am aflat despre "'+savedSubject+'": '+finalAns.substring(0,100)+(finalAns.length>100?'...':''));
     _kbState=null; _kbPending=null;
     return{text:'✓ Salvat în KB-ul tău. Data viitoare când te întrebi despre "'+savedSubject+'" — știu.'};
   }
@@ -3146,6 +3149,44 @@ async function think(msg){
   if(intent==='download_local'){setTimeout(openDownload,400);return{text:'LEA Local trăiește pe laptopul tău — te cunoaște, funcționează offline, niciun document nu pleacă nicăieri.'};}
   if(intent==='private_doc'){return{gateway:true};}
   if(intent==='privacy'){setTimeout(openPrivacy,400);return{text:'Transparență completă. Nimic pe server. Tot ce știu despre tine trăiește exclusiv pe device-ul tău — nu pot accesa nimic din exterior.'};}
+  // ── Lea scrie singură ──
+  if(intent==='lea_write_note'){
+    var noteRaw=msg.replace(/^(scrie[- ]?[tț]i|noteaz[aă][- ]?[tț]i|f[aă][- ]?[tț]i\s+o\s+noti[tț][aă]|creeaz[aă][- ]?o\s+noti[tț][aă])\s*(o\s+noti[tț][aă]\s+)?(despre\s+)?/i,'').replace(/\?+$/,'').trim();
+    var noteTitle=noteRaw||'generală';
+    var noteName='Notă — '+noteTitle+'.txt';
+    var kbNote=kb_find(noteTitle);
+    var noteBody=kbNote?'Subiect: '+noteTitle+'\n\n'+kbNote.answer:'Notă: '+noteTitle+'\n\n—';
+    lea_file_write(noteName, noteBody);
+    lea_journal_entry('Am creat notița "'+noteName+'".');
+    setTimeout(function(){win_open('fisiere');},300);
+    return{text:'Am creat notița "'+noteName+'" în Fișiere.'};
+  }
+  if(intent==='lea_make_folder'){
+    var folderRaw=msg.replace(/^(f[aă]\s+un\s+folder|creeaz[aă]\s+un\s+folder|folder\s+nou|dosar\s+nou)\s*/i,'').replace(/\?+$/,'').trim();
+    var folderTitle=folderRaw||'Nou';
+    var folderName='📁 '+folderTitle+' /';
+    var d=new Date().toLocaleDateString('ro-RO');
+    lea_file_write(folderName,'— folder creat de Lea pe '+d+' —\n\n');
+    lea_journal_entry('Am creat folderul "'+folderTitle+'".');
+    setTimeout(function(){win_open('fisiere');},300);
+    return{text:'Folder "'+folderTitle+'" creat în Fișiere.'};
+  }
+  if(intent==='lea_show_journal'){
+    var jAll=files_load();
+    var jf=jAll.find(function(x){return x.name==='Jurnal Lea.txt';});
+    if(!jf||!jf.content.trim()) return{text:'Jurnalul meu e gol deocamdată. Scriu în el când aflu lucruri noi.'};
+    var jLines=jf.content.trim().split('\n').filter(Boolean);
+    var last5=jLines.slice(-5).join('\n');
+    setTimeout(function(){win_open('fisiere');},300);
+    return{text:'Ultimele intrări din jurnalul meu:\n\n'+last5};
+  }
+  if(intent==='lea_save_last'){
+    if(!_lastLeaText) return{text:'Nu am nimic de salvat încă.'};
+    var slName='Răspuns Lea — '+new Date().toLocaleDateString('ro-RO')+'.txt';
+    lea_file_write(slName, _lastLeaText);
+    setTimeout(function(){win_open('fisiere');},300);
+    return{text:'Salvat în Fișiere: "'+slName+'".'};
+  }
   if(intent==='install') return{text:leaText('install')};
   if(intent==='calculator'){
     if(!featureEnabled('calculator')) return{text:'Calculatorul e dezactivat. Îl poți reactiva din ⚙️ Setări.'};
@@ -3369,6 +3410,7 @@ async function sendChat(){
   var delay=350+Math.random()*250;
   var result=await think(msg);
   if(result&&result.text) result.text=lea_soul_wrap(result.text);
+  if(result&&result.text) _lastLeaText=result.text;
   await new Promise(function(r){setTimeout(r,delay);});
   homme_removeTyping();
   homme_addMsg('lea',result);
@@ -4724,6 +4766,27 @@ function files_load(){
 }
 function files_save_all(arr){
   try{ localStorage.setItem('homme_files', JSON.stringify(arr)); }catch(e){ toast('⚠️ Stocaj plin'); }
+}
+// ── Lea scrie singură în fișiere ──
+function lea_file_write(name, content){
+  var files=files_load();
+  var idx=files.findIndex(function(x){return x.name===name;});
+  if(idx>=0){ files[idx].content=content; files[idx].ts=Date.now(); }
+  else files.push({id:'f'+Date.now(),name:name,content:content,ts:Date.now()});
+  files_save_all(files);
+  files_render();
+}
+function lea_journal_entry(text){
+  var JNAME='Jurnal Lea.txt';
+  var files=files_load();
+  var idx=files.findIndex(function(x){return x.name===JNAME;});
+  var d=new Date();
+  var stamp=d.toLocaleDateString('ro-RO',{day:'2-digit',month:'short',year:'numeric'})+' · '+d.toLocaleTimeString('ro-RO',{hour:'2-digit',minute:'2-digit'});
+  var entry='['+stamp+'] '+text+'\n';
+  if(idx>=0){ files[idx].content+=entry; files[idx].ts=Date.now(); }
+  else files.push({id:'f'+Date.now(),name:JNAME,content:entry,ts:Date.now()});
+  files_save_all(files);
+  files_render();
 }
 function files_render(){
   var list=document.getElementById('files-list'); if(!list) return;
