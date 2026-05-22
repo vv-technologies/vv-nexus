@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VV Lea Ask</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--ac:180,210,255;--gold:201,168,76}
+body{background:#050508;color:rgba(255,255,255,.82);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:32px 16px}
+
+.header{text-align:center;margin-bottom:32px}
+.logo{font-size:11px;letter-spacing:.18em;color:rgba(var(--gold),.55);text-transform:uppercase;margin-bottom:8px}
+.title{font-size:22px;font-weight:300;letter-spacing:.04em;color:rgba(255,255,255,.88)}
+.subtitle{font-size:11px;color:rgba(255,255,255,.25);margin-top:6px;letter-spacing:.05em}
+
+.search-box{width:100%;max-width:560px;display:flex;gap:10px;margin-bottom:20px}
+.search-inp{flex:1;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px 16px;color:rgba(255,255,255,.85);font-size:14px;outline:none;font-family:inherit;letter-spacing:.02em;transition:border .15s}
+.search-inp:focus{border-color:rgba(var(--ac),.35)}
+.search-inp::placeholder{color:rgba(255,255,255,.22)}
+.btn-search{padding:12px 22px;border-radius:12px;background:rgba(var(--ac),.1);border:1px solid rgba(var(--ac),.2);color:rgba(var(--ac),.85);font-size:13px;cursor:pointer;letter-spacing:.04em;white-space:nowrap;transition:all .15s}
+.btn-search:hover{background:rgba(var(--ac),.18)}
+
+.result-box{width:100%;max-width:560px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:20px;min-height:120px;margin-bottom:16px;display:none}
+.result-title{font-size:15px;font-weight:500;color:rgba(255,255,255,.9);margin-bottom:10px;letter-spacing:.02em}
+.result-text{font-size:13px;color:rgba(255,255,255,.6);line-height:1.7}
+.result-src{font-size:10px;color:rgba(255,255,255,.2);margin-top:12px;letter-spacing:.04em}
+.result-src a{color:rgba(var(--ac),.35);text-decoration:none}
+
+.actions{width:100%;max-width:560px;display:none;gap:10px;margin-bottom:28px}
+.btn-send{flex:1;padding:11px;border-radius:12px;background:rgba(var(--gold),.1);border:1px solid rgba(var(--gold),.2);color:rgba(var(--gold),.85);font-size:13px;cursor:pointer;letter-spacing:.04em;transition:all .15s}
+.btn-send:hover{background:rgba(var(--gold),.18)}
+.btn-raft{padding:11px 18px;border-radius:12px;background:none;border:1px solid rgba(255,255,255,.08);color:rgba(255,255,255,.35);font-size:13px;cursor:pointer;letter-spacing:.04em;transition:all .15s}
+.btn-raft:hover{border-color:rgba(var(--ac),.25);color:rgba(var(--ac),.6)}
+
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:rgba(20,22,30,.95);border:1px solid rgba(255,255,255,.1);border-radius:100px;padding:10px 22px;font-size:12px;color:rgba(255,255,255,.7);opacity:0;transition:all .25s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+.history-section{width:100%;max-width:560px}
+.history-label{font-size:10px;color:rgba(255,255,255,.2);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px}
+.history-list{display:flex;flex-wrap:wrap;gap:7px}
+.hist-chip{padding:5px 13px;border-radius:100px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);color:rgba(255,255,255,.38);font-size:11px;cursor:pointer;letter-spacing:.03em;transition:all .12s}
+.hist-chip:hover{border-color:rgba(var(--ac),.25);color:rgba(var(--ac),.7)}
+
+.empty-state{text-align:center;padding:28px 0;font-size:12px;color:rgba(255,255,255,.2);line-height:1.8}
+.loading{text-align:center;padding:18px;font-size:12px;color:rgba(255,255,255,.3);letter-spacing:.1em}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">VV Technologies</div>
+  <div class="title">Lea Ask</div>
+  <div class="subtitle">Caută · Înțelege · Trimite la Lea</div>
+</div>
+
+<div class="search-box">
+  <input class="search-inp" id="search-inp" type="text" placeholder="Ce vrei să știe Lea?" autocomplete="off">
+  <button class="btn-search" onclick="doSearch()">Caută →</button>
+</div>
+
+<div class="result-box" id="result-box">
+  <div class="result-title" id="result-title"></div>
+  <div class="result-text" id="result-text"></div>
+  <div class="result-src" id="result-src"></div>
+</div>
+
+<div class="actions" id="actions" style="display:none">
+  <button class="btn-send" onclick="sendToLea()">📚 Trimite la Lea</button>
+  <button class="btn-raft" onclick="saveToRaft()">📌 Raft</button>
+</div>
+
+<div class="history-section" id="history-section" style="display:none">
+  <div class="history-label">Căutări recente</div>
+  <div class="history-list" id="history-list"></div>
+</div>
+
+<div class="empty-state" id="empty-state">
+  Scrie orice subiect și caută.<br>
+  Răspunsul îl trimiți direct la Lea.
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+var _currentResult = null;
+var _currentSubject = '';
+
+// ── Init — verifică dacă Lea a trimis un subiect ──
+window.addEventListener('load', function(){
+  var pending = localStorage.getItem('vv_ask_subject');
+  if(pending){
+    document.getElementById('search-inp').value = pending;
+    localStorage.removeItem('vv_ask_subject');
+    setTimeout(doSearch, 200);
+  }
+  renderHistory();
+});
+
+// ── Search ──
+async function doSearch(){
+  var inp = document.getElementById('search-inp');
+  var query = inp.value.trim();
+  if(!query) return;
+  _currentSubject = query;
+  showLoading();
+  var result = await searchWiki(query);
+  if(!result) result = await searchWikiQuery(query);
+  if(!result){ showEmpty('Nu am găsit nimic despre "'+query+'". Încearcă un termen mai simplu.'); return; }
+  _currentResult = result;
+  showResult(result);
+  addToHistory(query);
+}
+
+async function searchWiki(query){
+  var langs = ['ro','en'];
+  for(var i=0;i<langs.length;i++){
+    try{
+      var url='https://'+langs[i]+'.wikipedia.org/api/rest_v1/page/summary/'+encodeURIComponent(query);
+      var res=await fetch(url);
+      if(!res.ok) continue;
+      var d=await res.json();
+      if(d.extract&&d.extract.length>40) return{title:d.title,text:d.extract,url:d.content_urls&&d.content_urls.desktop&&d.content_urls.desktop.page,lang:langs[i]};
+    }catch(e){}
+  }
+  return null;
+}
+
+async function searchWikiQuery(query){
+  try{
+    var url='https://ro.wikipedia.org/w/api.php?action=query&list=search&srsearch='+encodeURIComponent(query)+'&format=json&origin=*&srlimit=1';
+    var res=await fetch(url); var d=await res.json();
+    if(d.query&&d.query.search&&d.query.search.length>0){
+      return await searchWiki(d.query.search[0].title);
+    }
+  }catch(e){}
+  return null;
+}
+
+// ── UI ──
+function showLoading(){
+  document.getElementById('empty-state').style.display='none';
+  document.getElementById('result-box').style.display='block';
+  document.getElementById('result-box').innerHTML='<div class="loading">· · ·</div>';
+  document.getElementById('actions').style.display='none';
+}
+
+function showResult(r){
+  var box = document.getElementById('result-box');
+  box.style.display='block';
+  box.innerHTML='';
+  var titleEl=document.createElement('div'); titleEl.className='result-title'; titleEl.textContent=r.title;
+  var textEl=document.createElement('div'); textEl.className='result-text'; textEl.textContent=r.text;
+  var srcEl=document.createElement('div'); srcEl.className='result-src';
+  srcEl.innerHTML='via <a href="'+(r.url||'#')+'" target="_blank">Wikipedia '+(r.lang==='ro'?'Română':'English')+'</a>';
+  box.appendChild(titleEl); box.appendChild(textEl); box.appendChild(srcEl);
+  document.getElementById('actions').style.display='flex';
+}
+
+function showEmpty(msg){
+  document.getElementById('result-box').style.display='block';
+  document.getElementById('result-box').innerHTML='<div class="result-text" style="color:rgba(255,255,255,.3)">'+msg+'</div>';
+  document.getElementById('actions').style.display='none';
+}
+
+// ── Trimite la Lea ──
+function sendToLea(){
+  if(!_currentResult) return;
+  var answer = _currentResult.title+' — '+_currentResult.text.substring(0,300)+((_currentResult.text.length>300)?'...':'');
+  localStorage.setItem('vv_ask_pending', JSON.stringify({
+    subject: _currentSubject,
+    answer: answer,
+    ts: Date.now()
+  }));
+  toast('📚 Trimis la Lea! Revino în Lea pentru confirmare.');
+  document.getElementById('actions').style.display='none';
+}
+
+// ── Salvează în Raft ──
+function saveToRaft(){
+  if(!_currentResult) return;
+  var rafturi = [];
+  try{ rafturi = JSON.parse(localStorage.getItem('homme_rafturi')||'[]'); }catch(e){}
+  rafturi.unshift({
+    title: _currentResult.title,
+    text: _currentResult.text.substring(0,200),
+    src: _currentResult.url||'',
+    ts: Date.now()
+  });
+  if(rafturi.length>100) rafturi=rafturi.slice(0,100);
+  localStorage.setItem('homme_rafturi', JSON.stringify(rafturi));
+  toast('📌 Salvat în Raft!');
+}
+
+// ── Istoric ──
+function addToHistory(query){
+  var hist = [];
+  try{ hist = JSON.parse(localStorage.getItem('vv_ask_history')||'[]'); }catch(e){}
+  hist = hist.filter(function(h){ return h!==query; });
+  hist.unshift(query);
+  hist = hist.slice(0,8);
+  localStorage.setItem('vv_ask_history', JSON.stringify(hist));
+  renderHistory();
+}
+
+function renderHistory(){
+  var hist = [];
+  try{ hist = JSON.parse(localStorage.getItem('vv_ask_history')||'[]'); }catch(e){}
+  var section = document.getElementById('history-section');
+  var list = document.getElementById('history-list');
+  var empty = document.getElementById('empty-state');
+  if(!hist.length){ section.style.display='none'; return; }
+  empty.style.display='none';
+  section.style.display='block';
+  list.innerHTML='';
+  hist.forEach(function(h){
+    var chip = document.createElement('div');
+    chip.className='hist-chip'; chip.textContent=h;
+    chip.onclick=function(){ document.getElementById('search-inp').value=h; doSearch(); };
+    list.appendChild(chip);
+  });
+}
+
+// ── Enter key ──
+document.addEventListener('DOMContentLoaded',function(){
+  var inp = document.getElementById('search-inp');
+  if(inp) inp.addEventListener('keydown',function(e){ if(e.key==='Enter') doSearch(); });
+});
+
+// ── Toast ──
+function toast(msg){
+  var t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); },2800);
+}
+</script>
+</body>
+</html>
