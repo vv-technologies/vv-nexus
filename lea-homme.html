@@ -2262,7 +2262,6 @@ function updateModeChips(){
 
 // ── FEATURE TOGGLES ──
 var FEATURES=[
-  {id:'wiki',      label:'Wikipedia',  desc:'Caută informații despre orice'},
   {id:'weather',   label:'Vreme',      desc:'Date meteo live · Open-Meteo'},
   {id:'calculator',label:'Calculator', desc:'Expresii matematice și procente'},
   {id:'emergency', label:'Urgențe',    desc:'Numere urgență România'},
@@ -2565,24 +2564,7 @@ var HiS={
   }
 };
 
-function hisTokenize(msg){
-  var t={};
-  for(var k in HiS.ordinal){if(HiS.ordinal[k].test(msg)){t.ordinal=k;break;}}
-  for(var k in HiS.role){if(HiS.role[k].test(msg)){t.role=k;break;}}
-  for(var k in HiS.geo){if(HiS.geo[k].test(msg)){t.geo=k;break;}}
-  for(var k in HiS.temporal){if(HiS.temporal[k].test(msg)){t.temporal=k;break;}}
-  return t;
-}
-function hisBuildQuery(tokens,fallback){
-  var p=[];
-  if(tokens.ordinal) p.push(tokens.ordinal.replace('_',' '));
-  if(tokens.geo)     p.push(tokens.geo);
-  if(tokens.role)    p.push(tokens.role.replace('_',' '));
-  if(tokens.temporal)p.push(tokens.temporal);
-  return p.length>=2?p.join(' '):fallback;
-}
-
-// Wikipedia + APIs
+// APIs
 var CITIES_RO={
   'bucurești':[44.4268,26.1025],'bucuresti':[44.4268,26.1025],'bucharest':[44.4268,26.1025],
   'cluj':[46.7712,23.6236],'cluj-napoca':[46.7712,23.6236],
@@ -2611,61 +2593,6 @@ var WMO={
   95:'Furtună ⛈️',96:'Furtună cu grindină ⛈️',99:'Furtună severă cu grindină ⛈️',
 };
 
-async function searchWiki(query){
-  var langs=['ro','en'];
-  for(var i=0;i<langs.length;i++){
-    try{
-      var url='https://'+langs[i]+'.wikipedia.org/api/rest_v1/page/summary/'+encodeURIComponent(query);
-      var res=await fetch(url);
-      if(!res.ok) continue;
-      var d=await res.json();
-      if(d.type==='disambiguation') continue;
-      if(d.extract&&d.extract.length>50){
-        return{text:d.extract.length>400?d.extract.slice(0,400)+'…':d.extract,title:d.title,description:d.description||'',url:d.content_urls&&d.content_urls.desktop?d.content_urls.desktop.page:null,lang:langs[i]};
-      }
-    }catch(e){}
-  }
-  return null;
-}
-
-async function searchWikiFullIntro(title){
-  try{
-    var url='https://ro.wikipedia.org/w/api.php?action=query&prop=extracts&titles='+encodeURIComponent(title)+'&exintro=true&explaintext=true&exsentences=8&origin=*&format=json';
-    var res=await fetch(url);var d=await res.json();
-    var pages=d.query&&d.query.pages;
-    if(!pages) return null;
-    var page=Object.values(pages)[0];
-    if(page&&page.extract&&page.extract.length>80) return page.extract.trim();
-  }catch(e){}
-  return null;
-}
-
-async function searchWikiQuery(query){
-  try{
-    var url='https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch='+encodeURIComponent(query)+'&format=json&origin=*&srlimit=1';
-    var res=await fetch(url);var d=await res.json();
-    if(d.query&&d.query.search&&d.query.search.length>0) return await searchWiki(d.query.search[0].title);
-  }catch(e){}
-  return null;
-}
-
-async function searchWikiRoQuery(query){
-  try{
-    var url='https://ro.wikipedia.org/w/api.php?action=query&list=search&srsearch='+encodeURIComponent(query)+'&format=json&origin=*&srlimit=1';
-    var res=await fetch(url);var d=await res.json();
-    if(d.query&&d.query.search&&d.query.search.length>0) return await searchWiki(d.query.search[0].title);
-  }catch(e){}
-  return null;
-}
-
-async function searchDDG(query){
-  try{
-    var url='https://api.duckduckgo.com/?q='+encodeURIComponent(query)+'&format=json&no_redirect=1&no_html=1&skip_disambig=1';
-    var res=await fetch(url);var d=await res.json();
-    if(d.AbstractText&&d.AbstractText.length>60) return{text:d.AbstractText,source:'DuckDuckGo'};
-  }catch(e){}
-  return null;
-}
 
 function calcExpr(msg){
   var l=msg.toLowerCase()
@@ -2766,34 +2693,6 @@ function extractSubject(msg){
   return l;
 }
 
-function isRelevant(subject,result,category){
-  if(!result||!result.title) return false;
-  var normSubj=stripDiacritics(subject);
-  var words=normSubj.split(/\s+/).filter(function(w){return w.length>3;});
-  var title=stripDiacritics(result.title);
-  var desc=(result.description||'').toLowerCase();
-  if(words.length&&!words.some(function(w){return title.includes(w);})) return false;
-  if(category==='person'&&desc){if(!/born|politician|scriitor|writer|general|artist|ruler|composer|philosopher|inventor|scientist|actor|director|rege|imparat|presedinte|statesman|leader|commander|mathematician|physicist/.test(desc)) return false;}
-  if(category==='place'&&desc){if(!/city|town|village|country|mountain|river|lake|capital|region|municipiu|oras|sat|commune|district|peninsula|island/.test(desc)) return false;}
-  return true;
-}
-
-function detectCategory(question,subject){
-  var q=question.toLowerCase().trim();
-  var s=subject.toLowerCase().trim();
-  if(/^cine\s/.test(q)||/\b(a inventat|a creat|a fondat|a scris|a descoperit|a compus|a condus|a domnit)\b/.test(q)) return'person';
-  if(/biografie|data na[sș]terii|v[aâ]rsta|s-a n[aă]scut|a murit/.test(q)) return'person';
-  if(/^unde\s/.test(q)||/\b(ora[sș]|sat|jude[tț]|[tț]ar[aă]|munte|r[aâ]u|lac|ocean|mare|capital[aă]|insul[aă]|peninsul[aă]|continent)\b/.test(s)) return'place';
-  if(/^c[aâ]nd\s/.test(q)||/\b(r[aă]zboi|revolu[tț]ie|b[aă]t[aă]lie|tratat|invazi[ei]|independen[tț][aă])\b/.test(s)) return'event';
-  return null;
-}
-
-function buildCategoryVariants(subject,category){
-  if(category==='person') return[subject+' biografie',subject+' politician',subject+' scriitor'];
-  if(category==='place')  return[subject+' România',subject+' city',subject+' country'];
-  if(category==='event')  return[subject+' istoric',subject+' war',subject+' revolution'];
-  return[];
-}
 
 function getAppResponse(msg){
   var l=msg.toLowerCase();
@@ -2801,14 +2700,6 @@ function getAppResponse(msg){
   return null;
 }
 
-function formatWiki(result,extended){
-  var text=result.text;
-  var sentences=text.match(/[^.!?]+[.!?]+/g)||[text];
-  var count=extended?5:2;
-  var short=sentences.slice(0,count).join(' ').trim();
-  short=short.replace(/\([^)]{30,}\)/g,'').replace(/\s{2,}/g,' ').trim();
-  return short;
-}
 
 function detectIntent(msg){
   var l=msg.toLowerCase().trim();
@@ -3000,12 +2891,19 @@ function vvbl_situational(msg){
   var s=hic_read_situation(msg);
   var n=s.name;
 
-  // NOAPTE + OBOSIT/TRIST + SOMN → răspuns cald de noapte
-  if(s.hasSomn&&(s.time.slot==='seară'||s.time.slot==='noapte')){
+  // SOMN — oricând, nu doar noaptea
+  if(s.hasSomn){
     var extras=[];
     if(s.prefsFood.length&&Math.random()<0.4) extras.push('Și mâine nu uita '+(s.prefsFood[0].val)+'.');
     if(s.hasMunca) extras.push('Ai muncit destul azi.');
     if(s.hasObosit||s.hasTrist) extras.push('Mâine e altă zi.');
+    if(s.time.slot==='dimineață'||s.time.slot==='după-amiază'){
+      return pickRandom([
+        (n?n+', d':'D')+'acă poți, ia o pauză scurtă.'+(extras.length?' '+pickRandom(extras):''),
+        'O pauză de 10 minute face minuni.'+(s.hasMunca?' Munca nu pleacă nicăieri.':''),
+        (n?n+', s':'S')+'omnul e semnal — corpul tău cere ceva.'
+      ]);
+    }
     var base=(n?n+', d':'D')+'u-te la somn. Patul te așteaptă.';
     return base+(extras.length?' '+pickRandom(extras):'');
   }
@@ -3242,15 +3140,7 @@ async function think(msg){
   var forgetM=msg.match(/^(?:uit[aă]|șterge|sterge|uita|scoate din memorie|nu mai știi|nu mai stii)\s+(.+)/i);
   if(forgetM){ var toForget=forgetM[1].replace(/\?+$/,'').trim(); kb_delete(toForget); return{text:'Am uitat "'+toForget+'". Nu mai știu asta.'}; }
   if(intent==='depth'){
-    if(_lastSearchResult&&_lastSearchResult.title){
-      var fullText=await searchWikiFullIntro(_lastSearchResult.title);
-      if(fullText&&fullText.length>80){
-        var sents=fullText.match(/[^.!?]+[.!?]+/g)||[fullText];
-        return{formatted:sents.slice(0,6).join(' ').trim(),wiki:_lastSearchResult,depthSource:true};
-      }
-    }
-    if(_lastSearchResult) return{formatted:formatWiki(_lastSearchResult,true),wiki:_lastSearchResult,depthSource:true};
-    return{text:'Nu am mai multe informații despre "'+_lastSearchSubject+'".'};
+    return{text:'Nu am mai multe informații'+((_lastSearchSubject)?' despre "'+_lastSearchSubject+'"':'')+'. Caută în <b>🔍 Lea Ask</b>.'};
   }
   if(intent==='download_local'){setTimeout(openDownload,400);return{text:'LEA Local trăiește pe laptopul tău — te cunoaște, funcționează offline, niciun document nu pleacă nicăieri.'};}
   if(intent==='private_doc'){return{gateway:true};}
@@ -3305,9 +3195,7 @@ async function think(msg){
   }
   if(intent==='vv') return{text:VV.philosophy};
   if(intent==='follow_up'){
-    var fRes=await searchWiki(_lastSearchSubject);
-    if(fRes){_lastSearchResult=fRes;return{text:null,wiki:fRes,formatted:formatWiki(fRes)};}
-    return{text:'Nu am date exacte despre '+_lastSearchSubject+'. Încearcă o întrebare mai specifică.'};
+    return{text:'Nu am informații suplimentare. Încearcă în <b>🔍 Lea Ask</b>.'};
   }
   if(intent==='app'){var ar=getAppResponse(msg);if(ar) return{text:ar};}
   if(intent==='founder'){_lastSearchSubject='Cosmin Toma';return{text:VV.founder};}
@@ -3339,11 +3227,10 @@ async function think(msg){
       var kbD=kb_find(directSubj);
       if(kbD) return kb_speak(kbD);
     }
-    var r=await searchWiki(directSubj);
-    if(!r) r=await searchWikiQuery(directSubj);
-    if(r){ _lastSearchSubject=directSubj; _lastSearchResult=r; lea_save_topic(directSubj); return{text:null,wiki:r,formatted:formatWiki(r)}; }
     _kbState='teach'; _kbPending={subject:directSubj};
-    return{text:'Nu știu despre "'+directSubj+'". Vrei să mă înveți?'};
+    localStorage.setItem('vv_ask_subject', directSubj);
+    return{text:'Nu știu ce e "'+directSubj+'". Spune-mi tu sau caută în <b>🔍 Lea Ask</b>.'};
+
   }
 
   // ── KB lookup — înainte de Wikipedia ──
@@ -3351,68 +3238,8 @@ async function think(msg){
   if(!kbHit) kbHit=kb_find(extractSubject(msg.toLowerCase()));
   if(kbHit) return{text:kb_speak(kbHit)};
 
-  // SEARCH
-  if(!featureEnabled('wiki')) return{text:'Wikipedia e dezactivat. Îl poți reactiva din ⚙️ Setări.'};
   var msgNorm=normalizeTypos(msg);
   var subject=extractSubject(msgNorm);
-  var category=detectCategory(msgNorm,subject);
-  var hisTok=hisTokenize(msgNorm);
-  var hisQ=hisBuildQuery(hisTok,null);
-  var useHis=!!hisQ;
-
-  if(/^(ora|cât e|ceas|vreme|vremea|meteo|azi e|azi este|prețul|pretul|curs valutar)/.test(subject.toLowerCase())){
-    return{text:leaResponses.weather};
-  }
-
-  var result=null;
-  var hasOrdinal=/^(primul|prima|cel mai|cea mai|ultimul|ultima|al doilea|a doua|al treilea)\b/i.test(msgNorm.trim());
-
-  if(!hasOrdinal){
-    var r1=await searchWiki(subject);
-    if(r1&&!isRelevant(subject,r1,category)) r1=null;
-    result=r1;
-    if(!result&&category){
-      var catVariants=buildCategoryVariants(subject,category);
-      for(var cvi=0;cvi<catVariants.length&&!result;cvi++){
-        var r2=await searchWiki(catVariants[cvi]);
-        if(r2&&!isRelevant(subject,r2,null)) r2=null;
-        result=r2;
-      }
-    }
-    if(!result&&subject!==msgNorm.replace(/\?+$/,'').trim()){
-      var r3=await searchWiki(msgNorm.replace(/\?+$/,'').trim());
-      if(r3&&!isRelevant(subject,r3,category)) r3=null;
-      result=r3;
-    }
-  }
-
-  if(!result) result=await searchWikiRoQuery(subject);
-
-  if(useHis&&(!result||hasOrdinal)){
-    var hisResult=await searchWikiQuery(hisQ);
-    if(hisResult&&(!result||(result.title||'').split(' ').length>(hisResult.title||'').split(' ').length)) result=hisResult;
-  }
-
-  if(!result||(hasOrdinal&&!useHis)){
-    var enSubject=subject
-      .replace(/\bprimul\b|\bprima\b/gi,'first').replace(/\bultimul\b|\bultima\b/gi,'last')
-      .replace(/\bpreș?edinte\b/gi,'president').replace(/\bamerican[aă]?\b/gi,'american')
-      .replace(/\brege\b|\bîmpărat\b/gi,'king').replace(/\broman[aă]?\b/gi,'romanian');
-    var enResult2=await searchWikiQuery(enSubject);
-    if(enResult2&&(!result||(result.title||'').split(' ').length>(enResult2.title||'').split(' ').length)) result=enResult2;
-  }
-
-  if(!result) result=await searchWikiQuery(subject);
-
-  if(result){
-    _lastSearchSubject=subject;_lastSearchResult=result;
-    lea_save_topic(subject);
-    return{text:null,wiki:result,formatted:_safeDisclaimer+formatWiki(result)};
-  }
-
-  var ddg=await searchDDG(subject);
-  if(ddg&&ddg.text){_lastSearchSubject=subject;return{text:ddg.text,source:'DuckDuckGo'};}
-
   var name=localStorage.getItem('homme_name')||'';
   var cleanSubject=(subject&&subject.length>2&&subject.split(' ').length<=5)?subject:extractSubject(msg.toLowerCase());
   cleanSubject=ro_normalize(cleanSubject||msg.trim());
@@ -3483,18 +3310,6 @@ function homme_addMsg(role, content){
     var bbl=document.createElement('div'); bbl.className='bbl';
     bbl.innerHTML='Documentul tău trebuie să rămână pe laptop — zero upload, zero server.<br><span style="font-size:10px;color:rgba(var(--ac),.45);display:block;margin-top:5px">Descarcă LEA locală pentru PDF-uri și documente private.</span>';
     wrap.appendChild(bbl);
-  } else if(content&&content.wiki){
-    var w=content.wiki;
-    var display=(content.formatted||w.text||'').replace(/\n/g,'<br>');
-    var srcLabel=content.depthSource?'Wikipedia · extins':'Wikipedia';
-    var bbl=document.createElement('div'); bbl.className='bbl'; bbl.innerHTML=display;
-    wrap.appendChild(bbl);
-    if(w.url){
-      var src=document.createElement('div');
-      src.style.cssText='font-size:9px;color:rgba(255,255,255,.18);margin-top:5px;letter-spacing:.04em';
-      src.innerHTML='via <a href="'+w.url+'" target="_blank" style="color:rgba(var(--ac),.35);text-decoration:none">'+srcLabel+'</a>';
-      wrap.appendChild(src);
-    }
   } else {
     var text=typeof content==='string'?content:(content&&content.text?content.text:'');
     var bbl=document.createElement('div'); bbl.className='bbl';
@@ -3790,7 +3605,7 @@ async function sticky_ask(e,inp,id){
   var q=inp.value.trim(); if(!q) return;
   inp.value=''; inp.placeholder='…';
   var result=await think(q);
-  var resp=(result.formatted)||(result.wiki&&formatWiki(result.wiki))||result.text||'';
+  var resp=(result&&result.text)||'';
   var body=document.querySelector('#'+id+' .sticky-body'); if(!body) return;
   var qEl=document.createElement('div');
   qEl.style.cssText='margin-top:7px;padding-top:7px;border-top:1px solid rgba(255,218,90,.08)';
