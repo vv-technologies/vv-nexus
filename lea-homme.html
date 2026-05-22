@@ -2299,6 +2299,18 @@ function stripDiacritics(s){
     .replace(/[ăâ]/g,'a').replace(/î/g,'i')
     .replace(/[șş]/g,'s').replace(/[țţ]/g,'t');
 }
+var RO_NORMALIZE_MAP={
+  'caine':'câine','mâine':'mâine','tara':'țară','tari':'țări',
+  'fata':'fată','baiatul':'băiatul','copil':'copil','masa':'masă',
+  'casa':'casă','carte':'carte','oras':'oraș','masina':'mașină',
+  'avion':'avion','floare':'floare','arbore':'arbore','pasare':'pasăre',
+  'soare':'soare','luna':'lună','stea':'stea','apa':'apă','foc':'foc',
+  'pamant':'pământ','vant':'vânt','ploaie':'ploaie','zapada':'zăpadă'
+};
+function ro_normalize(s){
+  var words=s.toLowerCase().trim().split(/\s+/);
+  return words.map(function(w){ return RO_NORMALIZE_MAP[w]||w; }).join(' ');
+}
 
 function normalizeTypos(text){
   return text
@@ -2796,6 +2808,9 @@ function detectIntent(msg){
   if(/vv his|vv hig|vv hib|vv hia|trilogy|limbaj vv|pattern language|behavior language/.test(l)) return'trilogy';
   if(/^(f[aă].?mi|scrie.?mi|gen[e]?reaz[aă]|cre[ae]z[aă]|compune|inventeaz[aă]).*(o |un |ceva )?(poezie|poem|text|mesaj|articol|eseu|scrisoare|poveste|idee|glum[aă]|banc)/i.test(l)) return'creative';
   if(/^(fa|scrie|genereaza|creeaza|compune|inventeaza)\b.*(poem|song|story|joke|essay)/i.test(l)) return'creative';
+  if(/(?:vreu?|vrei|hai)\s+(?:s[aă]\s+)?(?:[iî]mi\s+)?(?:spui?|spune.?mi|zici?)\s+(?:o\s+)?(?:glum[aă]|banc|poezi[e]|poveste)/i.test(l)) return'creative';
+  if(/^spune.?mi\s+(?:o\s+)?(?:glum[aă]|banc|poezi[e]|poveste|mesaj)/i.test(l)) return'creative';
+  if(/\b(?:glum[aă]|bancuri?)\b.*\b(?:spune|zice|dai?|f[aă]|scrie)\b|\b(?:spune|zice|dai?|f[aă]|scrie)\b.*\b(?:glum[aă]|bancuri?)\b/i.test(l)) return'creative';
   if(/\b(lea|nexus|pulse map|vv pulse|vv write|vv now|vv me)\b|vvpulse|vvwrite|vvscout|vveil|vv studio/.test(l)) return'app';
   if(/ce e vv|ce este vv|vv hybrid|ecosistem vv|vv technologies/.test(l)) return'vv';
   if(/\bcosmin\b/.test(l)||/\bcine a (facut|creat|fondat)\s+(vv|lea|hilea|asta|asa ceva)\b/.test(l)) return'founder';
@@ -2811,8 +2826,8 @@ function detectIntent(msg){
   if(/^(noteaz[aă]|notează|scrie\s+o\s+noti[tț][aă]|adaug[aă]\s+noti[tț][aă]|note\s+despre|note\s+rapid|note\s+de\s+)/i.test(l)) return'quick_note';
   // întrebări personale/reflexive — nu Wikipedia
   if(/^(ce\s+am\s+realizat|ce\s+am\s+f[aă]cut|cum\s+a\s+fost\s+ziua|ce\s+știu|ce\s+am\s+[iî]nv[aă][tț]at|ce\s+am\s+discutat|ce\s+[tș]tii\s+despre\s+mine|ce\s+știi\s+tu\s+despre\s+mine)\b/i.test(l)) return'personal_reflect';
-  // definiție directă — "ce e ala X", "ce înseamnă X" → extrage corect subiectul
-  if(/^ce\s+e\s+(ala|aia|acela|aceea|ăla|ăia)\s+/i.test(l)) return'define_direct';
+  // definiție directă — "ce e ala X", "ce e un X", "ce înseamnă X"
+  if(/^ce\s+(?:e|este|[iî]nseamn[aă])\s+(?:ala|aia|acela|aceea|ăla|ăia|un|o|cel|cea)?\s*\S/i.test(l)) return'define_direct';
   return'search';
 }
 
@@ -3133,15 +3148,17 @@ async function think(msg){
     return{text:(name?name+', i':'I')+'ată ce știu: '+parts.join(', ')+'.'};
   }
   if(intent==='define_direct'){
-    var directSubj=msg.replace(/^ce\s+e\s+(ala|aia|acela|aceea|ăla|ăia)\s+/i,'').replace(/\?+$/,'').trim();
+    var directSubj=msg
+      .replace(/^ce\s+(?:e|este|[iî]nseamn[aă])\s+(?:ala|aia|acela|aceea|ăla|ăia|un|o|cel|cea)?\s*/i,'')
+      .replace(/\?+$/,'').trim();
+    directSubj=ro_normalize(directSubj);
     if(directSubj.length>1){
       var kbD=kb_find(directSubj);
       if(kbD) return kb_speak(kbD);
     }
-    // fallback — lasă search să ruleze cu subiectul corect
-    var fakeMsg=directSubj;
-    var r=await searchWiki(fakeMsg);
-    if(r){ _lastSearchSubject=fakeMsg; _lastSearchResult=r; lea_save_topic(fakeMsg); return{text:null,wiki:r,formatted:formatWiki(r)}; }
+    var r=await searchWiki(directSubj);
+    if(!r) r=await searchWikiQuery(directSubj);
+    if(r){ _lastSearchSubject=directSubj; _lastSearchResult=r; lea_save_topic(directSubj); return{text:null,wiki:r,formatted:formatWiki(r)}; }
     _kbState='teach'; _kbPending={subject:directSubj};
     return{text:'Nu știu despre "'+directSubj+'". Vrei să mă înveți?'};
   }
@@ -3214,9 +3231,11 @@ async function think(msg){
   if(ddg&&ddg.text){_lastSearchSubject=subject;return{text:ddg.text,source:'DuckDuckGo'};}
 
   var name=localStorage.getItem('homme_name')||'';
+  var cleanSubject=(subject&&subject.length>2&&subject.split(' ').length<=5)?subject:extractSubject(msg.toLowerCase());
+  cleanSubject=ro_normalize(cleanSubject||msg.trim());
   _kbState='teach';
-  _kbPending={subject:subject||msg.trim()};
-  return{text:(name?name+', n':'N')+'u știu despre "'+(_kbPending.subject)+'". Vrei să mă înveți? Spune-mi ce e și rețin pentru data viitoare.'};
+  _kbPending={subject:cleanSubject};
+  return{text:(name?name+', n':'N')+'u știu despre "'+cleanSubject+'". Vrei să mă înveți? Spune-mi ce e și rețin pentru data viitoare.'};
 }
 
 // ── CHAT PERSISTENȚĂ ──
