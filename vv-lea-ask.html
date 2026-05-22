@@ -7,43 +7,54 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{--ac:180,210,255;--gold:201,168,76}
-body{background:#050508;color:rgba(255,255,255,.82);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:32px 16px}
+body{background:#050508;color:rgba(255,255,255,.82);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:28px 16px 60px}
 
-.header{text-align:center;margin-bottom:32px}
-.logo{font-size:11px;letter-spacing:.18em;color:rgba(var(--gold),.55);text-transform:uppercase;margin-bottom:8px}
-.title{font-size:22px;font-weight:300;letter-spacing:.04em;color:rgba(255,255,255,.88)}
-.subtitle{font-size:11px;color:rgba(255,255,255,.25);margin-top:6px;letter-spacing:.05em}
+.header{text-align:center;margin-bottom:28px;position:relative;width:100%;max-width:560px}
+.logo{font-size:10px;letter-spacing:.18em;color:rgba(var(--gold),.5);text-transform:uppercase;margin-bottom:7px}
+.title{font-size:21px;font-weight:300;letter-spacing:.04em}
+.subtitle{font-size:11px;color:rgba(255,255,255,.22);margin-top:5px;letter-spacing:.05em}
+.btn-surprise{position:absolute;right:0;top:0;padding:6px 13px;border-radius:100px;background:none;border:1px solid rgba(255,255,255,.08);color:rgba(255,255,255,.3);font-size:11px;cursor:pointer;letter-spacing:.03em;transition:all .15s}
+.btn-surprise:hover{border-color:rgba(var(--gold),.3);color:rgba(var(--gold),.7)}
 
-.search-box{width:100%;max-width:560px;display:flex;gap:10px;margin-bottom:20px}
-.search-inp{flex:1;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px 16px;color:rgba(255,255,255,.85);font-size:14px;outline:none;font-family:inherit;letter-spacing:.02em;transition:border .15s}
+.search-box{width:100%;max-width:560px;display:flex;gap:9px;margin-bottom:18px}
+.search-inp{flex:1;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:11px 15px;color:rgba(255,255,255,.85);font-size:14px;outline:none;font-family:inherit;letter-spacing:.02em;transition:border .15s}
 .search-inp:focus{border-color:rgba(var(--ac),.35)}
 .search-inp::placeholder{color:rgba(255,255,255,.22)}
-.btn-search{padding:12px 22px;border-radius:12px;background:rgba(var(--ac),.1);border:1px solid rgba(var(--ac),.2);color:rgba(var(--ac),.85);font-size:13px;cursor:pointer;letter-spacing:.04em;white-space:nowrap;transition:all .15s}
+.btn-search{padding:11px 20px;border-radius:12px;background:rgba(var(--ac),.1);border:1px solid rgba(var(--ac),.2);color:rgba(var(--ac),.85);font-size:13px;cursor:pointer;letter-spacing:.04em;white-space:nowrap;transition:all .15s}
 .btn-search:hover{background:rgba(var(--ac),.18)}
 
-.result-box{width:100%;max-width:560px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:20px;min-height:120px;margin-bottom:16px;display:none}
-.result-title{font-size:15px;font-weight:500;color:rgba(255,255,255,.9);margin-bottom:10px;letter-spacing:.02em}
-.result-text{font-size:13px;color:rgba(255,255,255,.6);line-height:1.7}
-.result-src{font-size:10px;color:rgba(255,255,255,.2);margin-top:12px;letter-spacing:.04em}
-.result-src a{color:rgba(var(--ac),.35);text-decoration:none}
+.result-box{width:100%;max-width:560px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:18px 20px;margin-bottom:12px;display:none;position:relative}
+.result-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;gap:10px}
+.result-title{font-size:15px;font-weight:500;color:rgba(255,255,255,.9);letter-spacing:.02em;flex:1}
+.btn-reset{background:none;border:none;color:rgba(255,255,255,.2);font-size:16px;cursor:pointer;padding:0;line-height:1;flex-shrink:0;transition:color .12s}
+.btn-reset:hover{color:rgba(255,100,100,.5)}
+.result-text{font-size:13px;color:rgba(255,255,255,.58);line-height:1.72;margin-bottom:10px}
+.result-lang{display:inline-block;font-size:9px;letter-spacing:.08em;text-transform:uppercase;padding:2px 8px;border-radius:100px;margin-bottom:10px}
+.lang-ro{background:rgba(80,200,120,.08);border:1px solid rgba(80,200,120,.2);color:rgba(80,200,120,.7)}
+.lang-en{background:rgba(var(--ac),.07);border:1px solid rgba(var(--ac),.18);color:rgba(var(--ac),.6)}
+.result-src{font-size:10px;color:rgba(255,255,255,.18);margin-top:8px;letter-spacing:.03em}
+.result-src a{color:rgba(var(--ac),.32);text-decoration:none}
+.result-translated{font-size:12px;color:rgba(80,200,120,.7);background:rgba(80,200,120,.05);border:1px solid rgba(80,200,120,.12);border-radius:10px;padding:10px 13px;margin-top:10px;line-height:1.65;display:none}
 
-.actions{width:100%;max-width:560px;display:none;gap:10px;margin-bottom:28px}
-.btn-send{flex:1;padding:11px;border-radius:12px;background:rgba(var(--gold),.1);border:1px solid rgba(var(--gold),.2);color:rgba(var(--gold),.85);font-size:13px;cursor:pointer;letter-spacing:.04em;transition:all .15s}
+.btn-row{width:100%;max-width:560px;display:none;flex-wrap:wrap;gap:8px;margin-bottom:24px}
+.btn-send{flex:1;min-width:140px;padding:10px;border-radius:12px;background:rgba(var(--gold),.1);border:1px solid rgba(var(--gold),.2);color:rgba(var(--gold),.85);font-size:12px;cursor:pointer;letter-spacing:.03em;transition:all .15s}
 .btn-send:hover{background:rgba(var(--gold),.18)}
-.btn-raft{padding:11px 18px;border-radius:12px;background:none;border:1px solid rgba(255,255,255,.08);color:rgba(255,255,255,.35);font-size:13px;cursor:pointer;letter-spacing:.04em;transition:all .15s}
-.btn-raft:hover{border-color:rgba(var(--ac),.25);color:rgba(var(--ac),.6)}
-
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:rgba(20,22,30,.95);border:1px solid rgba(255,255,255,.1);border-radius:100px;padding:10px 22px;font-size:12px;color:rgba(255,255,255,.7);opacity:0;transition:all .25s;pointer-events:none;white-space:nowrap}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.btn-sm{padding:10px 14px;border-radius:12px;background:none;border:1px solid rgba(255,255,255,.08);color:rgba(255,255,255,.35);font-size:12px;cursor:pointer;letter-spacing:.03em;transition:all .15s;white-space:nowrap}
+.btn-sm:hover{border-color:rgba(var(--ac),.25);color:rgba(var(--ac),.6)}
+.btn-translate{padding:10px 14px;border-radius:12px;background:rgba(80,200,120,.07);border:1px solid rgba(80,200,120,.18);color:rgba(80,200,120,.7);font-size:12px;cursor:pointer;letter-spacing:.03em;transition:all .15s;display:none}
+.btn-translate:hover{background:rgba(80,200,120,.13)}
 
 .history-section{width:100%;max-width:560px}
-.history-label{font-size:10px;color:rgba(255,255,255,.2);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px}
+.history-label{font-size:10px;color:rgba(255,255,255,.18);letter-spacing:.08em;text-transform:uppercase;margin-bottom:9px}
 .history-list{display:flex;flex-wrap:wrap;gap:7px}
-.hist-chip{padding:5px 13px;border-radius:100px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);color:rgba(255,255,255,.38);font-size:11px;cursor:pointer;letter-spacing:.03em;transition:all .12s}
-.hist-chip:hover{border-color:rgba(var(--ac),.25);color:rgba(var(--ac),.7)}
+.hist-chip{padding:5px 12px;border-radius:100px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);color:rgba(255,255,255,.35);font-size:11px;cursor:pointer;letter-spacing:.03em;transition:all .12s}
+.hist-chip:hover{border-color:rgba(var(--ac),.25);color:rgba(var(--ac),.65)}
 
-.empty-state{text-align:center;padding:28px 0;font-size:12px;color:rgba(255,255,255,.2);line-height:1.8}
-.loading{text-align:center;padding:18px;font-size:12px;color:rgba(255,255,255,.3);letter-spacing:.1em}
+.empty-state{text-align:center;padding:32px 0;font-size:12px;color:rgba(255,255,255,.18);line-height:1.9}
+.loading{text-align:center;padding:22px;font-size:13px;color:rgba(255,255,255,.25);letter-spacing:.12em}
+
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(16px);background:rgba(18,20,28,.96);border:1px solid rgba(255,255,255,.1);border-radius:100px;padding:9px 20px;font-size:12px;color:rgba(255,255,255,.7);opacity:0;transition:all .22s;pointer-events:none;white-space:nowrap;z-index:99}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 </style>
 </head>
 <body>
@@ -52,6 +63,7 @@ body{background:#050508;color:rgba(255,255,255,.82);font-family:-apple-system,Bl
   <div class="logo">VV Technologies</div>
   <div class="title">Lea Ask</div>
   <div class="subtitle">Caută · Înțelege · Trimite la Lea</div>
+  <button class="btn-surprise" onclick="doSurprise()">✦ Surprinde-mă</button>
 </div>
 
 <div class="search-box">
@@ -60,14 +72,22 @@ body{background:#050508;color:rgba(255,255,255,.82);font-family:-apple-system,Bl
 </div>
 
 <div class="result-box" id="result-box">
-  <div class="result-title" id="result-title"></div>
+  <div class="result-header">
+    <div class="result-title" id="result-title"></div>
+    <button class="btn-reset" onclick="resetView()" title="Căutare nouă">✕</button>
+  </div>
+  <div id="result-lang-badge"></div>
   <div class="result-text" id="result-text"></div>
+  <div class="result-translated" id="result-translated"></div>
   <div class="result-src" id="result-src"></div>
 </div>
 
-<div class="actions" id="actions" style="display:none">
+<div class="btn-row" id="btn-row">
   <button class="btn-send" onclick="sendToLea()">📚 Trimite la Lea</button>
-  <button class="btn-raft" onclick="saveToRaft()">📌 Raft</button>
+  <button class="btn-sm" onclick="readMore()">↓ Mai mult</button>
+  <button class="btn-sm" onclick="copyText()">⎘ Copiază</button>
+  <button class="btn-sm" onclick="saveToRaft()">📌 Raft</button>
+  <button class="btn-translate" id="btn-translate" onclick="doTranslate()">🌐 Traduce</button>
 </div>
 
 <div class="history-section" id="history-section" style="display:none">
@@ -77,16 +97,17 @@ body{background:#050508;color:rgba(255,255,255,.82);font-family:-apple-system,Bl
 
 <div class="empty-state" id="empty-state">
   Scrie orice subiect și caută.<br>
-  Răspunsul îl trimiți direct la Lea.
+  Sau apasă <b>✦ Surprinde-mă</b> pentru ceva nou.
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-var _currentResult = null;
+var _current = null;
 var _currentSubject = '';
+var _fullText = '';
+var _isExpanded = false;
 
-// ── Init — verifică dacă Lea a trimis un subiect ──
 window.addEventListener('load', function(){
   var pending = localStorage.getItem('vv_ask_subject');
   if(pending){
@@ -103,129 +124,233 @@ async function doSearch(){
   var query = inp.value.trim();
   if(!query) return;
   _currentSubject = query;
+  _isExpanded = false;
   showLoading();
   var result = await searchWiki(query);
-  if(!result) result = await searchWikiQuery(query);
+  if(!result) result = await searchWikiRoQuery(query);
+  if(!result) result = await searchWikiEnQuery(query);
   if(!result){ showEmpty('Nu am găsit nimic despre "'+query+'". Încearcă un termen mai simplu.'); return; }
-  _currentResult = result;
+  _current = result;
+  _fullText = result.text;
   showResult(result);
   addToHistory(query);
 }
 
 async function searchWiki(query){
-  var langs = ['ro','en'];
+  var langs=['ro','en'];
   for(var i=0;i<langs.length;i++){
     try{
-      var url='https://'+langs[i]+'.wikipedia.org/api/rest_v1/page/summary/'+encodeURIComponent(query);
-      var res=await fetch(url);
+      var res=await fetch('https://'+langs[i]+'.wikipedia.org/api/rest_v1/page/summary/'+encodeURIComponent(query));
       if(!res.ok) continue;
       var d=await res.json();
-      if(d.extract&&d.extract.length>40) return{title:d.title,text:d.extract,url:d.content_urls&&d.content_urls.desktop&&d.content_urls.desktop.page,lang:langs[i]};
+      if(d.extract&&d.extract.length>40) return{title:d.title,text:d.extract,url:d.content_urls&&d.content_urls.desktop&&d.content_urls.desktop.page,lang:langs[i],pageId:d.pageid};
     }catch(e){}
   }
   return null;
 }
-
-async function searchWikiQuery(query){
+async function searchWikiRoQuery(query){
   try{
-    var url='https://ro.wikipedia.org/w/api.php?action=query&list=search&srsearch='+encodeURIComponent(query)+'&format=json&origin=*&srlimit=1';
-    var res=await fetch(url); var d=await res.json();
-    if(d.query&&d.query.search&&d.query.search.length>0){
-      return await searchWiki(d.query.search[0].title);
-    }
+    var res=await fetch('https://ro.wikipedia.org/w/api.php?action=query&list=search&srsearch='+encodeURIComponent(query)+'&format=json&origin=*&srlimit=1');
+    var d=await res.json();
+    if(d.query&&d.query.search&&d.query.search.length>0) return await searchWiki(d.query.search[0].title);
+  }catch(e){}
+  return null;
+}
+async function searchWikiEnQuery(query){
+  try{
+    var res=await fetch('https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch='+encodeURIComponent(query)+'&format=json&origin=*&srlimit=1');
+    var d=await res.json();
+    if(d.query&&d.query.search&&d.query.search.length>0) return await searchWiki(d.query.search[0].title);
   }catch(e){}
   return null;
 }
 
-// ── UI ──
-function showLoading(){
-  document.getElementById('empty-state').style.display='none';
-  document.getElementById('result-box').style.display='block';
-  document.getElementById('result-box').innerHTML='<div class="loading">· · ·</div>';
-  document.getElementById('actions').style.display='none';
+// ── Mai mult ──
+async function readMore(){
+  if(!_current) return;
+  if(_isExpanded){ showResult(_current); _isExpanded=false; return; }
+  var btn=document.querySelector('.btn-row .btn-sm');
+  if(btn) btn.textContent='· · ·';
+  try{
+    var lang=_current.lang||'ro';
+    var url='https://'+lang+'.wikipedia.org/w/api.php?action=query&prop=extracts&titles='+encodeURIComponent(_current.title)+'&exintro=true&explaintext=true&exsentences=12&origin=*&format=json';
+    var res=await fetch(url); var d=await res.json();
+    var pages=d.query&&d.query.pages;
+    if(pages){
+      var page=pages[Object.keys(pages)[0]];
+      if(page&&page.extract&&page.extract.length>100){
+        _fullText=page.extract;
+        document.getElementById('result-text').textContent=_fullText;
+        _isExpanded=true;
+        if(btn) btn.textContent='↑ Mai puțin';
+        return;
+      }
+    }
+  }catch(e){}
+  if(btn) btn.textContent='↓ Mai mult';
+  toast('Nu am mai mult de afișat.');
 }
 
-function showResult(r){
-  var box = document.getElementById('result-box');
-  box.style.display='block';
-  box.innerHTML='';
-  var titleEl=document.createElement('div'); titleEl.className='result-title'; titleEl.textContent=r.title;
-  var textEl=document.createElement('div'); textEl.className='result-text'; textEl.textContent=r.text;
-  var srcEl=document.createElement('div'); srcEl.className='result-src';
-  srcEl.innerHTML='via <a href="'+(r.url||'#')+'" target="_blank">Wikipedia '+(r.lang==='ro'?'Română':'English')+'</a>';
-  box.appendChild(titleEl); box.appendChild(textEl); box.appendChild(srcEl);
-  document.getElementById('actions').style.display='flex';
+// ── Traducere ──
+async function doTranslate(){
+  if(!_current) return;
+  var btn=document.getElementById('btn-translate');
+  btn.textContent='· · ·'; btn.disabled=true;
+  var textToTranslate=_fullText||_current.text;
+  var chunk=textToTranslate.substring(0,400);
+  try{
+    var res=await fetch('https://api.mymemory.translated.net/get?q='+encodeURIComponent(chunk)+'&langpair=en|ro');
+    var d=await res.json();
+    if(d.responseStatus===200&&d.responseData&&d.responseData.translatedText){
+      var translated=d.responseData.translatedText;
+      var box=document.getElementById('result-translated');
+      box.textContent='🌐 '+translated;
+      box.style.display='block';
+      btn.textContent='✓ Tradus'; btn.disabled=false;
+      _current.translatedText=translated;
+      return;
+    }
+  }catch(e){}
+  btn.textContent='🌐 Traduce'; btn.disabled=false;
+  toast('Traducerea a eșuat. Încearcă din nou.');
 }
 
-function showEmpty(msg){
-  document.getElementById('result-box').style.display='block';
-  document.getElementById('result-box').innerHTML='<div class="result-text" style="color:rgba(255,255,255,.3)">'+msg+'</div>';
-  document.getElementById('actions').style.display='none';
+// ── Surprinde-mă ──
+async function doSurprise(){
+  showLoading();
+  document.getElementById('search-inp').value='';
+  try{
+    var res=await fetch('https://ro.wikipedia.org/api/rest_v1/page/random/summary');
+    if(res.ok){
+      var d=await res.json();
+      if(d.extract&&d.extract.length>40){
+        _current={title:d.title,text:d.extract,url:d.content_urls&&d.content_urls.desktop&&d.content_urls.desktop.page,lang:'ro'};
+        _currentSubject=d.title; _fullText=d.extract; _isExpanded=false;
+        document.getElementById('search-inp').value=d.title;
+        showResult(_current);
+        addToHistory(d.title);
+        return;
+      }
+    }
+  }catch(e){}
+  toast('Nu am putut lua un articol random. Verifică internetul.');
+  resetView();
 }
 
 // ── Trimite la Lea ──
 function sendToLea(){
-  if(!_currentResult) return;
-  var answer = _currentResult.title+' — '+_currentResult.text.substring(0,300)+((_currentResult.text.length>300)?'...':'');
-  localStorage.setItem('vv_ask_pending', JSON.stringify({
-    subject: _currentSubject,
-    answer: answer,
-    ts: Date.now()
-  }));
+  if(!_current) return;
+  var translated=document.getElementById('result-translated');
+  var answer;
+  if(translated&&translated.style.display!=='none'&&_current.translatedText){
+    answer=_current.title+' — '+_current.translatedText;
+  } else {
+    answer=_current.title+' — '+(_fullText||_current.text).substring(0,300)+((_fullText||_current.text).length>300?'...':'');
+  }
+  localStorage.setItem('vv_ask_pending', JSON.stringify({subject:_currentSubject, answer:answer, ts:Date.now()}));
   toast('📚 Trimis la Lea! Revino în Lea pentru confirmare.');
-  document.getElementById('actions').style.display='none';
+  setTimeout(function(){ document.querySelector('.btn-send').textContent='✓ Trimis'; },100);
 }
 
-// ── Salvează în Raft ──
-function saveToRaft(){
-  if(!_currentResult) return;
-  var rafturi = [];
-  try{ rafturi = JSON.parse(localStorage.getItem('homme_rafturi')||'[]'); }catch(e){}
-  rafturi.unshift({
-    title: _currentResult.title,
-    text: _currentResult.text.substring(0,200),
-    src: _currentResult.url||'',
-    ts: Date.now()
+// ── Copiază ──
+function copyText(){
+  var text=(_fullText||_current&&_current.text||'');
+  if(!text){ toast('Nimic de copiat'); return; }
+  navigator.clipboard.writeText((_current?_current.title+'\n\n':'')+text).then(function(){
+    toast('⎘ Copiat în clipboard');
+  }).catch(function(){
+    toast('Copierea a eșuat în acest browser');
   });
+}
+
+// ── Raft ──
+function saveToRaft(){
+  if(!_current) return;
+  var rafturi=[];
+  try{ rafturi=JSON.parse(localStorage.getItem('homme_rafturi')||'[]'); }catch(e){}
+  rafturi.unshift({title:_current.title, text:(_current.text||'').substring(0,200), src:_current.url||'', ts:Date.now()});
   if(rafturi.length>100) rafturi=rafturi.slice(0,100);
   localStorage.setItem('homme_rafturi', JSON.stringify(rafturi));
   toast('📌 Salvat în Raft!');
 }
 
-// ── Istoric ──
-function addToHistory(query){
-  var hist = [];
-  try{ hist = JSON.parse(localStorage.getItem('vv_ask_history')||'[]'); }catch(e){}
-  hist = hist.filter(function(h){ return h!==query; });
-  hist.unshift(query);
-  hist = hist.slice(0,8);
-  localStorage.setItem('vv_ask_history', JSON.stringify(hist));
+// ── Reset ──
+function resetView(){
+  _current=null; _currentSubject=''; _fullText=''; _isExpanded=false;
+  document.getElementById('result-box').style.display='none';
+  document.getElementById('btn-row').style.display='none';
+  document.getElementById('result-translated').style.display='none';
+  document.getElementById('empty-state').style.display='block';
+  document.getElementById('search-inp').value='';
+  document.getElementById('search-inp').focus();
+  document.querySelector('.btn-send').textContent='📚 Trimite la Lea';
+  var btnT=document.getElementById('btn-translate');
+  btnT.style.display='none'; btnT.textContent='🌐 Traduce'; btnT.disabled=false;
   renderHistory();
 }
 
+// ── UI helpers ──
+function showLoading(){
+  document.getElementById('empty-state').style.display='none';
+  document.getElementById('history-section').style.display='none';
+  var box=document.getElementById('result-box');
+  box.style.display='block';
+  box.innerHTML='<div class="loading">· · ·</div>';
+  document.getElementById('btn-row').style.display='none';
+}
+function showResult(r){
+  var box=document.getElementById('result-box');
+  box.innerHTML='';
+  var hdr=document.createElement('div'); hdr.className='result-header';
+  var titleEl=document.createElement('div'); titleEl.className='result-title'; titleEl.textContent=r.title;
+  var resetBtn=document.createElement('button'); resetBtn.className='btn-reset'; resetBtn.textContent='✕'; resetBtn.title='Căutare nouă'; resetBtn.onclick=resetView;
+  hdr.appendChild(titleEl); hdr.appendChild(resetBtn); box.appendChild(hdr);
+  var badge=document.createElement('div');
+  badge.className='result-lang '+(r.lang==='ro'?'lang-ro':'lang-en');
+  badge.textContent=r.lang==='ro'?'Wikipedia Română':'Wikipedia English';
+  box.appendChild(badge);
+  var textEl=document.createElement('div'); textEl.className='result-text'; textEl.id='result-text'; textEl.textContent=r.text;
+  box.appendChild(textEl);
+  var transEl=document.createElement('div'); transEl.className='result-translated'; transEl.id='result-translated';
+  box.appendChild(transEl);
+  if(r.url){
+    var srcEl=document.createElement('div'); srcEl.className='result-src';
+    srcEl.innerHTML='via <a href="'+r.url+'" target="_blank">Wikipedia</a>';
+    box.appendChild(srcEl);
+  }
+  box.style.display='block';
+  document.getElementById('btn-row').style.display='flex';
+  document.querySelector('.btn-send').textContent='📚 Trimite la Lea';
+  var btnT=document.getElementById('btn-translate');
+  if(r.lang==='en'){ btnT.style.display='block'; btnT.textContent='🌐 Traduce'; btnT.disabled=false; }
+  else { btnT.style.display='none'; }
+}
+function showEmpty(msg){
+  document.getElementById('result-box').style.display='block';
+  document.getElementById('result-box').innerHTML='<div style="padding:8px 0;font-size:13px;color:rgba(255,255,255,.28)">'+msg+'</div>';
+  document.getElementById('btn-row').style.display='none';
+}
+
+// ── Istoric ──
+function addToHistory(query){
+  var hist=[]; try{ hist=JSON.parse(localStorage.getItem('vv_ask_history')||'[]'); }catch(e){}
+  hist=hist.filter(function(h){ return h!==query; });
+  hist.unshift(query); hist=hist.slice(0,8);
+  localStorage.setItem('vv_ask_history', JSON.stringify(hist));
+  renderHistory();
+}
 function renderHistory(){
-  var hist = [];
-  try{ hist = JSON.parse(localStorage.getItem('vv_ask_history')||'[]'); }catch(e){}
-  var section = document.getElementById('history-section');
-  var list = document.getElementById('history-list');
-  var empty = document.getElementById('empty-state');
-  if(!hist.length){ section.style.display='none'; return; }
-  empty.style.display='none';
+  var hist=[]; try{ hist=JSON.parse(localStorage.getItem('vv_ask_history')||'[]'); }catch(e){}
+  var section=document.getElementById('history-section');
+  if(!hist.length||_current){ section.style.display='none'; return; }
   section.style.display='block';
-  list.innerHTML='';
+  var list=document.getElementById('history-list'); list.innerHTML='';
   hist.forEach(function(h){
-    var chip = document.createElement('div');
-    chip.className='hist-chip'; chip.textContent=h;
+    var chip=document.createElement('div'); chip.className='hist-chip'; chip.textContent=h;
     chip.onclick=function(){ document.getElementById('search-inp').value=h; doSearch(); };
     list.appendChild(chip);
   });
 }
-
-// ── Enter key ──
-document.addEventListener('DOMContentLoaded',function(){
-  var inp = document.getElementById('search-inp');
-  if(inp) inp.addEventListener('keydown',function(e){ if(e.key==='Enter') doSearch(); });
-});
 
 // ── Toast ──
 function toast(msg){
@@ -233,6 +358,11 @@ function toast(msg){
   t.textContent=msg; t.classList.add('show');
   setTimeout(function(){ t.classList.remove('show'); },2800);
 }
+
+// ── Enter key ──
+document.getElementById('search-inp').addEventListener('keydown',function(e){
+  if(e.key==='Enter') doSearch();
+});
 </script>
 </body>
 </html>
