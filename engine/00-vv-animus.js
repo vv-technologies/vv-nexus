@@ -30,8 +30,10 @@ var VVAnimus = (function () {
   var HIT_INTREBARE = ['ce este','ce face','cum','de ce','cand','unde','cine','care','cat','este adevarat','stii','ai auzit'];
   var HIT_EMOTIE    = ['eu sunt','sunt','ma simt','simt ca','azi','ma doare','am obosit','nu pot','mi-e','mi e','imi este'];
   var HIT_CREATIV   = ['ceva care sa','transmite','o stare de','sentimentul de','atmosfera de','ceva cu','un sentiment'];
-  var HIT_SALUT     = ['buna ziua','buna seara','buna dimineata','buna','salut','hei','hello','hi','ce mai faci','cum esti','neata'];
-  var HIT_IDENTITATE= ['cine esti','ce esti','cum te cheama','ce faci tu','cine e lea','ce e lea','prezinta-te','spune-mi despre tine'];
+  var HIT_SALUT     = ['buna ziua','buna seara','buna dimineata','buna','salut','hei','hello','hi','ce mai faci','cum esti','neata','pa ','pa!','la revedere','noapte buna'];
+  var HIT_IDENTITATE= ['cine esti','ce esti','cum te cheama','ce faci tu','cine e lea','ce e lea','prezinta-te','spune-mi despre tine','pe tine cum','tu cum te'];
+  var HIT_EXPRESII  = ['ahh','ohh','off','uff','hmm','hm','ok','okk','aha','wow','ugh','brr','hey','da ','nu ','bine','super','tare','ajuta','help','nu stiu','habar','ce fac','ce zici','ce parere','serios','chiar','sigur'];
+  var HIT_LARAMUN   = ['nimic','nimica','lasa','las','uita','skip','trecem','gata','done','stop'];
 
   function hitClassify(text) {
     var n = norm(text);
@@ -42,8 +44,11 @@ var VVAnimus = (function () {
     HIT_INTREBARE.forEach(function(v){ if(n.indexOf(norm(v))!==-1) sc.intrebare += 1; });
     HIT_EMOTIE.forEach(function(v){    if(n.indexOf(norm(v))!==-1) sc.emotie    += 2; });
     HIT_CREATIV.forEach(function(v){   if(n.indexOf(norm(v))!==-1) sc.creativ   += 2; });
-    HIT_SALUT.forEach(function(v){     if(n.indexOf(norm(v))!==-1) sc.salut     = (sc.salut||0) + 3; });
-    HIT_IDENTITATE.forEach(function(v){if(n.indexOf(norm(v))!==-1) sc.identitate= (sc.identitate||0) + 4; });
+    HIT_SALUT.forEach(function(v){     if(n.indexOf(norm(v))!==-1) sc.salut      = (sc.salut||0) + 3; });
+    HIT_IDENTITATE.forEach(function(v){if(n.indexOf(norm(v))!==-1) sc.identitate = (sc.identitate||0) + 4; });
+    HIT_EXPRESII.forEach(function(v){  if(n.indexOf(norm(v))!==-1) sc.expresie   = (sc.expresie||0) + 1; });
+    HIT_LARAMUN.forEach(function(v){   if(n.indexOf(norm(v))!==-1) sc.laramun    = (sc.laramun||0) + 3; });
+    if (text.trim().length < 8) sc.expresie = (sc.expresie||0) + 2;
 
     if (text.trim().slice(-1) === '?') sc.intrebare += 3;
 
@@ -422,19 +427,61 @@ var VVAnimus = (function () {
     joc_inocent:           'Copilărie pură. Ploaia nu e tristă pentru ei.',
   };
 
-  var SALUTARI = [
-    'Bună. Sunt aici.', 'Salut. Ce construim azi?', 'Bună ziua. Gata.', 'Bună seara. Ce ai în minte?', 'Prezent.'
-  ];
+  var SALUTARI = ['Bună.', 'Salut.', 'Sunt aici.', 'Bună seara.', 'Bună ziua.'];
+  var SALUTARI_PA = ['Pa.', 'La revedere.', 'Revin când ai nevoie.', 'Pe curând.'];
 
   var IDENTITATE = [
-    'Sunt Lea — creierul VV Hybrid Universe. Nu sunt un chatbot. Sunt un sistem de inteligență personală care trăiește pe dispozitivul tău, înțelege românește și crește cu tine.',
-    'Mă cheamă Lea. Fac parte din ecosistemul VV — un creier local, al tău, care nu trimite nimic nicăieri. Cu cât vorbim mai mult, cu atât te înțeleg mai bine.',
-    'Lea — Hibrid Inteligent. Înțeleg ce simți, ce vrei să construiești, și țin minte. Datele tale rămân la tine.'
+    'Lea. Creierul VV. Trăiesc pe dispozitivul tău — nu trimit nimic nicăieri.',
+    'Mă cheamă Lea. Cu cât vorbim, cu atât te înțeleg mai bine.',
+    'Sunt Lea — inteligență personală, locală, a ta.'
   ];
 
+  var EXPRESII_MAP = {
+    'ahh': ['Ce s-a întâmplat?', 'Spune-mi.', 'Aud.'],
+    'ohh': ['Surpriză?', 'Ce e?', 'Spune.'],
+    'off': ['Aud. Ce e?', 'Ce s-a întâmplat?', 'Spune-mi.'],
+    'uff': ['Greu. Ce e?', 'Spune.'],
+    'hmm': ['Mă gândesc și eu.', 'Da?', 'Spune mai mult.'],
+    'ajuta': ['Sunt aici. Cu ce?', 'Spune-mi ce ai nevoie.'],
+    'help': ['Sunt aici. Cu ce te ajut?'],
+    'nu stiu': ['OK. Gândim împreună.', 'Nu trebuie să știi singur.'],
+    'serios': ['Da, serios.', 'Absolut.'],
+    'nimic': ['OK. Sunt aici.', 'Bine.'],
+    'laramun': ['OK.', 'Bine.', 'Înțeles.'],
+  };
+
+  function getExpresieResponse(text) {
+    var n = norm(text);
+    var keys = Object.keys(EXPRESII_MAP);
+    for (var i = 0; i < keys.length; i++) {
+      if (n.indexOf(norm(keys[i])) !== -1) {
+        var arr = EXPRESII_MAP[keys[i]];
+        return arr[Math.floor(Math.random() * arr.length)];
+      }
+    }
+    return 'Aud.';
+  }
+
+  function getNumeFromKB() {
+    if (_kb['nume']) return _kb['nume'].val;
+    return null;
+  }
+
   function generateResponse(result) {
-    if (result.type === 'identitate') return IDENTITATE[Math.floor(Math.random() * IDENTITATE.length)];
-    if (result.type === 'salut')     return SALUTARI[Math.floor(Math.random() * SALUTARI.length)];
+    var nume = getNumeFromKB();
+
+    if (result.type === 'identitate') {
+      var r = IDENTITATE[Math.floor(Math.random() * IDENTITATE.length)];
+      return nume ? r + ' Tu ești ' + nume + '.' : r;
+    }
+    if (result.type === 'salut') {
+      var isSalutPa = norm(result._rawText||'').match(/pa|revedere|noapte/);
+      if (isSalutPa) return SALUTARI_PA[Math.floor(Math.random() * SALUTARI_PA.length)];
+      var s = SALUTARI[Math.floor(Math.random() * SALUTARI.length)];
+      return nume ? s + ' ' + nume + '.' : s;
+    }
+    if (result.type === 'expresie') return getExpresieResponse(result._rawText || '');
+    if (result.type === 'laramun')  return 'OK.';
     if (result.type === 'intrebare') return 'Te ascult. Ce vrei să știi?';
     if (result.type === 'comanda')   return 'Execut.';
 
@@ -529,7 +576,8 @@ var VVAnimus = (function () {
       entities:   entities,
       inferred:   inferred,
       context:    himContext(),
-      response:   ''
+      response:   '',
+      _rawText:   text
     };
 
     result.response = generateResponse(result);
