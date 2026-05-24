@@ -1,0 +1,2855 @@
+ <!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VV Lea Studios</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&display=swap" rel="stylesheet">
+<style>
+:root{--ac:180,210,255;--gold:255,200,100;--gr:100,220,120}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#050508;color:#fff;-webkit-font-smoothing:antialiased}
+
+/* ── PREMIUM LAYOUT ── */
+html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#030308;color:#fff;-webkit-font-smoothing:antialiased}
+.vv-app{position:fixed;inset:0;background:#030308}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-3px)}to{opacity:1;transform:none}}
+
+/* ── TOPBAR ── */
+#vv-top{position:fixed;top:0;left:0;right:0;height:46px;z-index:100;background:rgba(3,3,12,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.05);display:flex;align-items:center;padding:0 16px;gap:10px}
+.vv-brand{font-family:'Cormorant Garamond',serif;font-size:15px;font-weight:300;letter-spacing:.1em;color:rgba(var(--ac),.75);white-space:nowrap;flex-shrink:0;display:flex;align-items:center;gap:6px}
+.vv-brand-dot{width:5px;height:5px;border-radius:50%;background:rgba(var(--gr),.8);animation:pulse 3s ease-in-out infinite}
+.vv-studios{display:flex;gap:3px;flex:1;overflow-x:auto;scrollbar-width:none;min-width:0}
+.vv-studios::-webkit-scrollbar{display:none}
+.vstudio{padding:4px 12px;border-radius:20px;border:1px solid rgba(255,255,255,.07);color:rgba(255,255,255,.32);font-size:11px;cursor:pointer;white-space:nowrap;transition:all .18s;background:transparent;font-family:inherit;flex-shrink:0}
+.vstudio.active{background:rgba(var(--gold),.1);border-color:rgba(var(--gold),.28);color:rgba(var(--gold),.9)}
+.vstudio:hover:not(.active){background:rgba(255,255,255,.05);color:rgba(255,255,255,.65)}
+.vv-workers{display:flex;gap:4px;align-items:center;flex-shrink:0;padding:0 2px}
+.vw-dot{width:5px;height:5px;border-radius:50%;opacity:.22;transition:opacity .4s,box-shadow .4s}
+.vw-dot.on{opacity:.85}
+.tok-strip{display:flex;gap:3px;overflow:hidden;max-width:150px;flex-shrink:0}
+.tok{padding:2px 6px;border-radius:20px;background:rgba(var(--ac),.06);border:1px solid rgba(var(--ac),.12);color:rgba(var(--ac),.5);font-size:8px;font-family:monospace;white-space:nowrap;animation:fadeIn .25s ease}
+.vv-acts{display:flex;gap:4px;align-items:center;flex-shrink:0}
+.vv-act{padding:4px 10px;border-radius:8px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);color:rgba(255,255,255,.35);font-size:11px;cursor:pointer;transition:all .15s;font-family:inherit;white-space:nowrap}
+.vv-act:hover{background:rgba(255,255,255,.09);color:rgba(255,255,255,.7)}
+.vv-lea-toggle{padding:4px 13px;border-radius:8px;background:rgba(var(--ac),.06);border:1px solid rgba(var(--ac),.15);color:rgba(var(--ac),.65);font-size:11px;cursor:pointer;transition:all .18s;font-family:inherit;flex-shrink:0;letter-spacing:.4px}
+.vv-lea-toggle.open{background:rgba(var(--ac),.14);color:rgba(var(--ac),.95);border-color:rgba(var(--ac),.35)}
+
+/* ── MAIN CANVAS ── */
+#vv-main{position:fixed;inset:46px 0 116px 0;background:#030308;overflow:hidden}
+svg#viz{width:100%;height:100%;display:block}
+.audio-viz{width:100%;height:100%;display:flex;align-items:flex-end;justify-content:center;gap:3px;padding:20px 30px}
+.av-bar{flex:1;max-width:18px;border-radius:3px 3px 0 0;transition:height .07s ease;min-height:3px;background:rgba(var(--gold),.5)}
+.av-bar.on{background:rgba(var(--gold),.9);box-shadow:0 0 8px rgba(var(--gold),.3)}
+.story-wrap{width:100%;height:100%;display:grid;grid-template-rows:1fr 80px}
+.story-viz{width:100%;height:100%}
+.story-audio{display:flex;align-items:flex-end;gap:2px;padding:8px 20px 4px;background:rgba(0,0,0,.2)}
+.sa-bar{flex:1;border-radius:2px 2px 0 0;min-height:2px;transition:height .07s;background:rgba(var(--gold),.45)}
+.empty-canvas{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;opacity:.2;pointer-events:none;display:flex;flex-direction:column;align-items:center}
+.ec-ico{font-size:54px;margin-bottom:14px}
+.ec-txt{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:300;letter-spacing:.06em}
+.ec-sub{font-size:11px;margin-top:8px;letter-spacing:.04em;color:rgba(255,255,255,.4)}
+.perf-lbl{position:absolute;bottom:52px;right:14px;font-size:8px;color:rgba(255,255,255,.1);letter-spacing:.06em}
+.scene-strip{position:absolute;bottom:0;left:0;right:0;height:44px;background:rgba(3,3,10,.8);border-top:1px solid rgba(255,255,255,.04);display:flex;align-items:center;gap:5px;padding:0 14px;overflow-x:auto;scrollbar-width:none;backdrop-filter:blur(12px)}
+.scene-strip::-webkit-scrollbar{display:none}
+.write-area{width:100%;height:100%;padding:32px 40px;overflow:auto;display:flex}
+#write-ta{width:100%;height:100%;background:transparent;border:none;outline:none;color:rgba(255,255,255,.78);font-size:15px;line-height:1.9;resize:none;font-family:'Cormorant Garamond',serif}
+
+/* ── BOTTOM INPUT BAR ── */
+#vv-bottom{position:fixed;bottom:0;left:0;right:0;height:116px;z-index:100;background:rgba(3,3,12,.96);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-top:1px solid rgba(255,255,255,.055);display:flex;flex-direction:column;padding:8px 18px 10px;gap:6px}
+.vv-chips{display:flex;gap:3px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;padding:1px 0}
+.vv-chips::-webkit-scrollbar{display:none}
+.chip-subj{padding:3px 9px;border-radius:20px;background:rgba(var(--ac),.05);border:1px solid rgba(var(--ac),.13);color:rgba(var(--ac),.65);font-size:10px;cursor:pointer;white-space:nowrap;transition:all .12s;flex-shrink:0}
+.chip-subj:hover{background:rgba(var(--ac),.14);color:#fff}
+.chip-act{padding:3px 9px;border-radius:20px;background:rgba(var(--gold),.04);border:1px solid rgba(var(--gold),.13);color:rgba(var(--gold),.55);font-size:10px;cursor:pointer;white-space:nowrap;transition:all .12s;flex-shrink:0}
+.chip-act:hover{background:rgba(var(--gold),.13);color:rgba(var(--gold),1)}
+.vv-inp-row{display:flex;align-items:center;gap:8px}
+.script-inp{flex:1;background:rgba(255,255,255,.04);border:1px solid rgba(var(--ac),.1);border-radius:12px;padding:11px 16px;color:#fff;font-size:14px;outline:none;transition:border-color .2s,background .2s;font-family:inherit}
+.script-inp::placeholder{color:rgba(255,255,255,.18)}
+.script-inp:focus{border-color:rgba(var(--ac),.28);background:rgba(var(--ac),.04)}
+.run-btn{padding:11px 22px;border-radius:12px;background:rgba(var(--ac),.1);border:1px solid rgba(var(--ac),.22);color:rgba(var(--ac),.85);font-size:13px;cursor:pointer;transition:all .15s;white-space:nowrap;font-family:inherit;letter-spacing:.4px}
+.run-btn:hover{background:rgba(var(--ac),.2)}
+.stop-btn{padding:11px 13px;border-radius:12px;background:rgba(255,80,80,.05);border:1px solid rgba(255,80,80,.13);color:rgba(255,100,100,.5);font-size:12px;cursor:pointer;transition:all .15s}
+
+/* ── LEA PANEL (slide-in) ── */
+#vv-panel{position:fixed;top:46px;right:-374px;width:360px;bottom:116px;z-index:200;background:rgba(4,4,14,.97);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);border-left:1px solid rgba(255,255,255,.07);transition:right .3s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;overflow:hidden;box-shadow:-20px 0 60px rgba(0,0,0,.6)}
+#vv-panel.open{right:0}
+.vp-tabs{display:flex;border-bottom:1px solid rgba(255,255,255,.05);flex-shrink:0}
+.vp-tab{flex:1;padding:10px 5px;font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.22);cursor:pointer;text-align:center;transition:all .15s}
+.vp-tab.active{color:rgba(var(--ac),.8);border-bottom:1px solid rgba(var(--ac),.35)}
+.vp-body{flex:1;overflow-y:auto;padding:14px}
+.vp-body::-webkit-scrollbar{width:2px}
+.vp-body::-webkit-scrollbar-thumb{background:rgba(255,255,255,.06)}
+.vp-chat{padding:8px 14px 10px;border-top:1px solid rgba(255,255,255,.05);flex-shrink:0}
+
+/* LEGI panel */
+.lege-group{margin-bottom:14px;}
+.lege-group-title{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:rgba(var(--gold),.5);margin-bottom:8px;}
+.lege-row{margin-bottom:9px;}
+.lege-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:3px;}
+.lege-name{font-size:11px;color:rgba(255,255,255,.65);}
+.lege-val{font-size:10px;color:rgba(var(--gold),.8);font-variant-numeric:tabular-nums;min-width:28px;text-align:right;}
+.lege-desc{font-size:9px;color:rgba(255,255,255,.2);line-height:1.5;margin-top:2px;}
+.lege-slider{-webkit-appearance:none;width:100%;height:3px;background:rgba(255,255,255,.08);border-radius:2px;outline:none;cursor:pointer;margin-top:4px;}
+.lege-slider::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;background:rgba(var(--gold),.9);border-radius:50%;}
+/* LEA assistant */
+.lea-msg{padding:9px 11px;border-radius:9px;font-size:12px;line-height:1.6;margin-bottom:8px;animation:fadeIn .3s ease}
+.lea-msg.lea{background:rgba(var(--ac),.06);border:1px solid rgba(var(--ac),.1);color:rgba(255,255,255,.7)}
+.lea-msg.sys{background:rgba(255,255,255,.03);color:rgba(255,255,255,.35);font-size:11px}
+.lea-dot{width:5px;height:5px;border-radius:50%;background:rgba(var(--ac),.7);display:inline-block;margin-right:6px;animation:pulse 2s ease-in-out infinite}
+.sug-btn{width:100%;padding:7px 10px;border-radius:7px;background:rgba(var(--ac),.05);border:1px solid rgba(var(--ac),.1);color:rgba(var(--ac),.6);font-size:11px;cursor:pointer;transition:all .15s;text-align:left;margin-bottom:5px}
+.sug-btn:hover{background:rgba(var(--ac),.12);color:rgba(var(--ac),.9)}
+
+/* KB */
+.kb-item{padding:7px 9px;border-radius:7px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);margin-bottom:5px;animation:fadeIn .4s ease}
+.kb-term{font-size:11px;color:rgba(255,255,255,.6);font-family:monospace;margin-bottom:3px}
+.kb-tokens{font-size:9px;color:rgba(255,255,255,.25);font-family:monospace;line-height:1.6}
+.kb-src{font-size:8px;color:rgba(var(--gr),.5);margin-top:2px;letter-spacing:.06em}
+.kb-new .kb-term{color:rgba(var(--gr),.8)}
+.wiki-fetch{font-size:10px;color:rgba(var(--gold),.6);padding:6px 9px;background:rgba(var(--gold),.05);border:1px solid rgba(var(--gold),.1);border-radius:6px;margin-bottom:6px;animation:fadeIn .3s ease}
+
+/* FREE badge */
+.free-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;background:rgba(var(--gr),.08);border:1px solid rgba(var(--gr),.15);color:rgba(var(--gr),.6);font-size:9px;margin-left:8px}
+.pro-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;background:rgba(var(--gold),.08);border:1px solid rgba(var(--gold),.15);color:rgba(var(--gold),.6);font-size:9px;margin-left:8px}
+.pro-locked{opacity:.45;pointer-events:none;position:relative}
+
+/* ── SCENE MEMORY STRIP ── */
+.scene-strip{height:46px;border-top:1px solid rgba(255,255,255,.04);display:flex;align-items:center;gap:5px;padding:0 12px;overflow-x:auto;scrollbar-width:none;background:#070710;flex-shrink:0}
+.scene-strip::-webkit-scrollbar{display:none}
+
+/* ── VOICE + CUSTOM VOCAB ── */
+.voice-btn{padding:7px 13px;border-radius:8px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:rgba(255,255,255,.38);font-size:11px;cursor:pointer;transition:all .2s;white-space:nowrap}
+.voice-btn.recording{background:rgba(255,60,60,.1);border-color:rgba(255,60,60,.3);color:rgba(255,100,100,.85);animation:pulse 1s ease-in-out infinite}
+.voice-btn.done{background:rgba(var(--gr),.08);border-color:rgba(var(--gr),.2);color:rgba(var(--gr),.75)}
+.cv-inp{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:6px;padding:7px 10px;color:rgba(255,255,255,.7);font-size:11px;outline:none;margin-bottom:6px;transition:border-color .2s}
+.cv-inp:focus{border-color:rgba(var(--ac),.25)}
+.cv-inp::placeholder{color:rgba(255,255,255,.2)}
+.cv-item{display:flex;align-items:center;gap:7px;padding:6px 9px;border-radius:7px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);margin-bottom:4px;font-size:10px;cursor:pointer;transition:background .15s}
+.cv-item:hover{background:rgba(255,60,60,.05);border-color:rgba(255,60,60,.12)}
+.cv-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+
+/* ── BURST OVERLAY ── */
+.burst-ov{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:200;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)}
+.burst-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;width:100%;max-width:1080px}
+.burst-card{cursor:pointer;border-radius:8px;border:1px solid rgba(255,255,255,.07);overflow:hidden;position:relative;transition:transform .15s,border-color .15s;background:#050508}
+.burst-card:hover{border-color:rgba(var(--ac),.45);transform:scale(1.03)}
+.burst-card svg{width:100%;height:auto;display:block}
+.burst-lbl{position:absolute;bottom:0;left:0;right:0;padding:4px 8px;background:rgba(0,0,0,.65);font-size:9px;color:rgba(255,255,255,.65);letter-spacing:.1em;text-transform:uppercase}
+.burst-card:hover .burst-lbl{background:rgba(var(--ac),.25);color:#fff}
+
+/* ── LEA CHAT ── */
+.lea-chat-wrap{padding:8px 12px 10px;border-top:1px solid rgba(255,255,255,.06);flex-shrink:0;background:#070710}
+.lea-chat-inp{width:100%;background:rgba(var(--ac),.05);border:1px solid rgba(var(--ac),.12);border-radius:8px;padding:9px 12px;color:#fff;font-size:12px;outline:none;transition:border-color .2s;font-family:inherit}
+.lea-chat-inp:focus{border-color:rgba(var(--ac),.32);background:rgba(var(--ac),.08)}
+.lea-chat-inp::placeholder{color:rgba(255,255,255,.18)}
+
+/* ── SUBJECT EDITOR (VV HiL) ── */
+#subj-editor{position:fixed;z-index:700;background:rgba(6,6,18,.94);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,.1);border-radius:18px;padding:16px;min-width:228px;max-width:256px;box-shadow:0 12px 48px rgba(0,0,0,.75),0 0 0 1px rgba(255,255,255,.04);display:none;transition:opacity .15s}
+.se-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+#se-title{font-size:13px;font-weight:600;color:rgba(255,255,255,.88);letter-spacing:.4px}
+.se-close{background:none;border:none;color:rgba(255,255,255,.28);cursor:pointer;font-size:17px;padding:0;line-height:1;transition:color .15s}
+.se-close:hover{color:rgba(255,255,255,.7)}
+.se-row{display:flex;align-items:center;gap:8px;margin-bottom:11px}
+.se-lbl{font-size:10px;color:rgba(255,255,255,.38);width:64px;flex-shrink:0;letter-spacing:.4px;text-transform:uppercase}
+.se-slider{flex:1;accent-color:rgba(var(--gold),1);cursor:pointer;height:3px}
+.se-val{font-size:10px;color:rgba(var(--gold),.85);width:26px;text-align:right;flex-shrink:0;font-variant-numeric:tabular-nums}
+.se-sel{flex:1;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:7px;color:rgba(255,255,255,.78);font-size:10px;padding:5px 7px;cursor:pointer;outline:none;font-family:inherit}
+.se-divider{height:1px;background:rgba(255,255,255,.06);margin:10px 0}
+.se-save{width:100%;background:rgba(var(--gr),.1);border:1px solid rgba(var(--gr),.22);border-radius:9px;color:rgba(var(--gr),.85);font-size:10px;padding:8px;cursor:pointer;transition:all .15s;letter-spacing:.6px;margin-bottom:5px;font-family:inherit}
+.se-save:hover{background:rgba(var(--gr),.22)}
+.se-reset{width:100%;background:none;border:1px solid rgba(255,255,255,.07);border-radius:9px;color:rgba(255,255,255,.25);font-size:10px;padding:6px;cursor:pointer;transition:all .15s;font-family:inherit}
+.se-reset:hover{color:rgba(255,255,255,.55);border-color:rgba(255,255,255,.15)}
+.se-pattern-hint{font-size:9px;color:rgba(var(--ac),.4);text-align:center;margin-top:6px;letter-spacing:.3px;min-height:12px}
+.subj-hit{transition:filter .18s;cursor:pointer}
+.subj-hit:hover{filter:brightness(1.22) drop-shadow(0 0 5px rgba(255,200,100,.25))}
+@keyframes patternGlow{0%{filter:drop-shadow(0 0 0 rgba(180,210,255,0))}50%{filter:brightness(1.18) drop-shadow(0 0 10px rgba(180,210,255,.7))}100%{filter:brightness(1.08) drop-shadow(0 0 4px rgba(180,210,255,.2))}}
+.pattern-applied{animation:patternGlow 1.4s ease forwards}
+/* ── SKELETON EDITOR ── */
+#skel-ovr{position:fixed;inset:0;z-index:800;background:rgba(0,0,0,.86);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);display:none;align-items:center;justify-content:center}
+.skel-box{background:rgba(6,6,18,.97);border:1px solid rgba(255,255,255,.1);border-radius:24px;padding:24px;display:flex;gap:20px;min-width:540px;box-shadow:0 24px 80px rgba(0,0,0,.9)}
+.skel-preview{position:relative;width:240px;height:320px;border-radius:16px;overflow:hidden;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.07);flex-shrink:0;cursor:grab;user-select:none;touch-action:none}
+.skel-preview:active{cursor:grabbing}
+.skel-preview-svg,.skel-joints-svg{position:absolute;inset:0;width:100%;height:100%}
+.skel-preview-svg{pointer-events:none}
+.skel-jc{cursor:grab;pointer-events:all}
+.skel-3d-hint{position:absolute;bottom:7px;left:0;right:0;text-align:center;font-size:8px;color:rgba(255,255,255,.2);letter-spacing:.5px;pointer-events:none}
+.skel-right{flex:1;display:flex;flex-direction:column;gap:10px;min-width:200px}
+.skel-hdr{display:flex;align-items:center;justify-content:space-between}
+.skel-title{font-size:14px;font-weight:600;color:rgba(255,255,255,.9);letter-spacing:.3px}
+.skel-x{background:none;border:none;color:rgba(255,255,255,.3);cursor:pointer;font-size:18px;line-height:1;transition:color .15s}
+.skel-x:hover{color:#fff}
+.skel-list{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:6px;max-height:210px}
+.skel-list::-webkit-scrollbar{width:2px}
+.skel-list::-webkit-scrollbar-thumb{background:rgba(255,255,255,.07)}
+.skel-jrow{display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:9px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.05);transition:all .14s}
+.skel-jdot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.skel-jname{font-size:11px;color:rgba(255,255,255,.65)}
+.skel-jhint{font-size:8px;color:rgba(255,255,255,.22);letter-spacing:.3px;margin-top:1px}
+.skel-jval{font-size:9px;color:rgba(255,200,100,.7);margin-left:auto;font-variant-numeric:tabular-nums;white-space:nowrap}
+.skel-params{font-size:9px;color:rgba(180,210,255,.45);padding:6px 4px;letter-spacing:.3px;font-family:monospace;line-height:1.7}
+.skel-div{height:1px;background:rgba(255,255,255,.06)}
+.skel-btns{display:flex;gap:7px}
+.skel-apply{flex:1;background:rgba(180,210,255,.09);border:1px solid rgba(180,210,255,.2);border-radius:10px;color:rgba(180,210,255,.85);font-size:10px;padding:8px;cursor:pointer;transition:all .15s;font-family:inherit;letter-spacing:.5px}
+.skel-apply:hover{background:rgba(180,210,255,.18)}
+.skel-mem{flex:1;background:rgba(100,220,120,.07);border:1px solid rgba(100,220,120,.18);border-radius:10px;color:rgba(100,220,120,.8);font-size:10px;padding:8px;cursor:pointer;transition:all .15s;font-family:inherit;letter-spacing:.5px}
+.skel-mem:hover{background:rgba(100,220,120,.17)}
+.skel-rot-note{font-size:8px;color:rgba(255,255,255,.15);text-align:center;letter-spacing:.4px}
+.se-skel-btn{width:100%;background:rgba(180,210,255,.05);border:1px solid rgba(180,210,255,.12);border-radius:9px;color:rgba(180,210,255,.6);font-size:10px;padding:7px;cursor:pointer;transition:all .15s;font-family:inherit;margin-bottom:5px;letter-spacing:.5px}
+.se-skel-btn:hover{background:rgba(180,210,255,.14);color:rgba(180,210,255,.9)}
+/* ── COLLECTIVE LEARNING ── */
+.lea-mesh-btn{padding:5px 12px;border-radius:8px;font-size:9px;letter-spacing:.5px;cursor:pointer;transition:all .15s;font-family:inherit}
+.lea-export{background:rgba(255,200,100,.06);border:1px solid rgba(255,200,100,.15);color:rgba(255,200,100,.6)}
+.lea-export:hover{background:rgba(255,200,100,.14);color:rgba(255,200,100,.9)}
+.lea-import{background:rgba(100,220,120,.06);border:1px solid rgba(100,220,120,.15);color:rgba(100,220,120,.6)}
+.lea-import:hover{background:rgba(100,220,120,.14);color:rgba(100,220,120,.9)}
+/* ── HOME OVERLAY ── */
+#home-ovr{position:fixed;inset:0;z-index:900;background:radial-gradient(ellipse at 50% 30%,#0d0820 0%,#04040c 65%);display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .45s cubic-bezier(.4,0,.2,1),transform .45s cubic-bezier(.4,0,.2,1)}
+#home-ovr.out{opacity:0;transform:scale(1.04);pointer-events:none}
+.home-bg-glow{position:absolute;top:0;left:50%;transform:translateX(-50%);width:600px;height:400px;background:radial-gradient(ellipse,rgba(var(--ac),.05) 0%,transparent 70%);pointer-events:none}
+.home-lea-brand{text-align:center;margin-bottom:52px}
+.home-lea-name{font-size:13px;letter-spacing:5px;color:rgba(var(--gold),.55);text-transform:uppercase;margin-bottom:6px}
+.home-lea-title{font-size:36px;font-weight:700;color:#fff;letter-spacing:1px;margin-bottom:6px}
+.home-lea-sub{font-size:12px;color:rgba(255,255,255,.28);letter-spacing:2px}
+.home-lea-dot{width:8px;height:8px;border-radius:50%;background:rgba(var(--gr),.9);margin:16px auto 0;animation:pulse 3s ease-in-out infinite;box-shadow:0 0 12px rgba(var(--gr),.5)}
+.home-greeting{font-size:18px;color:rgba(255,255,255,.72);text-align:center;margin-bottom:40px;font-weight:300;letter-spacing:.3px;min-height:28px;transition:opacity .4s}
+.home-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;width:100%;max-width:660px;padding:0 24px;margin-bottom:40px}
+.hcard{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:20px;padding:22px 16px 18px;cursor:pointer;text-align:center;transition:all .22s cubic-bezier(.4,0,.2,1);position:relative;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.hcard:hover{background:rgba(var(--gold),.07);border-color:rgba(var(--gold),.22);transform:translateY(-3px);box-shadow:0 8px 32px rgba(0,0,0,.4),0 0 0 1px rgba(var(--gold),.1)}
+.hcard-icon{font-size:26px;margin-bottom:10px;line-height:1}
+.hcard-name{font-size:15px;font-weight:600;color:rgba(255,255,255,.88);margin-bottom:3px;letter-spacing:.3px}
+.hcard-sub{font-size:10px;color:rgba(255,255,255,.3);letter-spacing:.5px}
+.hcard-badge{position:absolute;top:10px;right:10px;font-size:8px;padding:2px 7px;border-radius:6px;letter-spacing:.6px;font-weight:600}
+.hcard-badge.free{background:rgba(var(--gr),.12);color:rgba(var(--gr),.75)}
+.hcard-badge.pro{background:rgba(var(--gold),.14);color:rgba(var(--gold),.8)}
+.home-input-wrap{width:100%;max-width:520px;padding:0 24px;position:relative}
+.home-inp{width:100%;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:16px 56px 16px 20px;color:#fff;font-size:14px;outline:none;font-family:inherit;transition:all .2s;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);box-sizing:border-box}
+.home-inp:focus{background:rgba(var(--ac),.08);border-color:rgba(var(--ac),.28);box-shadow:0 0 0 3px rgba(var(--ac),.06)}
+.home-inp::placeholder{color:rgba(255,255,255,.2)}
+.home-inp-send{position:absolute;right:36px;top:50%;transform:translateY(-50%);background:rgba(var(--gold),.15);border:1px solid rgba(var(--gold),.25);border-radius:10px;color:rgba(var(--gold),.85);font-size:12px;padding:5px 10px;cursor:pointer;transition:all .15s}
+.home-inp-send:hover{background:rgba(var(--gold),.28)}
+.home-footer{margin-top:28px;font-size:10px;color:rgba(255,255,255,.15);letter-spacing:1.5px}
+/* home button in app (back to home) */
+#home-btn{position:fixed;top:12px;left:12px;z-index:500;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:10px;color:rgba(255,255,255,.35);font-size:11px;padding:6px 12px;cursor:pointer;transition:all .2s;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:none}
+#home-btn:hover{background:rgba(var(--gold),.08);color:rgba(var(--gold),.7);border-color:rgba(var(--gold),.18)}
+</style>
+</head>
+<body>
+<div class="vv-app">
+
+<!-- ── TOPBAR ── -->
+<header id="vv-top">
+  <div class="vv-brand">VV Lea Studios<div class="vv-brand-dot"></div></div>
+  <div class="vv-studios">
+    <button class="vstudio active" id="vs-vision" onclick="setStudio('vision')">👁 Vision</button>
+    <button class="vstudio" id="vs-music" onclick="setStudio('music')">🎵 Music</button>
+    <button class="vstudio" id="vs-story" onclick="setStudio('story')">🎬 Story</button>
+    <button class="vstudio" id="vs-write" onclick="setStudio('write')">✍️ Write</button>
+    <button class="vstudio" id="vs-photo" onclick="setStudio('photo')">📸 Photo</button>
+    <button class="vstudio" id="vs-timeline" onclick="setStudio('timeline')">🎞 Timeline</button>
+  </div>
+  <div class="vv-workers" title="VV HiES Workers">
+    <div class="vw-dot on" id="w-impuls" style="background:rgba(180,210,255,1)" title="IMPULS"></div>
+    <div class="vw-dot on" id="w-lumina" style="background:rgba(255,200,100,1)" title="LUMINA"></div>
+    <div class="vw-dot on" id="w-masa" style="background:rgba(100,220,120,1)" title="MASĂ"></div>
+  </div>
+  <div class="tok-strip" id="tok-strip"></div>
+  <div class="vv-acts">
+    <button class="vv-act" id="freeze-btn" onclick="toggleFreeze()" style="display:none">⏸</button>
+    <button class="vv-act" id="burst-btn" onclick="showBurst()" style="display:none">✦</button>
+    <button class="vv-act" id="export-btn" onclick="exportPNG()" style="display:none">⬇ PNG</button>
+    <button class="vv-act" id="voice-btn" onclick="toggleVoiceRec()">🎙</button>
+    <button class="vv-act" id="voice-play" onclick="playWithVoice()" style="display:none">▶ Voce</button>
+    <button class="vv-act" onclick="newScene()">✕</button>
+  </div>
+  <button class="vv-lea-toggle" id="vv-lea-toggle" onclick="toggleLeaPanel()">Lea ›</button>
+</header>
+
+<!-- ── MAIN CANVAS ── -->
+<main id="vv-main">
+  <div class="empty-canvas" id="empty-canvas" style="display:flex;flex-direction:column;align-items:center">
+    <div class="ec-ico" id="ec-ico">👁</div>
+    <div class="ec-txt">Scrie o scenă</div>
+    <div class="ec-sub">Lea o proiectează în mai puțin de 2ms</div>
+  </div>
+  <svg id="viz" viewBox="0 0 700 400" style="display:none"></svg>
+  <div id="audio-viz" class="audio-viz" style="display:none"></div>
+  <div id="story-wrap" class="story-wrap" style="display:none">
+    <svg id="story-svg" class="story-viz" viewBox="0 0 700 320"></svg>
+    <div class="story-audio" id="story-audio"></div>
+  </div>
+  <div class="write-area" id="write-area" style="display:none;width:100%;height:100%">
+    <textarea id="write-ta" placeholder="Scrie liber... Lea salvează automat." oninput="writeSave()"></textarea>
+  </div>
+  <div id="timeline-area" style="display:none;width:100%;height:100%;flex-direction:column">
+    <div style="flex:1;min-height:0;position:relative;background:#030308">
+      <svg id="tl-viz" viewBox="0 0 700 260" style="width:100%;height:100%;display:block"></svg>
+      <div id="tl-status" style="position:absolute;bottom:8px;left:14px;font-size:10px;color:rgba(255,255,255,.28);letter-spacing:.06em"></div>
+    </div>
+    <div style="height:198px;border-top:1px solid rgba(255,255,255,.06);background:#060609;display:flex;flex-direction:column;flex-shrink:0">
+      <div style="display:flex;gap:6px;padding:8px 12px;border-bottom:1px solid rgba(255,255,255,.04);align-items:center;flex-shrink:0">
+        <button onclick="tlAdd()" style="padding:6px 14px;border-radius:7px;background:rgba(var(--ac),.08);border:1px solid rgba(var(--ac),.2);color:rgba(var(--ac),.8);font-size:11px;cursor:pointer">+ Adaugă scenă</button>
+        <button onclick="tlPlay()" id="tl-play-btn" style="padding:6px 14px;border-radius:7px;background:rgba(100,220,120,.08);border:1px solid rgba(100,220,120,.2);color:rgba(100,220,120,.8);font-size:11px;cursor:pointer">▶ Redă filmul</button>
+        <button onclick="tlStop()" style="padding:6px 10px;border-radius:7px;background:rgba(255,80,80,.06);border:1px solid rgba(255,80,80,.15);color:rgba(255,100,100,.6);font-size:11px;cursor:pointer">■</button>
+        <button onclick="tlExportPlan()" title="Salvează filmul ca .vvplan" style="padding:6px 12px;border-radius:7px;background:rgba(180,210,255,.06);border:1px solid rgba(180,210,255,.18);color:rgba(180,210,255,.75);font-size:11px;cursor:pointer">↓ Plan VV</button>
+        <button onclick="tlImportPlan()" title="Încarcă plan film" style="padding:6px 12px;border-radius:7px;background:rgba(180,210,255,.04);border:1px solid rgba(180,210,255,.12);color:rgba(180,210,255,.55);font-size:11px;cursor:pointer">↑ Import</button>
+        <span id="tl-count" style="font-size:9px;color:rgba(255,255,255,.2);margin-left:auto;letter-spacing:.06em">0 scene</span>
+      </div>
+      <div id="tl-list" style="flex:1;overflow-y:auto;padding:8px 12px;scrollbar-width:thin"></div>
+    </div>
+  </div>
+  <div class="photo-area" id="photo-area" style="display:none;width:100%;height:100%;overflow-y:auto;padding:16px">
+    <div id="photo-grid" style="columns:3;gap:6px"></div>
+    <div id="photo-empty" style="text-align:center;padding:40px;color:rgba(255,255,255,.2);font-size:13px">
+      📸 Galeria ta e goală.<br><br>
+      <button onclick="photoPick()" style="padding:10px 22px;border-radius:100px;background:rgba(var(--ac),.08);border:1px solid rgba(var(--ac),.2);color:rgba(var(--ac),.7);cursor:pointer;font-size:13px">+ Adaugă fotografii</button>
+    </div>
+  </div>
+  <div class="perf-lbl" id="perf-lbl"></div>
+  <div class="scene-strip" id="scene-strip"></div>
+</main>
+
+<!-- ── BOTTOM INPUT BAR ── -->
+<footer id="vv-bottom">
+  <div class="vv-chips">
+    <span class="chip-subj" onclick="compAdd('om')">👤 Om</span>
+    <span class="chip-subj" onclick="compAdd('om cu mustata')">👨 Mustață</span>
+    <span class="chip-subj" onclick="compAdd('cal')">🐴 Cal</span>
+    <span class="chip-subj" onclick="compAdd('elefant')">🐘 Elefant</span>
+    <span class="chip-subj" onclick="compAdd('urs')">🐻 Urs</span>
+    <span class="chip-subj" onclick="compAdd('girafă')">🦒 Girafă</span>
+    <span class="chip-subj" onclick="compAdd('pisică')">🐱 Pisică</span>
+    <span class="chip-subj" onclick="compAdd('câine')">🐕 Câine</span>
+    <span class="chip-subj" onclick="compAdd('pasăre')">🐦 Pasăre</span>
+    <span class="chip-subj" onclick="compAdd('copac')">🌳 Copac</span>
+    <span class="chip-subj" onclick="compAdd('floare')">🌸 Floare</span>
+    <span class="chip-subj" onclick="compAdd('munte')">⛰ Munte</span>
+    <span class="chip-subj" onclick="compAdd('mare')">🌊 Mare</span>
+    <span class="chip-subj" onclick="compAdd('lună')">🌙 Lună</span>
+    <span class="chip-subj" onclick="compAdd('nor')">☁️ Nor</span>
+    <span class="chip-act" onclick="compAdd('trist')">😔 trist</span>
+    <span class="chip-act" onclick="compAdd('fericit')">😊 fericit</span>
+    <span class="chip-act" onclick="compAdd('ploaie')">🌧 ploaie</span>
+    <span class="chip-act" onclick="compAdd('noapte')">🌙 noapte</span>
+    <span class="chip-act" onclick="compAdd('aleargă')">⚡ aleargă</span>
+    <span class="chip-act" onclick="compAdd('sare')">🦘 sare</span>
+    <span class="chip-act" onclick="compAdd('dansează')">💃 dansează</span>
+    <span class="chip-act" onclick="compAdd('zboară')">🕊 zboară</span>
+    <span class="chip-act" onclick="compClear()" style="color:rgba(255,80,80,.5);border-color:rgba(255,80,80,.15)">✕</span>
+  </div>
+  <div class="vv-inp-row">
+    <input class="script-inp" id="script-inp" placeholder="Descrie o scenă pentru Lea…" onkeydown="if(event.key==='Enter')runStudio()">
+    <button class="run-btn" onclick="runStudio()">→ Lea</button>
+    <button class="stop-btn" onclick="stopAudio()">■</button>
+  </div>
+</footer>
+
+<!-- ── LEA PANEL (slide-in) ── -->
+<aside id="vv-panel">
+  <div class="vp-tabs">
+    <div class="vp-tab active" id="tab-lea" onclick="setTab('lea')">Lea</div>
+    <div class="vp-tab" id="tab-kb" onclick="setTab('kb')">KB</div>
+    <div class="vp-tab" id="tab-legi" onclick="setTab('legi')">Legi</div>
+    <div class="vp-tab" id="tab-settings" onclick="setTab('settings')">Setări</div>
+  </div>
+  <div class="vp-body" id="panel-lea">
+    <div id="mood-arc"></div>
+    <div class="lea-msg lea"><span class="lea-dot"></span>Bună ziua. Sunt Lea — asistentul tău de studio. Scrie o scenă și o proiectăm împreună.</div>
+    <div class="lea-msg sys">Sfat: Încearcă "un om trist în ploaie" sau "tensiune și furtună"</div>
+  </div>
+  <div class="vp-body" id="panel-kb" style="display:none">
+    <div style="font-size:9px;color:rgba(255,255,255,.18);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px">Knowledge Base · <span id="kb-count">0</span> termeni</div>
+    <div id="kb-list"></div>
+  </div>
+  <div class="vp-body" id="panel-legi" style="display:none">
+    <div style="font-size:9px;color:rgba(255,255,255,.18);letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px">9 Legi · Regulatorul scenei</div>
+    <div class="lege-group">
+      <div class="lege-group-title">Expresie</div>
+      <div class="lege-row"><div class="lege-header"><span class="lege-name">Emoție</span><span class="lege-val" id="lv-emotie">0.8</span></div><div class="lege-desc">Intensitatea expresiei emoționale în scenă</div><input type="range" class="lege-slider" min="0" max="1" step="0.05" value="0.8" oninput="lawSet('emotie',this.value)" id="ls-emotie"></div>
+      <div class="lege-row"><div class="lege-header"><span class="lege-name">Lumină</span><span class="lege-val" id="lv-lumina">0.7</span></div><div class="lege-desc">Intensitatea umbrelor și halourilor</div><input type="range" class="lege-slider" min="0" max="1" step="0.05" value="0.7" oninput="lawSet('lumina',this.value)" id="ls-lumina"></div>
+      <div class="lege-row"><div class="lege-header"><span class="lege-name">Ritm</span><span class="lege-val" id="lv-ritm">1.0</span></div><div class="lege-desc">Viteza animațiilor</div><input type="range" class="lege-slider" min="0.2" max="2" step="0.1" value="1.0" oninput="lawSet('ritm',this.value)" id="ls-ritm"></div>
+    </div>
+    <div class="lege-group">
+      <div class="lege-group-title">Spațiu</div>
+      <div class="lege-row"><div class="lege-header"><span class="lege-name">Gravitație</span><span class="lege-val" id="lv-gravitatie">0.6</span></div><div class="lege-desc">Dimensiunea umbrelor pe sol</div><input type="range" class="lege-slider" min="0" max="1" step="0.05" value="0.6" oninput="lawSet('gravitatie',this.value)" id="ls-gravitatie"></div>
+      <div class="lege-row"><div class="lege-header"><span class="lege-name">Adâncime</span><span class="lege-val" id="lv-adancime">0.7</span></div><div class="lege-desc">Variația y în scene multiple</div><input type="range" class="lege-slider" min="0" max="1" step="0.05" value="0.7" oninput="lawSet('adancime',this.value)" id="ls-adancime"></div>
+      <div class="lege-row"><div class="lege-header"><span class="lege-name">Variație</span><span class="lege-val" id="lv-variatie">0.3</span></div><div class="lege-desc">Organicitate — mică randomizare de poziție</div><input type="range" class="lege-slider" min="0" max="1" step="0.05" value="0.3" oninput="lawSet('variatie',this.value)" id="ls-variatie"></div>
+    </div>
+    <div class="lege-group">
+      <div class="lege-group-title">Sistem</div>
+      <div class="lege-row"><div class="lege-header"><span class="lege-name">Memorie</span><span class="lege-val" id="lv-memorie">0.5</span></div><div class="lege-desc">Influența istoricului asupra scenei curente</div><input type="range" class="lege-slider" min="0" max="1" step="0.05" value="0.5" oninput="lawSet('memorie',this.value)" id="ls-memorie"></div>
+      <div class="lege-row"><div class="lege-header"><span class="lege-name">Context</span><span class="lege-val" id="lv-context">0.5</span></div><div class="lege-desc">Influența timpului și anotimpului</div><input type="range" class="lege-slider" min="0" max="1" step="0.05" value="0.5" oninput="lawSet('context',this.value)" id="ls-context"></div>
+      <div class="lege-row"><div class="lege-header"><span class="lege-name">Sens</span><span class="lege-val" id="lv-sens">1.0</span></div><div class="lege-desc">Activează acțiunile personajelor</div><input type="range" class="lege-slider" min="0" max="1" step="0.05" value="1.0" oninput="lawSet('sens',this.value)" id="ls-sens"></div>
+    </div>
+    <button onclick="lawsReset()" style="width:100%;padding:7px;border-radius:7px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);color:rgba(255,255,255,.3);font-size:10px;cursor:pointer;margin-top:2px">↺ Resetează la implicit</button>
+  </div>
+  <div class="vp-body" id="panel-settings" style="display:none">
+    <div style="font-size:11px;color:rgba(255,255,255,.3);line-height:1.8">
+      <div style="margin-bottom:10px;color:rgba(var(--ac),.6);font-size:12px">VV Lea Studios</div>
+      <div>Version: 1.0 · 22 Mai 2026</div>
+      <div>KB local: <span id="set-kb-count">0</span> termeni</div>
+      <div style="margin-top:12px;color:rgba(var(--gold),.5)">PRO: Story · Export · Timeline</div>
+      <div style="margin-top:14px;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:rgba(var(--gr),.55)">Performanță laptop</div>
+      <div style="display:flex;gap:5px;margin:8px 0 6px">
+        <button id="perf-eco" onclick="setPerfMode('eco')" style="flex:1;padding:7px;border-radius:7px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);color:rgba(255,255,255,.5);font-size:10px;cursor:pointer">🌿 Eco</button>
+        <button id="perf-normal" onclick="setPerfMode('normal')" style="flex:1;padding:7px;border-radius:7px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);color:rgba(255,255,255,.5);font-size:10px;cursor:pointer">⚖ Normal</button>
+        <button id="perf-cinema" onclick="setPerfMode('cinema')" style="flex:1;padding:7px;border-radius:7px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);color:rgba(255,255,255,.5);font-size:10px;cursor:pointer">🎬 Cinema</button>
+      </div>
+      <button onclick="toggleWiki()" style="width:100%;padding:7px;border-radius:7px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);color:rgba(255,255,255,.4);font-size:10px;cursor:pointer;margin-bottom:6px"><span id="perf-wiki-lbl">Wikipedia: OFF</span></button>
+      <div style="font-size:9px;color:rgba(255,255,255,.22);line-height:1.5;margin-bottom:10px">Eco = fără rețea, particule puține, respirație minimă. Click pe om → mustață, mâini, postură 3D.</div>
+      <div style="margin-top:8px"><button onclick="clearKB()" style="width:100%;padding:8px;border-radius:7px;background:rgba(255,80,80,.05);border:1px solid rgba(255,80,80,.12);color:rgba(255,100,100,.5);font-size:11px;cursor:pointer">Resetează Knowledge Base</button></div>
+      <div style="margin-top:20px;color:rgba(var(--ac),.65);font-size:12px;margin-bottom:8px">🗣 Vocabular Personal</div>
+      <div style="font-size:10px;color:rgba(255,255,255,.25);margin-bottom:10px;line-height:1.65">Definește propriile elemente vizuale.</div>
+      <input class="cv-inp" id="cv-word" placeholder="cuvânt (ex: logo, brand, produs)">
+      <input class="cv-inp" id="cv-def" placeholder="descriere (ex: cerc auriu, text VV roșu)">
+      <button onclick="addCustomVocab()" style="width:100%;padding:8px;border-radius:7px;background:rgba(var(--ac),.07);border:1px solid rgba(var(--ac),.18);color:rgba(var(--ac),.75);font-size:11px;cursor:pointer;margin-bottom:6px">+ Adaugă în vocabular</button>
+      <div id="cv-feedback" style="font-size:10px;min-height:16px;margin-bottom:6px;transition:opacity .3s"></div>
+      <div id="cv-list"></div>
+    </div>
+  </div>
+  <div class="vp-chat">
+    <div style="font-size:8px;color:rgba(var(--ac),.28);letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px">↓ Spune-i lui Lea</div>
+    <input type="text" id="lea-chat-inp" class="lea-chat-inp" placeholder="un om trist · mai multă lumină…" autocomplete="off">
+  </div>
+</aside>
+
+<!-- ── DUMMY IDs FOR JS COMPAT ── -->
+<div id="studio-title" style="display:none">Vision Studio</div>
+<div id="studio-tag" style="display:none"></div>
+
+<!-- RESTORE SIDEBAR IDs FOR JS COMPAT -->
+<div style="display:none">
+  <div id="sb-vision"></div><div id="sb-music"></div><div id="sb-story"></div>
+  <div id="sb-write"></div><div id="sb-photo"></div><div id="sb-timeline"></div>
+</div>
+
+</div><!-- /vv-app -->
+
+<script src="engine/00-vv-hir-engine.js"></script>
+<script src="engine/01-vv-hir-tokenize.js"></script>
+<script src="engine/02-vv-hir-fx.js"></script>
+<script src="engine/03-vv-hir-actors.js"></script>
+<script src="engine/03-vv-hir-actors-om.js"></script>
+<script src="engine/03-vv-hir-actors-world.js"></script>
+<script src="engine/05-vv-hir-plan.js"></script>
+<script src="engine/06-vv-hir-pose.js"></script>
+<script src="engine/07-vv-hir-organism.js"></script>
+<script src="engine/08-vv-hir-lea.js"></script>
+<script src="engine/09-vv-hiq-clouds.js"></script>
+<script src="engine/09-vv-hiq-engine.js"></script>
+<script src="engine/04-vv-hir-bridge.js"></script>
+<script>
+// ══════════════════════════════════════════
+// VV LEA STUDIOS · Shell UI (motor: VV HiR în engine/)
+// ══════════════════════════════════════════
+
+var _studio = 'vision';
+var _actx = null, _anodes = [], _vizInt = null, _playing = false;
+var _perfMode = 'normal'; // eco | normal | cinema
+var _wikiEnabled = false;
+var _svgSeed = 1;
+var _organismTimer = null;
+var _lastSceneKey = '';
+
+function perfLoad(){
+  try{
+    var s = JSON.parse(localStorage.getItem('vv_studios_perf') || 'null');
+    if(s && s.mode) _perfMode = s.mode;
+    if(s && typeof s.wiki === 'boolean') _wikiEnabled = s.wiki;
+  }catch(e){}
+}
+function perfSave(){
+  try{ localStorage.setItem('vv_studios_perf', JSON.stringify({mode:_perfMode, wiki:_wikiEnabled})); }catch(e){}
+}
+function perfParticleMul(){
+  if(_perfMode === 'eco') return 0.35;
+  if(_perfMode === 'cinema') return 1.35;
+  return 1;
+}
+function sceneSeedKey(p){
+  return (p.subjects || []).join('|') + '|' + (p.mood || '') + '|' + (p.weather || '') + '|' + (p.time || '') + '|' + (p.action || '');
+}
+function setSceneSeed(p){
+  var str = sceneSeedKey(p);
+  var h = 0;
+  for(var i = 0; i < str.length; i++) h = ((h << 5) - h + str.charCodeAt(i)) | 0;
+  _svgSeed = Math.abs(h) || 1;
+}
+function vvRand(){
+  _svgSeed = (_svgSeed + 0x6d2b79f5) | 0;
+  var t = Math.imul(_svgSeed ^ (_svgSeed >>> 15), 1 | _svgSeed);
+  t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+  return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+}
+function setPerfMode(m){
+  _perfMode = m;
+  perfSave();
+  syncPerfUI();
+  reRenderScene();
+  leaSay('Mod <b>' + m + '</b> — ' + (m === 'eco' ? 'laptop rece, mai puține particule.' : m === 'cinema' ? 'mai mult detaliu, PC recomandat.' : 'echilibru.'));
+}
+function toggleWiki(){
+  _wikiEnabled = !_wikiEnabled;
+  perfSave();
+  syncPerfUI();
+  leaSay(_wikiEnabled ? 'Wikipedia ON — doar pentru termeni noi (poate încetini).' : 'Wikipedia OFF — totul local, rapid.');
+}
+function syncPerfUI(){
+  ['eco','normal','cinema'].forEach(function(m){
+    var b = document.getElementById('perf-' + m);
+    if(b) b.style.borderColor = (_perfMode === m) ? 'rgba(100,220,120,.45)' : 'rgba(255,255,255,.08)';
+  });
+  var w = document.getElementById('perf-wiki-lbl');
+  if(w) w.textContent = _wikiEnabled ? 'Wikipedia: ON' : 'Wikipedia: OFF (recomandat)';
+}
+function stopOrganismPulse(){ if(_organismTimer){ clearInterval(_organismTimer); _organismTimer = null; } }
+function startOrganismPulse(){
+  stopOrganismPulse();
+  if(_frozen || _perfMode === 'eco' || _laws.sens < 0.2) return;
+  _organismTimer = setInterval(function(){
+    if(_frozen || _studio !== 'vision' && _studio !== 'story') return;
+    var viz = document.getElementById('viz');
+    var st = document.getElementById('story-svg');
+    var el = (_studio === 'story' && st && st.style.display !== 'none') ? st : viz;
+    if(!el || el.style.display === 'none') return;
+    var gs = el.querySelectorAll('.vv-organism');
+    if(!gs.length) return;
+    var drift = (vvRand() - 0.5) * 0.4 * _laws.variatie;
+    gs.forEach(function(g){
+      var cur = g.getAttribute('data-drift') || '0';
+      var next = (+cur + drift).toFixed(3);
+      if(Math.abs(+next) > 1.2) next = (0).toFixed(3);
+      g.setAttribute('data-drift', next);
+      g.setAttribute('transform', 'translate(' + next + ',' + (+next * 0.35).toFixed(3) + ')');
+    });
+  }, 4200);
+}
+perfLoad();
+
+// ── 9 LEGI · Regulatorul scenei (VV HiL) ──
+var _laws={emotie:0.8,lumina:0.7,ritm:1.0,gravitatie:0.6,adancime:0.7,variatie:0.3,memorie:0.5,context:0.5,sens:1.0};
+function lawsSave(){try{localStorage.setItem('vv_laws',JSON.stringify(_laws));}catch(e){}}
+function lawsLoad(){try{var d=JSON.parse(localStorage.getItem('vv_laws')||'null');if(d)Object.keys(d).forEach(function(k){if(_laws.hasOwnProperty(k))_laws[k]=+d[k];});}catch(e){}}
+var _reRenderTimer=null, _frozen=false;
+function reRenderScene(){
+  clearTimeout(_reRenderTimer);
+  _reRenderTimer=setTimeout(function(){
+    var inp=document.getElementById('script-inp');
+    if(!inp||!inp.value.trim())return;
+    var hasViz=document.getElementById('viz').style.display!=='none';
+    var hasStory=document.getElementById('story-wrap').style.display!=='none';
+    if(!hasViz&&!hasStory)return;
+    var p=tokenize(inp.value.trim());
+    if(hasViz)document.getElementById('viz').innerHTML=svgScene(p);
+    if(hasStory)document.getElementById('story-svg').innerHTML=svgScene(p,700,320);
+    _frozen=false;
+    var fb=document.getElementById('freeze-btn');
+    if(fb){fb.textContent='⏸ Îngheață';fb.style.color='';}
+  },80);
+}
+function toggleFreeze(){
+  var viz=document.getElementById('viz');
+  var stSvg=document.getElementById('story-svg');
+  _frozen=!_frozen;
+  var fb=document.getElementById('freeze-btn');
+  if(_frozen){
+    stopOrganismPulse();
+    if(viz)viz.pauseAnimations();
+    if(stSvg)stSvg.pauseAnimations();
+    if(fb){fb.textContent='▶ Dezgheață';fb.style.color='rgba(100,220,120,.65)';}
+  }else{
+    startOrganismPulse();
+    if(viz)viz.unpauseAnimations();
+    if(stSvg)stSvg.unpauseAnimations();
+    if(fb){fb.textContent='⏸ Îngheață';fb.style.color='';}
+  }
+}
+function lawSet(k,v){_laws[k]=parseFloat((+v).toFixed(2));if(window.VVHiR&&VVHiR.laws[k]!==undefined)VVHiR.setLaw(k,v);var el=document.getElementById('lv-'+k);if(el)el.textContent=(+v).toFixed(1);lawsSave();reRenderScene();}
+function lawsSyncUI(){['emotie','lumina','ritm','gravitatie','adancime','variatie','memorie','context','sens'].forEach(function(k){var sl=document.getElementById('ls-'+k);var vl=document.getElementById('lv-'+k);if(sl)sl.value=_laws[k];if(vl)vl.textContent=(+_laws[k]).toFixed(1);});}
+function lawsReset(){_laws={emotie:0.8,lumina:0.7,ritm:1.0,gravitatie:0.6,adancime:0.7,variatie:0.3,memorie:0.5,context:0.5,sens:1.0};lawsSyncUI();lawsSave();reRenderScene();leaSay('Legile au fost resetate la valorile implicite.');}
+
+// ── KB UNIFIED ──
+var KB = {
+  mar:     {t:['OBIECT:sferic','CULOARE:rosu','NATURA:fruct'],       src:'local'},
+  om:      {t:['FIGURA:umanoida','INALTIME:1.7m','BIPEDAL:da'],      src:'local'},
+  pisica:  {t:['FIGURA:felina','OCHI:reflectorizanti','AGIL:da'],    src:'local'},
+  ploaie:  {t:['PARTICLE:picatura','DIRECTIE:vertical','SUNET:ritmic'],src:'local'},
+  soare:   {t:['LUMINA:calda','FORMA:disc','CULOARE:galben'],        src:'local'},
+  noapte:  {t:['LUMINA:absenta','CULOARE:albastru-inchis'],          src:'local'},
+  padure:  {t:['NATURA:vegetatie','CULOARE:verde','SUNET:ambiant'],  src:'local'},
+  munte:   {t:['RELIEF:inalt','CULOARE:gri-albastru','MARIME:mare'], src:'local'},
+  mare:    {t:['APA:sarata','CULOARE:albastru','MISCARE:valuri'],    src:'local'},
+  girafa:  {t:['FIGURA:mamifer','GATLUNGINATA:da','CULOARE:portocaliu-pete'],src:'local'},
+  floare:  {t:['NATURA:planta','PETALE:da','CULOARE:variat'],        src:'local'},
+  frunza:  {t:['NATURA:planta','FORMA:ovala','CULOARE:verde'],       src:'local'},
+  casa:    {t:['STRUCTURA:umana','ACOPERIS:triunghi','CULOARE:bej'], src:'local'},
+  luna:    {t:['ASTRU:satelit','FORMA:semicerc','LUMINA:rece'],      src:'local'},
+  nor:     {t:['METEOR:vapor','FORMA:pufos','CULOARE:alb-gri'],      src:'local'},
+  caine:   {t:['FIGURA:canina','COADA:da','LOIAL:da'],               src:'local'},
+  pasare:  {t:['FIGURA:aviara','ARIPI:da','CANT:da'],                src:'local'},
+  padure:  {t:['NATURA:vegetatie','COPACI:multi','UMBRA:da'],        src:'local'},
+  stol:    {t:['GRUP:pasari','ZBOR:da','FORMARE:da'],                src:'local'},
+};
+function kbLoad(){ try{ var d=JSON.parse(localStorage.getItem('vv_studios_kb')||'null'); if(d) Object.assign(KB,d); }catch(e){} }
+function kbSave(){ try{ localStorage.setItem('vv_studios_kb',JSON.stringify(KB)); }catch(e){} }
+function clearKB(){ if(confirm('Resetezi KB-ul? Termenii învățați se șterg.')){ localStorage.removeItem('vv_studios_kb'); location.reload(); } }
+kbLoad();
+
+// ── WIKIPEDIA FETCH ──
+async function wikiLookup(term){
+  addWikiFetch(term);
+  try{
+    var r = await fetch('https://ro.wikipedia.org/api/rest_v1/page/summary/'+encodeURIComponent(term));
+    var d = await r.json();
+    if(!d.extract) throw 'no extract';
+    var tokens = extractFromText(d.extract, term);
+    KB[term] = {t:tokens, src:'wikipedia', date:new Date().toLocaleDateString('ro-RO')};
+    kbSave();
+    addKBItem(term, true);
+    leaSay('Am găsit "'+term+'" pe Wikipedia și am stocat '+tokens.length+' caracteristici. Data viitoare îl știu.');
+    return KB[term];
+  }catch(e){
+    KB[term] = {t:['OBIECT:necunoscut','SURSA:absent'], src:'fallback'};
+    kbSave();
+    return KB[term];
+  }
+}
+function extractFromText(txt, term){
+  var l = txt.toLowerCase(); var tokens = [];
+  var colors = {rosu:'rosu',albastru:'albastru',verde:'verde',galben:'galben',negru:'negru',alb:'alb',portocaliu:'portocaliu',violet:'violet',maro:'maro'};
+  Object.keys(colors).forEach(function(c){ if(l.includes(c)) tokens.push('CULOARE:'+c); });
+  if(/animal|mamifer|pasare|insecta/.test(l)) tokens.push('NATURA:fauna');
+  if(/planta|copac|floare|vegetat/.test(l)) tokens.push('NATURA:flora');
+  if(/apa|rau|lac|ocean|mare/.test(l)) tokens.push('ELEMENT:apa');
+  if(/munte|deal|relief/.test(l)) tokens.push('RELIEF:inalt');
+  if(/rapid|viteza|alert/.test(l)) tokens.push('MISCARE:rapida');
+  if(/lent|calm|linistit/.test(l)) tokens.push('MISCARE:lenta');
+  if(/mare|vast|imens/.test(l)) tokens.push('MARIME:mare');
+  if(/mic|minuscul/.test(l)) tokens.push('MARIME:mic');
+  if(!tokens.length) tokens.push('OBIECT:general');
+  return tokens;
+}
+
+// ── COMPOSER (bara de butoane) ──
+function compAdd(word){
+  var inp=document.getElementById('script-inp');
+  var cur=inp.value.trim();
+  inp.value = cur ? cur+' '+word : word;
+  inp.focus();
+}
+function compClear(){
+  document.getElementById('script-inp').value='';
+  document.getElementById('script-inp').focus();
+}
+
+// ── SCENE HISTORY ──
+var _history = [];
+var _histIdx = -1;
+function historyPush(txt){
+  if(_history[0]===txt) return;
+  _history.unshift(txt);
+  if(_history.length>8) _history.pop();
+  _histIdx=-1;
+}
+
+// ── TOKENIZER VV HiS ──
+function norm(s){ return s.replace(/[ăâ]/g,'a').replace(/î/g,'i').replace(/[șş]/g,'s').replace(/[țţ]/g,'t'); }
+function tokenize(txt){
+  var l = txt.toLowerCase();
+  var r = {subjects:[], mood:null, action:null, weather:null, time:null, season:null, tokens:[], musicKey:'liniste', unknown:[]};
+
+  var SUBJS = [
+    ['om','om'],['omul','om'],['oameni','om'],['persoana','om'],['persoană','om'],['băiat','om'],['fată','om'],['copil','om'],
+    ['pisica','pisica'],['pisică','pisica'],['motan','pisica'],['felina','pisica'],
+    ['mar','mar'],['măr','mar'],['mere','mar'],
+    ['copac','copac'],['copaci','copac'],['pom','copac'],['pomul','copac'],['copacul','copac'],
+    ['munte','munte'],['munți','munte'],['muntele','munte'],['deal','munte'],
+    ['marea','mare'],['la mare','mare'],['ocean','mare'],['mare liniștit','mare'],['mare agitat','mare'],['apa','mare'],['lac','mare'],
+    ['câine','caine'],['caine','caine'],['câini','caine'],['catelus','caine'],['cățel','caine'],
+    ['pasare','pasare'],['pasăre','pasare'],['vultur','pasare'],['cioara','pasare'],['porumbel','pasare'],['vrabie','pasare'],
+    ['papagal','pasare'],['papagalul','pasare'],['lebada','pasare'],['lebădă','pasare'],['barza','pasare'],['barzã','pasare'],['bufnita','pasare'],['bufniță','pasare'],
+    ['inima','inima'],['inimă','inima'],['heart','inima'],['suflet','inima'],
+    ['girafa','girafa'],['girafă','girafa'],['girafe','girafa'],
+    ['cal','cal'],['calul','cal'],['cai','cal'],['iapa','cal'],['armăsar','cal'],['armăsarul','cal'],
+    ['elefant','elefant'],['elefantul','elefant'],['elefanti','elefant'],['elefanți','elefant'],['elephante','elefant'],
+    ['urs','urs'],['ursul','urs'],['ursi','urs'],['urși','urs'],['ursoaica','urs'],['ursoaică','urs'],['ursulețul','urs'],
+    ['floare','floare'],['flori','floare'],['trandafir','floare'],['lalea','floare'],['margareta','floare'],
+    ['frunza','frunza'],['frunță','frunza'],['frunze','frunza'],['frunzis','frunza'],['frunziș','frunza'],
+    ['casa','casa'],['casă','casa'],['căsuță','casa'],['casuta','casa'],['locuinta','casa'],['locuință','casa'],['cladire','casa'],
+    ['luna','luna'],['lună','luna'],['lunii','luna'],['lunatec','luna'],
+    ['nor','nor'],['nori','nor'],['norisor','nor'],
+    ['padure','padure'],['pădure','padure'],['codru','padure'],
+    ['stol','stol'],['stol de pasari','stol'],
+  ];
+  // word-boundary matching — previne "mar" să fie găsit în "mare"
+  var lpad=' '+l.replace(/[,\.!?;:]/g,' ')+' ';
+  var lpadN=' '+norm(l).replace(/[,\.!?;:]/g,' ')+' ';
+  SUBJS.forEach(function(pair){
+    var w=' '+pair[0]+' ', wn=' '+norm(pair[0])+' ';
+    if(lpad.includes(w)||lpadN.includes(wn)){
+      if(r.subjects.indexOf(pair[1])===-1) r.subjects.push(pair[1]);
+    }
+  });
+
+  if(/trist|supărat|suparat|plânge|plange/.test(l))    { r.mood='trist';    r.tokens.push('STARE:tristete'); }
+  if(/fericit|vesel|bucuros|fericire/.test(l))          { r.mood='fericit';  r.tokens.push('STARE:bucurie'); }
+  if(/tensiune|furtun|furie|pericol|speriat/.test(l))   { r.mood='tensiune'; r.tokens.push('STARE:tensiune'); }
+  if(/calm|liniș|liniste|pace|meditati/.test(l))        { r.mood='liniste';  r.tokens.push('STARE:liniste'); }
+  if(/ploaie|plouă|ploua/.test(l))                          { r.weather='ploaie';  r.tokens.push('VREME:ploaie'); }
+  if(/soare|însorit|insorit/.test(l))                       { r.weather='soare';   r.tokens.push('VREME:soare'); }
+  if(/ninge|zapada|zăpadă|ninsoare/.test(l))                { r.weather='ninge';   r.tokens.push('VREME:ninsoare'); }
+  if(/furtun[aă]|tunet|fulger|fulgere|vijelie/.test(l))     { r.weather='furtuna'; r.tokens.push('VREME:furtuna'); if(!r.mood)r.mood='tensiune'; }
+  if(/noapte/.test(l))                                       { r.time='noapte';    r.tokens.push('TIMP:noapte'); }
+  if(/dimineat|zorii|rasarit|răsărit/.test(l))               { r.time='dimineata'; r.tokens.push('TIMP:dimineata'); }
+  if(/apus|asfinit|asfin[tț]it|amurg/.test(l))               { r.time='apus';      r.tokens.push('TIMP:apus'); }
+  if(/iarn[aă]/.test(l))                                 { r.season='iarna';   r.tokens.push('ANOTIMP:iarna'); }
+  if(/toamn[aă]/.test(l))                                { r.season='toamna';  r.tokens.push('ANOTIMP:toamna'); }
+  if(/var[aă]\b|verii/.test(l))                          { r.season='vara';    r.tokens.push('ANOTIMP:vara'); }
+  if(/primavar[aă]/.test(l))                             { r.season='primavara';r.tokens.push('ANOTIMP:primavara'); }
+  if(/rostogol/.test(l))                                           { r.action='rostogolire'; r.tokens.push('ACTIUNE:rostogolire'); }
+  if(/alearg|fuge|alerga/.test(l))                                 { r.action='alergare';    r.tokens.push('ACTIUNE:alergare'); }
+  if(/doarm|adorm|dormind|doarme/.test(l))                         { r.action='doarme';      r.tokens.push('ACTIUNE:doarme'); }
+  if(/\bsar[eăi]\b|\bsaltur|\bsalta/.test(l))                     { r.action='sare';        r.tokens.push('ACTIUNE:sare'); }
+  if(/dans[ae]|dansează|dansand/.test(l))                          { r.action='danseaza';    r.tokens.push('ACTIUNE:danseaza'); }
+  if(/plânge|plange|plangand|plâns/.test(l))                       { r.action='plange';      r.tokens.push('ACTIUNE:plange'); }
+  if(/râde|rade|radand|râzând/.test(l))                            { r.action='rade';        r.tokens.push('ACTIUNE:rade'); }
+  if(/zboar[aă]|zbor|zburand/.test(l))                             { r.action='zboara';      r.tokens.push('ACTIUNE:zboara'); }
+
+  // music key
+  if(r.mood==='trist'&&r.weather==='ploaie')    r.musicKey='trist_ploaie';
+  else if(r.weather==='furtuna')                r.musicKey='tensiune';
+  else if(r.mood==='trist')                     r.musicKey='trist';
+  else if(r.mood==='fericit')                   r.musicKey='fericit';
+  else if(r.mood==='tensiune')                  r.musicKey='tensiune';
+  else if(r.mood==='liniste')                   r.musicKey='liniste';
+  else if(r.time==='apus')                      r.musicKey='trist';
+  else if(r.time==='noapte')                    r.musicKey='noapte';
+  else if(r.season==='iarna')                   r.musicKey='liniste';
+
+  // ─ MULTIPLICARE ARHETIPALĂ (VV HiS) ─
+  // Cuvinte speciale → mai multe instanțe (doar dacă 'padure'/'stol' nu au fost deja detectate)
+  if(/p[aă]dure|codru|forest/.test(l)&&r.subjects.indexOf('padure')===-1)     { for(var _i=0;_i<6;_i++) r.subjects.push('copac'); r.tokens.push('MULTIPLU:copac:6'); }
+  if(/stol|zbor\s+de\s+p[aă]s[aă]ri|flock/.test(l)&&r.subjects.indexOf('stol')===-1) { for(var _i=0;_i<8;_i++) r.subjects.push('pasare'); r.tokens.push('MULTIPLU:pasare:8'); }
+  if(/\bgr[aă]din[aă]\b/.test(l))          { r.subjects.push('floare'); r.subjects.push('floare'); r.subjects.push('copac'); r.tokens.push('MULTIPLU:gradina'); }
+  // Pattern "N subiect": "3 om", "5 girafe", "om x 3"
+  var MULTI_SUBJS=[['om|oameni|persoan',    'om'],['girafa|giraf[aă]',    'girafa'],
+                   ['pisica|pisic[aă]',     'pisica'],['copac|pom|copaci', 'copac'],
+                   ['p[aă]s[aă]re|p[aă]s[aă]ri','pasare'],['c[aâ]ine|c[aâ]ini','caine'],
+                   ['floare|flori',         'floare'],['cas[aă]|c[aă]su[tț][aă]','casa']];
+  MULTI_SUBJS.forEach(function(ms){
+    var mfwd=l.match(new RegExp('\\b([2-9])\\s+(?:'+ms[0]+')','i'));
+    var mbwd=l.match(new RegExp('(?:'+ms[0]+')\\s+x\\s*([2-9])','i'));
+    var count=mfwd?+mfwd[1]:mbwd?+mbwd[1]:0;
+    // dacă nu e sintaxa N, numără repetițiile în text (ex: "om om om" → 3)
+    if(!count){
+      var rep=lpad.match(new RegExp(' (?:'+ms[0]+') ','gi'));
+      if(rep&&rep.length>1) count=rep.length;
+    }
+    if(count>1){
+      var cap=Math.min(count,6);
+      var idx=r.subjects.indexOf(ms[1]); if(idx>-1) r.subjects.splice(idx,1);
+      for(var _k=0;_k<cap;_k++) r.subjects.push(ms[1]);
+      r.tokens.push('MULTIPLU:'+ms[1]+':'+cap);
+    }
+  });
+
+  // custom vocabulary words
+  Object.keys(_customVocab).forEach(function(word){
+    if(l.includes(word)&&r.subjects.indexOf(word)===-1) r.subjects.push(word);
+  });
+
+  // unknown = subiecte noi (fără duplicate în unknown list)
+  r.subjects.forEach(function(s){ if(!KB[s]&&!_customVocab[s]&&r.unknown.indexOf(s)===-1) r.unknown.push(s); });
+  if(!r.tokens.length) r.tokens.push('SCENA:generala');
+  return r;
+}
+
+// ── SVG VISION ──
+var _pc=0; // person counter — unique gradient IDs per scene
+var _sceneSubjects=[], _subjOverrides={};
+var _furOverrideVal, _speciesOverrideVal; // temp overrides for re-render
+var _subjPatterns={};
+try{_subjPatterns=JSON.parse(localStorage.getItem('vv_subj_patterns')||'{}');}catch(e){}
+var N={C3:130.81,D3:146.83,E3:164.81,G3:196,A3:220,B3:246.94,C4:261.63,D4:293.66,E4:329.63,F4:349.23,G4:392,A4:440,B4:493.88,C5:523.25,Bb3:233.08,Bb4:466.16,Eb4:311.13,Ab3:207.65};
+var SEQS={
+  trist:{bpm:52,wave:'triangle',fHz:900,rev:true,rain:false,n:[[N.E4,1.5,.8],[N.D4,1,.7],[N.C4,2,.9],[null,.5],[N.A3,1.5,.8],[N.B3,.5,.5],[N.C4,1,.7],[N.A3,3,.9],[null,1],[N.D4,1,.7],[N.C4,1,.8],[N.B3,1,.6],[N.A3,4,1]]},
+  trist_ploaie:{bpm:50,wave:'triangle',fHz:800,rev:true,rain:true,n:[[N.A3,2,.7],[N.C4,1.5,.8],[N.B3,1,.6],[null,.5],[N.G3,2,.9],[N.A3,1,.7],[N.G3,3,.8],[null,1],[N.A3,2,.9],[N.G3,4,.8]]},
+  fericit:{bpm:115,wave:'sine',fHz:3000,rev:false,rain:false,n:[[N.C4,.5,1],[N.E4,.5,.9],[N.G4,1,.9],[N.A4,.5,.8],[N.G4,.5,.7],[N.E4,.5,.9],[N.C4,.5,.8],[N.D4,.5,.7],[N.A4,1.5,.9],[N.G4,.5,.7],[N.E4,.5,.8],[N.C4,2,1]]},
+  noapte:{bpm:38,wave:'sine',fHz:600,rev:true,rain:false,n:[[N.G4,4,.4],[null,2],[N.Bb4,2.5,.35],[null,3],[N.C5,5,.4],[null,2],[N.G4,2,.3],[null,1],[N.G3,6,.4]]},
+  tensiune:{bpm:88,wave:'sawtooth',fHz:1200,rev:false,rain:false,n:[[N.A3,.5,.9],[N.Eb4,.5,.8],[N.A3,.5,.9],[null,.25],[N.Ab3,.5,.8],[N.D4,.5,.9],[N.Ab3,.5,.7],[null,.5],[N.A3,.5,.9],[N.Eb4,.5,.8],[N.Bb4,2,.7],[null,.5],[N.A3,.25,.9],[N.A3,.25,.8],[N.Eb4,.5,.9],[N.A3,2.5,.6]]},
+  liniste:{bpm:44,wave:'sine',fHz:700,rev:true,rain:false,n:[[N.G4,4,.3],[null,2],[N.C5,3,.28],[null,3],[N.E4,5,.3],[null,3],[N.G3,7,.3]]},
+};
+
+function svgScene(p, w, h){
+  _pc=0; _sceneSubjects=[]; // reset per scenă
+  setSceneSeed(p);
+  w=w||700; h=h||400;
+  var isNight=p.time==='noapte', isWinter=p.season==='iarna', isAutumn=p.season==='toamna', isSummer=p.season==='vara', isMorning=p.time==='dimineata', isSunset=p.time==='apus', isStorm=p.weather==='furtuna';
+  var gc1=isWinter?'#b8c8d8':isAutumn?'#4a3010':isSummer?'#1e3a04':isSunset?'#2e1000':isNight?'#06060e':'#0c0c16';
+  var gc2=isWinter?'#d8e8f8':isAutumn?'#2a1a00':isSummer?'#0a1a00':isSunset?'#100400':isNight?'#030308':'#070710';
+  var s='<defs><linearGradient id="skyG" x1="0" y1="0" x2="0" y2="1">';
+  if(isStorm)                              s+='<stop offset="0%" stop-color="#050508"/><stop offset="60%" stop-color="#0a0810"/><stop offset="100%" stop-color="#12101a"/>';
+  else if(p.weather==='ploaie'||isNight)   s+='<stop offset="0%" stop-color="#04070f"/><stop offset="100%" stop-color="#090d1a"/>';
+  else if(isSunset)                        s+='<stop offset="0%" stop-color="#0e0400"/><stop offset="40%" stop-color="#1a0800"/><stop offset="70%" stop-color="#180500"/><stop offset="100%" stop-color="#0a0408"/>';
+  else if(p.weather==='soare'||isSummer)   s+='<stop offset="0%" stop-color="#0e0900"/><stop offset="100%" stop-color="#180e00"/>';
+  else if(isWinter)                        s+='<stop offset="0%" stop-color="#0a0c14"/><stop offset="100%" stop-color="#0d1018"/>';
+  else if(isAutumn)                        s+='<stop offset="0%" stop-color="#100800"/><stop offset="100%" stop-color="#0e0a00"/>';
+  else if(isMorning)                       s+='<stop offset="0%" stop-color="#0a0600"/><stop offset="100%" stop-color="#150c00"/>';
+  else                                     s+='<stop offset="0%" stop-color="#080814"/><stop offset="100%" stop-color="#0c0c18"/>';
+  s+='</linearGradient>';
+  s+='<linearGradient id="gndG" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="'+gc1+'"/><stop offset="100%" stop-color="'+gc2+'"/></linearGradient>';
+  s+='<radialGradient id="starG" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#ffffff" stop-opacity=".65"/><stop offset="45%" stop-color="#ffffff" stop-opacity=".12"/><stop offset="100%" stop-color="#ffffff" stop-opacity="0"/></radialGradient>';
+  s+='<radialGradient id="sunG" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#ffe844" stop-opacity=".38"/><stop offset="55%" stop-color="#f5c020" stop-opacity=".07"/><stop offset="100%" stop-color="#f5a000" stop-opacity="0"/></radialGradient>';
+  s+='</defs>';
+  s+='<rect width="'+w+'" height="'+h+'" fill="url(#skyG)"/>';
+  if(isNight||isSunset) s+=stars(w,h);
+  if(isMorning) s+=aurora(w,h);
+  if(isSunset)  s+=sunsetGlow(w,h);
+  if(p.weather==='ploaie'||isStorm) s+=rain(w,h);
+  if(isStorm)   s+=lightning(w,h);
+  if(p.weather==='ninge'||isWinter) s+=snow(w,h);
+  if(isAutumn)  s+=fallingLeaves(w,h);
+  if((p.weather==='soare'||isSummer)&&!isStorm) s+=sun(w*.82,h*.18,h*.08);
+  if(isSunset)  s+=sun(w*.88,h*.72,h*.07);
+  var horizFog=isSunset?'rgba(220,80,20,.1)':isWinter?'rgba(160,200,240,.08)':isNight?'rgba(15,15,60,.06)':isMorning?'rgba(200,120,40,.07)':'rgba(20,60,10,.06)';
+  s+='<ellipse cx="'+(w*.5)+'" cy="'+(h*.875)+'" rx="'+(w*.62)+'" ry="'+(h*.072)+'" fill="'+horizFog+'"/>';
+  s+='<rect x="0" y="'+(h*.862)+'" width="'+w+'" height="'+(h*.138)+'" fill="url(#gndG)"/>';
+  s+='<line x1="0" y1="'+(h*.864).toFixed(1)+'" x2="'+w+'" y2="'+(h*.864).toFixed(1)+'" stroke="rgba(255,255,255,.05)" stroke-width="1"/>';
+  var n=p.subjects.length||1;
+  // ─ UMBRA: unghi după timp (VV HiC) ─
+  var shadowOp=(isNight?.15:isStorm?.35:p.mood==='tensiune'?.3:p.mood==='trist'?.18:.22)*_laws.lumina;
+  var shadowOffX=isMorning?h*.05:isSunset?-h*.05:0;
+  var eff_action=_laws.sens>=0.3?p.action:null;
+  var _SE_TYPES=['om','pisica','caine','copac','girafa','pasare','floare','cal','elefant','urs'];
+  p.subjects.forEach(function(subj,i){
+    var xFrac = n===1 ? 0.5 : n<=4 ? 0.22+i*(0.56/(n-1)) : 0.08+i*(0.84/(n-1));
+    var randOff=(vvRand()-.5)*h*_laws.variatie*.15;
+    var cx=w*xFrac+randOff;
+    var depthStep=n>4?0.04*_laws.adancime:0;
+    var yDepth=n>4?h*(0.52+(i%3)*depthStep):h*0.55;
+    var shadowW=h*(n>4?0.075:0.1)*_laws.gravitatie, shadowH=shadowW*.27;
+    // ── OVERRIDE + STATE (VV HiL) ──
+    var ov=_subjOverrides[i]||{};
+    var rMood=ov.mood_ov&&ov.mood_ov!=='auto'?ov.mood_ov:p.mood;
+    var rAction=ov.action_ov&&ov.action_ov!=='auto'?ov.action_ov:eff_action;
+    var rH=h*(n>4?.8:1)*(ov.h_factor||1);
+    var rSeason=ov.season_ov&&ov.season_ov!=='auto'?ov.season_ov:p.season;
+    var rScale=ov.scale||1;
+    var pc_before=_pc;
+    _sceneSubjects[i]={subj:subj,cx:cx,yDepth:yDepth,mood:p.mood,h:h*(n>4?.8:1),h_full:h,action:eff_action,season:p.season,time:p.time,pc_before:pc_before,n:n};
+    if(subj!=='luna'&&subj!=='nor'&&subj!=='munte'&&subj!=='mare')
+      s+='<ellipse cx="'+(cx+shadowOffX)+'" cy="'+(h*.893)+'" rx="'+shadowW+'" ry="'+shadowH+'" fill="rgba(0,0,0,'+shadowOp.toFixed(3)+')" />';
+    var _isEd=_SE_TYPES.indexOf(subj)!==-1;
+    if(_isEd) s+='<g id="subj-'+i+'" class="subj-hit" onclick="openSubjEditor(event,\''+subj+'\','+i+')">';
+    if(subj==='om')     s+=person(cx,yDepth*(rMood==='trist'?0.92:0.88),rMood,rH,rAction,ov);
+    if(subj==='mar')    s+=apple(cx,h*0.75,eff_action==='rostogolire',w,h);
+    if(subj==='pisica') s+=cat(cx,h*0.76*rScale,p.time,rAction);
+    if(subj==='copac')  s+=tree(cx,h*0.88,h*(n>4?.75:1)*(ov.h_factor||1),rSeason);
+    if(subj==='munte')  s+=mountain(cx,h,p.season);
+    if(subj==='mare')   s+=sea(w,h,p.mood);
+    if(subj==='caine')  s+=dog(cx,h*0.82*rScale,h*rScale,rAction);
+    if(subj==='pasare') s+=bird(cx,eff_action==='zboara'?h*(0.12+i*.025):h*(0.25+i*.04),h*rScale,rAction);
+    if(subj==='inima')  s+=heart(cx,h*0.48,p.mood,h);
+    if(subj==='girafa') s+=girafa(cx,h*0.88,h*(n>4?.7:1)*rScale,rAction);
+    if(subj==='floare') s+=floare(cx,h*0.85,h*(n>4?.8:1)*rScale,rMood);
+    if(subj==='cal')    s+=cal(cx,h*0.88,h*(n>4?.75:1)*rScale,rAction);
+    if(subj==='elefant')s+=elefant(cx,h*0.88,h*(n>4?.7:1)*rScale,rAction);
+    if(subj==='urs')    s+=urs(cx,h*0.85,h*(n>4?.8:1)*rScale,rAction);
+    if(subj==='frunza') s+=frunza(cx,h*(0.6+i*.04),h,p.season);
+    if(subj==='casa')   s+=casa(cx,h*0.88,h*(n>4?.75:1));
+    if(subj==='luna')   s+=luna(w*0.82,h*0.1,h);
+    if(subj==='nor')    s+=nor(cx,h*(0.18+i*.05),h);
+    if(subj==='padure'){
+      var treePositions=[.06,.16,.27,.42,.56,.7,.82,.91];
+      treePositions.forEach(function(frac,ti){
+        var tx=w*frac, tScale=0.55+Math.abs((ti-3.5)/4)*0.35;
+        var ty=h*(0.88-Math.abs((ti-3.5)/4)*0.06);
+        s+=tree(tx,ty,h*tScale,p.season);
+      });
+    }
+    if(subj==='stol'){
+      var flockPos=[[.15,.1],[.23,.07],[.32,.13],[.4,.08],[.5,.06],[.58,.1],[.67,.08],[.75,.13],[.82,.09],[.9,.07]];
+      flockPos.forEach(function(fp){ s+=bird(w*fp[0],h*fp[1],h,'zboara'); });
+    }
+    if(_customVocab[subj]) s+=customElement(cx,h*0.72,subj,_customVocab[subj]);
+    if(_isEd){_sceneSubjects[i].pc_after=_pc; s+='</g>';}
+  });
+  if(!p.subjects.length) s+=defaultScene(p,w,h);
+  return s;
+}
+function aurora(w,h){return'<ellipse cx="'+(w*.4)+'" cy="'+(h*.15)+'" rx="'+(w*.35)+'" ry="'+(h*.12)+'" fill="rgba(255,140,40,.06)"/><ellipse cx="'+(w*.6)+'" cy="'+(h*.2)+'" rx="'+(w*.28)+'" ry="'+(h*.09)+'" fill="rgba(255,100,20,.04)"/>';}
+function snow(w,h){var s='',n=Math.max(6,Math.round(28*perfParticleMul()));for(var i=0;i<n;i++){var cx=Math.floor(vvRand()*w),dur=(1.2+vvRand()*1.4).toFixed(2),del=(-vvRand()*2).toFixed(2),r=(1+vvRand()*2.5).toFixed(1);s+='<circle cx="'+cx+'" cy="0" r="'+r+'" fill="rgba(220,235,255,0.7)"><animate attributeName="cy" from="-10" to="'+(h+10)+'" dur="'+dur+'s" begin="'+del+'s" repeatCount="indefinite"/><animate attributeName="cx" from="'+cx+'" to="'+(cx+20)+'" dur="'+dur+'s" begin="'+del+'s" repeatCount="indefinite"/></circle>';}return s;}
+function fallingLeaves(w,h){var s='',cols=['#c84400','#e06000','#c8a000','#8a3000'],n=Math.max(4,Math.round(16*perfParticleMul()));for(var i=0;i<n;i++){var cx=Math.floor(vvRand()*w),col=cols[i%4],dur=(2+vvRand()*2).toFixed(2),del=(-vvRand()*3).toFixed(2);s+='<ellipse cx="'+cx+'" cy="0" rx="6" ry="4" fill="'+col+'" opacity=".8"><animate attributeName="cy" from="-10" to="'+(h+10)+'" dur="'+dur+'s" begin="'+del+'s" repeatCount="indefinite"/><animate attributeName="cx" from="'+cx+'" to="'+(cx+40)+'" dur="'+dur+'s" begin="'+del+'s" repeatCount="indefinite"/><animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="'+dur+'s" begin="'+del+'s" repeatCount="indefinite"/></ellipse>';}return s;}
+function tree(x,y,h,season){
+  _pc++;
+  var id='t'+_pc;
+  var th=h*.4, tw=h*.15;
+  var isWinter=season==='iarna', isAutumn=season==='toamna', isSummer=season==='vara';
+  var lc1=isAutumn?'#d05800':isWinter?'#2a3c2a':isSummer?'#1a6a0a':'#2a7818';
+  var lc2=isAutumn?'#a83000':isWinter?'#1a2a1a':isSummer?'#0a4a00':'#185010';
+  var trunkW=tw*.22;
+  var s='<g>';
+  s+='<defs>';
+  s+='<radialGradient id="lf'+id+'" cx="35%" cy="30%" r="70%"><stop offset="0%" stop-color="'+lc1+'" stop-opacity="1"/><stop offset="70%" stop-color="'+lc2+'" stop-opacity="1"/><stop offset="100%" stop-color="'+lc2+'" stop-opacity=".85"/></radialGradient>';
+  s+='<linearGradient id="tr'+id+'" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#2a1500"/><stop offset="40%" stop-color="#4a2a0a"/><stop offset="100%" stop-color="#2a1500"/></linearGradient>';
+  s+='</defs>';
+  // trunk
+  s+='<rect x="'+(x-trunkW*.5)+'" y="'+(y-th*.48)+'" width="'+trunkW+'" height="'+(th*.52)+'" rx="'+(trunkW*.35)+'" fill="url(#tr'+id+')" />';
+  // bark texture
+  s+='<line x1="'+(x-trunkW*.1)+'" y1="'+(y-th*.42)+'" x2="'+(x-trunkW*.18)+'" y2="'+(y-th*.18)+'" stroke="rgba(0,0,0,.18)" stroke-width="1.2" stroke-linecap="round"/>';
+  s+='<line x1="'+(x+trunkW*.1)+'" y1="'+(y-th*.38)+'" x2="'+(x+trunkW*.06)+'" y2="'+(y-th*.15)+'" stroke="rgba(0,0,0,.14)" stroke-width="1" stroke-linecap="round"/>';
+  if(isWinter){
+    // sparse thin branches
+    s+='<line x1="'+x+'" y1="'+(y-th*.48)+'" x2="'+(x-tw*.38)+'" y2="'+(y-th*.72)+'" stroke="#3a2010" stroke-width="2" stroke-linecap="round"/>';
+    s+='<line x1="'+x+'" y1="'+(y-th*.5)+'" x2="'+(x+tw*.32)+'" y2="'+(y-th*.74)+'" stroke="#3a2010" stroke-width="1.5" stroke-linecap="round"/>';
+    s+='<line x1="'+x+'" y1="'+(y-th*.58)+'" x2="'+x+'" y2="'+(y-th*.95)+'" stroke="#3a2010" stroke-width="2" stroke-linecap="round"/>';
+    // snow lumps on branches
+    s+='<ellipse cx="'+x+'" cy="'+(y-th*.96)+'" rx="'+(tw*.22)+'" ry="'+(th*.07)+'" fill="rgba(220,235,255,.82)"/>';
+    s+='<ellipse cx="'+(x-tw*.38)+'" cy="'+(y-th*.73)+'" rx="'+(tw*.15)+'" ry="'+(th*.05)+'" fill="rgba(220,235,255,.75)"/>';
+    s+='<ellipse cx="'+(x+tw*.32)+'" cy="'+(y-th*.75)+'" rx="'+(tw*.13)+'" ry="'+(th*.05)+'" fill="rgba(220,235,255,.75)"/>';
+  } else {
+    // volumetric foliage: 4 offset circles
+    var ry=y-th*.55;
+    s+='<circle cx="'+(x-tw*.18)+'" cy="'+(ry+th*.14)+'" r="'+(tw*.44)+'" fill="url(#lf'+id+')" opacity=".92"/>';
+    s+='<circle cx="'+(x+tw*.2)+'" cy="'+(ry+th*.12)+'" r="'+(tw*.42)+'" fill="url(#lf'+id+')" opacity=".88"/>';
+    s+='<circle cx="'+x+'" cy="'+(ry-th*.05)+'" r="'+(tw*.46)+'" fill="url(#lf'+id+')" opacity=".95"/>';
+    s+='<circle cx="'+x+'" cy="'+(ry+th*.22)+'" r="'+(tw*.38)+'" fill="url(#lf'+id+')" opacity=".78"/>';
+    // highlight
+    s+='<ellipse cx="'+(x-tw*.08)+'" cy="'+(ry-th*.1)+'" rx="'+(tw*.2)+'" ry="'+(th*.1)+'" fill="rgba(255,255,255,.1)"/>';
+    if(isAutumn){
+      // falling leaf particle
+      s+='<circle cx="'+(x+tw*.55)+'" cy="'+(ry+th*.3)+'" r="3.5" fill="#c84400" opacity=".7"><animate attributeName="cy" from="'+(ry+th*.2)+'" to="'+y+'" dur="2.8s" repeatCount="indefinite"/><animate attributeName="cx" from="'+(x+tw*.55)+'" to="'+(x+tw*.8)+'" dur="2.8s" repeatCount="indefinite"/><animateTransform attributeName="transform" type="rotate" from="0 '+(x+tw*.55)+' '+(ry+th*.2)+'" to="360 '+(x+tw*.8)+' '+y+'" dur="2.8s" repeatCount="indefinite"/></circle>';
+    }
+  }
+  return s+'</g>';
+}
+function mountain(cx,h,season){var x=cx,mh=h*.65;var col=season==='iarna'?'#8090a8':'#4a5060';var snowCap=season==='iarna'||season==='primavara';var s='<g><polygon points="'+(x-h*.35)+','+(h*.88)+' '+x+','+(h*.12)+' '+(x+h*.35)+','+(h*.88)+'" fill="'+col+'" opacity=".8"/>';if(snowCap)s+='<polygon points="'+(x-h*.1)+','+(h*.25)+' '+x+','+(h*.12)+' '+(x+h*.1)+','+(h*.25)+'" fill="rgba(220,235,255,.9)"/>';s+='<polygon points="'+(x+h*.08)+','+(h*.88)+' '+(x+h*.35)+','+(h*.88)+' '+x+','+(h*.3)+'" fill="rgba(0,0,0,.15)"/>';return s+'</g>';}
+function sea(w,h,mood){var col=mood==='trist'?'rgba(30,60,120,.6)':'rgba(20,80,120,.5)';var s='<rect x="0" y="'+(h*.6)+'" width="'+w+'" height="'+(h*.4)+'" fill="'+col+'"/>';for(var i=0;i<5;i++){var y=h*(.65+i*.06);s+='<path d="M0 '+y+' Q'+(w*.1)+' '+(y-8)+' '+(w*.2)+' '+y+' Q'+(w*.3)+' '+(y+8)+' '+(w*.4)+' '+y+' Q'+(w*.5)+' '+(y-8)+' '+(w*.6)+' '+y+' Q'+(w*.7)+' '+(y+8)+' '+(w*.8)+' '+y+' Q'+(w*.9)+' '+(y-8)+' '+w+' '+y+'" stroke="rgba(255,255,255,.12)" stroke-width="1.5" fill="none"><animate attributeName="d" values="M0 '+y+' Q'+(w*.1)+' '+(y-8)+' '+(w*.2)+' '+y+' Q'+(w*.3)+' '+(y+8)+' '+(w*.4)+' '+y+' Q'+(w*.5)+' '+(y-8)+' '+(w*.6)+' '+y+' Q'+(w*.7)+' '+(y+8)+' '+(w*.8)+' '+y+' Q'+(w*.9)+' '+(y-8)+' '+w+' '+y+';M0 '+(y+6)+' Q'+(w*.1)+' '+(y-4)+' '+(w*.2)+' '+(y+6)+' Q'+(w*.3)+' '+(y+10)+' '+(w*.4)+' '+(y+6)+' Q'+(w*.5)+' '+(y-4)+' '+(w*.6)+' '+(y+6)+' Q'+(w*.7)+' '+(y+10)+' '+(w*.8)+' '+(y+6)+' Q'+(w*.9)+' '+(y-4)+' '+w+' '+(y+6)+';M0 '+y+' Q'+(w*.1)+' '+(y-8)+' '+(w*.2)+' '+y+' Q'+(w*.3)+' '+(y+8)+' '+(w*.4)+' '+y+' Q'+(w*.5)+' '+(y-8)+' '+(w*.6)+' '+y+' Q'+(w*.7)+' '+(y+8)+' '+(w*.8)+' '+y+' Q'+(w*.9)+' '+(y-8)+' '+w+' '+y+'" dur="'+(2+i*.4)+'s" repeatCount="indefinite"/></path>';}return s;}
+function dog(x,y,h,action){
+  _pc++;
+  var id='d'+_pc;
+  var FURS=[['#8a6a40','#6a4a20'],['#d4a840','#a87820'],['#f0e0c8','#c8b898'],['#2a1a0a','#180e04']];
+  var fi=_furOverrideVal!==undefined?(_furOverrideVal%4):(_laws.variatie>0?_pc%4:0);
+  var dc=FURS[fi][0], dc2=FURS[fi][1];
+  var r=h*.05;
+  var s='<g>';
+  s+='<defs><radialGradient id="dg'+id+'" cx="38%" cy="28%" r="65%"><stop offset="0%" stop-color="'+dc+'"/><stop offset="100%" stop-color="'+dc2+'"/></radialGradient></defs>';
+  // picioare
+  s+='<line x1="'+(x-r*1.2)+'" y1="'+y+'" x2="'+(x-r*2)+'" y2="'+(y+r*1.4)+'" stroke="'+dc2+'" stroke-width="'+(r*.45)+'" stroke-linecap="round"/>';
+  s+='<line x1="'+(x-r*.4)+'" y1="'+y+'" x2="'+(x-r*1.1)+'" y2="'+(y+r*1.4)+'" stroke="'+dc2+'" stroke-width="'+(r*.45)+'" stroke-linecap="round"/>';
+  s+='<line x1="'+(x+r*.4)+'" y1="'+y+'" x2="'+(x+r*.1)+'" y2="'+(y+r*1.4)+'" stroke="'+dc2+'" stroke-width="'+(r*.45)+'" stroke-linecap="round"/>';
+  s+='<line x1="'+(x+r*1.2)+'" y1="'+y+'" x2="'+(x+r*.9)+'" y2="'+(y+r*1.4)+'" stroke="'+dc2+'" stroke-width="'+(r*.45)+'" stroke-linecap="round"/>';
+  // labute
+  [[x-r*2,x-r*1.1,x+r*.1,x+r*.9]].forEach(function(xs){xs.forEach(function(lx){s+='<ellipse cx="'+lx+'" cy="'+(y+r*1.42)+'" rx="'+(r*.3)+'" ry="'+(r*.13)+'" fill="'+dc2+'"/>';});});
+  // corp cu gradient
+  s+='<ellipse cx="'+x+'" cy="'+y+'" rx="'+(r*1.8)+'" ry="'+(r*.92)+'" fill="url(#dg'+id+')"/>';
+  s+='<ellipse cx="'+(x-r*.2)+'" cy="'+(y-r*.35)+'" rx="'+(r*.7)+'" ry="'+(r*.38)+'" fill="rgba(255,255,255,.08)"/>';
+  // cap
+  s+='<circle cx="'+(x+r*1.4)+'" cy="'+(y-r*.62)+'" r="'+(r*.72)+'" fill="url(#dg'+id+')"/>';
+  // urechi floppy
+  s+='<ellipse cx="'+(x+r*1.0)+'" cy="'+(y-r*.28)+'" rx="'+(r*.22)+'" ry="'+(r*.5)+'" fill="'+dc2+'" transform="rotate(-18,'+(x+r*1.0)+','+(y-r*.28)+')"/>';
+  s+='<ellipse cx="'+(x+r*1.8)+'" cy="'+(y-r*.28)+'" rx="'+(r*.22)+'" ry="'+(r*.5)+'" fill="'+dc2+'" transform="rotate(18,'+(x+r*1.8)+','+(y-r*.28)+')"/>';
+  // bot
+  s+='<ellipse cx="'+(x+r*2.0)+'" cy="'+(y-r*.38)+'" rx="'+(r*.28)+'" ry="'+(r*.2)+'" fill="'+dc+'"/>';
+  s+='<circle cx="'+(x+r*2.02)+'" cy="'+(y-r*.44)+'" r="'+(r*.1)+'" fill="#2a1008"/>';
+  // ochi
+  s+='<circle cx="'+(x+r*1.55)+'" cy="'+(y-r*.82)+'" r="'+(r*.18)+'" fill="#2a1008"/>';
+  s+='<circle cx="'+(x+r*1.5)+'" cy="'+(y-r*.86)+'" r="'+(r*.07)+'" fill="rgba(255,255,255,.85)"/>';
+  // coadă
+  s+='<path d="M'+(x-r*1.8)+' '+y+' Q'+(x-r*2.4)+' '+(y-r*.6)+' '+(x-r*2.1)+' '+(y-r*1.2)+'" stroke="'+dc+'" stroke-width="'+(r*.38)+'" fill="none" stroke-linecap="round"/>';
+  return s+'</g>';
+}
+function bird(x,y,h,action){
+  _pc++;
+  var id='b'+_pc;
+  var gv=_laws.variatie;
+  var SP=[
+    {c1:'#c83020',c2:'#901808',w:'#601008'},
+    {c1:'#2050c0',c2:'#1030a0',w:'#001880'},
+    {c1:'#d0c020',c2:'#a09010',w:'#806000'},
+    {c1:'#209050',c2:'#107030',w:'#004820'},
+    {c1:'#303038',c2:'#181820',w:'#080810'},
+  ];
+  var sp=_speciesOverrideVal!==undefined?SP[_speciesOverrideVal%5]:(gv>0?SP[_pc%5]:SP[4]);
+  var r=h*.028*(action==='zboara'?1.25:1);
+  var speed=((action==='zboara'?0.65:1.1)/_laws.ritm).toFixed(2)+'s';
+  var s='<g>';
+  s+='<defs><radialGradient id="bd'+id+'" cx="35%" cy="28%" r="65%"><stop offset="0%" stop-color="'+sp.c1+'"/><stop offset="100%" stop-color="'+sp.c2+'"/></radialGradient></defs>';
+  // corp
+  s+='<ellipse cx="'+x+'" cy="'+y+'" rx="'+(r*1.6)+'" ry="'+(r*.72)+'" fill="url(#bd'+id+')"/>';
+  // cap
+  s+='<circle cx="'+(x+r*1.2)+'" cy="'+(y-r*.58)+'" r="'+(r*.7)+'" fill="url(#bd'+id+')"/>';
+  // ochi
+  s+='<circle cx="'+(x+r*1.46)+'" cy="'+(y-r*.7)+'" r="'+(r*.21)+'" fill="#f0e060"/>';
+  s+='<circle cx="'+(x+r*1.47)+'" cy="'+(y-r*.7)+'" r="'+(r*.12)+'" fill="#111"/>';
+  s+='<circle cx="'+(x+r*1.42)+'" cy="'+(y-r*.74)+'" r="'+(r*.058)+'" fill="rgba(255,255,255,.9)"/>';
+  // cioc
+  s+='<path d="M'+(x+r*1.86)+' '+(y-r*.52)+' L'+(x+r*2.28)+' '+(y-r*.4)+' L'+(x+r*1.86)+' '+(y-r*.28)+'" fill="#d0a020"/>';
+  // coadă
+  s+='<path d="M'+(x-r*1.5)+' '+y+' Q'+(x-r*2.5)+' '+(y-r*.5)+' '+(x-r*2.75)+' '+(y+r*.28)+'" stroke="'+sp.c2+'" stroke-width="'+(r*.48)+'" fill="none" stroke-linecap="round"/>';
+  s+='<path d="M'+(x-r*1.5)+' '+(y+r*.18)+' Q'+(x-r*2.4)+' '+(y+r*.45)+' '+(x-r*2.6)+' '+(y+r*.88)+'" stroke="'+sp.c2+'" stroke-width="'+(r*.38)+'" fill="none" stroke-linecap="round"/>';
+  // aripi animate
+  s+='<path d="M'+(x-r*1.8)+' '+y+' Q'+x+' '+(y-r*2.4)+' '+(x+r*1.8)+' '+y+'" stroke="'+sp.w+'" stroke-width="'+(r*.58)+'" fill="none">';
+  s+='<animate attributeName="d" values="M'+(x-r*1.8)+' '+y+' Q'+x+' '+(y-r*2.4)+' '+(x+r*1.8)+' '+y+';M'+(x-r*1.8)+' '+y+' Q'+x+' '+(y+r*.9)+' '+(x+r*1.8)+' '+y+';M'+(x-r*1.8)+' '+y+' Q'+x+' '+(y-r*2.4)+' '+(x+r*1.8)+' '+y+'" dur="'+speed+'" repeatCount="indefinite"/>';
+  s+='</path>';
+  if(action==='zboara'){
+    s+='<animateTransform attributeName="transform" type="translate" values="0,0;'+(r*4)+','+(r*-1.5)+';0,0" dur="4s" repeatCount="indefinite"/>';
+  }
+  return s+'</g>';
+}
+function stars(w,h){
+  var s='';
+  var pos=[[.09,.1],[.17,.05],[.29,.17],[.44,.07],[.57,.13],[.68,.06],[.8,.12],[.89,.04],[.12,.24],[.37,.22],[.76,.2]];
+  pos.forEach(function(p,i){
+    var cx=w*p[0], cy=h*p[1];
+    var bright=i%3===0;
+    var r=bright?2.4:1.2;
+    var dur=(2+vvRand()*3).toFixed(1);
+    if(bright) s+='<circle cx="'+cx+'" cy="'+cy+'" r="'+(r*4.5)+'" fill="url(#starG)" opacity=".8"/>';
+    s+='<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="rgba(255,255,255,'+(bright?.92:.52)+')">';
+    s+='<animate attributeName="opacity" values="'+(bright?.9:.5)+';'+(bright?.28:.08)+';'+(bright?.9:.5)+'" dur="'+dur+'s" repeatCount="indefinite"/>';
+    s+='</circle>';
+  });
+  return s;
+}
+function rain(w,h){var s='',n=Math.max(8,Math.round(22*perfParticleMul()));for(var i=0;i<n;i++){var cx=30+Math.floor(vvRand()*(w-60)),dur=((0.7+vvRand()*0.7)/_laws.ritm).toFixed(2),del=(-vvRand()*1.5).toFixed(2),op=(0.25+vvRand()*0.35).toFixed(2);s+='<ellipse cx="'+cx+'" cy="0" rx="1.2" ry="5" fill="rgba(130,175,255,'+op+')"><animate attributeName="cy" from="-10" to="'+(h+10)+'" dur="'+dur+'s" begin="'+del+'s" repeatCount="indefinite"/><animate attributeName="cx" from="'+cx+'" to="'+(cx-18)+'" dur="'+dur+'s" begin="'+del+'s" repeatCount="indefinite"/></ellipse>';}return s;}
+function sun(x,y,r){
+  var s='<g>';
+  // corona pulsating glow
+  s+='<circle cx="'+x+'" cy="'+y+'" r="'+(r*3.2)+'" fill="url(#sunG)">';
+  s+='<animate attributeName="r" values="'+(r*3.2)+';'+(r*3.8)+';'+(r*3.2)+'" dur="5s" repeatCount="indefinite"/>';
+  s+='<animate attributeName="opacity" values=".85;.5;.85" dur="5s" repeatCount="indefinite"/>';
+  s+='</circle>';
+  s+='<circle cx="'+x+'" cy="'+y+'" r="'+(r*2)+'" fill="rgba(255,220,40,.06)"/>';
+  // main body
+  s+='<circle cx="'+x+'" cy="'+y+'" r="'+r+'" fill="#f5c020" opacity=".92"/>';
+  s+='<circle cx="'+x+'" cy="'+y+'" r="'+(r*.72)+'" fill="#ffe844"/>';
+  s+='<ellipse cx="'+(x-r*.22)+'" cy="'+(y-r*.22)+'" rx="'+(r*.3)+'" ry="'+(r*.2)+'" fill="rgba(255,255,200,.2)"/>';
+  // rays
+  for(var i=0;i<8;i++){
+    var a=i*45*Math.PI/180;
+    var len=i%2===0?r*1.75:r*1.45;
+    s+='<line x1="'+(x+Math.cos(a)*r*1.12).toFixed(1)+'" y1="'+(y+Math.sin(a)*r*1.12).toFixed(1)+'" x2="'+(x+Math.cos(a)*len).toFixed(1)+'" y2="'+(y+Math.sin(a)*len).toFixed(1)+'" stroke="#f5c020" stroke-width="'+(i%2===0?2.8:1.8)+'" stroke-linecap="round" opacity=".82"/>';
+  }
+  return s+'</g>';
+}
+function person(x,y,mood,h,action,ov){
+  ov=ov||{};
+  _pc++;
+  var id='p'+_pc;
+  // ── GENE SYSTEM ──
+  var gv=_laws.variatie;
+  var gene=(_pc*37)%100/100; // deterministic 0–1 per slot
+  if(gv>0) h=h*(1+(gene-.5)*.16*gv); // ±8% height variation
+  var SKINS=[['#fde8c4','#e8b468','#c48a3a'],['#f0d0a0','#d09050','#a87030'],['#e4be8a','#bf7840','#986030'],['#fce0b8','#e0a850','#bc8028']];
+  var sk=gv>0?SKINS[_pc%4]:SKINS[0];
+  var EYES=['#3a7aaa','#2a5a2a','#8a4818','#2a4a8a','#4a3a2a','#1a6060'];
+  var geneEye=gv>0?EYES[_pc%6]:null;
+  var HAIR=['#1a0c04','#3a1c08','#7a5028','#0a0804','#2a1a10','#504030'];
+  var r=h*.075;
+  var sad=mood==='trist'||action==='plange';
+  var happy=mood==='fericit'||action==='rade'||action==='danseaza';
+  var sleeping=action==='doarme';
+  var shirtA=sad?'#4a72b8':happy?'#d48820':mood==='tensiune'?'#9a2a18':'#2a7a52';
+  var shirtB=sad?'#2a4a80':happy?'#a86010':mood==='tensiune'?'#6a1a08':'#1a5a38';
+  var pantsCol=sad?'#22304a':'#1a2838';
+  var hairCol=gv>0?HAIR[_pc%6]:(happy?'#7a4818':'#2e1c0a');
+  var bodyTop=y+r*.88, bodyH=r*2.6, bodyW=r*1.18, bb=bodyTop+bodyH, armY=bodyTop+bodyH*.25, legH=r*2.1;
+  var breathe=_laws.sens>=0.28&&!_frozen&&_perfMode!=='eco';
+  var breathDur=(3.2/_laws.ritm).toFixed(2);
+  var s=breathe?'<g class="vv-organism" data-drift="0"><animateTransform attributeName="transform" type="translate" values="0,0;0,-'+(r*.06).toFixed(2)+';0,0" dur="'+breathDur+'s" repeatCount="indefinite" calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1" keyTimes="0;0.45;1"/>':'<g class="vv-organism" data-drift="0">';
+  // gradients
+  s+='<defs>';
+  s+='<radialGradient id="sk'+id+'" cx="38%" cy="30%" r="65%"><stop offset="0%" stop-color="'+sk[0]+'"/><stop offset="65%" stop-color="'+sk[1]+'"/><stop offset="100%" stop-color="'+sk[2]+'"/></radialGradient>';
+  s+='<linearGradient id="sh'+id+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="'+shirtA+'"/><stop offset="100%" stop-color="'+shirtB+'"/></linearGradient>';
+  s+='<linearGradient id="pt'+id+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#2a3848"/><stop offset="100%" stop-color="'+pantsCol+'"/></linearGradient>';
+  s+='</defs>';
+  // ── LEGS ──
+  var lw=r*.72;
+  if(action==='sare'){
+    s+='<path d="M'+(x-r*.25)+' '+bb+' Q'+(x-r*1.5)+' '+(bb+r*.9)+' '+(x-r*2.1)+' '+(bb+legH)+'" stroke="url(#pt'+id+')" stroke-width="'+lw+'" fill="none" stroke-linecap="round"/>';
+    s+='<path d="M'+(x+r*.25)+' '+bb+' Q'+(x+r*1.5)+' '+(bb+r*.9)+' '+(x+r*2.1)+' '+(bb+legH)+'" stroke="url(#pt'+id+')" stroke-width="'+lw+'" fill="none" stroke-linecap="round"/>';
+  } else if(action==='alergare'){
+    s+='<path d="M'+(x-r*.25)+' '+bb+' Q'+(x-r*1.7)+' '+(bb+r)+' '+(x-r*1.35)+' '+(bb+legH)+'" stroke="url(#pt'+id+')" stroke-width="'+lw+'" fill="none" stroke-linecap="round"/>';
+    s+='<path d="M'+(x+r*.25)+' '+bb+' Q'+(x+r*1.5)+' '+(bb+r*.55)+' '+(x+r*1.9)+' '+(bb+legH)+'" stroke="url(#pt'+id+')" stroke-width="'+lw+'" fill="none" stroke-linecap="round"/>';
+  } else if(action==='danseaza'){
+    s+='<path d="M'+(x-r*.25)+' '+bb+' Q'+(x-r*.5)+' '+(bb+r*1.2)+' '+(x-r*.7)+' '+(bb+legH)+'" stroke="url(#pt'+id+')" stroke-width="'+lw+'" fill="none" stroke-linecap="round"/>';
+    s+='<path d="M'+(x+r*.25)+' '+bb+' Q'+(x+r*2.1)+' '+(bb+r*.45)+' '+(x+r*2.6)+' '+(bb+r*1.2)+'" stroke="url(#pt'+id+')" stroke-width="'+lw+'" fill="none" stroke-linecap="round"/>';
+  } else {
+    s+='<path d="M'+(x-r*.25)+' '+bb+' Q'+(x-r*.38)+' '+(bb+r*1.1)+' '+(x-r*.48)+' '+(bb+legH)+'" stroke="url(#pt'+id+')" stroke-width="'+lw+'" fill="none" stroke-linecap="round"/>';
+    s+='<path d="M'+(x+r*.25)+' '+bb+' Q'+(x+r*.38)+' '+(bb+r*1.1)+' '+(x+r*.48)+' '+(bb+legH)+'" stroke="url(#pt'+id+')" stroke-width="'+lw+'" fill="none" stroke-linecap="round"/>';
+  }
+  // shoes
+  var sx1=action==='sare'?x-r*2.1:action==='alergare'?x-r*1.35:x-r*.48;
+  var sx2=action==='sare'?x+r*2.1:action==='alergare'?x+r*1.9:x+r*.48;
+  s+='<ellipse cx="'+sx1+'" cy="'+(bb+legH+r*.14)+'" rx="'+(r*.44)+'" ry="'+(r*.18)+'" fill="#18182a"/>';
+  s+='<ellipse cx="'+sx2+'" cy="'+(bb+legH+r*.14)+'" rx="'+(r*.44)+'" ry="'+(r*.18)+'" fill="#18182a"/>';
+  // ── BODY ──
+  s+='<rect x="'+(x-bodyW*.5)+'" y="'+bodyTop+'" width="'+bodyW+'" height="'+bodyH+'" rx="'+(bodyW*.28)+'" fill="url(#sh'+id+')"/>';
+  s+='<ellipse cx="'+(x-bodyW*.1)+'" cy="'+(bodyTop+bodyH*.22)+'" rx="'+(bodyW*.22)+'" ry="'+(bodyH*.14)+'" fill="rgba(255,255,255,.13)"/>';
+  // ── ARMS ──
+  var aw=r*.62;
+  if(action==='sare'){
+    s+='<path d="M'+x+' '+armY+' Q'+(x-r*1.9)+' '+(armY-r*1.4)+' '+(x-r*2.4)+' '+(armY-r*.35)+'" stroke="url(#sh'+id+')" stroke-width="'+aw+'" fill="none" stroke-linecap="round"/>';
+    s+='<path d="M'+x+' '+armY+' Q'+(x+r*1.9)+' '+(armY-r*1.4)+' '+(x+r*2.4)+' '+(armY-r*.35)+'" stroke="url(#sh'+id+')" stroke-width="'+aw+'" fill="none" stroke-linecap="round"/>';
+  } else if(action==='alergare'){
+    s+='<path d="M'+x+' '+armY+' Q'+(x-r*1.9)+' '+(armY+r*.4)+' '+(x-r*2.2)+' '+(armY+r*1.6)+'" stroke="url(#sh'+id+')" stroke-width="'+aw+'" fill="none" stroke-linecap="round"/>';
+    s+='<path d="M'+x+' '+armY+' Q'+(x+r*1.7)+' '+(armY-r*.7)+' '+(x+r*2)+' '+(armY+r*.4)+'" stroke="url(#sh'+id+')" stroke-width="'+aw+'" fill="none" stroke-linecap="round"/>';
+  } else if(action==='danseaza'){
+    s+='<path d="M'+x+' '+armY+' Q'+(x+r*2.2)+' '+(armY-r*1.2)+' '+(x+r*2.7)+' '+(armY+r*.2)+'" stroke="url(#sh'+id+')" stroke-width="'+aw+'" fill="none" stroke-linecap="round"/>';
+    s+='<path d="M'+x+' '+armY+' Q'+(x-r*1.7)+' '+(armY+r*1.4)+' '+(x-r*2)+' '+(armY+r*.3)+'" stroke="url(#sh'+id+')" stroke-width="'+aw+'" fill="none" stroke-linecap="round"/>';
+    s+='<text x="'+(x+r*2.7)+'" y="'+(y-r*.4)+'" fill="rgba(255,200,100,.85)" font-size="'+(r*.95)+'">♪</text>';
+  } else if(sleeping){
+    s+='<path d="M'+x+' '+armY+' Q'+(x-r*1.3)+' '+(armY+r*1.5)+' '+(x-r*1.55)+' '+(armY+r*2.2)+'" stroke="url(#sh'+id+')" stroke-width="'+aw+'" fill="none" stroke-linecap="round"/>';
+    s+='<path d="M'+x+' '+armY+' Q'+(x+r*1.3)+' '+(armY+r*1.5)+' '+(x+r*1.55)+' '+(armY+r*2.2)+'" stroke="url(#sh'+id+')" stroke-width="'+aw+'" fill="none" stroke-linecap="round"/>';
+  } else if(sad){
+    s+='<path d="M'+x+' '+armY+' Q'+(x-r*1.6)+' '+(armY+r*1.5)+' '+(x-r*1.8)+' '+(armY+r*2.4)+'" stroke="url(#sh'+id+')" stroke-width="'+aw+'" fill="none" stroke-linecap="round"/>';
+    s+='<path d="M'+x+' '+armY+' Q'+(x+r*1.6)+' '+(armY+r*1.5)+' '+(x+r*1.8)+' '+(armY+r*2.4)+'" stroke="url(#sh'+id+')" stroke-width="'+aw+'" fill="none" stroke-linecap="round"/>';
+  } else {
+    s+='<path d="M'+x+' '+armY+' Q'+(x-r*1.9)+' '+(armY-.1*r)+' '+(x-r*2.1)+' '+(armY+r*1.1)+'" stroke="url(#sh'+id+')" stroke-width="'+aw+'" fill="none" stroke-linecap="round"/>';
+    s+='<path d="M'+x+' '+armY+' Q'+(x+r*1.9)+' '+(armY-.1*r)+' '+(x+r*2.1)+' '+(armY+r*1.1)+'" stroke="url(#sh'+id+')" stroke-width="'+aw+'" fill="none" stroke-linecap="round"/>';
+  }
+  // ── NECK ──
+  s+='<rect x="'+(x-r*.22)+'" y="'+(y+r*.82)+'" width="'+(r*.44)+'" height="'+(r*.3)+'" fill="url(#sk'+id+')" rx="'+(r*.1)+'"/>';
+  // ── HEAD ──
+  s+='<circle cx="'+x+'" cy="'+y+'" r="'+r+'" fill="url(#sk'+id+')" stroke="#b87830" stroke-width=".8"/>';
+  // ── HAIR ──
+  s+='<path d="M'+(x-r*.96)+' '+(y-r*.2)+' Q'+x+' '+(y-r*1.72)+' '+(x+r*.96)+' '+(y-r*.2)+'" fill="'+hairCol+'"/>';
+  s+='<ellipse cx="'+(x-r*.9)+'" cy="'+(y+r*.12)+'" rx="'+(r*.2)+'" ry="'+(r*.3)+'" fill="'+hairCol+'"/>';
+  s+='<ellipse cx="'+(x+r*.9)+'" cy="'+(y+r*.12)+'" rx="'+(r*.2)+'" ry="'+(r*.3)+'" fill="'+hairCol+'"/>';
+  // ── EYEBROWS ──
+  var bry=y-r*.5;
+  if(sad){
+    s+='<path d="M'+(x-r*.48)+' '+bry+' Q'+(x-r*.27)+' '+(bry-r*.22)+' '+(x-r*.08)+' '+(bry-r*.06)+'" stroke="#2e1c0a" stroke-width="2.2" fill="none" stroke-linecap="round"/>';
+    s+='<path d="M'+(x+r*.08)+' '+(bry-r*.06)+' Q'+(x+r*.27)+' '+(bry-r*.22)+' '+(x+r*.48)+' '+bry+'" stroke="#2e1c0a" stroke-width="2.2" fill="none" stroke-linecap="round"/>';
+  } else if(happy){
+    s+='<path d="M'+(x-r*.48)+' '+(bry-r*.06)+' Q'+(x-r*.27)+' '+(bry-r*.28)+' '+(x-r*.08)+' '+(bry-r*.1)+'" stroke="#2e1c0a" stroke-width="2" fill="none" stroke-linecap="round"/>';
+    s+='<path d="M'+(x+r*.08)+' '+(bry-r*.1)+' Q'+(x+r*.27)+' '+(bry-r*.28)+' '+(x+r*.48)+' '+(bry-r*.06)+'" stroke="#2e1c0a" stroke-width="2" fill="none" stroke-linecap="round"/>';
+  } else if(mood==='tensiune'){
+    s+='<path d="M'+(x-r*.08)+' '+(bry-r*.12)+' Q'+(x-r*.27)+' '+(bry-r*.28)+' '+(x-r*.48)+' '+(bry-r*.06)+'" stroke="#2e1c0a" stroke-width="2.2" fill="none" stroke-linecap="round"/>';
+    s+='<path d="M'+(x+r*.48)+' '+(bry-r*.06)+' Q'+(x+r*.27)+' '+(bry-r*.28)+' '+(x+r*.08)+' '+(bry-r*.12)+'" stroke="#2e1c0a" stroke-width="2.2" fill="none" stroke-linecap="round"/>';
+  } else {
+    s+='<path d="M'+(x-r*.48)+' '+(bry-r*.06)+' Q'+(x-r*.27)+' '+(bry-r*.2)+' '+(x-r*.08)+' '+(bry-r*.06)+'" stroke="#2e1c0a" stroke-width="1.8" fill="none" stroke-linecap="round"/>';
+    s+='<path d="M'+(x+r*.08)+' '+(bry-r*.06)+' Q'+(x+r*.27)+' '+(bry-r*.2)+' '+(x+r*.48)+' '+(bry-r*.06)+'" stroke="#2e1c0a" stroke-width="1.8" fill="none" stroke-linecap="round"/>';
+  }
+  // ── EYES ──
+  var eyeY=y-r*.12, eRx=r*.22, eRy=r*.27;
+  if(sleeping){
+    s+='<path d="M'+(x-r*.46)+' '+eyeY+' Q'+(x-r*.27)+' '+(eyeY-r*.24)+' '+(x-r*.08)+' '+eyeY+'" stroke="#2e1c0a" stroke-width="2.2" fill="none" stroke-linecap="round"/>';
+    s+='<path d="M'+(x+r*.08)+' '+eyeY+' Q'+(x+r*.27)+' '+(eyeY-r*.24)+' '+(x+r*.46)+' '+eyeY+'" stroke="#2e1c0a" stroke-width="2.2" fill="none" stroke-linecap="round"/>';
+  } else {
+    [x-r*.28,x+r*.28].forEach(function(ex){
+      var irisCol=geneEye||(sad?'#2a4a88':happy?'#1a7038':mood==='tensiune'?'#6a1808':'#4a3810');
+      s+='<ellipse cx="'+ex+'" cy="'+eyeY+'" rx="'+eRx+'" ry="'+eRy+'" fill="white" stroke="#b88840" stroke-width=".7"/>';
+      s+='<ellipse cx="'+ex+'" cy="'+eyeY+'" rx="'+(eRx*.63)+'" ry="'+(eRy*.68)+'" fill="'+irisCol+'"/>';
+      s+='<ellipse cx="'+ex+'" cy="'+eyeY+'" rx="'+(eRx*.35)+'" ry="'+(eRy*.4)+'" fill="#0a0808"/>';
+      s+='<circle cx="'+(ex-eRx*.16)+'" cy="'+(eyeY-eRy*.22)+'" r="'+(eRx*.22)+'" fill="rgba(255,255,255,.94)"/>';
+      s+='<circle cx="'+(ex+eRx*.08)+'" cy="'+(eyeY+eRy*.1)+'" r="'+(eRx*.1)+'" fill="rgba(255,255,255,.5)"/>';
+    });
+  }
+  // ── NOSE ──
+  s+='<circle cx="'+x+'" cy="'+(y+r*.24)+'" r="'+(r*.08)+'" fill="#b07830" opacity=".5"/>';
+  // ── MOUTH ──
+  if(sad){
+    s+='<path d="M'+(x-r*.34)+' '+(y+r*.52)+' Q'+x+' '+(y+r*.74)+' '+(x+r*.34)+' '+(y+r*.52)+'" stroke="#2e1c0a" stroke-width="2" fill="none" stroke-linecap="round"/>';
+    s+='<ellipse cx="'+(x+r*.34)+'" cy="'+(y+r*.62)+'" rx="'+(r*.08)+'" ry="'+(r*.19)+'" fill="rgba(100,150,255,.72)"><animate attributeName="cy" from="'+(y+r*.44)+'" to="'+(y+r*1.02)+'" dur="2s" repeatCount="indefinite"/></ellipse>';
+  } else if(sleeping){
+    s+='<path d="M'+(x-r*.27)+' '+(y+r*.48)+' Q'+x+' '+(y+r*.65)+' '+(x+r*.27)+' '+(y+r*.48)+'" stroke="#2e1c0a" stroke-width="1.5" fill="none" stroke-linecap="round"/>';
+    s+='<text x="'+(x+r*.85)+'" y="'+(y-r*.92)+'" fill="rgba(180,200,255,.55)" font-size="'+(r*.72)+'">z<animate attributeName="opacity" values=".6;.15;.6" dur="2s" repeatCount="indefinite"/></text>';
+    s+='<text x="'+(x+r*1.55)+'" y="'+(y-r*1.65)+'" fill="rgba(180,200,255,.45)" font-size="'+(r*.9)+'">z<animate attributeName="opacity" values=".45;.1;.45" dur="2.4s" repeatCount="indefinite"/></text>';
+    s+='<text x="'+(x+r*2.2)+'" y="'+(y-r*2.35)+'" fill="rgba(180,200,255,.35)" font-size="'+(r*1.1)+'">Z<animate attributeName="opacity" values=".35;.05;.35" dur="3s" repeatCount="indefinite"/></text>';
+  } else if(happy){
+    s+='<path d="M'+(x-r*.38)+' '+(y+r*.38)+' Q'+x+' '+(y+r*.76)+' '+(x+r*.38)+' '+(y+r*.38)+'" stroke="#2e1c0a" stroke-width="2" fill="rgba(200,70,60,.18)" stroke-linecap="round"/>';
+    s+='<ellipse cx="'+(x-r*.55)+'" cy="'+(y+r*.32)+'" rx="'+(r*.22)+'" ry="'+(r*.14)+'" fill="rgba(255,100,80,.28)"/>';
+    s+='<ellipse cx="'+(x+r*.55)+'" cy="'+(y+r*.32)+'" rx="'+(r*.22)+'" ry="'+(r*.14)+'" fill="rgba(255,100,80,.28)"/>';
+  } else if(mood==='tensiune'){
+    s+='<path d="M'+(x-r*.3)+' '+(y+r*.5)+' Q'+x+' '+(y+r*.42)+' '+(x+r*.3)+' '+(y+r*.5)+'" stroke="#2e1c0a" stroke-width="1.8" fill="none" stroke-linecap="round"/>';
+  } else {
+    s+='<path d="M'+(x-r*.3)+' '+(y+r*.44)+' Q'+x+' '+(y+r*.62)+' '+(x+r*.3)+' '+(y+r*.44)+'" stroke="#2e1c0a" stroke-width="1.8" fill="none" stroke-linecap="round"/>';
+  }
+  var must=ov.mustache_ov&&ov.mustache_ov!=='auto'?ov.mustache_ov:(/mustat|mustaț|mustata/.test((document.getElementById('script-inp')||{}).value||'')?'clasica':'nu');
+  var beard=ov.beard_ov&&ov.beard_ov!=='auto'?ov.beard_ov:'nu';
+  var glasses=ov.glasses_ov&&ov.glasses_ov!=='auto'?ov.glasses_ov:'nu';
+  if(must&&must!=='nu'){
+    if(must==='stangace') s+='<path d="M'+(x-r*.2)+' '+(y+r*.46)+' L'+(x-r*.05)+' '+(y+r*.5)+'" stroke="#2e1c0a" stroke-width="1.6" fill="none" stroke-linecap="round"/>';
+    else if(must==='subțire'||must==='subtire') s+='<path d="M'+(x-r*.28)+' '+(y+r*.47)+' Q'+x+' '+(y+r*.5)+' '+(x+r*.28)+' '+(y+r*.47)+'" stroke="#2e1c0a" stroke-width="1.2" fill="none"/>';
+    else s+='<path d="M'+(x-r*.36)+' '+(y+r*.45)+' Q'+x+' '+(y+r*.54)+' '+(x+r*.36)+' '+(y+r*.45)+'" stroke="#2e1c0a" stroke-width="2.2" fill="none" stroke-linecap="round"/>';
+  }
+  if(beard&&beard!=='nu'){
+    var bh=beard==='lungă'||beard==='lunga'?r*.55:r*.28;
+    s+='<ellipse cx="'+x+'" cy="'+(y+r*.72)+'" rx="'+(r*.34)+'" ry="'+bh+'" fill="'+hairCol+'" opacity=".88"/>';
+  }
+  if(glasses&&glasses!=='nu'){
+    var gw=glasses==='patrate'?r*.34:r*.3;
+    [x-r*.28,x+r*.28].forEach(function(ex){
+      if(glasses==='patrate') s+='<rect x="'+(ex-gw)+'" y="'+(eyeY-r*.2)+'" width="'+(gw*2)+'" height="'+(eRy*1.5)+'" rx="2" fill="none" stroke="rgba(30,30,40,.85)" stroke-width="1.4"/>';
+      else s+='<ellipse cx="'+ex+'" cy="'+eyeY+'" rx="'+gw+'" ry="'+(eRy*1.1)+'" fill="none" stroke="rgba(30,30,40,.85)" stroke-width="1.4"/>';
+    });
+    s+='<line x1="'+(x-r*.06)+'" y1="'+eyeY+'" x2="'+(x+r*.06)+'" y2="'+eyeY+'" stroke="rgba(30,30,40,.7)" stroke-width="1"/>';
+  }
+  return s+'</g>';
+}
+function apple(x,y,rolling,w,h){var b='<ellipse cx="0" cy="0" rx="32" ry="30" fill="#cc2211"/><ellipse cx="0" cy="-27" rx="5" ry="4" fill="#991a0d"/><ellipse cx="-10" cy="-10" rx="9" ry="7" fill="rgba(255,255,255,0.22)" transform="rotate(-25,-10,-10)"/><path d="M0 -30 Q8 -43 14 -45" stroke="#5a3010" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M10 -41 Q28 -52 22 -33 Q14 -36 10 -41Z" fill="#2d7a1a"/>';if(rolling)return'<g style="animation:rollA 4s linear infinite;transform-origin:0 0">'+b+'</g>';return'<g transform="translate('+x+','+y+')">'+b+'</g>';}
+function cat(x,y,time,action){
+  _pc++;
+  var gv=_laws.variatie;
+  var FURS=['#3a3a3a','#c85820','#1a1a1a','#8a6a40'];
+  var furBase=_furOverrideVal!==undefined?FURS[_furOverrideVal%4]:(gv>0?FURS[_pc%4]:'#3a3a3a');
+  var c=time==='noapte'?'#1a1a2e':furBase, e=time==='noapte'?'#aaee22':'#88aa22';
+  var s='<g>';
+  // body
+  var bx=x, by=y, bry=26;
+  if(action==='sare'){by=y-30;}
+  if(action==='doarme'){bry=20;}
+  s+='<ellipse cx="'+bx+'" cy="'+by+'" rx="42" ry="'+bry+'" fill="'+c+'"/>';
+  // head
+  var hy=by-22;
+  s+='<circle cx="'+bx+'" cy="'+hy+'" r="22" fill="'+c+'"/>';
+  // ears
+  s+='<polygon points="'+(bx-11)+','+(hy-18)+' '+(bx-17)+','+(hy-38)+' '+(bx-3)+','+(hy-20)+'" fill="'+c+'"/>';
+  s+='<polygon points="'+(bx+11)+','+(hy-18)+' '+(bx+17)+','+(hy-38)+' '+(bx+3)+','+(hy-20)+'" fill="'+c+'"/>';
+  // eyes: closed if sleeping
+  if(action==='doarme'){
+    s+='<line x1="'+(bx-9)+'" y1="'+hy+'" x2="'+(bx-3)+'" y2="'+hy+'" stroke="'+e+'" stroke-width="2.5" stroke-linecap="round"/>';
+    s+='<line x1="'+(bx+3)+'" y1="'+hy+'" x2="'+(bx+9)+'" y2="'+hy+'" stroke="'+e+'" stroke-width="2.5" stroke-linecap="round"/>';
+    s+='<text x="'+(bx+24)+'" y="'+(hy-14)+'" fill="rgba(180,200,255,.5)" font-size="11">z<animate attributeName="opacity" values=".5;.1;.5" dur="2.2s" repeatCount="indefinite"/></text>';
+  } else {
+    s+='<ellipse cx="'+(bx-7)+'" cy="'+hy+'" rx="6" ry="8" fill="'+e+'" opacity=".9"/>';
+    s+='<ellipse cx="'+(bx+7)+'" cy="'+hy+'" rx="6" ry="8" fill="'+e+'" opacity=".9"/>';
+    // pupils: vertical slit night, horizontal day
+    s+='<ellipse cx="'+(bx-7)+'" cy="'+hy+'" rx="2" ry="7" fill="#111"/>';
+    s+='<ellipse cx="'+(bx+7)+'" cy="'+hy+'" rx="2" ry="7" fill="#111"/>';
+  }
+  // legs: spread if jumping
+  if(action==='sare'||action==='alergare'){
+    s+='<line x1="'+(bx-28)+'" y1="'+by+'" x2="'+(bx-42)+'" y2="'+(by+28)+'" stroke="'+c+'" stroke-width="7" stroke-linecap="round"/>';
+    s+='<line x1="'+(bx+28)+'" y1="'+by+'" x2="'+(bx+42)+'" y2="'+(by+28)+'" stroke="'+c+'" stroke-width="7" stroke-linecap="round"/>';
+    s+='<line x1="'+(bx-14)+'" y1="'+by+'" x2="'+(bx-20)+'" y2="'+(by+30)+'" stroke="'+c+'" stroke-width="7" stroke-linecap="round"/>';
+    s+='<line x1="'+(bx+14)+'" y1="'+by+'" x2="'+(bx+20)+'" y2="'+(by+30)+'" stroke="'+c+'" stroke-width="7" stroke-linecap="round"/>';
+  }
+  // tail
+  s+='<path d="M'+(bx-42)+' '+by+' Q'+(bx-65)+' '+(by-20)+' '+(bx-55)+' '+(by-40)+'" stroke="'+c+'" stroke-width="5" fill="none" stroke-linecap="round"/>';
+  return s+'</g>';
+}
+function heart(x,y,mood,h){
+  var r=h*.09;
+  var col=mood==='trist'?'#3a5aaa':mood==='fericit'?'#e03060':mood==='tensiune'?'#cc2222':'#aa4488';
+  var pulse=mood==='trist'?'3s':mood==='tensiune'?'.7s':'2s';
+  var glow=mood==='fericit'?'drop-shadow(0 0 '+Math.round(r*.4)+'px '+col+')':'none';
+  var s='<g filter="'+glow+'">';
+  // inimă din două cercuri + triunghi inversat
+  s+='<circle cx="'+(x-r*.28)+'" cy="'+(y-r*.18)+'" r="'+(r*.52)+'" fill="'+col+'" opacity=".9"/>';
+  s+='<circle cx="'+(x+r*.28)+'" cy="'+(y-r*.18)+'" r="'+(r*.52)+'" fill="'+col+'" opacity=".9"/>';
+  s+='<polygon points="'+x+','+(y+r*.72)+' '+(x-r*.82)+','+(y-r*.1)+' '+(x+r*.82)+','+(y-r*.1)+'" fill="'+col+'" opacity=".9"/>';
+  // puls
+  s+='<animateTransform attributeName="transform" type="scale" values="1;'+(mood==='tensiune'?'1.12':'1.06')+';1" dur="'+pulse+'" repeatCount="indefinite" additive="sum" calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1" keyTimes="0;0.3;1"/>';
+  // lacrima daca trist
+  if(mood==='trist') s+='<ellipse cx="'+(x+r*.1)+'" cy="'+(y+r*.9)+'" rx="'+(r*.1)+'" ry="'+(r*.22)+'" fill="rgba(100,150,255,0.6)"><animate attributeName="cy" from="'+(y+r*.7)+'" to="'+(y+r*1.4)+'" dur="1.8s" repeatCount="indefinite"/></ellipse>';
+  return s+'</g>';
+}
+function girafa(x,y,h,action){
+  _pc++;
+  var id='gi'+_pc;
+  var tw=h*.06,th=h*.44,neckH=h*.32,neckW=tw*.55;
+  var run=action==='alergare';
+  var s='<g>';
+  s+='<defs>';
+  s+='<radialGradient id="gf'+id+'" cx="35%" cy="28%" r="68%"><stop offset="0%" stop-color="#f2bc50"/><stop offset="62%" stop-color="#e8a030"/><stop offset="100%" stop-color="#b87020"/></radialGradient>';
+  s+='<linearGradient id="gn'+id+'" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#c07820"/><stop offset="45%" stop-color="#e8a030"/><stop offset="100%" stop-color="#b87020"/></linearGradient>';
+  s+='</defs>';
+  var bx=x,by=y-th*.28,bw=tw*2.2,bh=tw*1.1;
+  // corp cu gradient
+  s+='<ellipse cx="'+bx+'" cy="'+by+'" rx="'+bw+'" ry="'+bh+'" fill="url(#gf'+id+')"/>';
+  // pete
+  [[bx-bw*.4,by-bh*.2,tw*.28],[bx+bw*.1,by+bh*.1,tw*.22],[bx+bw*.5,by-bh*.1,tw*.2],[bx-bw*.1,by+bh*.4,tw*.18]].forEach(function(sp){s+='<ellipse cx="'+sp[0]+'" cy="'+sp[1]+'" rx="'+sp[2]+'" ry="'+(sp[2]*.7)+'" fill="#b05010" opacity=".72"/>';});
+  // highlight pe corp
+  s+='<ellipse cx="'+(bx-bw*.12)+'" cy="'+(by-bh*.38)+'" rx="'+(bw*.36)+'" ry="'+(bh*.28)+'" fill="rgba(255,255,255,.1)"/>';
+  // gât cu gradient liniar
+  var nx=bx+bw*.3,ny=by-bh*.6;
+  s+='<polygon points="'+(nx-neckW*.8)+','+(ny+neckH*.2)+' '+(nx+neckW*.8)+','+(ny+neckH*.2)+' '+(nx+neckW*.5)+','+(ny-neckH)+' '+(nx-neckW*.5)+','+(ny-neckH)+'" fill="url(#gn'+id+')"/>';
+  s+='<ellipse cx="'+nx+'" cy="'+(ny-neckH*.3)+'" rx="'+(neckW*.58)+'" ry="'+(neckH*.11)+'" fill="#b05010" opacity=".48"/>';
+  // cap
+  var hx=nx,hy=ny-neckH;
+  s+='<ellipse cx="'+hx+'" cy="'+hy+'" rx="'+(tw*.9)+'" ry="'+(tw*.62)+'" fill="url(#gf'+id+')"/>';
+  // ochi cu highlight
+  s+='<ellipse cx="'+(hx+tw*.5)+'" cy="'+(hy-tw*.08)+'" rx="'+(tw*.2)+'" ry="'+(tw*.22)+'" fill="#1a1000"/>';
+  s+='<ellipse cx="'+(hx+tw*.48)+'" cy="'+(hy-tw*.1)+'" rx="'+(tw*.1)+'" ry="'+(tw*.13)+'" fill="rgba(255,255,255,.72)"/>';
+  // coarne
+  s+='<line x1="'+(hx-tw*.2)+'" y1="'+(hy-tw*.55)+'" x2="'+(hx-tw*.15)+'" y2="'+(hy-tw*1.2)+'" stroke="#c06010" stroke-width="3" stroke-linecap="round"/>';
+  s+='<circle cx="'+(hx-tw*.15)+'" cy="'+(hy-tw*1.2)+'" r="'+(tw*.12)+'" fill="#c06010"/>';
+  s+='<line x1="'+(hx+tw*.15)+'" y1="'+(hy-tw*.5)+'" x2="'+(hx+tw*.2)+'" y2="'+(hy-tw*1.1)+'" stroke="#c06010" stroke-width="3" stroke-linecap="round"/>';
+  s+='<circle cx="'+(hx+tw*.2)+'" cy="'+(hy-tw*1.1)+'" r="'+(tw*.12)+'" fill="#c06010"/>';
+  // coadă
+  s+='<path d="M'+(bx-bw*.85)+' '+by+' Q'+(bx-bw*1.2)+' '+(by+bh*.5)+' '+(bx-bw*1.1)+' '+(by+bh*1.2)+'" stroke="#c06010" stroke-width="2.5" fill="none" stroke-linecap="round"/>';
+  // picioare
+  var legY=by+bh*.7,legH=th*.38;
+  var legs=run?[{x:bx-bw*.55,dy:0},{x:bx-bw*.15,dy:legH*-.3},{x:bx+bw*.2,dy:legH*.3},{x:bx+bw*.6,dy:0}]:[{x:bx-bw*.55,dy:0},{x:bx-bw*.15,dy:0},{x:bx+bw*.2,dy:0},{x:bx+bw*.6,dy:0}];
+  legs.forEach(function(leg){
+    s+='<line x1="'+leg.x+'" y1="'+legY+'" x2="'+(leg.x+leg.dy*.4)+'" y2="'+(legY+legH+leg.dy)+'" stroke="#b86820" stroke-width="4.5" stroke-linecap="round"/>';
+    s+='<ellipse cx="'+(leg.x+leg.dy*.4)+'" cy="'+(legY+legH+leg.dy)+'" rx="'+(tw*.25)+'" ry="'+(tw*.12)+'" fill="#6a3010"/>';
+  });
+  return s+'</g>';
+}
+function cal(x,y,h,action){
+  _pc++;
+  var id='ca'+_pc;
+  var COLORS=[['#8a5a20','#5a3410'],['#1a1008','#080502'],['#d4c8b0','#a09080'],['#8a3a10','#5a2008']];
+  var ci=_pc%4; var c1=COLORS[ci][0],c2=COLORS[ci][1];
+  var run=action==='alergare'; var r=h*.06;
+  var s='<g>';
+  s+='<defs><radialGradient id="ca'+id+'" cx="38%" cy="28%" r="65%"><stop offset="0%" stop-color="'+c1+'"/><stop offset="100%" stop-color="'+c2+'"/></radialGradient></defs>';
+  var bx=x,by=y-r*.6;
+  s+='<ellipse cx="'+bx+'" cy="'+by+'" rx="'+(r*2.2)+'" ry="'+(r*.85)+'" fill="url(#ca'+id+')"/>';
+  s+='<ellipse cx="'+(bx-r*.2)+'" cy="'+(by-r*.3)+'" rx="'+(r*.8)+'" ry="'+(r*.35)+'" fill="rgba(255,255,255,.07)"/>';
+  var nx=bx+r*1.6,ny=by-r*.3;
+  s+='<polygon points="'+(nx-r*.28)+','+(ny+r*.7)+' '+(nx+r*.28)+','+(ny+r*.7)+' '+(nx+r*.6)+','+(ny-r*.8)+' '+nx+','+(ny-r*.9)+'" fill="url(#ca'+id+')"/>';
+  var hx=nx+r*.5,hy=ny-r*.9;
+  s+='<ellipse cx="'+hx+'" cy="'+hy+'" rx="'+(r*.7)+'" ry="'+(r*.45)+'" fill="url(#ca'+id+')"/>';
+  s+='<ellipse cx="'+(hx+r*.55)+'" cy="'+(hy+r*.1)+'" rx="'+(r*.32)+'" ry="'+(r*.22)+'" fill="'+c2+'"/>';
+  s+='<circle cx="'+(hx+r*.2)+'" cy="'+(hy-r*.18)+'" r="'+(r*.14)+'" fill="#1a0a00"/>';
+  s+='<circle cx="'+(hx+r*.16)+'" cy="'+(hy-r*.2)+'" r="'+(r*.06)+'" fill="rgba(255,255,255,.8)"/>';
+  s+='<path d="M'+nx+' '+(ny-r*.9)+' Q'+(nx-r*.4)+' '+(ny-r*.3)+' '+(nx-r*.2)+' '+(ny+r*.5)+'" stroke="'+c2+'" stroke-width="'+(r*.45)+'" fill="none" stroke-linecap="round" opacity=".9"/>';
+  s+='<path d="M'+(bx-r*2.1)+' '+(by-r*.1)+' Q'+(bx-r*2.8)+' '+(by+r*.8)+' '+(bx-r*2.5)+' '+(by+r*2.0)+'" stroke="'+c2+'" stroke-width="'+(r*.4)+'" fill="none" stroke-linecap="round"/>';
+  s+='<path d="M'+(bx-r*2.0)+' '+(by-r*.2)+' Q'+(bx-r*2.6)+' '+(by+r*.6)+' '+(bx-r*2.3)+' '+(by+r*1.8)+'" stroke="'+c2+'" stroke-width="'+(r*.28)+'" fill="none" stroke-linecap="round" opacity=".65"/>';
+  var legY=by+r*.75,legH=r*1.5;
+  [bx-r*1.6,bx-r*.6,bx+r*.4,bx+r*1.5].forEach(function(lx,li){
+    var dy1=run&&(li===0||li===2)?-legH*.35:0;
+    s+='<line x1="'+lx+'" y1="'+legY+'" x2="'+(lx+(run?-r*.3:r*.05))+'" y2="'+(legY+legH*.5+dy1)+'" stroke="'+c2+'" stroke-width="'+(r*.38)+'" stroke-linecap="round"/>';
+    s+='<line x1="'+(lx+(run?-r*.3:r*.05))+'" y1="'+(legY+legH*.5+dy1)+'" x2="'+lx+'" y2="'+(legY+legH)+'" stroke="'+c2+'" stroke-width="'+(r*.32)+'" stroke-linecap="round"/>';
+    s+='<ellipse cx="'+lx+'" cy="'+(legY+legH)+'" rx="'+(r*.25)+'" ry="'+(r*.1)+'" fill="'+c2+'"/>';
+  });
+  return s+'</g>';
+}
+function elefant(x,y,h,action){
+  _pc++;
+  var id='ef'+_pc;
+  var r=h*.075;
+  var run=action==='alergare';
+  var s='<g>';
+  s+='<defs><radialGradient id="ef'+id+'" cx="35%" cy="28%" r="65%"><stop offset="0%" stop-color="#7a8888"/><stop offset="100%" stop-color="#3a4a48"/></radialGradient></defs>';
+  var bx=x,by=y-r*.7;
+  s+='<ellipse cx="'+bx+'" cy="'+by+'" rx="'+(r*2.4)+'" ry="'+(r*1.3)+'" fill="url(#ef'+id+')"/>';
+  s+='<ellipse cx="'+(bx-r*.3)+'" cy="'+(by-r*.5)+'" rx="'+(r*.9)+'" ry="'+(r*.4)+'" fill="rgba(255,255,255,.05)"/>';
+  var hx=bx+r*1.8,hy=by-r*.3;
+  s+='<circle cx="'+hx+'" cy="'+hy+'" r="'+(r*1.1)+'" fill="url(#ef'+id+')"/>';
+  s+='<ellipse cx="'+(hx+r*.1)+'" cy="'+(hy-r*.2)+'" rx="'+(r*.55)+'" ry="'+(r*.9)+'" fill="#5a6a68" opacity=".85" transform="rotate(-15,'+(hx+r*.1)+','+(hy-r*.2)+')"/>';
+  s+='<ellipse cx="'+(hx+r*.05)+'" cy="'+(hy-r*.2)+'" rx="'+(r*.35)+'" ry="'+(r*.62)+'" fill="#6a8078" opacity=".55" transform="rotate(-15,'+(hx+r*.05)+','+(hy-r*.2)+')"/>';
+  var tx=hx+r*1.0,ty=hy+r*.35;
+  s+='<path d="M'+tx+' '+ty+' Q'+(tx+r*.8)+' '+(ty+r*.6)+' '+(tx+r*.4)+' '+(ty+r*1.4)+' Q'+(tx)+' '+(ty+r*2.0)+' '+(tx-r*.3)+' '+(ty+r*1.8)+'" stroke="#3a4a48" stroke-width="'+(r*.5)+'" fill="none" stroke-linecap="round"/>';
+  s+='<circle cx="'+(hx+r*.5)+'" cy="'+(hy-r*.3)+'" r="'+(r*.16)+'" fill="#1a1a10"/>';
+  s+='<circle cx="'+(hx+r*.46)+'" cy="'+(hy-r*.33)+'" r="'+(r*.07)+'" fill="rgba(255,255,255,.8)"/>';
+  s+='<path d="M'+(hx+r*.9)+' '+(hy+r*.5)+' Q'+(hx+r*1.8)+' '+(hy+r*.6)+' '+(hx+r*1.6)+' '+(hy+r*1.1)+'" stroke="rgba(240,220,160,.7)" stroke-width="'+(r*.28)+'" fill="none" stroke-linecap="round"/>';
+  s+='<path d="M'+(bx-r*2.3)+' '+(by-r*.4)+' Q'+(bx-r*2.9)+' '+by+' '+(bx-r*2.7)+' '+(by+r*.8)+'" stroke="#3a4a48" stroke-width="2.5" fill="none" stroke-linecap="round"/>';
+  var legY=by+r*1.1,legH=r*1.1;
+  [bx-r*1.5,bx-r*.5,bx+r*.5,bx+r*1.5].forEach(function(lx,li){
+    var dy=run&&(li===0||li===2)?-legH*.3:0;
+    s+='<rect x="'+(lx-r*.32)+'" y="'+(legY+dy)+'" width="'+(r*.64)+'" height="'+legH+'" rx="'+(r*.2)+'" fill="#3a4a48"/>';
+    s+='<ellipse cx="'+lx+'" cy="'+(legY+legH+dy)+'" rx="'+(r*.38)+'" ry="'+(r*.15)+'" fill="#2a3a38"/>';
+  });
+  return s+'</g>';
+}
+function urs(x,y,h,action){
+  _pc++;
+  var id='ur'+_pc;
+  var COLORS=[['#4a2e10','#2a1808'],['#1a1008','#080502'],['#b8a888','#807060']];
+  var ci=_pc%3; var c1=COLORS[ci][0],c2=COLORS[ci][1];
+  var r=h*.055;
+  var s='<g>';
+  s+='<defs><radialGradient id="ur'+id+'" cx="35%" cy="25%" r="68%"><stop offset="0%" stop-color="'+c1+'"/><stop offset="100%" stop-color="'+c2+'"/></radialGradient></defs>';
+  var bx=x,by=y-r*.5;
+  s+='<circle cx="'+bx+'" cy="'+by+'" r="'+(r*1.8)+'" fill="url(#ur'+id+')"/>';
+  s+='<ellipse cx="'+(bx-r*.2)+'" cy="'+(by-r*.6)+'" rx="'+(r*.7)+'" ry="'+(r*.35)+'" fill="rgba(255,255,255,.05)"/>';
+  var hx=bx+r*1.4,hy=by-r*.7;
+  s+='<circle cx="'+hx+'" cy="'+hy+'" r="'+(r*1.1)+'" fill="url(#ur'+id+')"/>';
+  s+='<circle cx="'+(hx-r*.6)+'" cy="'+(hy-r*.9)+'" r="'+(r*.38)+'" fill="'+c1+'"/>';
+  s+='<circle cx="'+(hx+r*.3)+'" cy="'+(hy-r*1.0)+'" r="'+(r*.38)+'" fill="'+c1+'"/>';
+  s+='<circle cx="'+(hx-r*.6)+'" cy="'+(hy-r*.9)+'" r="'+(r*.2)+'" fill="'+c2+'"/>';
+  s+='<circle cx="'+(hx+r*.3)+'" cy="'+(hy-r*1.0)+'" r="'+(r*.2)+'" fill="'+c2+'"/>';
+  s+='<ellipse cx="'+(hx+r*.6)+'" cy="'+(hy+r*.15)+'" rx="'+(r*.4)+'" ry="'+(r*.28)+'" fill="'+c2+'"/>';
+  s+='<ellipse cx="'+(hx+r*.78)+'" cy="'+(hy+r*.05)+'" rx="'+(r*.17)+'" ry="'+(r*.11)+'" fill="#1a0808"/>';
+  s+='<circle cx="'+(hx+r*.2)+'" cy="'+(hy-r*.28)+'" r="'+(r*.15)+'" fill="#1a0808"/>';
+  s+='<circle cx="'+(hx+r*.16)+'" cy="'+(hy-r*.31)+'" r="'+(r*.06)+'" fill="rgba(255,255,255,.7)"/>';
+  var legY=by+r*1.5,legH=r*1.0;
+  [bx-r*1.0,bx-r*.3,bx+r*.3,bx+r*1.0].forEach(function(lx){
+    s+='<ellipse cx="'+lx+'" cy="'+(legY+legH*.5)+'" rx="'+(r*.4)+'" ry="'+(legH*.6)+'" fill="'+c2+'"/>';
+    s+='<ellipse cx="'+lx+'" cy="'+(legY+legH)+'" rx="'+(r*.38)+'" ry="'+(r*.15)+'" fill="'+c2+'"/>';
+  });
+  s+='<circle cx="'+(bx-r*1.7)+'" cy="'+(by+r*.3)+'" r="'+(r*.22)+'" fill="'+c2+'"/>';
+  return s+'</g>';
+}
+function floare(x,y,h,mood){
+  var r=h*.042;
+  var col=mood==='trist'?'#7a7aaa':mood==='tensiune'?'#aa2222':mood==='fericit'?'#ff9940':'#e84090';
+  var s='<g>';
+  s+='<line x1="'+x+'" y1="'+y+'" x2="'+x+'" y2="'+(y+h*.14)+'" stroke="#2a7a1a" stroke-width="3" stroke-linecap="round"/>';
+  s+='<path d="M'+x+' '+(y+h*.08)+' Q'+(x-h*.06)+' '+(y+h*.04)+' '+(x-h*.1)+' '+(y+h*.1)+' Q'+(x-h*.04)+' '+(y+h*.1)+' '+x+' '+(y+h*.08)+'Z" fill="#2a8a1a"/>';
+  for(var i=0;i<6;i++){var a=i*60*Math.PI/180;var px=x+Math.cos(a)*r*1.7,py=y+Math.sin(a)*r*1.7;s+='<ellipse cx="'+px+'" cy="'+py+'" rx="'+(r*.75)+'" ry="'+(r*.5)+'" fill="'+col+'" transform="rotate('+(i*60)+','+px+','+py+')" opacity=".9"><animate attributeName="rx" values="'+(r*.75)+';'+(r*.88)+';'+(r*.75)+'" dur="'+(2.5+i*.3)+'s" repeatCount="indefinite"/></ellipse>';}
+  s+='<circle cx="'+x+'" cy="'+y+'" r="'+(r*.55)+'" fill="#f5d020"/>';
+  return s+'</g>';
+}
+function frunza(x,y,h,season){
+  var col=season==='toamna'?'#c84400':season==='iarna'?'rgba(180,200,210,.4)':season==='vara'?'#1a7a0a':'#2a8a1a';
+  var stemCol=season==='toamna'?'#6a3000':'#2a6a1a';
+  var r=h*.065;
+  var s='<g>';
+  s+='<line x1="'+x+'" y1="'+y+'" x2="'+(x-r*.1)+'" y2="'+(y+r*1.6)+'" stroke="'+stemCol+'" stroke-width="2" stroke-linecap="round"/>';
+  s+='<path d="M'+x+' '+(y-r*1.2)+' Q'+(x+r*1.4)+' '+(y-r*.4)+' '+(x+r*1.2)+' '+(y+r*.8)+' Q'+x+' '+(y+r*1.2)+' '+(x-r*1.2)+' '+(y+r*.8)+' Q'+(x-r*1.4)+' '+(y-r*.4)+' '+x+' '+(y-r*1.2)+'Z" fill="'+col+'" opacity=".9"/>';
+  s+='<line x1="'+x+'" y1="'+(y-r*1.2)+'" x2="'+x+'" y2="'+(y+r)+'" stroke="rgba(0,0,0,.2)" stroke-width="1.2" stroke-linecap="round"/>';
+  return s+'</g>';
+}
+function casa(x,y,h){
+  var w=h*.22,rh=h*.18,dw=h*.07,ww=h*.07;
+  var wallTop=y-rh*.5, wallH=h*.22;
+  var s='<g>';
+  s+='<rect x="'+(x-w*.5)+'" y="'+wallTop+'" width="'+w+'" height="'+wallH+'" fill="#ddd0b0" stroke="#bba070" stroke-width="1.5" rx="2"/>';
+  s+='<polygon points="'+(x-w*.6)+','+wallTop+' '+x+','+(wallTop-rh)+' '+(x+w*.6)+','+wallTop+'" fill="#c04428" stroke="#a03420" stroke-width="1.5"/>';
+  s+='<rect x="'+(x-dw*.5)+'" y="'+(wallTop+wallH-h*.1)+'" width="'+dw+'" height="'+(h*.1)+'" fill="#8a5a30" rx="2"/>';
+  s+='<circle cx="'+(x+dw*.2)+'" cy="'+(wallTop+wallH-h*.05)+'" r="2.5" fill="#d4a040"/>';
+  var wy=wallTop+wallH*.22;
+  [x-w*.32,x+w*.1].forEach(function(wx){
+    s+='<rect x="'+wx+'" y="'+wy+'" width="'+ww+'" height="'+ww+'" fill="rgba(160,210,255,.5)" stroke="#bba070" stroke-width="1" rx="1"/>';
+    s+='<line x1="'+(wx+ww*.5)+'" y1="'+wy+'" x2="'+(wx+ww*.5)+'" y2="'+(wy+ww)+'" stroke="#bba070" stroke-width=".8"/>';
+    s+='<line x1="'+wx+'" y1="'+(wy+ww*.5)+'" x2="'+(wx+ww)+'" y2="'+(wy+ww*.5)+'" stroke="#bba070" stroke-width=".8"/>';
+  });
+  s+='<rect x="'+(x+w*.2)+'" y="'+(wallTop-rh*.65)+'" width="'+(h*.05)+'" height="'+(h*.1)+'" fill="#c04428"/>';
+  return s+'</g>';
+}
+function luna(x,y,h){
+  var r=h*.08;
+  var s='<g>';
+  // glow halo
+  s+='<circle cx="'+x+'" cy="'+y+'" r="'+(r*2.8)+'" fill="rgba(232,216,128,.04)"><animate attributeName="r" values="'+(r*2.8)+';'+(r*3.3)+';'+(r*2.8)+'" dur="6s" repeatCount="indefinite"/></circle>';
+  s+='<circle cx="'+x+'" cy="'+y+'" r="'+(r*1.6)+'" fill="rgba(232,216,128,.06)"/>';
+  // moon body
+  s+='<circle cx="'+x+'" cy="'+y+'" r="'+r+'" fill="#e8d880" opacity=".92"><animate attributeName="opacity" values=".92;.68;.92" dur="5s" repeatCount="indefinite"/></circle>';
+  // crescent shadow
+  s+='<circle cx="'+(x+r*.42)+'" cy="'+(y-r*.08)+'" r="'+(r*.84)+'" fill="#070710"/>';
+  // subtle highlight
+  s+='<ellipse cx="'+(x-r*.28)+'" cy="'+(y-r*.32)+'" rx="'+(r*.22)+'" ry="'+(r*.14)+'" fill="rgba(255,255,220,.2)"/>';
+  return s+'</g>';
+}
+function nor(x,y,h){
+  var r=h*.055;
+  var s='<g opacity=".85">';
+  s+='<circle cx="'+x+'" cy="'+y+'" r="'+(r*.9)+'" fill="#c8d0d8"/>';
+  s+='<circle cx="'+(x-r*.9)+'" cy="'+(y+r*.3)+'" r="'+(r*.7)+'" fill="#c8d0d8"/>';
+  s+='<circle cx="'+(x+r*.9)+'" cy="'+(y+r*.3)+'" r="'+(r*.7)+'" fill="#c8d0d8"/>';
+  s+='<circle cx="'+(x-r*.45)+'" cy="'+(y+r*.55)+'" r="'+(r*.6)+'" fill="#c8d0d8"/>';
+  s+='<circle cx="'+(x+r*.45)+'" cy="'+(y+r*.55)+'" r="'+(r*.6)+'" fill="#c8d0d8"/>';
+  return s+'</g>';
+}
+function sunsetGlow(w,h){
+  var s='';
+  // Razele apusului — evantai de linii radiale portocaliu/mov
+  s+='<ellipse cx="'+(w*.88)+'" cy="'+(h*.72)+'" rx="'+(w*.35)+'" ry="'+(h*.28)+'" fill="rgba(255,80,10,.09)"/>';
+  s+='<ellipse cx="'+(w*.88)+'" cy="'+(h*.72)+'" rx="'+(w*.2)+'" ry="'+(h*.18)+'" fill="rgba(255,120,20,.08)"/>';
+  s+='<ellipse cx="'+(w*.5)+'" cy="'+(h*.88)+'" rx="'+(w*.7)+'" ry="'+(h*.18)+'" fill="rgba(120,30,80,.12)"/>';
+  // linie orizont portocaliu
+  s+='<rect x="0" y="'+(h*.7)+'" width="'+w+'" height="'+(h*.04)+'" fill="rgba(255,90,10,.07)"/>';
+  return s;
+}
+function lightning(w,h){
+  var s='';
+  // 2 fulgere la poziții ușor diferite, animate cu opacity
+  [[w*.28,h*.08],[w*.65,h*.05]].forEach(function(pos,bi){
+    var x=pos[0],y=pos[1];
+    var zigzag='M'+x+' '+y+' L'+(x+8)+' '+(y+h*.12)+' L'+(x-4)+' '+(y+h*.12)+' L'+(x+10)+' '+(y+h*.3)+' L'+(x-2)+' '+(y+h*.3)+' L'+(x+7)+' '+(y+h*.52);
+    s+='<path d="'+zigzag+'" stroke="rgba(255,255,200,.9)" stroke-width="2.5" fill="none" stroke-linecap="round">';
+    s+='<animate attributeName="opacity" values="0;0;0;1;0.8;0;0;0;0" dur="'+(3+bi*1.5)+'s" repeatCount="indefinite"/>';
+    s+='</path>';
+    // halou fulger
+    s+='<path d="'+zigzag+'" stroke="rgba(180,200,255,.25)" stroke-width="8" fill="none" stroke-linecap="round">';
+    s+='<animate attributeName="opacity" values="0;0;0;.6;.3;0;0;0;0" dur="'+(3+bi*1.5)+'s" repeatCount="indefinite"/>';
+    s+='</path>';
+  });
+  return s;
+}
+function defaultScene(p,w,h){var s='';if(p.mood==='fericit'){s+='<circle cx="'+(w*.5)+'" cy="'+(h*.3)+'" r="'+(h*.18)+'" fill="rgba(255,220,50,.04)" opacity=".8"/>';s+='<circle cx="'+(w*.5)+'" cy="'+(h*.3)+'" r="'+(h*.12)+'" fill="rgba(255,200,30,.06)"/>';}if(p.mood==='tensiune'){for(var i=0;i<5;i++){s+='<line x1="'+(w*(.2+i*.15))+'" y1="0" x2="'+(w*(.25+i*.15))+'" y2="'+h+'" stroke="rgba(255,80,80,.04)" stroke-width="40"/>'; }}return s;}
+
+// ── AUDIO ──
+function actx(){if(!_actx)_actx=new(window.AudioContext||window.webkitAudioContext)();return _actx;}
+function stopAudio(){_anodes.forEach(function(n){try{n.stop(0);}catch(e){}});_anodes=[];_playing=false;clearInterval(_vizInt);stopViz();if(_actx&&_actx.state==='running'){_actx.suspend().catch(function(){});}}
+function makeRain(dur){var c=actx(),bl=c.sampleRate*Math.min(dur,8),buf=c.createBuffer(1,bl,c.sampleRate),d=buf.getChannelData(0);for(var i=0;i<bl;i++)d[i]=(Math.random()*2-1);var src=c.createBufferSource(),fi=c.createBiquadFilter(),g=c.createGain();src.buffer=buf;src.loop=true;fi.type='bandpass';fi.frequency.value=350;fi.Q.value=0.4;g.gain.value=0.06;src.connect(fi);fi.connect(g);g.connect(c.destination);src.start(c.currentTime);src.stop(c.currentTime+dur);_anodes.push(src);}
+function makeRev(){var c=actx(),d=c.createDelay(2),fb=c.createGain(),w=c.createGain();d.delayTime.value=0.28;fb.gain.value=0.32;w.gain.value=0.22;d.connect(fb);fb.connect(d);d.connect(w);w.connect(c.destination);return d;}
+function playSeq(key){stopAudio();var s=SEQS[key];if(!s)return 0;var c=actx(),bd=60/s.bpm,rev=s.rev?makeRev():null;if(s.rain)makeRain(30);var t=c.currentTime+0.1,tot=0;s.n.forEach(function(note){if(!note){t+=bd*.5;tot+=bd*.5;return;}var f=note[0],b=note[1],v=(note[2]||.7)*.18,dur=b*bd;var o=c.createOscillator(),g=c.createGain(),fi=c.createBiquadFilter();o.type=s.wave;o.frequency.value=f;fi.type='lowpass';fi.frequency.value=s.fHz;o.connect(fi);fi.connect(g);g.connect(c.destination);if(rev)g.connect(rev);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v,t+Math.min(.08,dur*.15));g.gain.setValueAtTime(v,t+dur*.7);g.gain.exponentialRampToValueAtTime(.0001,t+dur*.98);o.start(t);o.stop(t+dur);_anodes.push(o);t+=dur;tot+=dur;});return tot;}
+
+// ── AUDIO VIZ ──
+function initAudioViz(elId){var el=document.getElementById(elId);if(!el)return;el.innerHTML='';for(var i=0;i<28;i++){var b=document.createElement('div');b.className='av-bar';b.style.height='3px';el.appendChild(b);}}
+function startViz(key,elId){var el=document.getElementById(elId);if(!el)return;var bars=el.querySelectorAll('.av-bar,.sa-bar');var s=SEQS[key]||SEQS.liniste;clearInterval(_vizInt);var tick=0;_vizInt=setInterval(function(){if(!_playing){clearInterval(_vizInt);bars.forEach(function(b){b.style.height='3px';b.classList.remove('on');});return;}bars.forEach(function(b,i){var e=s.wave==='sawtooth'?1.5:s.wave==='triangle'?.8:1;var h=Math.max(3,(8+Math.sin(tick*.18+i*.45)*12+Math.random()*24)*e*(0.5+0.5*Math.sin(tick*.08+i*.3)));b.style.height=h+'px';b.classList.toggle('on',h>20);});tick++;},60/s.bpm*250);}
+function stopViz(){document.querySelectorAll('.av-bar,.sa-bar').forEach(function(b){b.style.height='3px';b.classList.remove('on');});}
+
+// ── LEA CHAT INTERFACE ──
+function leaSayUser(msg){
+  var p=document.getElementById('panel-lea');
+  var d=document.createElement('div');
+  d.className='lea-msg sys';
+  d.style.cssText='text-align:right;background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.09);color:rgba(255,255,255,.5)';
+  d.textContent='» '+msg;
+  var arc=document.getElementById('mood-arc');
+  p.insertBefore(d,arc?arc.nextSibling:p.firstChild);
+  p.scrollTop=0;
+}
+
+var _LAWS_CHAT=[
+  [/mai\s+mult[aă]?\s+lumin[aă]|lumin[aă]\s+mai\s+mare|mărește\s+lumin|mareste\s+lumin/,'lumina',+.25],
+  [/mai\s+put[ia][nă]?\s+lumin[aă]|lumin[aă]\s+mai\s+mic|scade\s+lumin|fără\s+lumin/,'lumina',-.25],
+  [/mai\s+rapid|mai\s+repede|accelere|dublu\s+vitez/,'ritm',+.5],
+  [/mai\s+lent|mai\s+inc[eă]t|inc[eă]tineș|incetines|slow/,'ritm',-.5],
+  [/f[aă]r[aă]\s+umbr|scade\s+grav|umbr[aă]\s+mic|f[aă]r[aă]\s+umbre/,'gravitatie',-.35],
+  [/mai\s+mult[aă]?\s+umbr|mărește\s+grav|mareste\s+grav|umbr[aă]\s+mai\s+mare/,'gravitatie',+.25],
+  [/mai\s+mult[aă]?\s+adânc|mai\s+mult[aă]?\s+adanc|mărește\s+adânc/,'adancime',+.25],
+  [/mai\s+put[ia][nă]?\s+adânc|mai\s+put[ia][nă]?\s+adanc|scade\s+adânc/,'adancime',-.25],
+  [/mai\s+mult[aă]?\s+variati|organic|haos|mai\s+dezordon/,'variatie',+.25],
+  [/f[aă]r[aă]\s+variati|mai\s+ordon|mai\s+fix|mai\s+rigid/,'variatie',-.25],
+  [/personaje\s+statice|f[aă]r[aă]\s+acți[uo]|opre[sș]te\s+acți[uo]|stat[ia]c/,'sens',-.9],
+  [/personaje\s+active|activează\s+acți[uo]|pune\s+acți[uo]|animează/,'sens',+.9],
+  [/resetea[ăz]+\s+leg|reset\s+leg|implicit/,'__reset__',0],
+];
+
+function leaChat(msg){
+  var l=msg.toLowerCase().trim();
+  if(!l)return;
+  setTab('lea');
+  leaSayUser(msg);
+
+  // ── Legi: reglaje naturale ──
+  for(var li=0;li<_LAWS_CHAT.length;li++){
+    if(_LAWS_CHAT[li][0].test(l)){
+      var lk=_LAWS_CHAT[li][1];
+      if(lk==='__reset__'){lawsReset();return;}
+      var mn=lk==='ritm'?.2:0, mx=lk==='ritm'?2:1;
+      var nv=Math.max(mn,Math.min(mx,+(_laws[lk]+_LAWS_CHAT[li][2]).toFixed(2)));
+      lawSet(lk,nv);
+      var sl=document.getElementById('ls-'+lk);if(sl)sl.value=nv;
+      leaSay('Legea <em>'+lk+'</em> → '+nv.toFixed(1)+'. Proiectează din nou să vezi efectul.');
+      return;
+    }
+  }
+
+  // ── Burst ──
+  if(/burst|variati|10\s+variati|genereaz[aă]\s+variati|mai\s+multe\s+versiu|toate\s+varian/.test(l)){
+    showBurst();return;
+  }
+
+  // ── Scenă nouă (șterge) ──
+  if(/scen[aă]\s+nou[aă]|resetea[ăz]+\s+scen|curat|gol|șterge\s+scen|sterge\s+scen|nou[aă]\s+scen[aă]|start\s+nou/.test(l)){
+    newScene();
+    return;
+  }
+
+  // ── Studio switch ──
+  if(/vision\s*studio|treci\s+pe\s+vision|deschide\s+vision/.test(l)){setStudio('vision');leaSay('Vision Studio activ — scrie o scenă.');return;}
+  if(/music\s*studio|treci\s+pe\s+music|deschide\s+music|cântă\s*$|cânt\s*$/.test(l)){setStudio('music');leaSay('Music Studio activ — descrie ce să cânte.');return;}
+  if(/story\s*studio|treci\s+pe\s+story|deschide\s+story/.test(l)){setStudio('story');leaSay('Story Studio activ — Vision + Music simultan.');return;}
+  if(/timeline|film\s+din\s+scene|mai\s+multe\s+scene/.test(l)){setStudio('timeline');leaSay('Timeline Studio — adaugă scene, redă filmul.');return;}
+  if(/galerie|photo\s*studio|fotografii/.test(l)&&!/(cânt|muzic)/.test(l)){setStudio('photo');leaSay('Photo Studio — galeria ta locală.');return;}
+
+  // ── Music explicit ──
+  if(/^(cânt[aă]|canta\b|pune\s+muzic|fă\s+muzic|fa\s+muzic|muzic[aă]\s+de)/.test(l)){
+    var md=msg.replace(/^(cânt[aă]|canta|pune\s+muzic[aă]|fă\s+muzic[aă]|fa\s+muzic[aă]|muzic[aă]\s+de)\s*/i,'').trim();
+    document.getElementById('script-inp').value=md||'liniște';
+    setStudio('music');runStudio();return;
+  }
+
+  // ── Salvează ──
+  if(/salvează|salveaza|pune\s+în\s+raft|pune\s+in\s+raft/.test(l)){
+    var ct=document.getElementById('script-inp').value.trim();
+    if(ct)saveToRaft(ct,tokenize(ct));else leaSay('Nu e nicio scenă activă de salvat.');
+    return;
+  }
+
+  // ── Export ──
+  if(/export|descarcă\s+svg|descarca\s+svg/.test(l)){exportSVG();return;}
+
+  // ── Ajutor ──
+  if(/ce\s+po[tț]i|ce\s+[sș]tii|ajutor|help\b|cum\s+te\s+foloses|ce\s+face/.test(l)){
+    leaSay('Pot să: proiectez scene (scrie orice), cânt muzică ("cântă ceva trist"), regleze legile ("mai multă lumină"), comut studioul, salvez în Raft. Dacă nu știi un buton — spune-mi mie direct.');
+    return;
+  }
+
+  // ── Default: orice altceva = scenă nouă ──
+  document.getElementById('script-inp').value=msg;
+  if(_studio!=='music'&&_studio!=='story') setStudio('vision');
+  runStudio();
+}
+
+// ── LEA PANEL ──
+function leaSay(msg){var p=document.getElementById('panel-lea');var d=document.createElement('div');d.className='lea-msg lea';d.innerHTML='<span class="lea-dot"></span>'+msg;var arc=document.getElementById('mood-arc');p.insertBefore(d,arc?arc.nextSibling:p.firstChild);}
+function leaSuggest(suggestions){var p=document.getElementById('panel-lea');var arc=document.getElementById('mood-arc');var ref=arc?arc.nextSibling:p.firstChild;suggestions.forEach(function(sug){var b=document.createElement('button');b.className='sug-btn';b.textContent='→ '+sug;b.onclick=function(){document.getElementById('script-inp').value=sug;runStudio();};p.insertBefore(b,ref);});}
+function addWikiFetch(term){var p=document.getElementById('panel-kb');var d=document.createElement('div');d.className='wiki-fetch';d.textContent='🔍 Wikipedia: cercetez "'+term+'"...';p.insertBefore(d,p.firstChild);setTimeout(function(){if(d.parentNode)d.parentNode.removeChild(d);},3000);}
+function addKBItem(term,isNew){var el=document.getElementById('kb-list');if(!el)return;var e=KB[term];if(!e)return;var d=document.createElement('div');d.className='kb-item'+(isNew?' kb-new':'');d.innerHTML='<div class="kb-term">'+term+'</div><div class="kb-tokens">'+e.t.join(' · ')+'</div><div class="kb-src">'+(e.src==='wikipedia'?'📡 Wikipedia · '+e.date:'📦 Local')+'</div>';el.insertBefore(d,el.firstChild);var cnt=document.getElementById('kb-count');var sc=document.getElementById('set-kb-count');if(cnt)cnt.textContent=Object.keys(KB).length;if(sc)sc.textContent=Object.keys(KB).length;}
+
+// ── STUDIO SWITCH ──
+function setStudio(id){
+  _studio=id;
+  document.querySelectorAll('.vstudio').forEach(function(b){b.classList.remove('active');});
+  var sb=document.getElementById('vs-'+id);if(sb)sb.classList.add('active');
+  var titles={vision:'Vision Studio',music:'Music Studio',story:'Story Studio ★',write:'Write Studio',photo:'Photo Studio'};
+  var tags={vision:'Proiecție vizuală · SVG pur · Zero GPU',music:'Muzică procedurală · Web Audio · Zero licență',story:'Vision + Music simultan · PRO',write:'Editor text cu Lea',photo:'Galerie locală · Zero upload'};
+  document.getElementById('studio-title').textContent=titles[id]||id;
+  document.getElementById('studio-tag').textContent=tags[id]||'';
+  document.getElementById('script-inp').placeholder='Descrie o scenă pentru '+titles[id]+' ...';
+  ['viz','audio-viz','story-wrap','write-area','photo-area','timeline-area'].forEach(function(x){var el=document.getElementById(x);if(el)el.style.display='none';});
+  document.getElementById('empty-canvas').style.display='flex';
+  stopAudio();
+  if(id==='photo') initPhotoStudio();
+  if(id==='write') writeLoad();
+  if(id==='timeline'){
+    document.getElementById('empty-canvas').style.display='none';
+    var ta=document.getElementById('timeline-area');
+    ta.style.display='flex';
+    loadTL(); renderTL();
+    leaSay('Timeline Studio. Scrie o scenă jos → + Adaugă scenă. Repetă. Apasă ▶ Redă filmul.');
+  }
+  if(id==='story'){leaSay('Story Studio combină Vision + Music în același timp. Scrie o scenă și ascultă + vizualizează simultan.');}
+}
+function setTab(id){
+  document.querySelectorAll('.vp-tab').forEach(function(t){t.classList.remove('active');});
+  document.getElementById('tab-'+id).classList.add('active');
+  ['panel-lea','panel-kb','panel-settings','panel-legi'].forEach(function(p){var el=document.getElementById(p);if(el)el.style.display='none';});
+  document.getElementById('panel-'+id).style.display='block';
+}
+function toggleLeaPanel(){
+  var panel=document.getElementById('vv-panel');
+  var btn=document.getElementById('vv-lea-toggle');
+  panel.classList.toggle('open');
+  if(btn)btn.classList.toggle('open');
+}
+
+// ── PLACEHOLDER DINAMIC ──
+var _placeholders=['un om trist în ploaie','o pisică noaptea','munte iarna','marea în toamnă','un copac și o pasăre','tensiune și furtună','liniște și pace','un om fericit sub soare'];
+var _phIdx=0;
+setInterval(function(){
+  var inp=document.getElementById('script-inp');
+  if(document.activeElement!==inp&&!inp.value){
+    _phIdx=(_phIdx+1)%_placeholders.length;
+    inp.placeholder=_placeholders[_phIdx];
+  }
+},4000);
+
+// ── KEYBOARD ↑ pentru istoric ──
+document.getElementById('script-inp').addEventListener('keydown',function(e){
+  if(e.key==='ArrowUp'){
+    e.preventDefault();
+    if(!_history.length) return;
+    _histIdx=Math.min(_histIdx+1,_history.length-1);
+    this.value=_history[_histIdx];
+  }
+  if(e.key==='ArrowDown'){
+    e.preventDefault();
+    _histIdx=Math.max(_histIdx-1,-1);
+    this.value=_histIdx>=0?_history[_histIdx]:'';
+  }
+});
+
+// ── SAVE TO RAFT ──
+function saveToRaft(txt, p){
+  try{
+    var rafturi=JSON.parse(localStorage.getItem('homme_rafturi')||'[]');
+    var tag='🎨 Studio';
+    if(p.subjects.length) tag='👁 Vision';
+    if(_studio==='music') tag='🎵 Music';
+    if(_studio==='story') tag='🎬 Story';
+    rafturi.unshift({title:tag+': '+txt.slice(0,40),content:'Scenă VV Studios · '+new Date().toLocaleDateString('ro-RO')+'\nTokeni: '+p.tokens.join(', '),ts:Date.now()});
+    localStorage.setItem('homme_rafturi',JSON.stringify(rafturi));
+    leaSay('Salvat în Raft: "'+txt.slice(0,30)+(txt.length>30?'…':'')+'"');
+  }catch(e){ leaSay('Nu am putut salva în Raft.'); }
+}
+
+// ── VV HiL Layer 3: Pattern Prediction ──
+function applyLearnedPatterns(p){
+  _subjOverrides={};
+  var names=[], indices=[];
+  if(window.VVHiR&&VVHiR.syncPatternsFromLegacy&&VVHiR.applyPatterns){
+    VVHiR.syncPatternsFromLegacy(_subjPatterns);
+    var hirOv=VVHiR.applyPatterns(p);
+    p.subjects.forEach(function(subj,i){
+      if(!hirOv[i]||!Object.keys(hirOv[i]).length) return;
+      _subjOverrides[i]=hirOv[i];
+      indices.push(i);
+      var nm=SE_NAMES[subj]||subj;
+      if(names.indexOf(nm)===-1) names.push(nm);
+    });
+    return {names:names,indices:indices};
+  }
+  var SE_TYPES=['om','pisica','caine','copac','girafa','pasare','floare','cal','elefant','urs'];
+  p.subjects.forEach(function(subj,i){
+    if(SE_TYPES.indexOf(subj)===-1) return;
+    var ov={};
+    Object.keys(_subjPatterns).forEach(function(key){
+      if(!key.startsWith(subj+'.')) return;
+      var prop=key.split('.')[1];
+      var bucket=_subjPatterns[key];
+      var bestVal=null, bestCount=4;
+      Object.keys(bucket).forEach(function(v){
+        if(bucket[v]>bestCount){bestCount=bucket[v];bestVal=JSON.parse(v);}
+      });
+      if(bestVal!==null) ov[prop]=bestVal;
+    });
+    if(Object.keys(ov).length>0){
+      _subjOverrides[i]=ov;
+      indices.push(i);
+      var nm=SE_NAMES[subj]||subj;
+      if(names.indexOf(nm)===-1) names.push(nm);
+    }
+  });
+  return {names:names,indices:indices};
+}
+
+// ── MAIN RUN ──
+async function runStudio(){
+  var txt=document.getElementById('script-inp').value.trim();if(!txt)return;
+  historyPush(txt);
+  var t0=performance.now();
+  var p=tokenize(txt);
+  var _pApplied=applyLearnedPatterns(p); // VV HiL L3
+  addToSceneMemory(txt,p);
+
+  // show tokens
+  var strip=document.getElementById('tok-strip');strip.innerHTML='';
+  p.tokens.forEach(function(t){var sp=document.createElement('span');sp.className='tok';sp.textContent=t;strip.appendChild(sp);});
+
+  if(_wikiEnabled){
+    for(var i=0;i<p.unknown.length;i++){
+      await wikiLookup(p.unknown[i]);
+    }
+  } else {
+    p.unknown.forEach(function(term){
+      if(!KB[term]){ KB[term]={t:['OBIECT:'+term,'SURSA:local'],src:'local'}; kbSave(); }
+    });
+  }
+
+  document.getElementById('empty-canvas').style.display='none';
+  // arată butoanele din topbar
+  var fb=document.getElementById('freeze-btn');if(fb){fb.style.display='inline-flex';_frozen=false;fb.textContent='⏸ Îngheață';fb.style.color='';}
+  var bb=document.getElementById('burst-btn');if(bb)bb.style.display='inline-flex';
+  var eb=document.getElementById('export-btn');if(eb)eb.style.display='inline-flex';
+
+  if(_studio==='vision'||_studio==='story'){
+    var svgEl=document.getElementById(_studio==='story'?'story-svg':'viz');
+    var usedHiR=false;
+    if(window._leaUseHiR&&typeof leaHiRRender==='function'){
+      var pCheck=tokenize(txt);
+      if(leaHiRAllSubjectsSupported(pCheck)){
+        window.leaHiQAfterRender = function(hiq) {
+          console.log('[VV HiQ] colaps:', hiq.moodKey, '| lumina:', hiq.lumina, '| BPM:', hiq.bpm, '| gama:', hiq.gama, '| accent:', hiq.culoareAccent);
+          /* Sincronizează BPM-ul secvencerului muzical cu emoția scenei */
+          if (typeof _bpm !== 'undefined' && hiq.bpm) _bpm = hiq.bpm;
+        };
+        var hir=leaHiRRender(txt,700,_studio==='story'?320:400);
+        if(hir&&!hir.error){ svgEl.innerHTML=hir.svg; usedHiR=true; startOrganismPulse(); }
+      }
+    }
+    if(!usedHiR) svgEl.innerHTML=svgScene(p);
+    if(_pApplied.indices.length>0){
+      _pApplied.indices.forEach(function(idx){
+        var el=document.getElementById('subj-'+idx);
+        if(el){el.classList.add('pattern-applied');setTimeout(function(){el.classList.remove('pattern-applied');},1500);}
+      });
+    }
+    document.getElementById(_studio==='story'?'story-wrap':'viz').style.display=_studio==='story'?'grid':'block';
+  }
+  if(_studio==='music'||_studio==='story'){
+    var vizId=_studio==='story'?'story-audio':'audio-viz';
+    document.getElementById(vizId).style.display='flex';
+    if(_studio==='music') initAudioViz('audio-viz');
+    else{var sa=document.getElementById('story-audio');sa.innerHTML='';for(var j=0;j<24;j++){var b=document.createElement('div');b.className='sa-bar';b.style.height='2px';sa.appendChild(b);}}
+    var dur=playSeq(p.musicKey);
+    _playing=true;
+    startViz(p.musicKey,vizId);
+    if(dur)setTimeout(function(){_playing=false;stopViz();},dur*1000+400);
+  }
+
+  // update KB panel
+  var allTerms=p.subjects.concat(p.weather?[p.weather]:[]).concat(p.time?[p.time]:[]);
+  allTerms.forEach(function(t){if(KB[t])addKBItem(t,false);});
+
+  // Lea commentary
+  var comments={
+    trist:'Scenă tristă. Am ales gama minoră și culori reci.',
+    fericit:'Energie pozitivă! Gama majoră și culori calde.',
+    tensiune:'Tensiune detectată — gamă diminuată, ritm rupt.',
+    liniste:'Liniște. Note rare, mult spațiu, reverb lung.',
+    noapte:'Noapte — pentatonic, șoptit, stele animate.',
+  };
+  if(!usedHiR){
+    var c=comments[p.mood||p.time||'liniste'];
+    if(c)leaSay(c);
+  }
+
+  // sugestii contextuale umane
+  var sugs=[];
+  if(p.subjects[0]==='om'&&!p.weather)  sugs=['un om trist în ploaie','un om fericit sub soare','un om singur noaptea'];
+  if(p.subjects[0]==='munte')            sugs=['munte iarna cu zăpadă','munte toamna','munte noaptea cu stele'];
+  if(p.subjects[0]==='mare')             sugs=['marea toamna tristă','marea vara fericită','marea noaptea'];
+  if(p.season==='iarna'&&!p.subjects.length) sugs=['copac iarna','munte iarna','om trist iarna'];
+  if(p.season==='toamna')                sugs=['copac toamna','om singur toamna','pasăre toamna'];
+  if(sugs.length) leaSuggest(sugs);
+
+  // buton Raft după proiecție (înlocuiește cel existent)
+  var panel=document.getElementById('panel-lea');
+  var oldRaft=document.getElementById('raft-btn-current');
+  if(oldRaft) oldRaft.parentNode.removeChild(oldRaft);
+  var raftBtn=document.createElement('button');
+  raftBtn.id='raft-btn-current';
+  raftBtn.className='sug-btn';
+  raftBtn.innerHTML='📚 Salvează scena în Raft';
+  raftBtn.onclick=(function(t,pp){ return function(){ saveToRaft(t,pp); raftBtn.textContent='✓ Salvat'; raftBtn.disabled=true; }; })(txt,p);
+  var arc=document.getElementById('mood-arc');
+  panel.insertBefore(raftBtn,arc?arc.nextSibling:panel.firstChild);
+
+  if(_pApplied.names.length>0){
+    setTimeout(function(){leaSay('✦ Lea a aplicat stilul tău pentru <em>'+_pApplied.names.join(', ')+'</em>.');},420);
+  }
+
+  var ms=(performance.now()-t0).toFixed(1);
+  var pl=document.getElementById('perf-lbl');
+  if(pl) pl.textContent=ms+'ms · '+_perfMode+' · local · fără model AI';
+  startOrganismPulse();
+}
+
+// ── PHOTO STUDIO ──
+var _photos=[];
+function initPhotoStudio(){
+  try{_photos=JSON.parse(localStorage.getItem('vv_galerie')||'[]');}catch(e){_photos=[];}
+  document.getElementById('photo-area').style.display='block';
+  var grid=document.getElementById('photo-grid');
+  var empty=document.getElementById('photo-empty');
+  if(!_photos.length){grid.style.display='none';empty.style.display='block';return;}
+  empty.style.display='none';grid.style.display='block';grid.innerHTML='';
+  _photos.forEach(function(ph,i){
+    var d=document.createElement('div');
+    d.style.cssText='break-inside:avoid;margin-bottom:6px;border-radius:8px;overflow:hidden;cursor:pointer';
+    d.innerHTML='<img src="'+ph.src+'" style="width:100%;display:block;border-radius:8px" loading="lazy">';
+    d.onclick=function(){leaSay('Fotografie: '+ph.name+' ('+ph.date+'). Spune-mi ce e în ea și notăm ca amintire.');setTab('lea');};
+    grid.appendChild(d);
+  });
+}
+function photoPick(){var inp=document.createElement('input');inp.type='file';inp.multiple=true;inp.accept='image/*';inp.onchange=function(){var files=Array.from(inp.files);var loaded=0;files.forEach(function(f){var r=new FileReader();r.onload=function(ev){_photos.push({name:f.name,date:new Date(f.lastModified).toLocaleDateString('ro-RO'),src:ev.target.result,ts:Date.now()});loaded++;if(loaded===files.length){localStorage.setItem('vv_galerie',JSON.stringify(_photos));initPhotoStudio();}};r.readAsDataURL(f);});};inp.click();}
+
+// ── TIMELINE STUDIO ──
+var _tl=[], _tlPlaying=false, _tlIdx=0;
+function saveTL(){try{localStorage.setItem('vv_timeline',JSON.stringify(_tl.map(function(s){return{txt:s.txt,dur:s.dur,overrides:JSON.parse(JSON.stringify(s.overrides||{}))};})));}catch(e){}}
+function loadTL(){try{var d=JSON.parse(localStorage.getItem('vv_timeline')||'[]');_tl=d.map(function(s){return{txt:s.txt,dur:s.dur||3,p:tokenize(s.txt),overrides:s.overrides||{}};});}catch(e){}}
+function tlAdd(){
+  var txt=document.getElementById('script-inp').value.trim();
+  if(!txt){leaSay('Scrie o scenă jos și apasă + Adaugă scenă.');return;}
+  _tl.push({txt:txt,dur:3,p:tokenize(txt),overrides:JSON.parse(JSON.stringify(_subjOverrides))});
+  saveTL(); renderTL();
+  leaSay('Scenă '+ _tl.length +' adăugată: "'+txt.slice(0,28)+'"');
+}
+function tlRemove(i){_tl.splice(i,1);saveTL();renderTL();}
+function tlSetDur(i,val){_tl[i].dur=Math.max(1,Math.min(30,+val));saveTL();}
+function tlMoveUp(i){if(i===0)return;var t=_tl[i];_tl[i]=_tl[i-1];_tl[i-1]=t;saveTL();renderTL();}
+function tlMoveDown(i){if(i>=_tl.length-1)return;var t=_tl[i];_tl[i]=_tl[i+1];_tl[i+1]=t;saveTL();renderTL();}
+function tlExportPlan(){
+  if(!window.VVHiR||!VVHiR.downloadPlan){leaSay('Motor VV HiR lipsește.');return;}
+  if(!_tl.length){leaSay('Adaugă scene în Timeline înainte de export.');return;}
+  VVHiR.downloadPlan(_tl);
+  leaSay('Plan film exportat (.vvplan) — '+_tl.length+' scene.');
+}
+function tlImportPlan(){
+  if(!window.VVHiR||!VVHiR.importPlan){leaSay('Motor VV HiR lipsește.');return;}
+  var inp=document.createElement('input');
+  inp.type='file'; inp.accept='.json,.vvplan,application/json';
+  inp.onchange=function(){
+    var f=inp.files[0]; if(!f)return;
+    var r=new FileReader();
+    r.onload=function(){
+      try{
+        var plan=JSON.parse(r.result);
+        _tl=VVHiR.importPlan(plan);
+        if(plan.laws&&typeof _laws!=='undefined') Object.keys(plan.laws).forEach(function(k){
+          if(_laws[k]!==undefined) lawSet(k, plan.laws[k]);
+        });
+        saveTL(); renderTL();
+        leaSay('Plan importat: <em>'+_tl.length+'</em> scene · legi sincronizate.');
+      }catch(e){leaSay('Fișier plan invalid sau corupt.');}
+    };
+    r.readAsText(f);
+  };
+  inp.click();
+}
+function tlPlay(){
+  if(!_tl.length){leaSay('Adaugă cel puțin o scenă în Timeline.');return;}
+  _tlPlaying=true; _tlIdx=0;
+  document.getElementById('tl-play-btn').textContent='⏸ Se redă...';
+  leaSay('Redau filmul tău — '+_tl.length+' scene.');
+  tlNext();
+}
+function tlStop(){
+  _tlPlaying=false; stopAudio();
+  document.getElementById('tl-play-btn').textContent='▶ Redă filmul';
+  document.getElementById('tl-status').textContent='';
+  renderTL();
+}
+function tlNext(){
+  if(!_tlPlaying||_tlIdx>=_tl.length){
+    _tlPlaying=false;
+    document.getElementById('tl-play-btn').textContent='▶ Redă filmul';
+    document.getElementById('tl-status').textContent='';
+    if(_tlIdx>=_tl.length) leaSay('Film terminat! '+_tl.length+' scene redate.');
+    return;
+  }
+  var shot=_tl[_tlIdx];
+  var st=document.getElementById('tl-status');
+  if(st) st.textContent='Scena '+(_tlIdx+1)+' / '+_tl.length+' · "'+shot.txt.slice(0,28)+'"';
+  _subjOverrides=JSON.parse(JSON.stringify(shot.overrides||{}));
+  // render visual
+  var svg=document.getElementById('tl-viz');
+  if(svg){
+    if(window._leaUseHiR&&typeof leaHiRRender==='function'&&leaHiRAllSubjectsSupported(shot.p)){
+      var ht=leaHiRRender(shot.txt,700,260);
+      if(ht&&!ht.error) svg.innerHTML=ht.svg; else svg.innerHTML=svgScene(shot.p,700,260);
+    } else svg.innerHTML=svgScene(shot.p,700,260);
+  }
+  // play music
+  stopAudio();
+  var dur=playSeq(shot.p.musicKey);
+  _playing=true;
+  // highlight current in list
+  renderTL(_tlIdx);
+  var wait=Math.max(shot.dur*1000, dur>0?dur*1000+300:shot.dur*1000);
+  _tlIdx++;
+  setTimeout(function(){if(_tlPlaying)tlNext();},wait);
+}
+function renderTL(activeIdx){
+  var el=document.getElementById('tl-list'); if(!el)return;
+  var cnt=document.getElementById('tl-count'); if(cnt)cnt.textContent=_tl.length+' scene';
+  el.innerHTML='';
+  if(!_tl.length){
+    el.innerHTML='<div style="font-size:11px;color:rgba(255,255,255,.18);text-align:center;padding:16px 0">Scrie o scenă jos → + Adaugă scenă → repetă → ▶ Redă filmul</div>';
+    return;
+  }
+  _tl.forEach(function(shot,i){
+    var isActive=(activeIdx===i);
+    var row=document.createElement('div');
+    row.style.cssText='display:flex;align-items:center;gap:6px;padding:5px 8px;border-radius:7px;margin-bottom:4px;background:'+(isActive?'rgba(var(--ac),.08)':'rgba(255,255,255,.02)')+';border:1px solid '+(isActive?'rgba(var(--ac),.22)':'rgba(255,255,255,.05)')+';transition:background .2s';
+    row.innerHTML=
+      '<span style="font-size:9px;color:rgba(255,255,255,.25);width:14px;flex-shrink:0;text-align:center">'+(i+1)+'</span>'+
+      '<span style="flex:1;font-size:11px;color:'+(isActive?'rgba(var(--ac),.9)':'rgba(255,255,255,.65)')+';overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer" onclick="(function(){document.getElementById(\'script-inp\').value=\''+shot.txt.replace(/'/g,"\\'")+'\';})()" title="'+shot.txt+'">'+shot.txt.slice(0,30)+(shot.txt.length>30?'…':'')+'</span>'+
+      '<span style="font-size:9px;color:rgba(255,255,255,.25);flex-shrink:0">⏱</span>'+
+      '<input type="number" value="'+shot.dur+'" min="1" max="30" style="width:34px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);border-radius:4px;color:rgba(255,255,255,.5);font-size:10px;text-align:center;padding:2px;outline:none" title="secunde" onchange="tlSetDur('+i+',this.value)">'+
+      '<span style="font-size:10px;color:rgba(255,255,255,.2);cursor:pointer;padding:0 2px" onclick="tlMoveUp('+i+')" title="sus">↑</span>'+
+      '<span style="font-size:10px;color:rgba(255,255,255,.2);cursor:pointer;padding:0 2px" onclick="tlMoveDown('+i+')" title="jos">↓</span>'+
+      '<span style="font-size:11px;color:rgba(255,80,80,.4);cursor:pointer;padding:0 3px" onclick="tlRemove('+i+')" title="șterge">✕</span>';
+    el.appendChild(row);
+  });
+}
+
+// ── WRITE STUDIO SAVE ──
+function writeSave(){try{localStorage.setItem('vv_write',document.getElementById('write-ta').value);}catch(e){}}
+function writeLoad(){try{var v=localStorage.getItem('vv_write');if(v)document.getElementById('write-ta').value=v;}catch(e){}}
+
+// ── EXPORT SVG ──
+function exportSVG(){
+  var svgEl=document.getElementById('viz');
+  if(!svgEl||svgEl.style.display==='none'){leaSay('Generează mai întâi o scenă în Vision Studio, apoi exportă.');setTab('lea');return;}
+  var content='<?xml version="1.0" encoding="UTF-8"?>\n'+svgEl.outerHTML;
+  var blob=new Blob([content],{type:'image/svg+xml'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');
+  a.href=url; a.download='vv-scena-'+(Date.now())+'.svg';
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a); URL.revokeObjectURL(url);
+  leaSay('Scenă exportată ca SVG. O poți deschide în browser, Illustrator sau Figma.');setTab('lea');
+}
+function exportVoice(){
+  if(!_voiceBlob){leaSay('Înregistrează mai întâi o narațiune vocală.');setTab('lea');return;}
+  var url=URL.createObjectURL(_voiceBlob);
+  var a=document.createElement('a');
+  a.href=url; a.download='vv-voce-'+(Date.now())+'.webm';
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a); URL.revokeObjectURL(url);
+  leaSay('Narațiunea exportată ca fișier audio .webm.');setTab('lea');
+}
+
+// ── PRO INFO ──
+function showProInfo(){leaSay('PRO include: Story Studio (Vision+Music simultan), Export SVG/Audio, Timeline multi-scenă, KB Builder avansat. 9€/lună — lansare în curând.');setTab('lea');}
+
+// ── VV PERSONAL VOCABULARY (Limbajul tău vizual) ──
+var _customVocab={};
+function loadCustomVocab(){try{var d=JSON.parse(localStorage.getItem('vv_custom_vocab')||'{}');if(d&&typeof d==='object')_customVocab=d;}catch(e){}}
+function saveCustomVocab(){try{localStorage.setItem('vv_custom_vocab',JSON.stringify(_customVocab));}catch(e){}}
+function addCustomVocab(){
+  var word=document.getElementById('cv-word').value.trim().toLowerCase();
+  var def=document.getElementById('cv-def').value.trim();
+  if(!word||!def){leaSay('Scrie atât cuvântul cât și descrierea vizuală.');return;}
+  var col='#8844cc',dl=def.toLowerCase();
+  if(/rosu|roșu/.test(dl)) col='#cc2222';
+  else if(/albastru/.test(dl)) col='#2244cc';
+  else if(/verde/.test(dl)) col='#228822';
+  else if(/galben|auriu/.test(dl)) col='#cc9900';
+  else if(/portocaliu/.test(dl)) col='#cc6600';
+  else if(/mov|violet/.test(dl)) col='#8844cc';
+  else if(/alb/.test(dl)) col='#cccccc';
+  else if(/negru/.test(dl)) col='#334455';
+  _customVocab[word]={def:def,col:col,ts:Date.now()};
+  KB[word]={t:['CUSTOM:'+def.slice(0,24),'UTILIZATOR:definitie'],src:'user'};
+  kbSave(); saveCustomVocab();
+  document.getElementById('cv-word').value='';
+  document.getElementById('cv-def').value='';
+  renderCVList();
+  var fb=document.getElementById('cv-feedback');
+  if(fb){fb.textContent='✓ "'+word+'" adăugat — scrie "'+word+'" în orice scenă';fb.style.color='rgba(100,220,120,.8)';setTimeout(function(){fb.textContent='';},3000);}
+  leaSay('"'+word+'" adăugat în vocabularul tău. Scrie "'+word+'" în orice scenă — apare vizual.');
+}
+function renderCVList(){
+  var el=document.getElementById('cv-list');if(!el)return;
+  el.innerHTML='';
+  Object.keys(_customVocab).forEach(function(word){
+    var cv=_customVocab[word];
+    var item=document.createElement('div');item.className='cv-item';
+    item.innerHTML='<div class="cv-dot" style="background:'+cv.col+'"></div><span style="color:rgba(255,255,255,.75);flex:1">'+word+'</span><span style="color:rgba(255,255,255,.25);font-size:9px">'+cv.def.slice(0,22)+'</span><span style="color:rgba(255,80,80,.4);font-size:10px;margin-left:4px">✕</span>';
+    item.onclick=(function(w){return function(){if(confirm('Ștergi "'+w+'" din vocabular?')){delete _customVocab[w];delete KB[w];saveCustomVocab();kbSave();renderCVList();}};})(word);
+    el.appendChild(item);
+  });
+}
+function customElement(x,y,word,cv){
+  var w=92,h=44;
+  return'<g><rect x="'+(x-w/2)+'" y="'+(y-h/2)+'" width="'+w+'" height="'+h+'" rx="10" fill="'+cv.col+'" opacity=".75"/><rect x="'+(x-w/2+1)+'" y="'+(y-h/2+1)+'" width="'+(w-2)+'" height="'+(h/2-1)+'" rx="9 9 0 0" fill="rgba(255,255,255,.06)"/><text x="'+x+'" y="'+(y-3)+'" text-anchor="middle" fill="rgba(255,255,255,.95)" font-size="14" font-family="-apple-system,sans-serif" font-weight="700">'+word+'</text><text x="'+x+'" y="'+(y+11)+'" text-anchor="middle" fill="rgba(255,255,255,.45)" font-size="8.5" font-family="-apple-system,sans-serif">'+cv.def.slice(0,18)+'</text></g>';
+}
+loadCustomVocab();
+
+// ── VV VOICE LAYER (Vocea ta în scenă) ──
+var _recorder=null,_voiceBlob=null,_voiceURL=null,_isRecording=false;
+function toggleVoiceRec(){if(_isRecording)stopVoiceRec();else startVoiceRec();}
+function startVoiceRec(){
+  navigator.mediaDevices.getUserMedia({audio:true}).then(function(stream){
+    var chunks=[];
+    _recorder=new MediaRecorder(stream);
+    _recorder.ondataavailable=function(e){if(e.data.size>0)chunks.push(e.data);};
+    _recorder.onstop=function(){
+      stream.getTracks().forEach(function(t){t.stop();});
+      _voiceBlob=new Blob(chunks,{type:'audio/webm'});
+      _voiceURL=URL.createObjectURL(_voiceBlob);
+      _isRecording=false;
+      var btn=document.getElementById('voice-btn');
+      btn.className='voice-btn done'; btn.textContent='🎙 Gata';
+      document.getElementById('voice-play').style.display='inline-flex';
+      leaSay('Narațiunea e înregistrată. Apasă ▶ Voce+Scenă — proiectez totul simultan.');
+    };
+    _recorder.start(); _isRecording=true;
+    var btn=document.getElementById('voice-btn');
+    btn.className='voice-btn recording'; btn.textContent='⏹ Stop';
+    leaSay('Înregistrez... Vorbește textul reclamei. Apasă ⏹ Stop când termini.');
+  }).catch(function(){
+    leaSay('Microfonul nu a putut fi accesat — permite accesul în browser și încearcă din nou.');
+  });
+}
+function stopVoiceRec(){if(_recorder&&_recorder.state!=='inactive')_recorder.stop();}
+function playWithVoice(){
+  if(!_voiceURL){leaSay('Înregistrează mai întâi o narațiune.');return;}
+  var va=new Audio(_voiceURL); va.play();
+  runStudio();
+  leaSay('Scenă + muzică + vocea ta — simultan. Acesta e studioul tău de reclamă.');
+}
+
+// ── VV CREATIVE MEMORY · Scene Memory + Mood Arc + Mirror ──
+var _sceneMemory=[];
+function moodColor(mood,alpha){
+  var cols={trist:'60,100,200',fericit:'240,180,30',tensiune:'200,50,50',liniste:'40,160,120',noapte:'100,80,180'};
+  return'rgba('+(cols[mood]||'120,120,120')+','+(alpha||1)+')';
+}
+function loadSceneMemory(){try{var d=JSON.parse(localStorage.getItem('vv_scene_memory')||'[]');if(Array.isArray(d))_sceneMemory=d;}catch(e){}}
+function saveSceneMemory(){try{localStorage.setItem('vv_scene_memory',JSON.stringify(_sceneMemory.slice(0,20)));}catch(e){}}
+function addToSceneMemory(txt,p){
+  var mood=p.mood||p.time||'liniste';
+  _sceneMemory.unshift({txt:txt,mood:mood,tokens:p.tokens,ts:Date.now(),studio:_studio});
+  if(_sceneMemory.length>20)_sceneMemory.pop();
+  saveSceneMemory();
+  renderSceneStrip();
+  updateMoodArc();
+  checkMoodMirror();
+}
+function renderSceneStrip(){
+  var el=document.getElementById('scene-strip');if(!el)return;
+  el.innerHTML='';
+  if(!_sceneMemory.length)return;
+  var lbl=document.createElement('div');
+  lbl.style.cssText='font-size:9px;color:rgba(255,255,255,.15);letter-spacing:.1em;white-space:nowrap;text-transform:uppercase;margin-right:4px;flex-shrink:0';
+  lbl.textContent='Memorie';
+  el.appendChild(lbl);
+  _sceneMemory.slice(0,14).forEach(function(sc){
+    var chip=document.createElement('div');
+    var ico={vision:'👁',music:'🎵',story:'🎬'}[sc.studio]||'✦';
+    chip.style.cssText='flex-shrink:0;padding:3px 9px;border-radius:20px;font-size:10px;cursor:pointer;background:'+moodColor(sc.mood,.1)+';border:1px solid '+moodColor(sc.mood,.25)+';color:'+moodColor(sc.mood,.8)+';max-width:112px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis';
+    chip.title=sc.txt;
+    chip.textContent=ico+' '+sc.txt.slice(0,16)+(sc.txt.length>16?'…':'');
+    chip.onmouseenter=function(){this.style.filter='brightness(1.4)';};
+    chip.onmouseleave=function(){this.style.filter='';};
+    chip.onclick=(function(s){return function(){document.getElementById('script-inp').value=s.txt;runStudio();};})(sc);
+    el.appendChild(chip);
+  });
+}
+function updateMoodArc(){
+  var el=document.getElementById('mood-arc');if(!el)return;
+  el.innerHTML='';
+  if(_sceneMemory.length<2)return;
+  var last=_sceneMemory.slice(0,8).reverse();
+  var w=document.createElement('div');
+  w.style.cssText='display:flex;align-items:center;gap:3px;flex-wrap:wrap;margin-bottom:8px;padding:6px 9px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:8px';
+  var lbl=document.createElement('div');
+  lbl.style.cssText='width:100%;font-size:9px;color:rgba(255,255,255,.18);letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px';
+  lbl.textContent='Arc emoțional · '+last.length+' scene';
+  w.appendChild(lbl);
+  last.forEach(function(sc,i){
+    var dot=document.createElement('div');
+    dot.style.cssText='width:11px;height:11px;border-radius:50%;background:'+moodColor(sc.mood,.9)+';flex-shrink:0;cursor:pointer;transition:transform .15s';
+    dot.title='"'+sc.txt.slice(0,30)+'" · '+sc.mood;
+    dot.onmouseenter=function(){this.style.transform='scale(1.5)';};
+    dot.onmouseleave=function(){this.style.transform='';};
+    dot.onclick=(function(s){return function(){document.getElementById('script-inp').value=s.txt;runStudio();};})(sc);
+    w.appendChild(dot);
+    if(i<last.length-1){var arr=document.createElement('div');arr.style.cssText='width:8px;height:1px;background:rgba(255,255,255,.08);flex-shrink:0';w.appendChild(arr);}
+  });
+  el.appendChild(w);
+}
+function checkMoodMirror(){
+  if(_sceneMemory.length<3)return;
+  var last3=_sceneMemory.slice(0,3).map(function(s){return s.mood;});
+  if(last3[0]===last3[1]&&last3[1]===last3[2]){
+    var opp={trist:'un om fericit sub soare',fericit:'liniște și ceață ușoară',tensiune:'pace · liniște deplină',liniste:'tensiune și furtună',noapte:'dimineată și lumină caldă'};
+    var mirror=opp[last3[0]];
+    if(mirror){
+      setTimeout(function(){
+        leaSay('Trei scene "'+last3[0]+'" la rând. Poate o schimbare?');
+        leaSuggest([mirror]);
+      },900);
+    }
+  }
+}
+
+// ── VV CREATIVE BURST ──
+var BURST_VARS=[
+  {label:'Noapte',    time:'noapte',   weather:null,     mood:null,       season:null},
+  {label:'Ploaie',    time:null,       weather:'ploaie', mood:'trist',    season:null},
+  {label:'Fericit',   time:null,       weather:'soare',  mood:'fericit',  season:null},
+  {label:'Trist',     time:null,       weather:null,     mood:'trist',    season:null},
+  {label:'Tensiune',  time:null,       weather:null,     mood:'tensiune', season:null},
+  {label:'Liniște',   time:null,       weather:null,     mood:'liniste',  season:null},
+  {label:'Iarnă',     time:null,       weather:'ninge',  mood:null,       season:'iarna'},
+  {label:'Toamnă',    time:'apus',     weather:null,     mood:null,       season:'toamna'},
+  {label:'Apus',      time:'apus',     weather:null,     mood:null,       season:null},
+  {label:'Furtună',   time:null,       weather:'furtuna',mood:'tensiune', season:null},
+];
+function burstMusicKey(p){
+  if(p.mood==='trist'&&p.weather==='ploaie') return'trist_ploaie';
+  if(p.weather==='furtuna') return'tensiune';
+  if(p.mood==='trist')      return'trist';
+  if(p.mood==='fericit')    return'fericit';
+  if(p.mood==='tensiune')   return'tensiune';
+  if(p.mood==='liniste')    return'liniste';
+  if(p.time==='noapte')     return'noapte';
+  if(p.time==='apus')       return'trist';
+  return'liniste';
+}
+function showBurst(){
+  var inp=document.getElementById('script-inp').value.trim();
+  if(!inp){leaSay('Scrie mai întâi o scenă de bază, apoi fac Burst.');return;}
+  var baseP=tokenize(inp);
+  // remove old overlay if exists
+  var old=document.getElementById('burst-overlay');if(old)old.remove();
+
+  var ov=document.createElement('div');
+  ov.className='burst-ov';ov.id='burst-overlay';
+
+  // header
+  var hdr=document.createElement('div');
+  hdr.style.cssText='color:rgba(255,255,255,.45);font-size:10px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:14px;text-align:center';
+  hdr.innerHTML='10 variații din <em style="color:rgba(var(--ac),.8);font-style:normal">"'+inp.slice(0,50)+'"</em>';
+  ov.appendChild(hdr);
+
+  var grid=document.createElement('div');
+  grid.className='burst-grid';
+
+  var varParsed=[];
+  BURST_VARS.forEach(function(v){
+    var vp=JSON.parse(JSON.stringify(baseP));
+    if(v.time)    vp.time=v.time;
+    if(v.weather) vp.weather=v.weather;
+    if(v.mood)    vp.mood=v.mood;
+    if(v.season)  vp.season=v.season;
+    vp.musicKey=burstMusicKey(vp);
+    varParsed.push(vp);
+
+    var card=document.createElement('div');
+    card.className='burst-card';
+    var svgStr=svgScene(vp,320,180);
+    card.innerHTML='<svg viewBox="0 0 320 180">'+svgStr+'</svg><div class="burst-lbl">'+v.label+'</div>';
+    card.onclick=(function(vp2,lbl){return function(){
+      ov.remove();
+      document.getElementById('script-inp').value=inp+' · '+lbl.toLowerCase();
+      var vizEl=document.getElementById('viz');
+      vizEl.innerHTML=svgScene(vp2);
+      vizEl.style.display='block';
+      document.getElementById('empty-canvas').style.display='none';
+      var fbb=document.getElementById('freeze-btn');if(fbb){fbb.style.display='inline-flex';_frozen=false;fbb.textContent='⏸ Îngheață';fbb.style.color='';}
+      var bbb=document.getElementById('burst-btn');if(bbb)bbb.style.display='inline-flex';
+      var ebb=document.getElementById('export-btn');if(ebb)ebb.style.display='inline-flex';
+      addToSceneMemory(inp+' '+lbl,vp2);
+      leaSay('Variația <em>'+lbl+'</em> proiectată. Apasă Burst din nou sau ✦ adaugă în Timeline.');
+    };})(vp, v.label);
+    grid.appendChild(card);
+  });
+  ov.appendChild(grid);
+
+  // bottom buttons
+  var btnRow=document.createElement('div');
+  btnRow.style.cssText='display:flex;gap:10px;margin-top:14px';
+
+  var tlBtn=document.createElement('button');
+  tlBtn.textContent='+ Toate în Timeline';
+  tlBtn.style.cssText='padding:9px 20px;border-radius:8px;background:rgba(var(--ac),.07);border:1px solid rgba(var(--ac),.2);color:rgba(var(--ac),.8);font-size:11px;cursor:pointer';
+  tlBtn.onclick=function(){
+    varParsed.forEach(function(vp,i){
+      _tl.push({txt:inp+' '+BURST_VARS[i].label,dur:3,p:vp});
+    });
+    saveTL();ov.remove();setStudio('timeline');renderTL();
+    leaSay('10 variații adăugate în Timeline. Apasă ▶ Redă filmul!');
+  };
+
+  var closeBtn=document.createElement('button');
+  closeBtn.textContent='✕ Închide';
+  closeBtn.style.cssText='padding:9px 18px;border-radius:8px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);color:rgba(255,255,255,.4);font-size:11px;cursor:pointer';
+  closeBtn.onclick=function(){ov.remove();};
+
+  btnRow.appendChild(tlBtn);btnRow.appendChild(closeBtn);
+  ov.appendChild(btnRow);
+
+  ov.addEventListener('click',function(e){if(e.target===ov)ov.remove();});
+  document.body.appendChild(ov);
+}
+
+// ── SCENĂ NOUĂ ──
+function newScene(){
+  document.getElementById('script-inp').value='';
+  var viz=document.getElementById('viz');if(viz){viz.innerHTML='';viz.style.display='none';}
+  document.getElementById('empty-canvas').style.display='flex';
+  document.getElementById('tok-strip').innerHTML='';
+  document.getElementById('perf-lbl').textContent='';
+  var fb=document.getElementById('freeze-btn');if(fb){fb.style.display='none';_frozen=false;}
+  var bb=document.getElementById('burst-btn');if(bb)bb.style.display='none';
+  var eb=document.getElementById('export-btn');if(eb)eb.style.display='none';
+  stopAudio();
+  document.getElementById('script-inp').focus();
+  leaSay('Pânză curată. Scrie o scenă nouă.');
+}
+
+// ── EXPORT PNG ──
+function exportPNG(){
+  var svgEl=document.getElementById('viz');
+  if(!svgEl||svgEl.style.display==='none'){leaSay('Nu există o scenă de exportat. Generează mai întâi o scenă.');return;}
+  var W=1400,H=800;
+  var clone=svgEl.cloneNode(true);
+  clone.setAttribute('xmlns','http://www.w3.org/2000/svg');
+  clone.setAttribute('width',W);clone.setAttribute('height',H);
+  // fill background to match scene sky
+  var bgEl=clone.querySelector('rect');
+  if(!bgEl){var bg=document.createElementNS('http://www.w3.org/2000/svg','rect');bg.setAttribute('width',W);bg.setAttribute('height',H);bg.setAttribute('fill','#0a0a18');clone.insertBefore(bg,clone.firstChild);}
+  var xml=(new XMLSerializer()).serializeToString(clone);
+  var blob=new Blob([xml],{type:'image/svg+xml'});
+  var url=URL.createObjectURL(blob);
+  var img=new Image();
+  img.onload=function(){
+    var canvas=document.createElement('canvas');
+    canvas.width=W;canvas.height=H;
+    var ctx=canvas.getContext('2d');
+    ctx.drawImage(img,0,0,W,H);
+    URL.revokeObjectURL(url);
+    canvas.toBlob(function(b){
+      var a=document.createElement('a');
+      var ts=new Date().toISOString().slice(0,16).replace('T','_').replace(':','-');
+      a.download='vv-lea-scena-'+ts+'.png';
+      a.href=URL.createObjectURL(b);
+      a.click();
+      setTimeout(function(){URL.revokeObjectURL(a.href);},3000);
+      leaSay('Scena a fost exportată ca PNG (1400×800).');
+    },'image/png');
+  };
+  img.onerror=function(){
+    // fallback: download SVG directly
+    var a=document.createElement('a');
+    var ts=new Date().toISOString().slice(0,16).replace('T','_').replace(':','-');
+    a.download='vv-lea-scena-'+ts+'.svg';
+    a.href=URL.createObjectURL(blob);
+    a.click();
+    setTimeout(function(){URL.revokeObjectURL(a.href);},3000);
+    leaSay('Export PNG blocat de browser (CORS). Am salvat scena ca SVG.');
+  };
+  img.src=url;
+}
+
+// ── VV HiL — SUBJECT EDITOR ──
+var SE_DEFS={
+  om:[
+    {prop:'h_factor',label:'Înălțime',type:'range',min:.6,max:1.5,step:.05,def:1},
+    {prop:'mood_ov',label:'Expresie',type:'sel',opts:['auto','fericit','trist','tensiune','liniste']},
+    {prop:'action_ov',label:'Postură',type:'sel',opts:['auto','sare','danseaza','doarme','alergare','plange','rade']},
+    {prop:'mustache_ov',label:'Mustață',type:'sel',opts:['auto','nu','subțire','clasica','stângace']},
+    {prop:'beard_ov',label:'Barbă',type:'sel',opts:['auto','nu','scurtă','lungă']},
+    {prop:'glasses_ov',label:'Ochelari',type:'sel',opts:['auto','nu','rotunde','patrate']},
+  ],
+  pisica:[
+    {prop:'scale',label:'Mărime',type:'range',min:.5,max:2,step:.1,def:1},
+    {prop:'fur_idx',label:'Blană',type:'sel',opts:['Gri','Portocaliu','Negru','Brun']},
+    {prop:'action_ov',label:'Postură',type:'sel',opts:['auto','doarme','sare','alergare']},
+  ],
+  copac:[
+    {prop:'h_factor',label:'Înălțime',type:'range',min:.4,max:2,step:.1,def:1},
+    {prop:'season_ov',label:'Sezon',type:'sel',opts:['auto','vara','toamna','iarna','primavara']},
+  ],
+  caine:[
+    {prop:'scale',label:'Mărime',type:'range',min:.5,max:1.8,step:.1,def:1},
+    {prop:'fur_idx',label:'Blană',type:'sel',opts:['Brun','Golden','Alb','Negru']},
+    {prop:'action_ov',label:'Postură',type:'sel',opts:['auto','alergare']},
+  ],
+  girafa:[
+    {prop:'scale',label:'Mărime',type:'range',min:.5,max:1.4,step:.1,def:1},
+    {prop:'action_ov',label:'Mișcare',type:'sel',opts:['auto','alergare']},
+  ],
+  pasare:[
+    {prop:'scale',label:'Mărime',type:'range',min:.5,max:2.5,step:.1,def:1},
+    {prop:'species_idx',label:'Specie',type:'sel',opts:['Cioară','Robin','Jay','Canar','Papagal']},
+    {prop:'action_ov',label:'Mișcare',type:'sel',opts:['auto','zboara']},
+  ],
+  floare:[
+    {prop:'scale',label:'Mărime',type:'range',min:.5,max:2,step:.1,def:1},
+    {prop:'mood_ov',label:'Culoare',type:'sel',opts:['auto','fericit','trist','tensiune','liniste']},
+  ],
+};
+var SE_NAMES={om:'Persoană',pisica:'Pisică',caine:'Câine',copac:'Copac',girafa:'Girafă',pasare:'Pasăre',floare:'Floare',cal:'Cal',elefant:'Elefant',urs:'Urs'};
+
+function openSubjEditor(evt,subj,idx){
+  evt.stopPropagation();
+  var ed=document.getElementById('subj-editor');
+  if(!ed)return;
+  var x=evt.clientX,y=evt.clientY;
+  var maxX=window.innerWidth-272,maxY=window.innerHeight-320;
+  ed.style.left=Math.min(x+14,maxX)+'px';
+  ed.style.top=Math.max(40,Math.min(y-30,maxY))+'px';
+  ed.style.display='block';
+  document.getElementById('se-title').textContent=SE_NAMES[subj]||subj;
+  ed.dataset.idx=idx; ed.dataset.subj=subj;
+  _seSubj=subj; _seIdx=idx; // sync pentru skeleton editor button
+  document.getElementById('se-controls').innerHTML=buildSeControls(subj,idx);
+  // pattern hint
+  var hint=getTopPatternHint(subj);
+  var ph=document.getElementById('se-pattern-hint');
+  if(ph)ph.textContent=hint?'Lea știe: '+hint:'';
+}
+function buildSeControls(subj,idx){
+  var defs=SE_DEFS[subj]; if(!defs)return'';
+  var ov=_subjOverrides[idx]||{};
+  var html='';
+  defs.forEach(function(d){
+    var val=ov[d.prop]!==undefined?ov[d.prop]:(d.def!==undefined?d.def:'auto');
+    html+='<div class="se-row"><span class="se-lbl">'+d.label+'</span>';
+    if(d.type==='range'){
+      html+='<input type="range" class="se-slider" min="'+d.min+'" max="'+d.max+'" step="'+d.step+'" value="'+val+'" oninput="seChange('+idx+',\''+d.prop+'\',+this.value,this)">';
+      html+='<span class="se-val" id="sev-'+d.prop+'">'+parseFloat(val).toFixed(1)+'</span>';
+    } else {
+      html+='<select class="se-sel" onchange="seChange('+idx+',\''+d.prop+'\',this.value,this)">';
+      d.opts.forEach(function(o,oi){
+        var v=o==='auto'?'auto':(d.prop==='fur_idx'||d.prop==='species_idx'?oi:o.toLowerCase());
+        var sel=(String(val)===String(v))||(!ov[d.prop]&&o==='auto');
+        html+='<option value="'+v+'"'+(sel?' selected':'')+'>'+(o==='auto'?'— auto —':o)+'</option>';
+      });
+      html+='</select>';
+    }
+    html+='</div>';
+  });
+  return html;
+}
+function seChange(idx,prop,val,el){
+  if(!_subjOverrides[idx])_subjOverrides[idx]={};
+  _subjOverrides[idx][prop]=isNaN(+val)||val===''||val==='auto'?val:+val;
+  var vd=document.getElementById('sev-'+prop);
+  if(vd&&!isNaN(+val))vd.textContent=parseFloat(val).toFixed(1);
+  reRenderSubject(idx);
+  var ed=document.getElementById('subj-editor');
+  if(ed)recordPattern(ed.dataset.subj,prop,val);
+}
+function reRenderSubject(idx){
+  var st=_sceneSubjects[idx]; if(!st)return;
+  var el=document.getElementById('subj-'+idx); if(!el)return;
+  var ov=_subjOverrides[idx]||{};
+  var rMood=ov.mood_ov&&ov.mood_ov!=='auto'?ov.mood_ov:st.mood;
+  var rAction=ov.action_ov&&ov.action_ov!=='auto'?ov.action_ov:st.action;
+  var rH=st.h*(ov.h_factor||1);
+  var rSeason=ov.season_ov&&ov.season_ov!=='auto'?ov.season_ov:st.season;
+  var rScale=ov.scale||1;
+  var savedPc=_pc;
+  _pc=st.pc_before;
+  if(ov.fur_idx!==undefined&&ov.fur_idx!=='auto') _furOverrideVal=+ov.fur_idx;
+  if(ov.species_idx!==undefined&&ov.species_idx!=='auto') _speciesOverrideVal=+ov.species_idx;
+  var nc='';
+  var s=st.subj, cx=st.cx, hf=st.h_full;
+  if(s==='om')     nc=person(cx,st.yDepth*(rMood==='trist'?0.92:0.88),rMood,rH,rAction,ov);
+  if(s==='pisica') nc=cat(cx,hf*0.76*rScale,st.time,rAction);
+  if(s==='copac')  nc=tree(cx,hf*0.88,st.h*(ov.h_factor||1),rSeason);
+  if(s==='caine')  nc=dog(cx,hf*0.82*rScale,hf*rScale,rAction);
+  if(s==='pasare') nc=bird(cx,st.action==='zboara'?hf*0.12:hf*0.25,hf*rScale,rAction);
+  if(s==='girafa') nc=girafa(cx,hf*0.88,st.h*rScale,rAction);
+  if(s==='floare') nc=floare(cx,hf*0.85,st.h*rScale,rMood);
+  if(s==='cal')    nc=cal(cx,hf*0.88,st.h*rScale,rAction);
+  if(s==='elefant')nc=elefant(cx,hf*0.88,st.h*rScale,rAction);
+  if(s==='urs')    nc=urs(cx,hf*0.85,st.h*rScale,rAction);
+  _furOverrideVal=undefined; _speciesOverrideVal=undefined;
+  _pc=savedPc;
+  if(nc)el.innerHTML=nc;
+}
+function closeSubjEditor(){
+  var ed=document.getElementById('subj-editor');
+  if(ed)ed.style.display='none';
+}
+function resetSubjEditor(){
+  var ed=document.getElementById('subj-editor'); if(!ed)return;
+  var idx=+ed.dataset.idx;
+  delete _subjOverrides[idx];
+  reRenderSubject(idx);
+  document.getElementById('se-controls').innerHTML=buildSeControls(ed.dataset.subj,idx);
+  leaSay('Subiectul a fost resetat la valorile scenei.');
+}
+function memorizeSubjStyle(){
+  var ed=document.getElementById('subj-editor'); if(!ed)return;
+  var subj=ed.dataset.subj, idx=+ed.dataset.idx;
+  var ov=_subjOverrides[idx]||{};
+  Object.keys(ov).forEach(function(prop){recordPattern(subj,prop,ov[prop]);});
+  leaSay('Stilul tău pentru <em>'+SE_NAMES[subj]+'</em> a fost memorat. Lea îl va aplica automat.');
+}
+function recordPattern(subj,prop,val){
+  if(window._leaSyncingPattern) return;
+  var key=subj+'.'+prop;
+  if(!_subjPatterns[key])_subjPatterns[key]={};
+  var vs=JSON.stringify(val);
+  _subjPatterns[key][vs]=(_subjPatterns[key][vs]||0)+1;
+  try{localStorage.setItem('vv_subj_patterns',JSON.stringify(_subjPatterns));}catch(e){}
+  if(window.VVHiR&&VVHiR.recordPattern){VVHiR.recordPattern(subj,prop,val);}
+}
+function getTopPatternHint(subj){
+  var keys=Object.keys(_subjPatterns).filter(function(k){return k.startsWith(subj+'.');});
+  var best=null,bestCount=4,bestLabel='';
+  keys.forEach(function(k){
+    var prop=k.split('.')[1];
+    var bucket=_subjPatterns[k];
+    Object.keys(bucket).forEach(function(v){
+      if(bucket[v]>bestCount){bestCount=bucket[v];best=v;bestLabel=prop+'='+JSON.parse(v);}
+    });
+  });
+  return bestLabel||null;
+}
+// close editor on outside click
+document.addEventListener('click',function(e){
+  var ed=document.getElementById('subj-editor');
+  if(ed&&ed.style.display!=='none'&&!ed.contains(e.target)&&!e.target.closest('.subj-hit'))closeSubjEditor();
+});
+
+// ── INIT ──
+lawsLoad(); lawsSyncUI(); syncPerfUI();
+document.getElementById('script-inp').focus();
+// Lea Chat: Enter trimite mesajul
+document.getElementById('lea-chat-inp').addEventListener('keydown',function(e){
+  if(e.key==='Enter'){var m=this.value.trim();if(m){leaChat(m);this.value='';}}
+});
+// rolling apple CSS
+var style=document.createElement('style');
+style.textContent='@keyframes rollA{0%{transform:translate(60px,300px) rotate(0deg)}100%{transform:translate(680px,300px) rotate(720deg)}}';
+document.head.appendChild(style);
+// init KB panel count
+document.getElementById('kb-count').textContent=Object.keys(KB).length;
+document.getElementById('set-kb-count').textContent=Object.keys(KB).length;
+// pre-populate KB panel
+Object.keys(KB).forEach(function(k){addKBItem(k,false);});
+// Scene Memory
+loadSceneMemory();
+renderSceneStrip();
+updateMoodArc();
+// Custom Vocabulary list
+renderCVList();
+// Timeline
+loadTL();
+// ── HOME OVERLAY ──
+var _homeGreetings=['Ce creăm azi?','Scrie o scenă. Eu o văd.','O muzică? O poveste? Spune.','Sunt aici. Ce simți?','Lumea ta, în câteva cuvinte.'];
+var _hgi=0;
+function homeGreetingCycle(){
+  var el=document.getElementById('home-greeting');
+  if(!el)return;
+  el.style.opacity='0';
+  setTimeout(function(){
+    _hgi=(_hgi+1)%_homeGreetings.length;
+    el.textContent=_homeGreetings[_hgi];
+    el.style.opacity='1';
+  },400);
+}
+setInterval(homeGreetingCycle,4500);
+function openFromHome(studio){
+  var ov=document.getElementById('home-ovr');
+  ov.classList.add('out');
+  setTimeout(function(){
+    ov.style.display='none';
+    var hb=document.getElementById('home-btn');
+    if(hb)hb.style.display='block';
+  },450);
+  if(typeof setStudio==='function') setStudio(studio);
+}
+function homeInputSubmit(){
+  var inp=document.getElementById('home-inp-el');
+  var msg=inp?inp.value.trim():'';
+  if(!msg)return;
+  // guess studio from input
+  var lo=msg.toLowerCase();
+  var studio='vision';
+  if(/muzic|melodie|cânt|cant|sunet|ritm/.test(lo)) studio='music';
+  else if(/povest|film|scen[aă]/.test(lo)) studio='vision';
+  openFromHome(studio);
+  setTimeout(function(){
+    var si=document.getElementById('script-inp');
+    if(si){si.value=msg;si.dispatchEvent(new KeyboardEvent('keydown',{key:'Enter',bubbles:true}));}
+  },500);
+}
+// ─────────────────────────────────────────────
+// VV HiL · SKELETON EDITOR
+// ─────────────────────────────────────────────
+/* Skeleton: engine/06-vv-hir-pose.js → SKEL_W, SKEL_H, SKEL_JOINTS, SKEL_BONES */
+var SKEL_W=window.SKEL_W||240, SKEL_H=window.SKEL_H||320;
+var SKEL_JOINTS=window.SKEL_JOINTS||{};
+var SKEL_BONES=window.SKEL_BONES||{};
+var _skl={subj:null,idx:null,joints:{},drag:null,rotX:0,rotY:0,rotDrag:null};
+var _skelPT=null;
+var _seSubj=null,_seIdx=null; // exposed for se-skel-btn onclick
+
+function openSkelEditor(subj,idx){
+  if(!subj||idx===null||idx===undefined) return;
+  _skl.subj=subj; _skl.idx=idx;
+  _seSubj=subj; _seIdx=idx;
+  _skl.joints={};
+  (SKEL_JOINTS[subj]||[]).forEach(function(jd){_skl.joints[jd.id]={cx:jd.cx,cy:jd.cy};});
+  _skl.rotX=0; _skl.rotY=0; _skl.drag=null; _skl.rotDrag=null;
+  document.getElementById('skel-title').textContent=(SE_NAMES[subj]||subj)+' — Postură';
+  var ov=document.getElementById('skel-ovr'); ov.style.display='flex';
+  skelRedraw();
+}
+function closeSkelEditor(){document.getElementById('skel-ovr').style.display='none';}
+
+function skelRedraw(){
+  skelPreview(); skelJoints(); skelList();
+}
+
+function skelPreview(){
+  var el=document.getElementById('skel-subj'); if(!el) return;
+  var st=_sceneSubjects[_skl.idx]; if(!st) return;
+  var params=skelToParams();
+  var savedPc=_pc;
+  _pc=0;
+  if(_skl.idx!==undefined) _furOverrideVal=params.fur_idx!==undefined?+params.fur_idx:undefined;
+  if(_skl.idx!==undefined) _speciesOverrideVal=params.species_idx!==undefined?+params.species_idx:undefined;
+  var scX=SKEL_W/1200, scY=SKEL_H/800;
+  var cx=st.cx*scX, hf=st.h_full*scY, yD=st.yDepth*scY;
+  var rMood=params.mood_ov&&params.mood_ov!=='auto'?params.mood_ov:st.mood;
+  var rAction=params.action_ov&&params.action_ov!=='auto'?params.action_ov:st.action;
+  var rSeason=params.season_ov&&params.season_ov!=='auto'?params.season_ov:st.season;
+  var rH=hf*(params.h_factor||1), rScale=params.scale||1;
+  var nc='';
+  var s=_skl.subj;
+  var pOv=Object.assign({},_subjOverrides[_skl.idx]||{},params);
+  if(s==='om')     nc=person(cx,yD*(rMood==='trist'?.92:.88),rMood,rH,rAction,pOv);
+  if(s==='pisica') nc=cat(cx,hf*.76*rScale,st.time,rAction);
+  if(s==='caine')  nc=dog(cx,hf*.82*rScale,hf*rScale,rAction);
+  if(s==='copac')  nc=tree(cx,hf*.88,hf*(params.h_factor||1),rSeason);
+  if(s==='girafa') nc=girafa(cx,hf*.88,hf*rScale,rAction);
+  if(s==='pasare') nc=bird(cx,hf*.25,hf*rScale,rAction);
+  if(s==='floare') nc=floare(cx,hf*.85,hf*rScale,rMood);
+  if(s==='cal')    nc=cal(cx,hf*.88,hf*rScale,rAction);
+  if(s==='elefant')nc=elefant(cx,hf*.88,hf*rScale,rAction);
+  if(s==='urs')    nc=urs(cx,hf*.85,hf*rScale,rAction);
+  _furOverrideVal=undefined; _speciesOverrideVal=undefined;
+  _pc=savedPc;
+  var rotS='transform-origin:'+(SKEL_W/2)+'px '+(SKEL_H/2)+'px;transform:perspective(500px) rotateY('+_skl.rotY+'deg) rotateX('+(-_skl.rotX)+'deg)';
+  el.innerHTML='<rect width="'+SKEL_W+'" height="'+SKEL_H+'" fill="#07071a"/>'
+    +'<ellipse cx="'+(SKEL_W/2)+'" cy="'+(SKEL_H*.88)+'" rx="'+(SKEL_W*.38)+'" ry="'+(SKEL_H*.04)+'" fill="rgba(0,0,0,.35)"/>'
+    +'<g style="'+rotS+'">'+nc+'</g>';
+}
+
+function skelJoints(){
+  var el=document.getElementById('skel-jsvg'); if(!el) return;
+  var defs=SKEL_JOINTS[_skl.subj]||[];
+  var bones=SKEL_BONES[_skl.subj]||[];
+  var s='';
+  bones.forEach(function(b){
+    var j1=_skl.joints[b[0]], j2=_skl.joints[b[1]];
+    if(!j1||!j2) return;
+    s+='<line x1="'+(j1.cx*SKEL_W).toFixed(1)+'" y1="'+(j1.cy*SKEL_H).toFixed(1)+'" x2="'+(j2.cx*SKEL_W).toFixed(1)+'" y2="'+(j2.cy*SKEL_H).toFixed(1)+'" stroke="rgba(255,255,255,.1)" stroke-width="1.5" stroke-dasharray="4,3"/>';
+  });
+  defs.forEach(function(jd){
+    var j=_skl.joints[jd.id]||{cx:jd.cx,cy:jd.cy};
+    var px=(j.cx*SKEL_W).toFixed(1), py=(j.cy*SKEL_H).toFixed(1);
+    s+='<circle class="skel-jc" id="jc-'+jd.id+'" cx="'+px+'" cy="'+py+'" r="7" fill="'+jd.col+'" fill-opacity=".82" stroke="rgba(255,255,255,.35)" stroke-width="1.5"/>';
+  });
+  el.innerHTML=s;
+  el.style.pointerEvents='all';
+  defs.forEach(function(jd){
+    var c=document.getElementById('jc-'+jd.id);
+    if(c) c.addEventListener('pointerdown',function(e){e.stopPropagation();skelJDown(e,jd.id);},{passive:false});
+  });
+}
+
+function skelList(){
+  var el=document.getElementById('skel-list'); if(!el) return;
+  var defs=SKEL_JOINTS[_skl.subj]||[];
+  var s='';
+  defs.forEach(function(jd){
+    var j=_skl.joints[jd.id]||{cx:jd.cx,cy:jd.cy};
+    var dxP=((j.cx-jd.cx)*SKEL_W).toFixed(0);
+    var dyP=((j.cy-jd.cy)*SKEL_H).toFixed(0);
+    var moved=Math.abs(+dxP)>2||Math.abs(+dyP)>2;
+    var valStr=moved?(( +dxP>0?'+':'')+dxP+', '+( +dyP>0?'+':'')+dyP):'—';
+    s+='<div class="skel-jrow"><div class="skel-jdot" style="background:'+jd.col+'"></div><div style="flex:1"><div class="skel-jname">'+jd.label+'</div><div class="skel-jhint">'+jd.hint+'</div></div><div class="skel-jval">'+valStr+'</div></div>';
+  });
+  el.innerHTML=s;
+  var params=skelToParams();
+  var pk=Object.keys(params).filter(function(k){return params[k]!='auto';});
+  var pd=document.getElementById('skel-params');
+  pd.innerHTML=pk.length?pk.map(function(k){return k+' → <b>'+params[k]+'</b>';}).join(' &nbsp; '):'';
+}
+
+function skelToParams(){
+  if(window.VVHiR&&VVHiR.pose&&VVHiR.pose.toOverrides)
+    return VVHiR.pose.toOverrides(_skl.subj,_skl.joints);
+  return {};
+}
+
+// ── Joint drag ──
+function skelJDown(e,jid){
+  e.preventDefault();
+  var pw=document.getElementById('skel-pw');
+  var rect=pw.getBoundingClientRect();
+  _skl.drag={jid:jid,sx:e.clientX,sy:e.clientY,ox:_skl.joints[jid].cx,oy:_skl.joints[jid].cy,rect:rect};
+  pw.setPointerCapture(e.pointerId);
+}
+function skelPMove(e){
+  if(_skl.drag){
+    var d=_skl.drag;
+    var ncx=Math.max(.04,Math.min(.96, d.ox+(e.clientX-d.sx)/d.rect.width));
+    var ncy=Math.max(.04,Math.min(.96, d.oy+(e.clientY-d.sy)/d.rect.height));
+    _skl.joints[d.jid]={cx:ncx,cy:ncy};
+    var c=document.getElementById('jc-'+d.jid);
+    if(c){c.setAttribute('cx',(ncx*SKEL_W).toFixed(1));c.setAttribute('cy',(ncy*SKEL_H).toFixed(1));}
+    clearTimeout(_skelPT);
+    _skelPT=setTimeout(skelRedraw,80);
+  } else if(_skl.rotDrag){
+    var rd=_skl.rotDrag;
+    _skl.rotY=Math.max(-65,Math.min(65, rd.oy+(e.clientX-rd.sx)*.5));
+    _skl.rotX=Math.max(-35,Math.min(35, rd.ox+(e.clientY-rd.sy)*.3));
+    skelPreview();
+  }
+}
+function skelPUp(e){_skl.drag=null; _skl.rotDrag=null;}
+function skelRDown(e){
+  if(e.target.classList.contains('skel-jc')) return;
+  e.preventDefault();
+  var pw=document.getElementById('skel-pw');
+  _skl.rotDrag={sx:e.clientX,sy:e.clientY,ox:_skl.rotX,oy:_skl.rotY};
+  pw.setPointerCapture(e.pointerId);
+}
+
+function skelApply(){
+  if(_skl.idx===null) return;
+  var params=skelToParams();
+  _subjOverrides[_skl.idx]=Object.assign(_subjOverrides[_skl.idx]||{},params);
+  reRenderSubject(_skl.idx);
+  leaSay('Postura aplicată. Click pe figură pentru ajustări fine.');
+  closeSkelEditor();
+}
+function skelMemorize(){
+  if(_skl.idx===null) return;
+  var params=skelToParams();
+  Object.keys(params).forEach(function(prop){recordPattern(_skl.subj,prop,params[prop]);});
+  leaSay('✦ Postura pentru <em>'+(SE_NAMES[_skl.subj]||_skl.subj)+'</em> memorată. Lea o va aplica automat.');
+  skelApply();
+}
+
+// ─────────────────────────────────────────────
+// VV HiL · COLLECTIVE LEARNING (Lea Mesh)
+// ─────────────────────────────────────────────
+function leaExportStyle(){
+  var pack={v:1,date:new Date().toISOString().slice(0,10),patterns:_subjPatterns};
+  var blob=new Blob([JSON.stringify(pack,null,2)],{type:'application/json'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a'); a.href=url;
+  a.download='lea-style-'+pack.date+'.json'; a.click();
+  setTimeout(function(){URL.revokeObjectURL(url);},1000);
+  leaSay('Stilul tău Lea a fost exportat. Distribuie fișierul prietenilor sau importă-l pe alt dispozitiv.');
+}
+function leaImportStyle(){
+  var inp=document.createElement('input'); inp.type='file'; inp.accept='.json';
+  inp.onchange=function(e){
+    var file=e.target.files[0]; if(!file) return;
+    var reader=new FileReader();
+    reader.onload=function(ev){
+      try{
+        var pack=JSON.parse(ev.target.result);
+        if(!pack.patterns) throw new Error('format invalid');
+        var merged=0;
+        Object.keys(pack.patterns).forEach(function(key){
+          if(!_subjPatterns[key]) _subjPatterns[key]={};
+          Object.keys(pack.patterns[key]).forEach(function(v){
+            // blend: imported patterns add weight 2 (gentil, nu override)
+            _subjPatterns[key][v]=(_subjPatterns[key][v]||0)+2;
+            merged++;
+          });
+        });
+        try{localStorage.setItem('vv_subj_patterns',JSON.stringify(_subjPatterns));}catch(ex){}
+        leaSay('✦ Stilul comunitar importat · '+merged+' preferințe integrate. Lea le va folosi subtil, fără să îți schimbe stilul propriu.');
+      }catch(ex){ leaSay('Nu am putut importa fișierul. Verifică formatul.'); }
+    };
+    reader.readAsText(file);
+  };
+  inp.click();
+}
+
+function goHome(){
+  var ov=document.getElementById('home-ovr');
+  ov.style.display='flex';
+  ov.style.opacity='0';
+  ov.style.transform='scale(.97)';
+  setTimeout(function(){
+    ov.classList.remove('out');
+    ov.style.opacity='';
+    ov.style.transform='';
+  },20);
+  var hb=document.getElementById('home-btn');
+  if(hb)hb.style.display='none';
+}
+document.getElementById('home-inp-el').addEventListener('keydown',function(e){
+  if(e.key==='Enter') homeInputSubmit();
+});
+
+// ── Skeleton Editor pointer events ──
+(function(){
+  var pw=document.getElementById('skel-pw');
+  if(!pw) return;
+  pw.addEventListener('pointerdown',function(e){
+    if(e.target.classList.contains('skel-jc')) return;
+    skelRDown(e);
+  },{passive:false});
+  pw.addEventListener('pointermove',skelPMove,{passive:true});
+  pw.addEventListener('pointerup',skelPUp);
+  pw.addEventListener('pointercancel',skelPUp);
+})();
+
+// ── Collective Learning buttons in Lea panel ──
+(function(){
+  var panel=document.getElementById('panel-lea');
+  if(!panel) return;
+  var wrap=document.createElement('div');
+  wrap.style.cssText='display:flex;gap:6px;padding:6px 0 2px;';
+  var btnE=document.createElement('button');
+  btnE.className='lea-mesh-btn lea-export';
+  btnE.textContent='↑ Export stil Lea';
+  btnE.onclick=leaExportStyle;
+  var btnI=document.createElement('button');
+  btnI.className='lea-mesh-btn lea-import';
+  btnI.textContent='↓ Import stil comunitar';
+  btnI.onclick=leaImportStyle;
+  wrap.appendChild(btnE); wrap.appendChild(btnI);
+  panel.appendChild(wrap);
+})();
+</script>
+
+<!-- ── HOME OVERLAY ── -->
+<!-- ── VV HiL SUBJECT EDITOR ── -->
+<div id="subj-editor">
+  <div class="se-header">
+    <span id="se-title">Subiect</span>
+    <button class="se-close" onclick="closeSubjEditor()">✕</button>
+  </div>
+  <div id="se-controls"></div>
+  <div class="se-divider"></div>
+  <button class="se-skel-btn" id="se-skel-open" onclick="openSkelEditor(_seSubj,_seIdx)">⬟ Editează postura în spațiu</button>
+  <button class="se-save" onclick="memorizeSubjStyle()">♡ Memorează stilul</button>
+  <button class="se-reset" onclick="resetSubjEditor()">↺ Resetează</button>
+  <div class="se-pattern-hint" id="se-pattern-hint"></div>
+</div>
+
+<!-- ── SKELETON EDITOR OVERLAY ── -->
+<div id="skel-ovr">
+  <div class="skel-box">
+    <div class="skel-preview" id="skel-pw">
+      <svg id="skel-subj" class="skel-preview-svg" viewBox="0 0 240 320"></svg>
+      <svg id="skel-jsvg" class="skel-joints-svg" viewBox="0 0 240 320"></svg>
+      <div class="skel-3d-hint">drag pe figură → rotire 3D &nbsp;·&nbsp; drag pe ● → editare</div>
+    </div>
+    <div class="skel-right">
+      <div class="skel-hdr">
+        <span class="skel-title" id="skel-title">Postură</span>
+        <button class="skel-x" onclick="closeSkelEditor()">✕</button>
+      </div>
+      <div class="skel-list" id="skel-list"></div>
+      <div id="skel-params" class="skel-params"></div>
+      <div class="skel-div"></div>
+      <div class="skel-btns">
+        <button class="skel-apply" onclick="skelApply()">↗ Aplică în scenă</button>
+        <button class="skel-mem" onclick="skelMemorize()">♡ Memorează</button>
+      </div>
+      <div class="skel-rot-note">Drag pe figură = rotire 3D · Drag pe ● = editare articulație</div>
+    </div>
+  </div>
+</div>
+
+<button id="home-btn" onclick="goHome()">⌂ Acasă</button>
+<div id="home-ovr">
+  <div class="home-bg-glow"></div>
+  <div class="home-lea-brand">
+    <div class="home-lea-name">VV Technologies</div>
+    <div class="home-lea-title">Lea Studios</div>
+    <div class="home-lea-sub">ECOSISTEM CREATIV · LOCAL · AL TĂU</div>
+    <div class="home-lea-dot"></div>
+  </div>
+  <div class="home-greeting" id="home-greeting">Ce creăm azi?</div>
+  <div class="home-cards">
+    <div class="hcard" onclick="openFromHome('vision')">
+      <div class="hcard-icon">✦</div>
+      <div class="hcard-name">Vision</div>
+      <div class="hcard-sub">text → scenă</div>
+      <span class="hcard-badge free">FREE</span>
+    </div>
+    <div class="hcard" onclick="openFromHome('music')">
+      <div class="hcard-icon">♫</div>
+      <div class="hcard-name">Music</div>
+      <div class="hcard-sub">text → muzică</div>
+      <span class="hcard-badge free">FREE</span>
+    </div>
+    <div class="hcard" onclick="openFromHome('story')">
+      <div class="hcard-icon">▶</div>
+      <div class="hcard-name">Story</div>
+      <div class="hcard-sub">vizual + sonor</div>
+      <span class="hcard-badge pro">PRO</span>
+    </div>
+    <div class="hcard" onclick="openFromHome('write')">
+      <div class="hcard-icon">✏</div>
+      <div class="hcard-name">Write</div>
+      <div class="hcard-sub">editor text</div>
+      <span class="hcard-badge free">FREE</span>
+    </div>
+    <div class="hcard" onclick="openFromHome('voice')">
+      <div class="hcard-icon">🎙</div>
+      <div class="hcard-name">Voice</div>
+      <div class="hcard-sub">ascultă · vorbește</div>
+      <span class="hcard-badge free">FREE</span>
+    </div>
+    <div class="hcard" onclick="openFromHome('photo')">
+      <div class="hcard-icon">⊞</div>
+      <div class="hcard-name">Photo</div>
+      <div class="hcard-sub">galerie locală</div>
+      <span class="hcard-badge free">FREE</span>
+    </div>
+  </div>
+  <div class="home-input-wrap">
+    <input class="home-inp" id="home-inp-el" placeholder="sau spune-i lui Lea direct ce vrei să creezi…" autocomplete="off">
+    <button class="home-inp-send" onclick="homeInputSubmit()">→</button>
+  </div>
+  <div class="home-footer">LOCAL · ZERO SERVER · ZERO AI EXTERN</div>
+</div>
+</body>
+</html>
