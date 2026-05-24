@@ -198,17 +198,18 @@
     var mEyeW = matStd(0xffffff, 0.4);
     var mIris  = matStd(0x1a3060, 0.3);
     var mPupil = matStd(0x060408, 0.2);
+    var _eyeWhites = []; /* referințe pentru clipit */
     [-1, 1].forEach(function (s2) {
       var ew = mkSphere(HEAD * 0.21, mEyeW);
       ew.position.set(s2 * HEAD * 0.33, HEAD * 0.1, HEAD * 0.9);
       headPivot.add(ew);
+      _eyeWhites.push(ew);
       var iris = mkSphere(HEAD * 0.13, mIris);
       iris.position.set(s2 * HEAD * 0.33, HEAD * 0.1, HEAD * 0.98);
       headPivot.add(iris);
       var pupil = mkSphere(HEAD * 0.07, mPupil);
       pupil.position.set(s2 * HEAD * 0.33, HEAD * 0.1, HEAD * 1.01);
       headPivot.add(pupil);
-      /* Strălucire ochi */
       var shine = mkSphere(HEAD * 0.04, matStd(0xffffff, 0.1));
       shine.position.set(s2 * HEAD * 0.3, HEAD * 0.16, HEAD * 1.03);
       headPivot.add(shine);
@@ -281,14 +282,44 @@
     /* Override rotație */
     if (ov.rotation) root.rotation.y = ov.rotation * Math.PI / 180;
 
-    /* ── ANIMAȚIE respirație ── */
+    /* ── LERP TARGETS — animație smooth pentru comenzi Director ── */
+    var _targets = {};
+    function lerpTargets() {
+      var keys = Object.keys(_targets);
+      for (var k = 0; k < keys.length; k++) {
+        var tk = keys[k]; var t = _targets[tk];
+        var delta = t.val - t.obj[t.prop];
+        if (Math.abs(delta) < 0.002) { t.obj[t.prop] = t.val; delete _targets[tk]; }
+        else { t.obj[t.prop] += delta * 0.12; }
+      }
+    }
+
+    /* ── ANIMAȚIE respirație + clipit ── */
     var doBreathe = (ov.breathe_ov !== 'off');
     var breathSpeed = ov.breathe_speed ? (1 / +ov.breathe_speed) : 0.35;
+    var _blinkNext = 3 + Math.random() * 4; /* secunde până la primul clipit */
+    var _blinkPhase = -1; /* -1 = inactiv */
 
     function tick(t) {
-      if (!doBreathe) return;
-      var b = Math.sin(t * breathSpeed * Math.PI * 2) * 0.009;
-      torso.scale.set(1 + b, 1 - b*0.3, 1 + b*0.5);
+      /* Respirație */
+      if (doBreathe) {
+        var b = Math.sin(t * breathSpeed * Math.PI * 2) * 0.009;
+        torso.scale.set(1 + b, 1 - b * 0.3, 1 + b * 0.5);
+      }
+      /* Clipit */
+      _blinkNext -= 0.016;
+      if (_blinkNext <= 0 && _blinkPhase < 0) {
+        _blinkPhase = 0;
+        _blinkNext = 3 + Math.random() * 5;
+      }
+      if (_blinkPhase >= 0) {
+        _blinkPhase += 0.22;
+        var sc = _blinkPhase < Math.PI ? Math.max(0.04, Math.sin(_blinkPhase)) : 1;
+        _eyeWhites.forEach(function (e) { e.scale.y = sc; });
+        if (_blinkPhase >= Math.PI) { _blinkPhase = -1; _eyeWhites.forEach(function(e){e.scale.y=1;}); }
+      }
+      /* Lerp comenzi Director */
+      lerpTargets();
     }
 
     return {
@@ -297,6 +328,8 @@
       armL: armL, armR: armR,
       legL: legL, legR: legR,
       torso: torso,
+      eyes: _eyeWhites,
+      setTarget: function (key, obj, prop, val) { _targets[key] = { obj: obj, prop: prop, val: val }; },
       tick: tick,
       dispose: function () {
         root.traverse(function (o) {
