@@ -432,6 +432,7 @@ svg#viz{width:100%;height:100%;display:block}
 
 </div><!-- /vv-app -->
 
+<script src="https://cdn.jsdelivr.net/npm/three@0.163.0/build/three.min.js"></script>
 <script src="engine/00-vv-hir-engine.js"></script>
 <script src="engine/01-vv-hir-tokenize.js"></script>
 <script src="engine/02-vv-hir-fx.js"></script>
@@ -446,6 +447,7 @@ svg#viz{width:100%;height:100%;display:block}
 <script src="engine/09-vv-hiq-clouds.js"></script>
 <script src="engine/09-vv-hiq-engine.js"></script>
 <script src="engine/04-vv-hir-bridge.js"></script>
+<script src="engine/11-vv-cast-engine.js"></script>
 <script>
 // ══════════════════════════════════════════
 // VV LEA STUDIOS · Shell UI (motor: VV HiR în engine/)
@@ -533,6 +535,15 @@ function startOrganismPulse(){
   }, 4200);
 }
 perfLoad();
+
+/* ── VV CAST — init motor 3D ── */
+setTimeout(function() {
+  if (window.THREE && window.VVCast) {
+    VVCast.init(document.getElementById('vv-main'));
+    VVCast.enableDrag(VVCast.canvas);
+    console.log('[VV Cast] init OK — Three.js r' + THREE.REVISION);
+  }
+}, 200);
 
 // ── 9 LEGI · Regulatorul scenei (VV HiL) ──
 var _laws={emotie:0.8,lumina:0.7,ritm:1.0,gravitatie:0.6,adancime:0.7,variatie:0.3,memorie:0.5,context:0.5,sens:1.0};
@@ -1744,14 +1755,29 @@ async function runStudio(){
       if(leaHiRAllSubjectsSupported(pCheck)){
         window.leaHiQAfterRender = function(hiq) {
           console.log('[VV HiQ] colaps:', hiq.moodKey, '| lumina:', hiq.lumina, '| BPM:', hiq.bpm, '| gama:', hiq.gama, '| accent:', hiq.culoareAccent);
-          /* Sincronizează BPM-ul secvencerului muzical cu emoția scenei */
           if (typeof _bpm !== 'undefined' && hiq.bpm) _bpm = hiq.bpm;
+          if (window.VVCast && VVCast.active) VVCast.updateLighting(hiq);
         };
         var hir=leaHiRRender(txt,700,_studio==='story'?320:400);
-        if(hir&&!hir.error){ svgEl.innerHTML=hir.svg; usedHiR=true; startOrganismPulse(); gizmoReattach(svgEl); }
+        if(hir&&!hir.error){
+          svgEl.innerHTML=hir.svg; usedHiR=true; startOrganismPulse(); gizmoReattach(svgEl);
+          /* VV Cast — plasează personaje 3D peste scena SVG */
+          if (window.VVCast && VVCast.active) {
+            VVCast.clear();
+            var sceneH = _studio==='story' ? 320 : 400;
+            _sceneSubjects.forEach(function(st, i) {
+              VVCast.addCharacter(
+                st.subj, st.cx, st.yDepth, sceneH,
+                { mood: st.mood, action: st.action },
+                _subjOverrides[i] || st.ov || {}, i
+              );
+            });
+            VVCast.show();
+          }
+        }
       }
     }
-    if(!usedHiR){ svgEl.innerHTML=svgScene(p); gizmoReattach(svgEl); }
+    if(!usedHiR){ svgEl.innerHTML=svgScene(p); gizmoReattach(svgEl); if(window.VVCast&&VVCast.active)VVCast.hide(); }
     if(_pApplied.indices.length>0){
       _pApplied.indices.forEach(function(idx){
         var el=document.getElementById('subj-'+idx);
