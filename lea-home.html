@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LEA — Acasă</title>
+<style>
+  :root {
+    --gold: #c8a040;
+    --gold-dim: #7a5f20;
+    --blue: #4a9eff;
+    --blue-dim: #1a3a6a;
+    --bg: #07070f;
+    --bg2: #0d0d1a;
+    --bg3: #12121f;
+    --border: #1e1e30;
+    --text: #d0d0e0;
+    --text-dim: #5a5a7a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* HEADER */
+  #header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 24px;
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  #header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  #lea-logo {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #1a2a4a, #0a1020);
+    border: 1.5px solid var(--gold);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    color: var(--gold);
+    font-weight: bold;
+    letter-spacing: 1px;
+  }
+
+  #header-title {
+    display: flex;
+    flex-direction: column;
+  }
+
+  #header-title span:first-child {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--gold);
+    letter-spacing: 2px;
+  }
+
+  #header-title span:last-child {
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+  }
+
+  #status-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #40e878;
+    box-shadow: 0 0 6px #40e878;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  #header-right {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .hbtn {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 11px;
+    cursor: pointer;
+    letter-spacing: 1px;
+    transition: all 0.2s;
+  }
+
+  .hbtn:hover {
+    border-color: var(--gold-dim);
+    color: var(--gold);
+  }
+
+  /* MAIN LAYOUT */
+  #main {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  /* SIDEBAR */
+  #sidebar {
+    width: 220px;
+    background: var(--bg2);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    overflow-y: auto;
+  }
+
+  .sidebar-section {
+    padding: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .sidebar-label {
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  #mem-emotie {
+    font-size: 12px;
+    color: var(--blue);
+    margin-bottom: 6px;
+  }
+
+  #mem-vreme {
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-bottom: 4px;
+  }
+
+  #mem-subiecte {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 8px;
+  }
+
+  .mem-chip {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    font-size: 9px;
+    padding: 2px 7px;
+    border-radius: 10px;
+    letter-spacing: 0.5px;
+  }
+
+  #preferinte-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .pref-item {
+    font-size: 10px;
+    color: var(--gold-dim);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .pref-item::before {
+    content: '';
+    width: 4px; height: 4px;
+    border-radius: 50%;
+    background: var(--gold-dim);
+    flex-shrink: 0;
+  }
+
+  #sidebar-footer {
+    margin-top: auto;
+    padding: 12px 16px;
+    border-top: 1px solid var(--border);
+  }
+
+  #clear-mem-btn {
+    width: 100%;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    padding: 6px;
+    border-radius: 6px;
+    font-size: 10px;
+    cursor: pointer;
+    letter-spacing: 1px;
+    transition: all 0.2s;
+  }
+
+  #clear-mem-btn:hover {
+    border-color: #5a2a2a;
+    color: #c05050;
+  }
+
+  /* CHAT AREA */
+  #chat-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  #messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    scroll-behavior: smooth;
+  }
+
+  #messages::-webkit-scrollbar { width: 4px; }
+  #messages::-webkit-scrollbar-track { background: transparent; }
+  #messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  /* WELCOME */
+  #welcome {
+    text-align: center;
+    padding: 60px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+
+  #welcome-logo {
+    width: 64px; height: 64px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #1a2a4a, #0a1020);
+    border: 2px solid var(--gold);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px;
+    color: var(--gold);
+    font-weight: bold;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+  }
+
+  #welcome h2 {
+    font-size: 22px;
+    color: var(--gold);
+    font-weight: 300;
+    letter-spacing: 4px;
+  }
+
+  #welcome p {
+    font-size: 13px;
+    color: var(--text-dim);
+    max-width: 400px;
+    line-height: 1.7;
+  }
+
+  .welcome-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-top: 8px;
+  }
+
+  .welcome-chip {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    padding: 7px 14px;
+    border-radius: 20px;
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .welcome-chip:hover {
+    border-color: var(--gold-dim);
+    color: var(--gold);
+    background: #1a1508;
+  }
+
+  /* MESAJE */
+  .msg-row {
+    display: flex;
+    gap: 12px;
+    max-width: 720px;
+  }
+
+  .msg-row.user {
+    align-self: flex-end;
+    flex-direction: row-reverse;
+  }
+
+  .msg-row.lea {
+    align-self: flex-start;
+  }
+
+  .msg-avatar {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px;
+    font-weight: bold;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .msg-row.lea .msg-avatar {
+    background: linear-gradient(135deg, #1a2a4a, #0a1020);
+    border: 1px solid var(--gold);
+    color: var(--gold);
+  }
+
+  .msg-row.user .msg-avatar {
+    background: var(--bg3);
+    border: 1px solid var(--blue-dim);
+    color: var(--blue);
+  }
+
+  .msg-body {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-width: 600px;
+  }
+
+  .msg-bubble {
+    padding: 12px 16px;
+    border-radius: 12px;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .msg-row.lea .msg-bubble {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-top-left-radius: 4px;
+  }
+
+  .msg-row.user .msg-bubble {
+    background: var(--blue-dim);
+    border: 1px solid #2a5a9a;
+    color: #c0d8ff;
+    border-top-right-radius: 4px;
+  }
+
+  /* META INFO sub mesajul Lea */
+  .msg-meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    padding: 0 2px;
+  }
+
+  .meta-type {
+    font-size: 9px;
+    letter-spacing: 1px;
+    padding: 2px 7px;
+    border-radius: 10px;
+    text-transform: uppercase;
+  }
+
+  .meta-type.scena    { background: #0a1a2a; color: #4a9eff; border: 1px solid #1a4a7a; }
+  .meta-type.emotie   { background: #1a0a1a; color: #e878c8; border: 1px solid #5a2a5a; }
+  .meta-type.comanda  { background: #1a1a0a; color: #c8a040; border: 1px solid #5a4a10; }
+  .meta-type.intrebare{ background: #0a1a0a; color: #50c878; border: 1px solid #1a5a2a; }
+  .meta-type.creativ  { background: #1a0a0a; color: #ff8050; border: 1px solid #6a2a10; }
+  .meta-type.feedback { background: #0a1a0a; color: #50c878; border: 1px solid #1a5a2a; }
+
+  .meta-tone {
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 0.5px;
+  }
+
+  .meta-concept {
+    font-size: 9px;
+    padding: 2px 6px;
+    border-radius: 8px;
+    background: #1a1020;
+    border: 1px solid #3a2040;
+    color: #b090d0;
+  }
+
+  /* Feedback buttons */
+  .msg-feedback {
+    display: flex;
+    gap: 6px;
+    margin-top: 2px;
+  }
+
+  .fb-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    width: 26px; height: 26px;
+    border-radius: 6px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .fb-btn:hover { border-color: var(--gold-dim); }
+  .fb-btn.active-pos { border-color: #40e878; color: #40e878; background: #0a1a0a; }
+  .fb-btn.active-neg { border-color: #e84040; color: #e84040; background: #1a0a0a; }
+
+  /* TYPING INDICATOR */
+  #typing {
+    display: none;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 0;
+    color: var(--text-dim);
+    font-size: 12px;
+  }
+
+  #typing.show { display: flex; }
+
+  .typing-dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--gold);
+    animation: tdot 1.2s infinite;
+  }
+
+  .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+  .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes tdot {
+    0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+    40% { transform: scale(1); opacity: 1; }
+  }
+
+  /* INPUT AREA */
+  #input-area {
+    padding: 16px 32px 20px;
+    background: var(--bg2);
+    border-top: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  #input-wrap {
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 10px 14px;
+    transition: border-color 0.2s;
+  }
+
+  #input-wrap:focus-within {
+    border-color: var(--gold-dim);
+  }
+
+  #msg-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text);
+    font-size: 14px;
+    font-family: inherit;
+    resize: none;
+    max-height: 120px;
+    line-height: 1.5;
+  }
+
+  #msg-input::placeholder { color: var(--text-dim); }
+
+  #send-btn {
+    background: var(--gold);
+    border: none;
+    color: #000;
+    width: 34px; height: 34px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+    flex-shrink: 0;
+  }
+
+  #send-btn:hover { background: #e0b850; }
+  #send-btn:active { transform: scale(0.95); }
+
+  #input-hint {
+    font-size: 10px;
+    color: var(--text-dim);
+    margin-top: 8px;
+    text-align: center;
+    letter-spacing: 0.5px;
+  }
+
+  /* TONE COLORS */
+  .tone-trist    { color: #6090ff; }
+  .tone-furios   { color: #ff6050; }
+  .tone-bucuros  { color: #60d860; }
+  .tone-speriat  { color: #a060ff; }
+  .tone-linistit { color: #60d8c0; }
+  .tone-obosit   { color: #909090; }
+  .tone-nostalgic{ color: #d0a060; }
+  .tone-neutru   { color: var(--text-dim); }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div id="header">
+  <div id="header-left">
+    <div id="lea-logo">L</div>
+    <div id="header-title">
+      <span>LEA</span>
+      <span>VV Hybrid Universe — Acasă</span>
+    </div>
+    <div id="status-dot"></div>
+  </div>
+  <div id="header-right">
+    <button class="hbtn" onclick="showMemory()">Memorie</button>
+    <button class="hbtn" onclick="clearAll()">Resetează</button>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div id="main">
+
+  <!-- SIDEBAR — starea Lea -->
+  <div id="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Scena curentă</div>
+      <div id="mem-emotie">neutru</div>
+      <div id="mem-vreme" style="display:none"></div>
+      <div id="mem-subiecte"></div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">Folosești des</div>
+      <div id="preferinte-list"><span style="font-size:10px;color:var(--text-dim)">— nimic încă —</span></div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">Motoare active</div>
+      <div style="display:flex;flex-direction:column;gap:5px;margin-top:4px;">
+        <div style="font-size:9px;color:#50c878;letter-spacing:1px;">✓ HiT — Tranzit</div>
+        <div style="font-size:9px;color:#50c878;letter-spacing:1px;">✓ HiN — Nexus</div>
+        <div style="font-size:9px;color:#50c878;letter-spacing:1px;">✓ HiM — Memorie</div>
+        <div style="font-size:9px;color:#50c878;letter-spacing:1px;">✓ HiE — Emotio</div>
+        <div style="font-size:9px;color:#50c878;letter-spacing:1px;">✓ HiD — Dopamina</div>
+      </div>
+    </div>
+
+    <div id="sidebar-footer">
+      <button id="clear-mem-btn" onclick="clearMemory()">Șterge memoria</button>
+    </div>
+  </div>
+
+  <!-- CHAT -->
+  <div id="chat-area">
+    <div id="messages">
+
+      <!-- WELCOME -->
+      <div id="welcome">
+        <div id="welcome-logo">L</div>
+        <h2>Bună ziua</h2>
+        <p>Sunt Lea. Spune-mi ce gândești — o scenă, o emoție, o întrebare. Înțeleg românește cum vorbești.</p>
+        <div class="welcome-chips">
+          <div class="welcome-chip" onclick="sendQuick('om trist la apus lângă mare')">om trist la apus</div>
+          <div class="welcome-chip" onclick="sendQuick('copil bucuros în pădure vara')">copil în pădure</div>
+          <div class="welcome-chip" onclick="sendQuick('bătrân singur ninge noaptea')">bătrân în ninsoare</div>
+          <div class="welcome-chip" onclick="sendQuick('sunt obosit azi')">sunt obosit azi</div>
+          <div class="welcome-chip" onclick="sendQuick('furtună și casă caldă cu foc')">furtună și casă caldă</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- TYPING -->
+    <div id="typing" style="padding: 0 32px 8px;">
+      <div class="typing-dot"></div>
+      <div class="typing-dot"></div>
+      <div class="typing-dot"></div>
+      <span style="font-size:11px;color:var(--text-dim);margin-left:4px;">Lea gândește</span>
+    </div>
+
+    <!-- INPUT -->
+    <div id="input-area">
+      <div id="input-wrap">
+        <textarea id="msg-input" rows="1" placeholder="Spune-i ceva Lea..." onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+        <button id="send-btn" onclick="sendMessage()">→</button>
+      </div>
+      <div id="input-hint">Enter pentru a trimite &nbsp;·&nbsp; Shift+Enter pentru linie nouă</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- VV ANIMUS — Creierul -->
+<script src="engine/00-vv-animus.js"></script>
+
+<script>
+  var _msgCount = 0;
+
+  function autoResize(el) {
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+  }
+
+  function handleKey(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  }
+
+  function sendQuick(text) {
+    document.getElementById('msg-input').value = text;
+    sendMessage();
+  }
+
+  function sendMessage() {
+    var input = document.getElementById('msg-input');
+    var text = input.value.trim();
+    if (!text) return;
+
+    // Ascunde welcome
+    var welcome = document.getElementById('welcome');
+    if (welcome) welcome.style.display = 'none';
+
+    input.value = '';
+    input.style.height = 'auto';
+
+    addUserMsg(text);
+    showTyping(true);
+
+    setTimeout(function() {
+      processWithLea(text);
+    }, 400);
+  }
+
+  function processWithLea(text) {
+    if (!window.Lea) {
+      showTyping(false);
+      addLeaMsg('Creierul nu s-a încărcat. Reîncarcă pagina.', null);
+      return;
+    }
+
+    var result = Lea.think(text);
+    showTyping(false);
+
+    if (!result) {
+      addLeaMsg('Nu am înțeles. Încearcă din nou.', null);
+      return;
+    }
+
+    addLeaMsg(result.response, result);
+    updateSidebar(result);
+  }
+
+  function addUserMsg(text) {
+    var msgs = document.getElementById('messages');
+    var row = document.createElement('div');
+    row.className = 'msg-row user';
+    row.innerHTML =
+      '<div class="msg-avatar">Tu</div>' +
+      '<div class="msg-body">' +
+        '<div class="msg-bubble">' + escHtml(text) + '</div>' +
+      '</div>';
+    msgs.appendChild(row);
+    scrollBottom();
+  }
+
+  function addLeaMsg(text, result) {
+    var msgs = document.getElementById('messages');
+    var id = 'msg-' + (++_msgCount);
+    var row = document.createElement('div');
+    row.className = 'msg-row lea';
+
+    var metaHtml = '';
+    var fbHtml = '';
+
+    if (result) {
+      // Type chip
+      var typeLabel = { scena:'Scenă', emotie:'Emoție', comanda:'Comandă', intrebare:'Întrebare', creativ:'Creativ', feedback:'Feedback' };
+      metaHtml += '<span class="meta-type ' + result.type + '">' + (typeLabel[result.type] || result.type) + '</span>';
+
+      // Tone
+      if (result.tone && result.tone !== 'neutru') {
+        metaHtml += '<span class="meta-tone tone-' + result.tone + '">· ' + result.tone + '</span>';
+      }
+
+      // Top 2 concepte inferred
+      var concepts = Object.keys(result.inferred.concepts || {}).sort(function(a,b){
+        return result.inferred.concepts[b] - result.inferred.concepts[a];
+      }).slice(0, 2);
+      concepts.forEach(function(c) {
+        metaHtml += '<span class="meta-concept">' + c.replace(/_/g,' ') + '</span>';
+      });
+
+      // Feedback buttons
+      fbHtml =
+        '<div class="msg-feedback">' +
+          '<button class="fb-btn" id="pos-' + id + '" onclick="doFeedback(\'' + id + '\', true)" title="Îmi place">👍</button>' +
+          '<button class="fb-btn" id="neg-' + id + '" onclick="doFeedback(\'' + id + '\', false)" title="Nu îmi place">👎</button>' +
+        '</div>';
+    }
+
+    row.innerHTML =
+      '<div class="msg-avatar">L</div>' +
+      '<div class="msg-body">' +
+        '<div class="msg-bubble">' + escHtml(text) + '</div>' +
+        (metaHtml ? '<div class="msg-meta">' + metaHtml + '</div>' : '') +
+        fbHtml +
+      '</div>';
+
+    msgs.appendChild(row);
+    scrollBottom();
+  }
+
+  function doFeedback(id, isPositive) {
+    if (!window.Lea) return;
+    var resp = Lea.feedback(isPositive);
+
+    // Update buttons
+    var posBtn = document.getElementById('pos-' + id);
+    var negBtn = document.getElementById('neg-' + id);
+    if (posBtn) posBtn.className = 'fb-btn' + (isPositive ? ' active-pos' : '');
+    if (negBtn) negBtn.className = 'fb-btn' + (!isPositive ? ' active-neg' : '');
+
+    // Arată răspuns Lea
+    addLeaMsg(resp, null);
+  }
+
+  function updateSidebar(result) {
+    if (!window.Lea) return;
+    var mem = Lea.getMemory();
+
+    // Emoție scenă
+    var emotieEl = document.getElementById('mem-emotie');
+    var toneColors = { trist:'#6090ff', furios:'#ff6050', bucuros:'#60d860', speriat:'#a060ff', linistit:'#60d8c0', obosit:'#909090', nostalgic:'#d0a060', neutru:'#5a5a7a' };
+    var tone = mem.scena ? (mem.scena.emotie || 'neutru') : 'neutru';
+    emotieEl.textContent = tone;
+    emotieEl.style.color = toneColors[tone] || '#5a5a7a';
+
+    // Vreme
+    var vremeEl = document.getElementById('mem-vreme');
+    if (mem.scena && mem.scena.vreme) {
+      vremeEl.textContent = '☁ ' + mem.scena.vreme;
+      vremeEl.style.display = 'block';
+    }
+
+    // Subiecte
+    var subjEl = document.getElementById('mem-subiecte');
+    subjEl.innerHTML = '';
+    var subs = (mem.scena && mem.scena.subiecte) ? mem.scena.subiecte.slice(-8) : [];
+    subs.forEach(function(s) {
+      var chip = document.createElement('span');
+      chip.className = 'mem-chip';
+      chip.textContent = s;
+      subjEl.appendChild(chip);
+    });
+
+    // Preferințe
+    var prefEl = document.getElementById('preferinte-list');
+    prefEl.innerHTML = '';
+    var prefs = mem.preferinte || [];
+    if (prefs.length === 0) {
+      prefEl.innerHTML = '<span style="font-size:10px;color:var(--text-dim)">— nimic încă —</span>';
+    } else {
+      prefs.forEach(function(p) {
+        var d = document.createElement('div');
+        d.className = 'pref-item';
+        d.textContent = p;
+        prefEl.appendChild(d);
+      });
+    }
+  }
+
+  function showTyping(show) {
+    document.getElementById('typing').className = show ? 'show' : '';
+  }
+
+  function scrollBottom() {
+    var msgs = document.getElementById('messages');
+    msgs.scrollTop = msgs.scrollHeight;
+  }
+
+  function showMemory() {
+    if (!window.Lea) return;
+    var mem = Lea.getMemory();
+    var text = 'MEMORIA LEA:\n\n';
+    text += 'Scenă curentă:\n';
+    text += '  Emoție: ' + (mem.scena.emotie || 'neutru') + '\n';
+    text += '  Vreme: ' + (mem.scena.vreme || '—') + '\n';
+    text += '  Moment: ' + (mem.scena.moment || '—') + '\n';
+    text += '  Subiecte: ' + (mem.scena.subiecte || []).join(', ') + '\n\n';
+    text += 'Preferințele tale: ' + (mem.preferinte || []).join(', ') + '\n\n';
+    text += 'Ultimele schimburi:\n';
+    (mem.ultimele || []).forEach(function(u) {
+      text += '  [' + u.type + '/' + u.tone + '] ' + u.text + '\n';
+    });
+    alert(text);
+  }
+
+  function clearMemory() {
+    if (!window.Lea) return;
+    Lea.clearMemory();
+    document.getElementById('mem-emotie').textContent = 'neutru';
+    document.getElementById('mem-emotie').style.color = '';
+    document.getElementById('mem-vreme').style.display = 'none';
+    document.getElementById('mem-subiecte').innerHTML = '';
+    document.getElementById('preferinte-list').innerHTML = '<span style="font-size:10px;color:var(--text-dim)">— nimic încă —</span>';
+  }
+
+  function clearAll() {
+    clearMemory();
+    if (window.Lea) Lea.resetWeights();
+    var msgs = document.getElementById('messages');
+    msgs.innerHTML = '';
+    // Readaugă welcome
+    var w = document.createElement('div');
+    w.id = 'welcome';
+    w.innerHTML =
+      '<div id="welcome-logo">L</div>' +
+      '<h2>Bună ziua</h2>' +
+      '<p>Sunt Lea. Spune-mi ce gândești — o scenă, o emoție, o întrebare. Înțeleg românește cum vorbești.</p>' +
+      '<div class="welcome-chips">' +
+        '<div class="welcome-chip" onclick="sendQuick(\'om trist la apus lângă mare\')">om trist la apus</div>' +
+        '<div class="welcome-chip" onclick="sendQuick(\'copil bucuros în pădure vara\')">copil în pădure</div>' +
+        '<div class="welcome-chip" onclick="sendQuick(\'bătrân singur ninge noaptea\')">bătrân în ninsoare</div>' +
+        '<div class="welcome-chip" onclick="sendQuick(\'sunt obosit azi\')">sunt obosit azi</div>' +
+        '<div class="welcome-chip" onclick="sendQuick(\'furtună și casă caldă cu foc\')">furtună și casă caldă</div>' +
+      '</div>';
+    msgs.appendChild(w);
+    _msgCount = 0;
+  }
+
+  function escHtml(s) {
+    return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+  }
+
+  // Init check
+  window.addEventListener('load', function() {
+    if (!window.Lea) {
+      console.error('[LEA HOME] VV ANIMUS nu s-a încărcat!');
+    } else {
+      console.log('[LEA HOME] VV ANIMUS conectat. Lea e activă.');
+    }
+  });
+</script>
+
+</body>
+</html>
