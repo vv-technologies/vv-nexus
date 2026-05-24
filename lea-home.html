@@ -369,30 +369,42 @@
     border-top-right-radius: 4px;
   }
 
-  /* META INFO sub mesajul Lea */
+  /* META — ascuns, vizibil doar la hover */
   .msg-meta {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 5px;
     flex-wrap: wrap;
     padding: 0 2px;
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: opacity 0.2s, max-height 0.2s;
+  }
+
+  .msg-body:hover .msg-meta {
+    max-height: 30px;
+    opacity: 1;
+    margin-top: 4px;
   }
 
   .meta-type {
-    font-size: 9px;
+    font-size: 8px;
     letter-spacing: 1px;
-    padding: 2px 7px;
-    border-radius: 10px;
+    padding: 1px 6px;
+    border-radius: 8px;
     text-transform: uppercase;
   }
 
-  .meta-type.scena    { background: #0a1a2a; color: #4a9eff; border: 1px solid #1a4a7a; }
-  .meta-type.emotie   { background: #1a0a1a; color: #e878c8; border: 1px solid #5a2a5a; }
-  .meta-type.comanda  { background: #1a1a0a; color: #c8a040; border: 1px solid #5a4a10; }
-  .meta-type.intrebare{ background: #0a1a0a; color: #50c878; border: 1px solid #1a5a2a; }
-  .meta-type.creativ  { background: #1a0a0a; color: #ff8050; border: 1px solid #6a2a10; }
-  .meta-type.feedback { background: #0a1a0a; color: #50c878; border: 1px solid #1a5a2a; }
-  .meta-type.memorie  { background: #1a0a1a; color: #d878ff; border: 1px solid #5a1a7a; }
+  .meta-type.scena    { background: #0a1520; color: #305880; border: 1px solid #10304a; }
+  .meta-type.emotie   { background: #150a15; color: #804060; border: 1px solid #2a1025; }
+  .meta-type.comanda  { background: #151500; color: #706010; border: 1px solid #302800; }
+  .meta-type.intrebare{ background: #0a150a; color: #306040; border: 1px solid #102510; }
+  .meta-type.creativ  { background: #150a00; color: #804030; border: 1px solid #2a1500; }
+  .meta-type.feedback { background: #0a150a; color: #306040; border: 1px solid #102510; }
+  .meta-type.memorie  { background: #100a18; color: #604090; border: 1px solid #20103a; }
+  .meta-type.salut    { background: #0a150a; color: #406050; border: 1px solid #102510; }
+  .meta-type.expresie { background: #101010; color: #404040; border: 1px solid #202020; }
 
   .kb-item {
     display: flex; justify-content: space-between; align-items: center;
