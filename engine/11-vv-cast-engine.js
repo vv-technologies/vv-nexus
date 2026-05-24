@@ -55,7 +55,9 @@
     var mood   = opts.mood   || 'neutru';
     var action = opts.action || null;
     var ov     = opts.ov     || {};
-    var s      = opts.scale  || 1;   // scală uniformă
+    /* Scală: height_scale din HiG (genomul utilizatorului) */
+    var heightScale = (ov.height_scale && opts.pcIdx === 0) ? ov.height_scale : 1.0;
+    var s = (opts.scale || 1) * heightScale;
 
     /* Proporții umane (head = 1/7.5 din înălțimea totală) */
     var HEAD  = 11  * s;
@@ -76,18 +78,21 @@
     var TOTAL = HEAD*2 + NECK + TORH + ULEGH + FLEGH;
     var GND   = -TOTAL * 0.5;   /* Y = picioarele pe sol */
 
-    /* Culori */
+    /* Culori — HiG genome pentru pcIdx=0 (personajul principal) */
     var SKIN_TONES = [0xe8b468, 0xd09050, 0xbf7840, 0xf0d8a0];
-    var skinCol = SKIN_TONES[Math.floor((opts.pcIdx || 0) % 4)];
+    var skinIdx = (ov.skin_idx !== undefined && opts.pcIdx === 0) ? ov.skin_idx : Math.floor((opts.pcIdx || 0) % 4);
+    var skinCol = SKIN_TONES[Math.max(0, Math.min(3, skinIdx))];
 
     var shirtCol = MOOD_SHIRT[mood] || MOOD_SHIRT.neutru;
     if (ov.shirt_ov && ov.shirt_ov !== 'auto' && SHIRT_COLORS[ov.shirt_ov])
       shirtCol = SHIRT_COLORS[ov.shirt_ov];
 
+    var hairHex = (ov.hair_col && opts.pcIdx === 0) ? ov.hair_col : 0x2e1c0a;
+
     var mSkin  = matStd(skinCol,  0.75);
     var mShirt = matStd(shirtCol, 0.85);
     var mPants = matStd(0x1a2838, 0.9);
-    var mHair  = matStd(0x2e1c0a, 0.9);
+    var mHair  = matStd(hairHex,  0.9);
     var mShoe  = matStd(0x14121e, 0.95);
 
     /* Rădăcină */
