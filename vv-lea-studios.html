@@ -538,12 +538,12 @@ perfLoad();
 
 /* ── VV CAST — init motor 3D ── */
 setTimeout(function() {
-  if (window.THREE && window.VVCast) {
-    VVCast.init(document.getElementById('vv-main'));
-    VVCast.enableDrag(VVCast.canvas);
-    console.log('[VV Cast] init OK — Three.js r' + THREE.REVISION);
-  }
-}, 200);
+  if (!window.THREE) { console.warn('[VV Cast] Three.js NU s-a încărcat! Verifică conexiunea internet.'); return; }
+  if (!window.VVCast) { console.warn('[VV Cast] engine lipsă'); return; }
+  VVCast.init(document.getElementById('vv-main'));
+  VVCast.enableDrag(VVCast.canvas);
+  console.log('[VV Cast] ✓ init OK — Three.js r' + THREE.REVISION);
+}, 300);
 
 // ── 9 LEGI · Regulatorul scenei (VV HiL) ──
 var _laws={emotie:0.8,lumina:0.7,ritm:1.0,gravitatie:0.6,adancime:0.7,variatie:0.3,memorie:0.5,context:0.5,sens:1.0};
@@ -1765,14 +1765,21 @@ async function runStudio(){
           if (window.VVCast && VVCast.active) {
             VVCast.clear();
             var sceneH = _studio==='story' ? 320 : 400;
+            var castCount = 0;
             _sceneSubjects.forEach(function(st, i) {
-              VVCast.addCharacter(
+              var ch = VVCast.addCharacter(
                 st.subj, st.cx, st.yDepth, sceneH,
                 { mood: st.mood, action: st.action },
                 _subjOverrides[i] || st.ov || {}, i
               );
+              if (ch) {
+                /* Ascunde personajul SVG 2D — 3D îl înlocuiește */
+                var svgSubj = svgEl.querySelector('[id="subj-' + i + '"]');
+                if (svgSubj) svgSubj.style.opacity = '0';
+                castCount++;
+              }
             });
-            VVCast.show();
+            if (castCount > 0) VVCast.show(); else VVCast.hide();
           }
         }
       }
