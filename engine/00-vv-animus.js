@@ -255,6 +255,71 @@ var VVAnimus = (function () {
   }
 
   // ════════════════════════════════════════════════════════
+  // HiK — Hibrid Inteligent Knowing
+  // KB Personal: Lea ține minte ce îi spui permanent
+  // ════════════════════════════════════════════════════════
+
+  var _kb = {};
+  try { _kb = JSON.parse(localStorage.getItem('vv_animus_kb') || '{}'); } catch(e) {}
+
+  function kbSave(key, value) {
+    _kb[key] = { val: value, t: Date.now() };
+    try { localStorage.setItem('vv_animus_kb', JSON.stringify(_kb)); } catch(e) {}
+  }
+
+  function kbGet() { return _kb; }
+
+  function kbForget(key) {
+    delete _kb[key];
+    try { localStorage.setItem('vv_animus_kb', JSON.stringify(_kb)); } catch(e) {}
+  }
+
+  // Tipare de detectat ce trebuie reținut
+  var HIK_PATTERNS = [
+    { rx: /ma cheama\s+(\w+)/i,              key: 'nume',        fmt: function(m){ return m[1]; } },
+    { rx: /am\s+(\d+)\s+ani/i,               key: 'varsta',      fmt: function(m){ return m[1] + ' ani'; } },
+    { rx: /lucrez\s+(?:la|ca|in)\s+(.+)/i,   key: 'job',         fmt: function(m){ return m[1].trim(); } },
+    { rx: /locuiesc\s+(?:in|la)\s+(.+)/i,    key: 'oras',        fmt: function(m){ return m[1].trim(); } },
+    { rx: /imi place\s+(.+)/i,               key: null,          fmt: function(m){ return m[1].trim(); }, category: 'place' },
+    { rx: /nu imi place\s+(.+)/i,            key: null,          fmt: function(m){ return m[1].trim(); }, category: 'nu_place' },
+    { rx: /retine\s+(?:ca\s+)?(.+)/i,        key: null,          fmt: function(m){ return m[1].trim(); }, category: 'nota' },
+    { rx: /tine minte\s+(?:ca\s+)?(.+)/i,    key: null,          fmt: function(m){ return m[1].trim(); }, category: 'nota' },
+    { rx: /sa stii\s+(?:ca\s+)?(.+)/i,       key: null,          fmt: function(m){ return m[1].trim(); }, category: 'nota' },
+    { rx: /noteaza\s+(?:ca\s+)?(.+)/i,       key: null,          fmt: function(m){ return m[1].trim(); }, category: 'nota' },
+  ];
+
+  function hikDetect(text) {
+    var n = text.toLowerCase()
+      .replace(/ă/g,'a').replace(/â/g,'a').replace(/î/g,'i')
+      .replace(/ș/g,'s').replace(/ş/g,'s').replace(/ț/g,'t').replace(/ţ/g,'t');
+
+    for (var i = 0; i < HIK_PATTERNS.length; i++) {
+      var p = HIK_PATTERNS[i];
+      var m = n.match(p.rx);
+      if (m) {
+        var val = p.fmt(m);
+        var key = p.key;
+        if (!key) {
+          key = (p.category || 'nota') + '_' + Date.now();
+        }
+        return { key: key, val: val, category: p.category || key, raw: m[0] };
+      }
+    }
+    return null;
+  }
+
+  function hikResponse(detected) {
+    var cat = detected.category || detected.key;
+    if (cat === 'nume')     return 'Am reținut. Te cheamă ' + detected.val + '.';
+    if (cat === 'varsta')   return 'Notat. ' + detected.val + '.';
+    if (cat === 'job')      return 'Reținut — ' + detected.val + '.';
+    if (cat === 'oras')     return 'Știu acum. ' + detected.val + '.';
+    if (cat === 'place')    return 'Am notat că îți place ' + detected.val + '.';
+    if (cat === 'nu_place') return 'Am notat. Evit ' + detected.val + '.';
+    return 'Am reținut: ' + detected.val + '.';
+  }
+
+  // ════════════════════════════════════════════════════════
   // HiD — Hibrid Inteligent Dopamina
   // Feedback: Lea se îmbunătățește din reacțiile tale
   // ════════════════════════════════════════════════════════
@@ -408,13 +473,25 @@ var VVAnimus = (function () {
   function think(text) {
     if (!text || !text.trim()) return null;
 
-    // 1. HiT — clasifică intenția PRIMUL (înainte de feedback)
+    // 1. HiK — e ceva de reținut permanent?
+    var kbDetected = hikDetect(text);
+    if (kbDetected) {
+      kbSave(kbDetected.key, kbDetected.val);
+      return {
+        type: 'memorie', tone: 'neutru', intensity: 0,
+        entities: [], inferred: { concepts: {}, visual: {} },
+        context: himContext(), response: hikResponse(kbDetected),
+        kb: kbDetected
+      };
+    }
+
+    // 2. HiT — clasifică intenția PRIMUL (înainte de feedback)
     var intent = hitClassify(text);
 
-    // 2. HiE — emoție rapidă
+    // 3. HiE — emoție rapidă
     var emotion = hieDetect(text);
 
-    // 3. HiD — e feedback? (doar dacă NU e scenă/comandă clară)
+    // 4. HiD — e feedback? (doar dacă NU e scenă/comandă clară)
     var fb = (intent.confidence < 0.5) ? hidDetect(text) : null;
     if (fb) {
       return {
@@ -501,6 +578,9 @@ var VVAnimus = (function () {
     getMemory:    getMemory,
     clearMemory:  clearMemory,
     resetWeights: resetWeights,
+    // KB Personal
+    getKB:        kbGet,
+    kbForget:     kbForget,
     // Acces direct la module (pentru debugging și extensii)
     _hit: hitClassify,
     _hin: hinInfer,
