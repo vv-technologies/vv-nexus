@@ -448,6 +448,7 @@ svg#viz{width:100%;height:100%;display:block}
 <script src="engine/09-vv-hiq-engine.js"></script>
 <script src="engine/04-vv-hir-bridge.js"></script>
 <script src="engine/11-vv-cast-engine.js"></script>
+<script src="engine/12-vv-cast-director.js"></script>
 <script>
 // ══════════════════════════════════════════
 // VV LEA STUDIOS · Shell UI (motor: VV HiR în engine/)
@@ -1721,6 +1722,18 @@ function applyLearnedPatterns(p){
 // ── MAIN RUN ──
 async function runStudio(){
   var txt=document.getElementById('script-inp').value.trim();if(!txt)return;
+
+  /* ── VV Cast Director: comandă naturală pe personaj? ── */
+  if (window.VVCastDirector && window.VVCast && VVCast._chars.length > 0 && VVCastDirector.isCommand(txt)) {
+    var ok = VVCastDirector.apply(txt);
+    if (ok) {
+      historyPush(txt);
+      leaSay('Am înțeles: "' + txt + '"');
+      document.getElementById('script-inp').value = '';
+      return;
+    }
+  }
+
   historyPush(txt);
   var t0=performance.now();
   var p=tokenize(txt);
