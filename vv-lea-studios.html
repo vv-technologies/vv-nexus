@@ -2721,7 +2721,8 @@ function goHome(){
   var hb=document.getElementById('home-btn');
   if(hb)hb.style.display='none';
 }
-document.getElementById('home-inp-el').addEventListener('keydown',function(e){
+var _homeInpEl=document.getElementById('home-inp-el');
+if(_homeInpEl)_homeInpEl.addEventListener('keydown',function(e){
   if(e.key==='Enter') homeInputSubmit();
 });
 
