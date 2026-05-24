@@ -1590,7 +1590,21 @@ function leaChat(msg){
 }
 
 // ── LEA PANEL ──
-function leaSay(msg){var p=document.getElementById('panel-lea');var d=document.createElement('div');d.className='lea-msg lea';d.innerHTML='<span class="lea-dot"></span>'+msg;var arc=document.getElementById('mood-arc');p.insertBefore(d,arc?arc.nextSibling:p.firstChild);}
+function leaClearAuto(){
+  /* Șterge mesajele auto-generate (clasa lea-msg + sug-btn), păstrează raft-btn și user msgs */
+  var p=document.getElementById('panel-lea');if(!p)return;
+  Array.from(p.querySelectorAll('.lea-msg.lea,.sug-btn:not(#raft-btn-current)')).forEach(function(el){el.parentNode.removeChild(el);});
+}
+function leaSay(msg){
+  var p=document.getElementById('panel-lea');
+  /* maxim 4 mesaje auto simultane — șterge cel mai vechi */
+  var existing=p.querySelectorAll('.lea-msg.lea');
+  if(existing.length>=4) existing[existing.length-1].parentNode.removeChild(existing[existing.length-1]);
+  var d=document.createElement('div');d.className='lea-msg lea';
+  d.innerHTML='<span class="lea-dot"></span>'+msg;
+  var arc=document.getElementById('mood-arc');
+  p.insertBefore(d,arc?arc.nextSibling:p.firstChild);
+}
 function leaSuggest(suggestions){var p=document.getElementById('panel-lea');var arc=document.getElementById('mood-arc');var ref=arc?arc.nextSibling:p.firstChild;suggestions.forEach(function(sug){var b=document.createElement('button');b.className='sug-btn';b.textContent='→ '+sug;b.onclick=function(){document.getElementById('script-inp').value=sug;runStudio();};p.insertBefore(b,ref);});}
 function addWikiFetch(term){var p=document.getElementById('panel-kb');var d=document.createElement('div');d.className='wiki-fetch';d.textContent='🔍 Wikipedia: cercetez "'+term+'"...';p.insertBefore(d,p.firstChild);setTimeout(function(){if(d.parentNode)d.parentNode.removeChild(d);},3000);}
 function addKBItem(term,isNew){var el=document.getElementById('kb-list');if(!el)return;var e=KB[term];if(!e)return;var d=document.createElement('div');d.className='kb-item'+(isNew?' kb-new':'');d.innerHTML='<div class="kb-term">'+term+'</div><div class="kb-tokens">'+e.t.join(' · ')+'</div><div class="kb-src">'+(e.src==='wikipedia'?'📡 Wikipedia · '+e.date:'📦 Local')+'</div>';el.insertBefore(d,el.firstChild);var cnt=document.getElementById('kb-count');var sc=document.getElementById('set-kb-count');if(cnt)cnt.textContent=Object.keys(KB).length;if(sc)sc.textContent=Object.keys(KB).length;}
@@ -1750,6 +1764,7 @@ async function runStudio(){
     }
   }
 
+  leaClearAuto();
   historyPush(txt);
   var t0=performance.now();
   var p=tokenize(txt);
