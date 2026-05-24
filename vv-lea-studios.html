@@ -58,12 +58,22 @@ svg#viz{width:100%;height:100%;display:block}
 
 /* ── BOTTOM INPUT BAR ── */
 #vv-bottom{position:fixed;bottom:0;left:0;right:0;height:116px;z-index:100;background:rgba(3,3,12,.96);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-top:1px solid rgba(255,255,255,.055);display:flex;flex-direction:column;padding:8px 18px 10px;gap:6px}
-.vv-chips{display:flex;gap:3px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;padding:1px 0}
-.vv-chips::-webkit-scrollbar{display:none}
-.chip-subj{padding:3px 9px;border-radius:20px;background:rgba(var(--ac),.05);border:1px solid rgba(var(--ac),.13);color:rgba(var(--ac),.65);font-size:10px;cursor:pointer;white-space:nowrap;transition:all .12s;flex-shrink:0}
-.chip-subj:hover{background:rgba(var(--ac),.14);color:#fff}
-.chip-act{padding:3px 9px;border-radius:20px;background:rgba(var(--gold),.04);border:1px solid rgba(var(--gold),.13);color:rgba(var(--gold),.55);font-size:10px;cursor:pointer;white-space:nowrap;transition:all .12s;flex-shrink:0}
-.chip-act:hover{background:rgba(var(--gold),.13);color:rgba(var(--gold),1)}
+/* ── CATALOG REGNURI ── */
+.vv-catalog-bar{display:flex;gap:5px;overflow-x:auto;scrollbar-width:none;padding:2px 0;align-items:center}
+.vv-catalog-bar::-webkit-scrollbar{display:none}
+.vcat-btn{padding:4px 11px;border-radius:20px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:rgba(255,255,255,.38);font-size:10px;cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0;letter-spacing:.3px;font-family:inherit}
+.vcat-btn:hover{background:rgba(255,255,255,.09);color:rgba(255,255,255,.75)}
+.vcat-btn.active{background:rgba(var(--ac),.12);border-color:rgba(var(--ac),.32);color:rgba(var(--ac),.9)}
+/* ── POPUP CATALOG ── */
+#vv-catalog-popup{position:fixed;bottom:120px;left:14px;right:14px;z-index:500;background:rgba(6,6,20,.97);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);border:1px solid rgba(255,255,255,.09);border-radius:16px;padding:14px 16px 12px;box-shadow:0 -8px 48px rgba(0,0,0,.7);display:none;animation:fadeIn .18s ease}
+.vcp-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.vcp-title{font-size:11px;letter-spacing:.06em;color:rgba(255,255,255,.35);text-transform:uppercase}
+.vcp-close{width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.06);border:none;color:rgba(255,255,255,.3);cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;line-height:1}
+.vcp-grid{display:flex;flex-wrap:wrap;gap:5px}
+.vcp-item{padding:5px 11px;border-radius:20px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:rgba(255,255,255,.55);font-size:11px;cursor:pointer;transition:all .12s;display:flex;align-items:center;gap:5px}
+.vcp-item:hover{background:rgba(var(--ac),.14);border-color:rgba(var(--ac),.3);color:#fff}
+.vcp-item .vi-em{font-size:14px}
+.vcp-item .vi-lb{font-size:10px;opacity:.7;margin-left:2px;font-style:italic}
 .vv-inp-row{display:flex;align-items:center;gap:8px}
 .script-inp{flex:1;background:rgba(255,255,255,.04);border:1px solid rgba(var(--ac),.1);border-radius:12px;padding:11px 16px;color:#fff;font-size:14px;outline:none;transition:border-color .2s,background .2s;font-family:inherit}
 .script-inp::placeholder{color:rgba(255,255,255,.18)}
@@ -318,31 +328,13 @@ svg#viz{width:100%;height:100%;display:block}
 
 <!-- ── BOTTOM INPUT BAR ── -->
 <footer id="vv-bottom">
-  <div class="vv-chips">
-    <span class="chip-subj" onclick="compAdd('om')">👤 Om</span>
-    <span class="chip-subj" onclick="compAdd('om cu mustata')">👨 Mustață</span>
-    <span class="chip-subj" onclick="compAdd('cal')">🐴 Cal</span>
-    <span class="chip-subj" onclick="compAdd('elefant')">🐘 Elefant</span>
-    <span class="chip-subj" onclick="compAdd('urs')">🐻 Urs</span>
-    <span class="chip-subj" onclick="compAdd('girafă')">🦒 Girafă</span>
-    <span class="chip-subj" onclick="compAdd('pisică')">🐱 Pisică</span>
-    <span class="chip-subj" onclick="compAdd('câine')">🐕 Câine</span>
-    <span class="chip-subj" onclick="compAdd('pasăre')">🐦 Pasăre</span>
-    <span class="chip-subj" onclick="compAdd('copac')">🌳 Copac</span>
-    <span class="chip-subj" onclick="compAdd('floare')">🌸 Floare</span>
-    <span class="chip-subj" onclick="compAdd('munte')">⛰ Munte</span>
-    <span class="chip-subj" onclick="compAdd('mare')">🌊 Mare</span>
-    <span class="chip-subj" onclick="compAdd('lună')">🌙 Lună</span>
-    <span class="chip-subj" onclick="compAdd('nor')">☁️ Nor</span>
-    <span class="chip-act" onclick="compAdd('trist')">😔 trist</span>
-    <span class="chip-act" onclick="compAdd('fericit')">😊 fericit</span>
-    <span class="chip-act" onclick="compAdd('ploaie')">🌧 ploaie</span>
-    <span class="chip-act" onclick="compAdd('noapte')">🌙 noapte</span>
-    <span class="chip-act" onclick="compAdd('aleargă')">⚡ aleargă</span>
-    <span class="chip-act" onclick="compAdd('sare')">🦘 sare</span>
-    <span class="chip-act" onclick="compAdd('dansează')">💃 dansează</span>
-    <span class="chip-act" onclick="compAdd('zboară')">🕊 zboară</span>
-    <span class="chip-act" onclick="compClear()" style="color:rgba(255,80,80,.5);border-color:rgba(255,80,80,.15)">✕</span>
+  <div class="vv-catalog-bar" id="vv-catalog-bar"></div>
+  <div id="vv-catalog-popup">
+    <div class="vcp-head">
+      <span class="vcp-title" id="vcp-title"></span>
+      <button class="vcp-close" onclick="closeCatalog()">✕</button>
+    </div>
+    <div class="vcp-grid" id="vcp-grid"></div>
   </div>
   <div class="vv-inp-row">
     <input class="script-inp" id="script-inp" placeholder="Descrie o scenă pentru Lea…" onkeydown="if(event.key==='Enter')runStudio()">
@@ -2884,6 +2876,193 @@ function gizmoSvgPt(evt){
   return pt.matrixTransform(svg.getScreenCTM().inverse());
 }
 
+/* ══════════════════════════════════════════
+   VV CATALOG — Regnuri
+══════════════════════════════════════════ */
+var VV_CATALOG = [
+  { id:'oameni', icon:'👤', label:'Oameni', color:'180,210,255',
+    items:[
+      {e:'👤',w:'om',d:'personaj uman'},
+      {e:'👨',w:'om cu mustata',d:'om cu mustață'},
+      {e:'👩',w:'femeie',d:'personaj feminin'},
+      {e:'🧒',w:'copil',d:'personaj copil'},
+      {e:'👴',w:'batran',d:'personaj vârstnic'},
+      {e:'🧑‍🎨',w:'artist',d:'om cu pensulă'},
+      {e:'🧑‍💼',w:'om de afaceri',d:'în costum'},
+      {e:'🧙',w:'vrajitor',d:'cu pălărie și bagheta'}
+    ]},
+  { id:'animale', icon:'🐾', label:'Animale', color:'100,220,120',
+    items:[
+      {e:'🐱',w:'pisica',d:'domestică, toarce'},
+      {e:'🐕',w:'caine',d:'domestic, prietenos'},
+      {e:'🐴',w:'cal',d:'nobil, rapid'},
+      {e:'🐄',w:'vaca',d:'pe câmp'},
+      {e:'🐑',w:'oaie',d:'cu lână'},
+      {e:'🐇',w:'iepure',d:'cu urechi lungi'},
+      {e:'🐓',w:'gaina',d:'cântă dimineața'},
+      {e:'🦁',w:'leu',d:'regele junglei'},
+      {e:'🐯',w:'tigru',d:'dungi portocalii'},
+      {e:'🐻',w:'urs',d:'mare și lent'},
+      {e:'🐼',w:'panda',d:'negru și alb, agale'},
+      {e:'🐘',w:'elefant',d:'cu trompă lungă'},
+      {e:'🦒',w:'girafa',d:'gât extrem de lung'},
+      {e:'🦊',w:'vulpe',d:'vicleană, roșcată'},
+      {e:'🐺',w:'lup',d:'urletul nopții'},
+      {e:'🦌',w:'cerb',d:'cu coarne ramificate'},
+      {e:'🦓',w:'zebra',d:'dungi alb-negre'},
+      {e:'🦍',w:'gorila',d:'mare și puternică'},
+      {e:'🐦',w:'pasare',d:'zboară liber'},
+      {e:'🦅',w:'vultur',d:'zboară sus'},
+      {e:'🦆',w:'rata',d:'înoată și zboară'},
+      {e:'🐟',w:'peste',d:'în apă'},
+      {e:'🐬',w:'delfin',d:'inteligent, jucăuș'},
+      {e:'🦋',w:'fluture',d:'aripi colorate'},
+      {e:'🐝',w:'albina',d:'face miere'},
+      {e:'🐛',w:'gandac',d:'pe frunze'},
+      {e:'🐊',w:'crocodil',d:'lent până lovește'}
+    ]},
+  { id:'plante', icon:'🌿', label:'Plante', color:'80,200,100',
+    items:[
+      {e:'🌳',w:'copac',d:'cu rădăcini adânci'},
+      {e:'🌲',w:'brad',d:'veșnic verde'},
+      {e:'🌴',w:'palmier',d:'pe plajă'},
+      {e:'🌸',w:'floare',d:'petalele în vânt'},
+      {e:'🌹',w:'trandafir',d:'cu spini și parfum'},
+      {e:'🌻',w:'floarea soarelui',d:'urmărește lumina'},
+      {e:'🍄',w:'ciuperca',d:'în pădure umedă'},
+      {e:'🌾',w:'grau',d:'câmpuri de aur'},
+      {e:'🎋',w:'bambus',d:'creșete repede'},
+      {e:'🌵',w:'cactus',d:'în deșert'}
+    ]},
+  { id:'peisaj', icon:'🏔', label:'Peisaj', color:'150,180,255',
+    items:[
+      {e:'⛰',w:'munte',d:'vârf înzăpezit'},
+      {e:'🌊',w:'mare',d:'orizontul albastru'},
+      {e:'🏖',w:'plaja',d:'nisip cald'},
+      {e:'🌲',w:'padure',d:'umbră și mister'},
+      {e:'🏜',w:'desert',d:'nisip și tăcere'},
+      {e:'🌾',w:'camp',d:'câmp deschis'},
+      {e:'🌋',w:'vulcan',d:'foc și lavă'},
+      {e:'🪨',w:'stanca',d:'solidă, veche'},
+      {e:'🏠',w:'casa',d:'cu acoperiș roșu'},
+      {e:'🌙',w:'luna',d:'luminează noaptea'},
+      {e:'☁️',w:'nor',d:'plutește pe cer'}
+    ]},
+  { id:'vreme', icon:'☀️', label:'Vreme', color:'255,200,100',
+    items:[
+      {e:'☀️',w:'soare',d:'cald și luminos'},
+      {e:'🌧',w:'ploaie',d:'picături pe geam'},
+      {e:'❄️',w:'ninge',d:'fulgii cad lin'},
+      {e:'⛈',w:'furtuna',d:'tunete și fulgere'},
+      {e:'🌫',w:'ceata',d:'mister și vag'},
+      {e:'💨',w:'vant',d:'mișcă totul'},
+      {e:'🌈',w:'curcubeu',d:'după ploaie'},
+      {e:'⚡',w:'fulger',d:'instant, orbitor'}
+    ]},
+  { id:'stari', icon:'🎭', label:'Stări', color:'200,150,255',
+    items:[
+      {e:'😊',w:'fericit',d:'liniște interioară'},
+      {e:'😔',w:'trist',d:'melancolie'},
+      {e:'😤',w:'furios',d:'tensiune maximă'},
+      {e:'😌',w:'linistit',d:'pace și calm'},
+      {e:'😰',w:'ingrijorat',d:'neliniște'},
+      {e:'😲',w:'surprins',d:'neașteptat'},
+      {e:'🥰',w:'indragostit',d:'inimă caldă'},
+      {e:'😴',w:'somnoros',d:'gata de somn'}
+    ]},
+  { id:'actiuni', icon:'⚡', label:'Acțiuni', color:'255,180,80',
+    items:[
+      {e:'🏃',w:'alearga',d:'viteză și efort'},
+      {e:'🦘',w:'sare',d:'în aer'},
+      {e:'💃',w:'danseaza',d:'ritm și mișcare'},
+      {e:'🕊',w:'zboara',d:'liber în cer'},
+      {e:'😴',w:'doarme',d:'odihnă adâncă'},
+      {e:'🥊',w:'lupta',d:'forță și tensiune'},
+      {e:'🧘',w:'mediteaza',d:'liniște interioară'},
+      {e:'😢',w:'plange',d:'lacrimi pe obraji'},
+      {e:'😄',w:'rade',d:'bucurie zgomotoasă'},
+      {e:'🚶',w:'merge agale',d:'lent, contemplativ'}
+    ]},
+  { id:'timp', icon:'🕐', label:'Timp', color:'180,180,220',
+    items:[
+      {e:'🌅',w:'rasarit',d:'prima lumină'},
+      {e:'☀️',w:'zi',d:'lumină deplină'},
+      {e:'🌆',w:'apus',d:'auriu și warm'},
+      {e:'🌙',w:'noapte',d:'stele și liniște'},
+      {e:'🌸',w:'primavara',d:'renaștere'},
+      {e:'☀️',w:'vara',d:'cald și vibrant'},
+      {e:'🍂',w:'toamna',d:'auriu și trecere'},
+      {e:'❄️',w:'iarna',d:'rece și pur'}
+    ]}
+];
+
+var _activeCat = null;
+
+function buildCatalog() {
+  var bar = document.getElementById('vv-catalog-bar');
+  if (!bar) return;
+  bar.innerHTML = '';
+  VV_CATALOG.forEach(function(cat) {
+    var btn = document.createElement('button');
+    btn.className = 'vcat-btn';
+    btn.id = 'vcat-' + cat.id;
+    btn.innerHTML = cat.icon + ' ' + cat.label;
+    btn.style.setProperty('--cc', cat.color);
+    btn.onclick = function() { toggleCatalog(cat); };
+    bar.appendChild(btn);
+  });
+  /* Buton clear */
+  var clr = document.createElement('button');
+  clr.className = 'vcat-btn';
+  clr.style.cssText = 'color:rgba(255,80,80,.45);border-color:rgba(255,80,80,.12);margin-left:6px';
+  clr.innerHTML = '✕ Șterge';
+  clr.onclick = compClear;
+  bar.appendChild(clr);
+}
+
+function toggleCatalog(cat) {
+  if (_activeCat === cat.id) { closeCatalog(); return; }
+  _activeCat = cat.id;
+  /* highlight buton activ */
+  document.querySelectorAll('.vcat-btn').forEach(function(b){ b.classList.remove('active'); });
+  var btn = document.getElementById('vcat-' + cat.id);
+  if (btn) btn.classList.add('active');
+  /* populează popup */
+  document.getElementById('vcp-title').textContent = cat.icon + '  ' + cat.label;
+  var grid = document.getElementById('vcp-grid');
+  grid.innerHTML = '';
+  cat.items.forEach(function(item) {
+    var el = document.createElement('div');
+    el.className = 'vcp-item';
+    el.innerHTML = '<span class="vi-em">' + item.e + '</span>' +
+                   '<span>' + item.w + '</span>' +
+                   '<span class="vi-lb">' + item.d + '</span>';
+    el.onclick = function() {
+      compAdd(item.w);
+      closeCatalog();
+    };
+    grid.appendChild(el);
+  });
+  document.getElementById('vv-catalog-popup').style.display = 'block';
+}
+
+function closeCatalog() {
+  _activeCat = null;
+  document.getElementById('vv-catalog-popup').style.display = 'none';
+  document.querySelectorAll('.vcat-btn').forEach(function(b){ b.classList.remove('active'); });
+}
+
+/* Închide popup dacă click în afara lui */
+document.addEventListener('click', function(e) {
+  var popup = document.getElementById('vv-catalog-popup');
+  var bar   = document.getElementById('vv-catalog-bar');
+  if (!popup || !bar) return;
+  if (!popup.contains(e.target) && !bar.contains(e.target)) closeCatalog();
+});
+
+buildCatalog();
+
+/* ══════════════════════════════════════════ */
 function gizmoReattach(svgEl){
   if(!svgEl)return;
   var gl=svgEl.querySelector('#gizmo-layer');
