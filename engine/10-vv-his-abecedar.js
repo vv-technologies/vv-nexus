@@ -295,6 +295,135 @@
       'foret','bois','wald','forst','foresta','bosco','bosque','selva'
     ]},
 
+    /* ── ANIMALE SĂLBATICE ───────────────────── */
+    { token: 'SUBIECT:leu', subject: 'leu', stems: [
+      'leu','leul','leoaica','regele junglei',
+      'lion','lioness','leo','lejon',
+      'lion','lionne','lowé','löwe','leone','leon'
+    ]},
+    { token: 'SUBIECT:tigru', subject: 'tigru', stems: [
+      'tigru','tigrul','tigroaica',
+      'tiger','tigress',
+      'tigre','tigre','tiger','tigre'
+    ]},
+    { token: 'SUBIECT:panda', subject: 'panda', stems: [
+      'panda','urs panda','giant panda','panda bear',
+      'panda','pandabär','panda','panda géant'
+    ]},
+    { token: 'SUBIECT:vulpe', subject: 'vulpe', stems: [
+      'vulpe','vulpea','renard',
+      'fox','vixen','fuchs','volpe','zorro','renard'
+    ]},
+    { token: 'SUBIECT:lup', subject: 'lup', stems: [
+      'lup','lupul','lupoaica','haita',
+      'wolf','wolves','wolf','lupo','lobo','loup'
+    ]},
+    { token: 'SUBIECT:cerb', subject: 'cerb', stems: [
+      'cerb','cerbul','caprioara','caprioa',
+      'deer','stag','doe','buck','reindeer',
+      'cerf','hirsch','cervo','ciervo'
+    ]},
+    { token: 'SUBIECT:zebra', subject: 'zebra', stems: [
+      'zebra','zebre','zebras','zebra','zèbre','zebra'
+    ]},
+    { token: 'SUBIECT:gorila', subject: 'gorila', stems: [
+      'gorila','gorilla','gorilă','gorille','gorilla'
+    ]},
+    { token: 'SUBIECT:crocodil', subject: 'crocodil', stems: [
+      'crocodil','aligator','aligato','alligator','crocodile','krokodil'
+    ]},
+
+    /* ── ANIMALE DOMESTICE EXTRA ─────────────── */
+    { token: 'SUBIECT:vaca', subject: 'vaca', stems: [
+      'vaca','vacuta','bou','taurul','vitel',
+      'cow','bull','calf','cattle','ox',
+      'vache','veau','kuh','buey','mucca','bue'
+    ]},
+    { token: 'SUBIECT:oaie', subject: 'oaie', stems: [
+      'oaie','miel','berbec','oita',
+      'sheep','lamb','ram','ewe',
+      'mouton','agneau','schaf','oveja','pecora','agnello'
+    ]},
+    { token: 'SUBIECT:iepure', subject: 'iepure', stems: [
+      'iepure','iepuras','iepurele',
+      'rabbit','bunny','hare',
+      'lapin','kaninchen','conejo','coniglio'
+    ]},
+    { token: 'SUBIECT:gaina', subject: 'gaina', stems: [
+      'gaina','cocos','pui','pasare de curte',
+      'chicken','hen','rooster','chick','cock',
+      'poule','coq','huhn','gallina','pollo'
+    ]},
+
+    /* ── INSECTE / PEȘTI ─────────────────────── */
+    { token: 'SUBIECT:fluture', subject: 'fluture', stems: [
+      'fluture','fluturele','fluturi',
+      'butterfly','moth','papillon',
+      'schmetterling','farfalla','mariposa'
+    ]},
+    { token: 'SUBIECT:albina', subject: 'albina', stems: [
+      'albina','albinele','stup','fagure',
+      'bee','honeybee','bumblebee',
+      'abeille','biene','ape','abeja'
+    ]},
+    { token: 'SUBIECT:gandac', subject: 'gandac', stems: [
+      'gandac','insecta','gargarita','lacusta','greier',
+      'bug','insect','beetle','grasshopper','cricket',
+      'insecte','käfer','insetto','insecto'
+    ]},
+    { token: 'SUBIECT:peste', subject: 'peste', stems: [
+      'peste','pestele','rechin','delfin','balena','crap','stiuca',
+      'fish','shark','dolphin','whale','salmon',
+      'poisson','requin','dauphin','fisch','pesce','pez'
+    ]},
+
+    /* ── PLANTE EXTRA ────────────────────────── */
+    { token: 'SUBIECT:trandafir', subject: 'trandafir', stems: [
+      'trandafir','trandafirul','roses','rosier',
+      'rose','roses','rosen','rosa','trandafiri'
+    ]},
+    { token: 'SUBIECT:cactus', subject: 'cactus', stems: [
+      'cactus','cactusi','cactee','kakteen','cactus','cacto'
+    ]},
+    { token: 'SUBIECT:bambus', subject: 'bambus', stems: [
+      'bambus','bamboo','bambou','bambou','bambu','bambù'
+    ]},
+    { token: 'SUBIECT:palmier', subject: 'palmier', stems: [
+      'palmier','palmier','palma','palme','palm tree','palm','coconut tree'
+    ]},
+    { token: 'SUBIECT:brad', subject: 'brad', stems: [
+      'brad','brazi','molid','conifer','pin','pinul',
+      'pine','fir','spruce','cedar','christmas tree',
+      'sapin','tanne','abete','pino'
+    ]},
+    { token: 'SUBIECT:grau', subject: 'grau', stems: [
+      'grau','spic','holda','câmp de grau',
+      'wheat','grain','field of wheat','cornfield',
+      'ble','weizen','grano','trigo'
+    ]},
+
+    /* ── PEISAJ EXTRA ────────────────────────── */
+    { token: 'SUBIECT:vulcan', subject: 'vulcan', stems: [
+      'vulcan','vulcanul','eruptie','lava',
+      'volcano','eruption','lava','volcanic',
+      'volcan','vulkan','vulcano','volcán'
+    ]},
+    { token: 'SUBIECT:plaja', subject: 'plaja', stems: [
+      'plaja','plajă','nisip','litoral','tarm',
+      'beach','shore','coast','seaside','sand',
+      'plage','strand','spiaggia','playa'
+    ]},
+    { token: 'SUBIECT:stanca', subject: 'stanca', stems: [
+      'stanca','stânca','roca','piatra','bolovan','perete de roca',
+      'rock','cliff','boulder','stone wall','crag',
+      'rocher','falaise','felsen','roccia','roca'
+    ]},
+    { token: 'SUBIECT:casa', subject: 'casa', stems: [
+      'casa','casuta','cladire','locuinta',
+      'house','home','cottage','building','cabin',
+      'maison','haus','casa','hogar'
+    ]},
+
     /* ── CINEMA / STIL ────────────────────────── */
     { token: 'CINEMA:epic', stems: [
       'epic','cinematic','hollywood','blockbuster','grandios','spectaculos','magnific',
