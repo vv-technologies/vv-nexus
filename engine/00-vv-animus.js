@@ -30,6 +30,8 @@ var VVAnimus = (function () {
   var HIT_INTREBARE = ['ce este','ce face','cum','de ce','cand','unde','cine','care','cat','este adevarat','stii','ai auzit'];
   var HIT_EMOTIE    = ['eu sunt','sunt','ma simt','simt ca','azi','ma doare','am obosit','nu pot','mi-e','mi e','imi este'];
   var HIT_CREATIV   = ['ceva care sa','transmite','o stare de','sentimentul de','atmosfera de','ceva cu','un sentiment'];
+  var HIT_SALUT     = ['buna ziua','buna seara','buna dimineata','buna','salut','hei','hello','hi','ce mai faci','cum esti','neata'];
+  var HIT_IDENTITATE= ['cine esti','ce esti','cum te cheama','ce faci tu','cine e lea','ce e lea','prezinta-te','spune-mi despre tine'];
 
   function hitClassify(text) {
     var n = norm(text);
@@ -40,6 +42,8 @@ var VVAnimus = (function () {
     HIT_INTREBARE.forEach(function(v){ if(n.indexOf(norm(v))!==-1) sc.intrebare += 1; });
     HIT_EMOTIE.forEach(function(v){    if(n.indexOf(norm(v))!==-1) sc.emotie    += 2; });
     HIT_CREATIV.forEach(function(v){   if(n.indexOf(norm(v))!==-1) sc.creativ   += 2; });
+    HIT_SALUT.forEach(function(v){     if(n.indexOf(norm(v))!==-1) sc.salut     = (sc.salut||0) + 3; });
+    HIT_IDENTITATE.forEach(function(v){if(n.indexOf(norm(v))!==-1) sc.identitate= (sc.identitate||0) + 4; });
 
     if (text.trim().slice(-1) === '?') sc.intrebare += 3;
 
@@ -353,7 +357,19 @@ var VVAnimus = (function () {
     joc_inocent:           'Copilărie pură. Ploaia nu e tristă pentru ei.',
   };
 
+  var SALUTARI = [
+    'Bună. Sunt aici.', 'Salut. Ce construim azi?', 'Bună ziua. Gata.', 'Bună seara. Ce ai în minte?', 'Prezent.'
+  ];
+
+  var IDENTITATE = [
+    'Sunt Lea — creierul VV Hybrid Universe. Nu sunt un chatbot. Sunt un sistem de inteligență personală care trăiește pe dispozitivul tău, înțelege românește și crește cu tine.',
+    'Mă cheamă Lea. Fac parte din ecosistemul VV — un creier local, al tău, care nu trimite nimic nicăieri. Cu cât vorbim mai mult, cu atât te înțeleg mai bine.',
+    'Lea — Hibrid Inteligent. Înțeleg ce simți, ce vrei să construiești, și țin minte. Datele tale rămân la tine.'
+  ];
+
   function generateResponse(result) {
+    if (result.type === 'identitate') return IDENTITATE[Math.floor(Math.random() * IDENTITATE.length)];
+    if (result.type === 'salut')     return SALUTARI[Math.floor(Math.random() * SALUTARI.length)];
     if (result.type === 'intrebare') return 'Te ascult. Ce vrei să știi?';
     if (result.type === 'comanda')   return 'Execut.';
 
