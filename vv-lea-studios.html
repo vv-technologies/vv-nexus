@@ -197,6 +197,13 @@ svg#viz{width:100%;height:100%;display:block}
 .skel-rot-note{font-size:8px;color:rgba(255,255,255,.15);text-align:center;letter-spacing:.4px}
 .se-skel-btn{width:100%;background:rgba(180,210,255,.05);border:1px solid rgba(180,210,255,.12);border-radius:9px;color:rgba(180,210,255,.6);font-size:10px;padding:7px;cursor:pointer;transition:all .15s;font-family:inherit;margin-bottom:5px;letter-spacing:.5px}
 .se-skel-btn:hover{background:rgba(180,210,255,.14);color:rgba(180,210,255,.9)}
+.se-axis-wrap{margin:6px 0 4px;text-align:center}
+.se-axis-lbl{display:block;font-size:9px;color:rgba(255,255,255,.28);letter-spacing:.6px;margin-bottom:5px}
+.se-axis-pad{display:inline-flex;flex-direction:column;align-items:center;gap:3px}
+.se-ax-row{display:flex;gap:3px}
+.se-ax-btn{width:28px;height:28px;border-radius:7px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);color:rgba(255,255,255,.6);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .12s;font-family:inherit;padding:0}
+.se-ax-btn:hover{background:rgba(100,180,255,.18);border-color:rgba(100,180,255,.35);color:#fff}
+.se-ax-reset{font-size:18px;color:rgba(255,255,255,.25)}
 /* ── COLLECTIVE LEARNING ── */
 .lea-mesh-btn{padding:5px 12px;border-radius:8px;font-size:9px;letter-spacing:.5px;cursor:pointer;transition:all .15s;font-family:inherit}
 .lea-export{background:rgba(255,200,100,.06);border:1px solid rgba(255,200,100,.15);color:rgba(255,200,100,.6)}
@@ -1050,13 +1057,15 @@ function person(x,y,mood,h,action,ov){
   var sad=mood==='trist'||action==='plange';
   var happy=mood==='fericit'||action==='rade'||action==='danseaza';
   var sleeping=action==='doarme';
-  var shirtA=sad?'#4a72b8':happy?'#d48820':mood==='tensiune'?'#9a2a18':'#2a7a52';
-  var shirtB=sad?'#2a4a80':happy?'#a86010':mood==='tensiune'?'#6a1a08':'#1a5a38';
+  var SHIRT_PAL={albastru:['#4a72b8','#2a4a80'],verde:['#2a7a52','#1a5a38'],rosu:['#9a2a18','#6a1a08'],portocaliu:['#d48820','#a86010'],negru:['#1a1a2a','#0a0a18'],alb:['#c8c8dc','#9898b0'],galben:['#b8a010','#907808'],mov:['#6a2a8a','#4a1a6a']};
+  var _sp=ov.shirt_ov&&ov.shirt_ov!=='auto'?SHIRT_PAL[ov.shirt_ov]:null;
+  var shirtA=_sp?_sp[0]:(sad?'#4a72b8':happy?'#d48820':mood==='tensiune'?'#9a2a18':'#2a7a52');
+  var shirtB=_sp?_sp[1]:(sad?'#2a4a80':happy?'#a86010':mood==='tensiune'?'#6a1a08':'#1a5a38');
   var pantsCol=sad?'#22304a':'#1a2838';
   var hairCol=gv>0?HAIR[_pc%6]:(happy?'#7a4818':'#2e1c0a');
   var bodyTop=y+r*.88, bodyH=r*2.6, bodyW=r*1.18, bb=bodyTop+bodyH, armY=bodyTop+bodyH*.25, legH=r*2.1;
-  var breathe=_laws.sens>=0.28&&!_frozen&&_perfMode!=='eco';
-  var breathDur=(3.2/_laws.ritm).toFixed(2);
+  var breathe=(ov.breathe_ov==='on')||(_laws.sens>=0.28&&!_frozen&&_perfMode!=='eco'&&ov.breathe_ov!=='off');
+  var breathDur=ov.breathe_speed&&ov.breathe_speed!=='auto'?(+ov.breathe_speed).toFixed(2):(3.2/_laws.ritm).toFixed(2);
   var s=breathe?'<g class="vv-organism" data-drift="0"><animateTransform attributeName="transform" type="translate" values="0,0;0,-'+(r*.06).toFixed(2)+';0,0" dur="'+breathDur+'s" repeatCount="indefinite" calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1" keyTimes="0;0.45;1"/>':'<g class="vv-organism" data-drift="0">';
   // gradients
   s+='<defs>';
@@ -1106,8 +1115,9 @@ function person(x,y,mood,h,action,ov){
     s+='<path d="M'+x+' '+armY+' Q'+(x-r*1.6)+' '+(armY+r*1.5)+' '+(x-r*1.8)+' '+(armY+r*2.4)+'" stroke="url(#sh'+id+')" stroke-width="'+aw+'" fill="none" stroke-linecap="round"/>';
     s+='<path d="M'+x+' '+armY+' Q'+(x+r*1.6)+' '+(armY+r*1.5)+' '+(x+r*1.8)+' '+(armY+r*2.4)+'" stroke="url(#sh'+id+')" stroke-width="'+aw+'" fill="none" stroke-linecap="round"/>';
   } else {
-    s+='<path d="M'+x+' '+armY+' Q'+(x-r*1.9)+' '+(armY-.1*r)+' '+(x-r*2.1)+' '+(armY+r*1.1)+'" stroke="url(#sh'+id+')" stroke-width="'+aw+'" fill="none" stroke-linecap="round"/>';
-    s+='<path d="M'+x+' '+armY+' Q'+(x+r*1.9)+' '+(armY-.1*r)+' '+(x+r*2.1)+' '+(armY+r*1.1)+'" stroke="url(#sh'+id+')" stroke-width="'+aw+'" fill="none" stroke-linecap="round"/>';
+    var aOff=(ov.arm_angle||0)*r*0.045;
+    s+='<path d="M'+x+' '+armY+' Q'+(x-r*1.9)+' '+(armY-0.1*r+aOff*0.5)+' '+(x-r*2.1)+' '+(armY+r*1.1+aOff)+'" stroke="url(#sh'+id+')" stroke-width="'+aw+'" fill="none" stroke-linecap="round"/>';
+    s+='<path d="M'+x+' '+armY+' Q'+(x+r*1.9)+' '+(armY-0.1*r+aOff*0.5)+' '+(x+r*2.1)+' '+(armY+r*1.1+aOff)+'" stroke="url(#sh'+id+')" stroke-width="'+aw+'" fill="none" stroke-linecap="round"/>';
   }
   // ── NECK ──
   s+='<rect x="'+(x-r*.22)+'" y="'+(y+r*.82)+'" width="'+(r*.44)+'" height="'+(r*.3)+'" fill="url(#sk'+id+')" rx="'+(r*.1)+'"/>';
@@ -2284,6 +2294,10 @@ function exportPNG(){
 var SE_DEFS={
   om:[
     {prop:'h_factor',label:'Înălțime',type:'range',min:.6,max:1.5,step:.05,def:1},
+    {prop:'arm_angle',label:'Brațe ↕',type:'range',min:-60,max:60,step:5,def:0},
+    {prop:'breathe_speed',label:'Respirație',type:'range',min:.8,max:6,step:.2,def:3.2},
+    {prop:'breathe_ov',label:'Respirație',type:'sel',opts:['auto','on','off']},
+    {prop:'shirt_ov',label:'Haine',type:'sel',opts:['auto','albastru','verde','rosu','portocaliu','negru','alb','galben','mov']},
     {prop:'mood_ov',label:'Expresie',type:'sel',opts:['auto','fericit','trist','tensiune','liniste']},
     {prop:'action_ov',label:'Postură',type:'sel',opts:['auto','sare','danseaza','doarme','alergare','plange','rade']},
     {prop:'mustache_ov',label:'Mustață',type:'sel',opts:['auto','nu','subțire','clasica','stângace']},
@@ -2361,6 +2375,18 @@ function buildSeControls(subj,idx){
   });
   return html;
 }
+function seMove(idx,dir){
+  var st=_sceneSubjects[idx]; if(!st)return;
+  var step=st.h_full*0.03;
+  if(!_subjOverrides[idx])_subjOverrides[idx]={};
+  var ov=_subjOverrides[idx];
+  if(dir==='left')  ov.cx_offset=(ov.cx_offset||0)-step;
+  if(dir==='right') ov.cx_offset=(ov.cx_offset||0)+step;
+  if(dir==='up')    ov.y_offset=(ov.y_offset||0)-step;
+  if(dir==='down')  ov.y_offset=(ov.y_offset||0)+step;
+  if(dir==='reset') {ov.cx_offset=0;ov.y_offset=0;}
+  reRenderSubject(idx);
+}
 function seChange(idx,prop,val,el){
   if(!_subjOverrides[idx])_subjOverrides[idx]={};
   _subjOverrides[idx][prop]=isNaN(+val)||val===''||val==='auto'?val:+val;
@@ -2380,12 +2406,15 @@ function reRenderSubject(idx){
   var rSeason=ov.season_ov&&ov.season_ov!=='auto'?ov.season_ov:st.season;
   var rScale=ov.scale||1;
   var savedPc=_pc;
-  _pc=st.pc_before;
+  _pc=st.pc_before!==undefined?st.pc_before:idx;
   if(ov.fur_idx!==undefined&&ov.fur_idx!=='auto') _furOverrideVal=+ov.fur_idx;
   if(ov.species_idx!==undefined&&ov.species_idx!=='auto') _speciesOverrideVal=+ov.species_idx;
   var nc='';
-  var s=st.subj, cx=st.cx, hf=st.h_full;
-  if(s==='om')     nc=person(cx,st.yDepth*(rMood==='trist'?0.92:0.88),rMood,rH,rAction,ov);
+  var s=st.subj;
+  var cx=st.cx+(ov.cx_offset||0);
+  var yD=st.yDepth+(ov.y_offset||0);
+  var hf=st.h_full;
+  if(s==='om')     nc=person(cx,yD*(rMood==='trist'?0.92:0.88),rMood,rH,rAction,ov);
   if(s==='pisica') nc=cat(cx,hf*0.76*rScale,st.time,rAction);
   if(s==='copac')  nc=tree(cx,hf*0.88,st.h*(ov.h_factor||1),rSeason);
   if(s==='caine')  nc=dog(cx,hf*0.82*rScale,hf*rScale,rAction);
@@ -2766,6 +2795,19 @@ if(_homeInpEl)_homeInpEl.addEventListener('keydown',function(e){
     <button class="se-close" onclick="closeSubjEditor()">✕</button>
   </div>
   <div id="se-controls"></div>
+  <div class="se-divider"></div>
+  <div class="se-axis-wrap">
+    <span class="se-axis-lbl">Axe (poziție)</span>
+    <div class="se-axis-pad">
+      <button class="se-ax-btn" onclick="seMove(_seIdx,'up')">↑</button>
+      <div class="se-ax-row">
+        <button class="se-ax-btn" onclick="seMove(_seIdx,'left')">←</button>
+        <button class="se-ax-btn se-ax-reset" onclick="seMove(_seIdx,'reset')">·</button>
+        <button class="se-ax-btn" onclick="seMove(_seIdx,'right')">→</button>
+      </div>
+      <button class="se-ax-btn" onclick="seMove(_seIdx,'down')">↓</button>
+    </div>
+  </div>
   <div class="se-divider"></div>
   <button class="se-skel-btn" id="se-skel-open" onclick="openSkelEditor(_seSubj,_seIdx)">⬟ Editează postura în spațiu</button>
   <button class="se-save" onclick="memorizeSubjStyle()">♡ Memorează stilul</button>
