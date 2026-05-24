@@ -187,7 +187,16 @@
   var CMD_VERBS = [
     'ridica','coboara','intoarce','uita','roteste','pune','deschide',
     'intinde','incrucis','inclina','priveste','indoaie','relaxeaza','pozitie',
+    'schimba','fa-l','fa-ma','mai inalt','mai scund',
     'raise','lower','turn','look','rotate','open','cross','stretch'
+  ];
+
+  /* Comenzi genome (schimbă aspectul vizual) */
+  var GENOME_PATTERNS = [
+    /schimba.{0,12}camasa/,
+    /schimba.{0,10}par/,
+    /fa.{0,6}mai (inalt|scund|mare|mic)/,
+    /schimba.{0,10}(skin|ten|piele)/,
   ];
 
   var Director = {
@@ -196,7 +205,14 @@
     isCommand: function (text) {
       var n = norm(text);
       if (SCENE_WORDS.some(function (w) { return n.indexOf(w) >= 0; })) return false;
+      if (GENOME_PATTERNS.some(function (p) { return p.test(n); })) return true;
       return CMD_VERBS.some(function (v) { return n.indexOf(v) >= 0; });
+    },
+
+    /* Returnează true dacă e o comandă de genome (aspect vizual) */
+    isGenomeCommand: function (text) {
+      var n = norm(text);
+      return GENOME_PATTERNS.some(function (p) { return p.test(n); });
     },
 
     apply: function (text, charIdx) {
