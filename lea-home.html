@@ -392,6 +392,17 @@
   .meta-type.intrebare{ background: #0a1a0a; color: #50c878; border: 1px solid #1a5a2a; }
   .meta-type.creativ  { background: #1a0a0a; color: #ff8050; border: 1px solid #6a2a10; }
   .meta-type.feedback { background: #0a1a0a; color: #50c878; border: 1px solid #1a5a2a; }
+  .meta-type.memorie  { background: #1a0a1a; color: #d878ff; border: 1px solid #5a1a7a; }
+
+  .kb-item {
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 10px; color: var(--text-dim);
+    padding: 3px 0; border-bottom: 1px solid var(--border);
+    gap: 6px;
+  }
+  .kb-item span { flex: 1; color: #c0a0e0; }
+  .kb-del { background: none; border: none; color: #5a3a5a; cursor: pointer; font-size: 11px; padding: 0 2px; }
+  .kb-del:hover { color: #e05050; }
 
   .meta-tone {
     font-size: 9px;
@@ -577,6 +588,11 @@
       </div>
     </div>
 
+    <div class="sidebar-section">
+      <div class="sidebar-label">Știu despre tine</div>
+      <div id="kb-list"><span style="font-size:10px;color:var(--text-dim)">— nimic încă —</span></div>
+    </div>
+
     <div id="sidebar-footer">
       <button id="clear-mem-btn" onclick="clearMemory()">Șterge memoria</button>
     </div>
@@ -682,6 +698,7 @@
 
     addLeaMsg(result.response, result);
     updateSidebar(result);
+    updateKB();
   }
 
   function addUserMsg(text) {
@@ -756,6 +773,31 @@
 
     // Arată răspuns Lea
     addLeaMsg(resp, null);
+  }
+
+  function updateKB() {
+    if (!window.Lea) return;
+    var kb = Lea.getKB();
+    var el = document.getElementById('kb-list');
+    var keys = Object.keys(kb);
+    if (keys.length === 0) {
+      el.innerHTML = '<span style="font-size:10px;color:var(--text-dim)">— nimic încă —</span>';
+      return;
+    }
+    el.innerHTML = '';
+    keys.slice(-8).forEach(function(k) {
+      var item = document.createElement('div');
+      item.className = 'kb-item';
+      var label = k.replace(/_\d+$/, '').replace(/_/g,' ');
+      item.innerHTML =
+        '<span title="' + k + '">' + label + ': ' + escHtml(kb[k].val) + '</span>' +
+        '<button class="kb-del" onclick="deleteKB(\'' + k + '\')" title="Uită">✕</button>';
+      el.appendChild(item);
+    });
+  }
+
+  function deleteKB(key) {
+    if (window.Lea) { Lea.kbForget(key); updateKB(); }
   }
 
   function updateSidebar(result) {
