@@ -196,9 +196,13 @@ var VVAnimus = (function () {
     if (_him.conversatie.length > 12) _him.conversatie.shift();
 
     if (result.type === 'scena' || result.type === 'creativ') {
+      var VREME_WORDS = ['ninge','ploaie','soare','furtuna','ceata','vant','caldura'];
+      var MOMENT_WORDS = ['noapte','dimineata','apus','amiaza'];
       result.entities.forEach(function(e) {
         if (_him.scena_curenta.subiecte.indexOf(e) === -1) _him.scena_curenta.subiecte.push(e);
         _him.profil.frecventa[e] = (_him.profil.frecventa[e] || 0) + 1;
+        if (VREME_WORDS.indexOf(norm(e)) !== -1) _him.scena_curenta.vreme = e;
+        if (MOMENT_WORDS.indexOf(norm(e)) !== -1) _him.scena_curenta.moment = e;
       });
       if (result.tone && result.tone !== 'neutru') _him.scena_curenta.emotie = result.tone;
     }
@@ -251,8 +255,8 @@ var VVAnimus = (function () {
   // Feedback: Lea se îmbunătățește din reacțiile tale
   // ════════════════════════════════════════════════════════
 
-  var HID_POS = ['da','bine','perfect','exact','imi place','superb','bravo','corect','asa da','frumos','minunat','wow','boom','tare','fain'];
-  var HID_NEG = ['nu','gresit','altfel','nu imi place','nu vreau','schimba','prost','urat','nu asa','mai incearca','nu e bine'];
+  var HID_POS = ['perfect','exact','imi place','superb','bravo','asa da','minunat','wow','boom','e bine','e corect','mai asa','chiar asa','exact asta'];
+  var HID_NEG = ['nu imi place','nu e bine','nu asa','nu vreau asta','mai incearca','gresit','schimba totul','nu e corect','nu ma reprezinta'];
 
   var _lastEntities = [];
 
@@ -388,11 +392,14 @@ var VVAnimus = (function () {
   function think(text) {
     if (!text || !text.trim()) return null;
 
-    // 1. HiE — emoție rapidă
+    // 1. HiT — clasifică intenția PRIMUL (înainte de feedback)
+    var intent = hitClassify(text);
+
+    // 2. HiE — emoție rapidă
     var emotion = hieDetect(text);
 
-    // 2. HiD — e feedback?
-    var fb = hidDetect(text);
+    // 3. HiD — e feedback? (doar dacă NU e scenă/comandă clară)
+    var fb = (intent.confidence < 0.5) ? hidDetect(text) : null;
     if (fb) {
       return {
         type:     'feedback',
@@ -405,9 +412,6 @@ var VVAnimus = (function () {
         feedback: fb
       };
     }
-
-    // 3. HiT — clasifică intenția
-    var intent = hitClassify(text);
 
     // 4. Extrage entitățile
     var entities = extractEntities(text);
