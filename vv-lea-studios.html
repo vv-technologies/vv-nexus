@@ -1747,10 +1747,10 @@ async function runStudio(){
           if (typeof _bpm !== 'undefined' && hiq.bpm) _bpm = hiq.bpm;
         };
         var hir=leaHiRRender(txt,700,_studio==='story'?320:400);
-        if(hir&&!hir.error){ svgEl.innerHTML=hir.svg; usedHiR=true; startOrganismPulse(); }
+        if(hir&&!hir.error){ svgEl.innerHTML=hir.svg; usedHiR=true; startOrganismPulse(); gizmoReattach(svgEl); }
       }
     }
-    if(!usedHiR) svgEl.innerHTML=svgScene(p);
+    if(!usedHiR){ svgEl.innerHTML=svgScene(p); gizmoReattach(svgEl); }
     if(_pApplied.indices.length>0){
       _pApplied.indices.forEach(function(idx){
         var el=document.getElementById('subj-'+idx);
@@ -2347,6 +2347,7 @@ function openSubjEditor(evt,subj,idx){
   ed.dataset.idx=idx; ed.dataset.subj=subj;
   _seSubj=subj; _seIdx=idx; // sync pentru skeleton editor button
   document.getElementById('se-controls').innerHTML=buildSeControls(subj,idx);
+  showGizmo(idx);
   // pattern hint
   var hint=getTopPatternHint(subj);
   var ph=document.getElementById('se-pattern-hint');
@@ -2431,6 +2432,7 @@ function reRenderSubject(idx){
 function closeSubjEditor(){
   var ed=document.getElementById('subj-editor');
   if(ed)ed.style.display='none';
+  hideGizmo();
 }
 function resetSubjEditor(){
   var ed=document.getElementById('subj-editor'); if(!ed)return;
@@ -2785,6 +2787,191 @@ if(_homeInpEl)_homeInpEl.addEventListener('keydown',function(e){
   wrap.appendChild(btnE); wrap.appendChild(btnI);
   panel.appendChild(wrap);
 })();
+
+/* ══════════════════════════════════════════
+   VV GIZMO — Editare în spațiu pe axe X/Y/Z
+   Inspirat din Blender gizmo · SVG pur · zero librării
+   ══════════════════════════════════════════ */
+var _gizmo={active:false,idx:-1,dragging:null,startPt:null,startOv:null};
+
+function gizmoSvgPt(evt){
+  var svg=document.getElementById('viz');
+  if(!svg||!svg.getScreenCTM)return null;
+  var pt=svg.createSVGPoint();
+  pt.x=evt.clientX; pt.y=evt.clientY;
+  return pt.matrixTransform(svg.getScreenCTM().inverse());
+}
+
+function gizmoReattach(svgEl){
+  if(!svgEl)return;
+  var gl=svgEl.querySelector('#gizmo-layer');
+  if(!gl){
+    gl=document.createElementNS('http://www.w3.org/2000/svg','g');
+    gl.id='gizmo-layer';
+    svgEl.appendChild(gl);
+  }
+  if(_gizmo.active)drawGizmo();
+}
+
+function showGizmo(idx){
+  var st=_sceneSubjects[idx]; if(!st)return;
+  _gizmo.active=true; _gizmo.idx=idx;
+  var svg=document.getElementById('viz');
+  gizmoReattach(svg);
+}
+
+function hideGizmo(){
+  _gizmo.active=false; _gizmo.idx=-1; _gizmo.dragging=null;
+  var gl=document.getElementById('gizmo-layer');
+  if(gl)gl.innerHTML='';
+}
+
+function gizmoArrow(x1,y1,x2,y2,col,sz,id){
+  var dx=x2-x1,dy=y2-y1,len=Math.sqrt(dx*dx+dy*dy);
+  if(len<0.01)return'';
+  var ux=dx/len,uy=dy/len,px=-uy,py=ux;
+  var b1x=x2-ux*sz-px*sz*.5,b1y=y2-uy*sz-py*sz*.5;
+  var b2x=x2-ux*sz+px*sz*.5,b2y=y2-uy*sz+py*sz*.5;
+  return'<polygon id="'+id+'" points="'+x2+','+y2+' '+b1x+','+b1y+' '+b2x+','+b2y+'" fill="'+col+'" style="cursor:crosshair;pointer-events:all"/>';
+}
+
+function drawGizmo(){
+  var gl=document.getElementById('gizmo-layer'); if(!gl||!_gizmo.active)return;
+  var idx=_gizmo.idx;
+  var st=_sceneSubjects[idx]; if(!st)return;
+  var ov=_subjOverrides[idx]||{};
+  var cx=st.cx+(ov.cx_offset||0);
+  var cy=st.yDepth+(ov.y_offset||0);
+  var r=st.h*0.075;
+  var aLen=r*3.8, zLen=r*2.6, sz=r*.52;
+  var s='';
+
+  /* ── Shadow handle ── */
+  var shX=cx-aLen*1.2,shY=cy+r*1.8;
+  s+='<g id="gz-shadow" style="cursor:grab;pointer-events:all">';
+  s+='<circle cx="'+shX+'" cy="'+shY+'" r="'+(r*.85)+'" fill="rgba(0,0,0,.55)" stroke="rgba(130,130,200,.8)" stroke-width="1.5"/>';
+  s+='<text x="'+shX+'" y="'+(shY+r*.38)+'" text-anchor="middle" fill="rgba(180,180,220,.8)" font-size="'+(r*.7)+'" font-family="system-ui">↕</text>';
+  s+='<text x="'+shX+'" y="'+(shY+r*1.35)+'" text-anchor="middle" fill="rgba(130,130,200,.6)" font-size="'+(r*.5)+'" font-family="system-ui">umbra</text>';
+  s+='</g>';
+
+  /* ── Light handle ── */
+  var liX=cx+aLen*1.2,liY=cy-r*1.8;
+  s+='<g id="gz-light" style="cursor:grab;pointer-events:all">';
+  s+='<circle cx="'+liX+'" cy="'+liY+'" r="'+(r*.85)+'" fill="rgba(255,220,60,.15)" stroke="rgba(255,220,60,.85)" stroke-width="1.5"/>';
+  s+='<text x="'+liX+'" y="'+(liY+r*.38)+'" text-anchor="middle" fill="rgba(255,220,80,.95)" font-size="'+(r*.8)+'" font-family="system-ui">☀</text>';
+  s+='<text x="'+liX+'" y="'+(liY+r*1.35)+'" text-anchor="middle" fill="rgba(255,220,60,.6)" font-size="'+(r*.5)+'" font-family="system-ui">lumina</text>';
+  s+='</g>';
+
+  /* ── Z axis (albastru, diagonal) ── */
+  var zEx=cx+zLen*.72,zEy=cy-zLen*.72;
+  s+='<line id="gz-z-line" x1="'+cx+'" y1="'+cy+'" x2="'+zEx+'" y2="'+zEy+'" stroke="rgba(80,140,255,.85)" stroke-width="2.8" stroke-linecap="round" style="cursor:ne-resize;pointer-events:stroke"/>';
+  s+=gizmoArrow(cx,cy,zEx,zEy,'rgba(80,140,255,.95)',sz,'gz-z-arrow');
+  s+='<text x="'+(zEx+5)+'" y="'+(zEy-4)+'" fill="rgba(80,140,255,.9)" font-size="'+(r*.62)+'" font-family="monospace">Z</text>';
+
+  /* ── X axis (roșu, orizontal) ── */
+  s+='<line id="gz-x-line" x1="'+(cx-aLen*.2)+'" y1="'+cy+'" x2="'+(cx+aLen)+'" y2="'+cy+'" stroke="rgba(220,60,60,.85)" stroke-width="2.8" stroke-linecap="round" style="cursor:ew-resize;pointer-events:stroke"/>';
+  s+=gizmoArrow(cx,cy,cx+aLen,cy,'rgba(220,60,60,.95)',sz,'gz-x-arrow');
+  s+='<text x="'+(cx+aLen+7)+'" y="'+(cy+r*.3)+'" fill="rgba(220,60,60,.9)" font-size="'+(r*.62)+'" font-family="monospace">X</text>';
+
+  /* ── Y axis (verde, vertical) ── */
+  s+='<line id="gz-y-line" x1="'+cx+'" y1="'+(cy+aLen*.2)+'" x2="'+cx+'" y2="'+(cy-aLen)+'" stroke="rgba(60,200,80,.85)" stroke-width="2.8" stroke-linecap="round" style="cursor:ns-resize;pointer-events:stroke"/>';
+  s+=gizmoArrow(cx,cy,cx,cy-aLen,'rgba(60,200,80,.95)',sz,'gz-y-arrow');
+  s+='<text x="'+(cx+r*.4)+'" y="'+(cy-aLen-5)+'" fill="rgba(60,200,80,.9)" font-size="'+(r*.62)+'" font-family="monospace">Y</text>';
+
+  /* ── Centru ── */
+  s+='<circle cx="'+cx+'" cy="'+cy+'" r="'+(r*.28)+'" fill="rgba(255,255,255,.92)" style="pointer-events:none"/>';
+
+  /* ── Rotire L/R ── */
+  var rotY=cy+r*4.2,bW=r*2.5,bH=r*1.3,bRx=r*.38;
+  s+='<g id="gz-rot-l" style="cursor:pointer;pointer-events:all" onclick="gizmoRotate('+idx+',-1)">';
+  s+='<rect x="'+(cx-r*3.1)+'" y="'+(rotY-bH*.5)+'" width="'+bW+'" height="'+bH+'" rx="'+bRx+'" fill="rgba(180,180,255,.07)" stroke="rgba(180,180,255,.38)" stroke-width="1.2"/>';
+  s+='<text x="'+(cx-r*1.85)+'" y="'+(rotY+r*.4)+'" text-anchor="middle" fill="rgba(180,180,255,.88)" font-size="'+(r*.78)+'" font-family="system-ui">↺ L</text>';
+  s+='</g>';
+  s+='<g id="gz-rot-r" style="cursor:pointer;pointer-events:all" onclick="gizmoRotate('+idx+',1)">';
+  s+='<rect x="'+(cx+r*.6)+'" y="'+(rotY-bH*.5)+'" width="'+bW+'" height="'+bH+'" rx="'+bRx+'" fill="rgba(180,180,255,.07)" stroke="rgba(180,180,255,.38)" stroke-width="1.2"/>';
+  s+='<text x="'+(cx+r*1.85)+'" y="'+(rotY+r*.4)+'" text-anchor="middle" fill="rgba(180,180,255,.88)" font-size="'+(r*.78)+'" font-family="system-ui">↻ R</text>';
+  s+='</g>';
+
+  /* ── Tabel coordonate ── */
+  var xOff=Math.round(ov.cx_offset||0),yOff=Math.round(ov.y_offset||0);
+  var zSc=((ov.z_scale||1)).toFixed(2),rot=Math.round(ov.rotation||0);
+  var cX=cx-aLen,cY=cy-aLen*1.25,cW=r*5.2,cH=r*3.2;
+  s+='<rect x="'+cX+'" y="'+cY+'" width="'+cW+'" height="'+cH+'" rx="7" fill="rgba(4,4,16,.88)" stroke="rgba(255,255,255,.07)" stroke-width="1"/>';
+  s+='<text x="'+(cX+r*.4)+'" y="'+(cY+r*1)+'" fill="rgba(220,60,60,.9)" font-size="'+(r*.58)+'" font-family="monospace">X '+(xOff>=0?'+':'')+xOff+'px</text>';
+  s+='<text x="'+(cX+r*.4)+'" y="'+(cY+r*1.85)+'" fill="rgba(60,200,80,.9)" font-size="'+(r*.58)+'" font-family="monospace">Y '+(yOff>=0?'+':'')+yOff+'px</text>';
+  s+='<text x="'+(cX+r*2.7)+'" y="'+(cY+r*1)+'" fill="rgba(80,140,255,.9)" font-size="'+(r*.58)+'" font-family="monospace">Z '+zSc+'×</text>';
+  s+='<text x="'+(cX+r*2.7)+'" y="'+(cY+r*1.85)+'" fill="rgba(180,180,255,.75)" font-size="'+(r*.58)+'" font-family="monospace">↺ '+rot+'°</text>';
+
+  gl.innerHTML=s;
+  gl.setAttribute('pointer-events','all');
+
+  /* Atașează drag ── */
+  ['gz-x-line','gz-x-arrow'].forEach(function(id){gizmoBind(id,'x');});
+  ['gz-y-line','gz-y-arrow'].forEach(function(id){gizmoBind(id,'y');});
+  ['gz-z-line','gz-z-arrow'].forEach(function(id){gizmoBind(id,'z');});
+  gizmoBind('gz-shadow','shadow');
+  gizmoBind('gz-light','light');
+}
+
+function gizmoBind(id,axis){
+  var el=document.getElementById(id); if(!el)return;
+  el.onpointerdown=function(e){
+    e.stopPropagation(); e.preventDefault();
+    var pt=gizmoSvgPt(e); if(!pt)return;
+    _gizmo.dragging=axis;
+    _gizmo.startPt={x:pt.x,y:pt.y};
+    var ov=_subjOverrides[_gizmo.idx]||{};
+    _gizmo.startOv={cx_offset:ov.cx_offset||0,y_offset:ov.y_offset||0,z_scale:ov.z_scale||1};
+    try{el.setPointerCapture(e.pointerId);}catch(er){}
+  };
+}
+
+function gizmoRotate(idx,dir){
+  if(!_subjOverrides[idx])_subjOverrides[idx]={};
+  var ov=_subjOverrides[idx];
+  ov.rotation=((ov.rotation||0)+dir*15+360)%360;
+  var el=document.getElementById('subj-'+idx);
+  if(el){
+    var st=_sceneSubjects[idx];
+    var cx=st?st.cx+(ov.cx_offset||0):0;
+    var cy=st?st.yDepth+(ov.y_offset||0):0;
+    el.setAttribute('transform','rotate('+ov.rotation+','+cx+','+cy+')');
+  }
+  drawGizmo();
+}
+
+document.addEventListener('pointermove',function(e){
+  if(!_gizmo.active||!_gizmo.dragging||!_gizmo.startPt)return;
+  var pt=gizmoSvgPt(e); if(!pt)return;
+  var dx=pt.x-_gizmo.startPt.x, dy=pt.y-_gizmo.startPt.y;
+  var idx=_gizmo.idx;
+  if(!_subjOverrides[idx])_subjOverrides[idx]={};
+  var ov=_subjOverrides[idx];
+  if(_gizmo.dragging==='x'){
+    ov.cx_offset=+(_gizmo.startOv.cx_offset+dx).toFixed(1);
+    reRenderSubject(idx); drawGizmo();
+  } else if(_gizmo.dragging==='y'){
+    ov.y_offset=+(_gizmo.startOv.y_offset+dy).toFixed(1);
+    reRenderSubject(idx); drawGizmo();
+  } else if(_gizmo.dragging==='z'){
+    var delta=(dx-dy)*0.012;
+    ov.z_scale=Math.max(.3,Math.min(2.5,+(_gizmo.startOv.z_scale+delta).toFixed(3)));
+    ov.h_factor=ov.z_scale;
+    reRenderSubject(idx); drawGizmo();
+    _gizmo.startOv.z_scale=ov.z_scale;
+  } else if(_gizmo.dragging==='light'){
+    if(window.VVHiR) VVHiR.laws.lumina=Math.max(.1,Math.min(2,+(VVHiR.laws.lumina-dy*.008).toFixed(3)));
+    drawGizmo();
+  } else if(_gizmo.dragging==='shadow'){
+    ov.shadow_op=Math.max(0,Math.min(1,+((ov.shadow_op||.22)-dy*.006).toFixed(3)));
+    drawGizmo();
+  }
+  _gizmo.startPt={x:pt.x,y:pt.y};
+  _gizmo.startOv.cx_offset=ov.cx_offset||0;
+  _gizmo.startOv.y_offset=ov.y_offset||0;
+},{ passive:true });
+
+document.addEventListener('pointerup',function(){ _gizmo.dragging=null; });
 </script>
 
 <!-- ── HOME OVERLAY ── -->
