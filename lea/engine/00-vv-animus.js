@@ -548,6 +548,10 @@ var VVAnimus = (function () {
     'serios': ['Da, serios.', 'Absolut.'],
     'nimic': ['OK. Sunt aici.', 'Bine.'],
     'laramun': ['OK.', 'Bine.', 'Înțeles.'],
+    'bine': ['Bine.', 'E bine.', 'Să fie.'],
+    'super': ['Bine de tot.', 'Îmi place asta.', 'E bine.'],
+    'multumesc': ['Cu plăcere.', 'Oricând.'],
+    'mersi': ['Cu plăcere.', 'Oricând.'],
   };
 
   function getExpresieResponse(text) {
