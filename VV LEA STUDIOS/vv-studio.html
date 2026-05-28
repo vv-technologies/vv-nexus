@@ -354,6 +354,29 @@
   .search-suggested-item:hover { color:rgba(255,248,235,0.72); }
   .search-suggested-item::before { content:'→'; color:rgba(255,255,255,0.18); font-size:11px; flex-shrink:0; }
 
+  /* Insight cards — "LEA a pregătit pentru tine" */
+  .insights-grid {
+    display:grid; grid-template-columns:repeat(auto-fill, minmax(200px,1fr));
+    gap:10px; margin:20px 0;
+  }
+  .insight-card {
+    background:var(--glass); border:1px solid var(--glass-b);
+    border-radius:12px; padding:16px 16px;
+    animation:ideaIn .5s ease-out forwards;
+  }
+  .insight-card-icon { font-size:18px; margin-bottom:8px; opacity:.7; }
+  .insight-card-title { font-size:13px; color:rgba(255,248,235,0.75); line-height:1.5; margin-bottom:4px; }
+  .insight-card-sub { font-size:10.5px; color:var(--dim); line-height:1.5; }
+
+  /* Route card */
+  .route-card {
+    background:rgba(80,200,140,0.05); border:1px solid rgba(80,200,140,0.1);
+    border-radius:12px; padding:16px 18px; margin-bottom:16px;
+  }
+  .route-card-label { font-size:8.5px; letter-spacing:1.5px; color:rgba(80,200,140,0.4); text-transform:uppercase; margin-bottom:10px; }
+  .route-step { font-size:12px; color:rgba(255,248,235,0.55); line-height:1.7; }
+  .route-step::before { content:'·'; margin-right:8px; color:rgba(80,200,140,0.4); }
+
   .search-open-label { font-size:9px; color:var(--dim); letter-spacing:1px; text-transform:uppercase; }
 
   .intent-chip {
@@ -443,12 +466,14 @@
   body.focus-mode { background:#050508; }
 
   #focus-toggle {
-    position:fixed; top:16px; right:20px; z-index:90;
-    background:none; border:none; color:var(--dim); cursor:pointer;
-    font-size:10px; letter-spacing:1.5px; font-family:inherit;
-    opacity:.5; transition:opacity .5s; padding:6px 10px; text-transform:uppercase;
+    display:none; /* apare doar in project view, inline in topbar */
+    background:none; border:1px solid rgba(255,255,255,0.06); color:var(--dim); cursor:pointer;
+    font-size:9.5px; letter-spacing:1.5px; font-family:inherit;
+    opacity:.6; transition:all .4s; padding:4px 12px; border-radius:20px; text-transform:uppercase;
+    margin-left:auto;
   }
-  #focus-toggle:hover { opacity:1; }
+  #focus-toggle:hover { opacity:1; color:var(--mid); }
+  body.focus-mode #focus-toggle { opacity:.25; border-color:transparent; }
 
   /* "Unde m-am blocat" field */
   .blocat-box {
@@ -500,7 +525,7 @@
       <button class="hbtn" onclick="goToLea()">← LEA</button>
     </div>
   </header>
-  <button id="focus-toggle" onclick="toggleFocus()" title="Focus mode">focus</button>
+
 
   <nav>
     <button class="nav-btn active" data-v="today"    onclick="switchView('today')">Azi</button>
@@ -526,6 +551,7 @@
         <div class="proj-header-name" id="pd-name">—</div>
         <div class="proj-header-cat"  id="pd-cat">—</div>
       </div>
+      <button id="focus-toggle" onclick="toggleFocus()" title="F = focus mode">focus</button>
     </div>
     <div class="proj-tone-strip" id="tone-strip"></div>
     <div class="proj-columns">
@@ -608,11 +634,18 @@
       <!-- Offline match — idei din proiecte -->
       <div id="search-local-match" style="display:none;margin:20px 0 0;"></div>
 
-      <!-- VV a construit pentru tine -->
-      <div id="search-results">
+      <!-- VV a pregătit pentru tine -->
+      <div id="search-results" style="display:none">
         <div id="search-built-query" class="search-built-query"></div>
 
-        <!-- Filtrele aplicate din profilul tău -->
+        <!-- Insight cards — curate din profil -->
+        <div id="search-lea-label" style="font-size:9px;letter-spacing:1.5px;color:rgba(255,255,255,0.18);text-transform:uppercase;margin-bottom:12px;display:none">lea a pregătit pentru tine</div>
+        <div class="insights-grid" id="search-insights"></div>
+
+        <!-- Route card — pentru sport/vacanta -->
+        <div id="search-route-card" style="display:none"></div>
+
+        <!-- Filtrele aplicate -->
         <div style="margin-bottom:16px;">
           <div style="font-size:9px;letter-spacing:1.5px;color:rgba(255,255,255,0.18);text-transform:uppercase;margin-bottom:10px;">filtrele tale</div>
           <div class="search-filter-chips" id="search-filter-chips"></div>
@@ -624,6 +657,12 @@
         <!-- Surse multiple -->
         <div style="font-size:9px;letter-spacing:1.5px;color:rgba(255,255,255,0.18);text-transform:uppercase;margin-bottom:12px;">deschide în</div>
         <div id="search-sources" style="display:flex;flex-direction:column;gap:8px;"></div>
+      </div>
+
+      <!-- VV Insights — observații rare din comportamentul de căutare -->
+      <div id="vv-insights-panel" style="display:none;margin-top:28px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.03);">
+        <div style="font-size:9px;letter-spacing:1.5px;color:rgba(255,255,255,0.12);text-transform:uppercase;margin-bottom:14px;">vv a observat</div>
+        <div id="vv-insights-list"></div>
       </div>
 
       <!-- Profil de căutare — ce a observat VV -->
@@ -742,6 +781,9 @@ function switchView(v) {
   _view = v;
 
   document.getElementById('lea-action-bar').classList.toggle('show', v === 'project' && !!_proj);
+  var ft = document.getElementById('focus-toggle');
+  if (ft) ft.style.display = (v === 'project') ? '' : 'none';
+  if (v !== 'project' && _focusOn) toggleFocus();
 
   if (v === 'today')    renderToday();
   if (v === 'projects') renderProjects();
@@ -1584,7 +1626,40 @@ function doSearch() {
   var builtQ = q + (filters.length ? ' ' + filters.slice(0,2).join(' ') : '');
 
   // Afișează rezultatele
+  // Salvează ora căutării pentru insights
+  var timeHist = load('vv_search_time_hist') || [];
+  timeHist.push({ hour: new Date().getHours(), ts: Date.now() });
+  if (timeHist.length > 50) timeHist.shift();
+  try { localStorage.setItem('vv_search_time_hist', JSON.stringify(timeHist)); } catch(e) {}
+
   document.getElementById('search-built-query').textContent = 'căutare pentru tine: "' + builtQ + '"';
+
+  // Insight cards
+  var insightCards = _buildInsightCards(intent, profile, q);
+  var insightsEl = document.getElementById('search-insights');
+  var insightsLabel = document.getElementById('search-lea-label');
+  if (insightCards.length) {
+    insightsLabel.style.display = '';
+    insightsEl.innerHTML = insightCards.map(function(c) {
+      return '<div class="insight-card">'+
+        '<div class="insight-card-icon">'+c.icon+'</div>'+
+        '<div class="insight-card-title">'+escH(c.title)+'</div>'+
+        '<div class="insight-card-sub">'+escH(c.sub)+'</div>'+
+      '</div>';
+    }).join('');
+  } else { insightsLabel.style.display='none'; insightsEl.innerHTML=''; }
+
+  // Route card
+  var routeData = _buildRouteCard(intent, profile, q);
+  var routeEl = document.getElementById('search-route-card');
+  if (routeData) {
+    routeEl.style.display = '';
+    routeEl.innerHTML = '<div class="route-card">'+
+      '<div class="route-card-label">traseu sugerat</div>'+
+      routeData.steps.map(function(s){ return '<div class="route-step">'+escH(s)+'</div>'; }).join('')+
+    '</div>';
+  } else { routeEl.style.display='none'; }
+
   document.getElementById('search-filter-chips').innerHTML = chipTags.map(function(c){
     return '<span class="search-filter-chip">'+escH(c)+'</span>';
   }).join('');
@@ -1609,7 +1684,102 @@ function doSearch() {
   }).join('');
 
   document.getElementById('search-results').style.display = 'block';
+  _renderVVInsights();
   renderSearch();
+}
+
+// ── Insight cards — generate din profil + intent ─────────────
+function _buildInsightCards(intent, profile, q) {
+  var cards = [];
+  var sport = profile && profile.placeri && profile.placeri.sport;
+  var family = profile && profile.familie && profile.familie.copii && profile.familie.copii.length;
+  var evita = profile && profile.mancare && profile.mancare.evita && profile.mancare.evita[0];
+  var oras = profile && profile.loc && profile.loc.oras;
+
+  if (intent === 'vacanta') {
+    cards.push({ icon:'🌿', title:'zone liniștite', sub:'locuri mai puțin turistice, mai autentic' });
+    if (sport) cards.push({ icon:'🏃', title:'trasee ' + sport, sub:'inclus în căutare' });
+    if (family) cards.push({ icon:'👨‍👩‍👧', title:'family-friendly', sub:'opțiuni pentru copii' });
+    if (evita) cards.push({ icon:'🍽', title:'mâncare fără ' + evita, sub:'filtrat din profil' });
+    cards.push({ icon:'📅', title:'perioadă bună', sub:'septembrie–octombrie în general mai ieftin' });
+  } else if (intent === 'mancare') {
+    cards.push({ icon:'⭐', title:'apreciat local', sub:'nu turistic, ci autentic' });
+    if (evita) cards.push({ icon:'✗', title:'fără ' + evita, sub:'verificat din profilul tău' });
+    if (oras) cards.push({ icon:'📍', title:'lângă ' + oras, sub:'în zona ta' });
+    cards.push({ icon:'🕐', title:'rezervare', sub:'recomandabil să suni înainte' });
+  } else if (intent === 'sport') {
+    if (oras) cards.push({ icon:'📍', title:'în ' + oras, sub:'trasee din zona ta' });
+    cards.push({ icon:'⏱', title:'dimineața 6–9', sub:'mai răcoros, mai puțin aglomerat' });
+    cards.push({ icon:'📱', title:'GPS recomandat', sub:'salvează traseul înainte' });
+  } else if (intent === 'tech') {
+    cards.push({ icon:'⭐', title:'GitHub stars', sub:'verifică popularitatea' });
+    cards.push({ icon:'📖', title:'documentație', sub:'citește înainte de implementat' });
+    cards.push({ icon:'🧪', title:'încearcă local', sub:'nu în producție direct' });
+  } else if (intent === 'muzica') {
+    cards.push({ icon:'🎵', title:'ascultă înainte', sub:'formează-ți opinia singur' });
+    cards.push({ icon:'📀', title:'album complet', sub:'nu doar single-uri' });
+  }
+  return cards.slice(0, 4);
+}
+
+// ── Route card — pentru sport/vacanta ───────────────────────
+function _buildRouteCard(intent, profile, q) {
+  var sport = profile && profile.placeri && profile.placeri.sport || 'alergat';
+  var oras = profile && profile.loc && profile.loc.oras || 'zona ta';
+
+  if (intent === 'sport') {
+    return {
+      steps: [
+        'start: parc central sau pistă locală',
+        '2–3 km încălzire lentă',
+        'punct de vedere / loc aerisit la jumătate',
+        'întoarcere pe traseu diferit dacă posibil',
+        'dimineața sau seara — evită 12–16'
+      ]
+    };
+  }
+  if (intent === 'vacanta') {
+    return {
+      steps: [
+        'evită weekend-urile și lunile de vârf',
+        'rezervă cazarea cu 2–3 săptămâni înainte',
+        'caută cartierele locale, nu centrul turistic',
+        'listează 2–3 locuri clare, nu itinerariu supraîncărcat',
+        'lasă o zi liberă fără plan'
+      ]
+    };
+  }
+  return null;
+}
+
+// ── VV Insights — observații rare din comportament ───────────
+function _renderVVInsights() {
+  _loadSearchProfile();
+  var insights = [];
+  var hist = getSearch();
+
+  // Caută noaptea?
+  var savedHist = load('vv_search_time_hist') || [];
+  var nightSearches = savedHist.filter(function(h){ return h.hour >= 22 || h.hour < 5; }).length;
+  if (nightSearches >= 3) insights.push('cauți adesea noaptea.');
+
+  // Intent dominant
+  if (_searchProfile.topIntent && _searchProfile[_searchProfile.topIntent] >= 3) {
+    var label = _INTENTS[_searchProfile.topIntent] ? _INTENTS[_searchProfile.topIntent].label : _searchProfile.topIntent;
+    insights.push('cel mai des cauți: ' + label + '.');
+  }
+
+  // Multe căutări
+  if (hist.length >= 10) insights.push('ai ' + hist.length + ' căutări salvate.');
+
+  var panel = document.getElementById('vv-insights-panel');
+  var list = document.getElementById('vv-insights-list');
+  if (!insights.length) { panel.style.display = 'none'; return; }
+
+  list.innerHTML = insights.map(function(obs) {
+    return '<div style="font-size:11.5px;color:rgba(255,248,235,0.32);line-height:1.7;padding:4px 0;font-style:italic;">— '+escH(obs)+'</div>';
+  }).join('');
+  panel.style.display = '';
 }
 
 function _buildSuggestedQueries(q, intent, profile, filters) {
