@@ -984,6 +984,20 @@ function leaRespond(text, userProfile, animusResult) {
   // Emotia CASTIGA mereu daca e semnal puternic
   // ══════════════════════════════════════════════════════════════
 
+  // ── LEA SEARCH MODE — concierge calm când vine din Studio ────
+  if (studioCtx && studioCtx.name) {
+    var tLowS = (typeof leaNormDiac === 'function') ? leaNormDiac(textNorm.toLowerCase()) : textNorm.toLowerCase();
+    var isSearchQ = /\b(cauta|cauta|gaseste|gaseste|recomanda|recomanda|vreau\s+sa\s+(caut|gasesc)|unde\s+(gasesc|pot)|ce\s+(restaurant|hotel|traseu|loc\s+bun))\b/i.test(tLowS);
+    if (isSearchQ) {
+      var concPool = [
+        'deschide "Caută" în Studio — am filtrele tale pregătite.',
+        'în Studio la Caută construiesc query-ul din profilul tău.',
+        'mergi la Caută în Studio. știu exact ce să filtrez.'
+      ];
+      return { raspuns: concPool[Math.floor(Math.random()*concPool.length)], pattern:null, comportament:'chat' };
+    }
+  }
+
   var _routeResult = _leaClassifyRoute(textNorm);
 
   if (_routeResult === 'factual') {
