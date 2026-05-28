@@ -1174,10 +1174,20 @@ function leaRespond(text, userProfile, animusResult) {
     state = leaStateGet();
   }
 
+  // FIX POSITIVE MISREAD — achievement/realization keywords → uplift fortat
+  // "am realizat", "am reusit", "am terminat", "am facut" nu intra in soothe
+  var tNormLow = (typeof leaNormDiac === 'function') ? leaNormDiac(textNorm.toLowerCase()) : textNorm.toLowerCase();
+  var isPositiveAchievement = /\b(am\s+(realizat|reusit|terminat|facut|finalizat|rezolvat|invatat|descoperit)|am\s+facut-o|am\s+gasit|stiu\s+acum|mi-am\s+dat\s+seama|ceva\s+important\s+azi)\b/i.test(tNormLow);
+
   // INTENTION ENGINE — dual intention din stare + context
   var intentionObj = (typeof leaChooseIntention === 'function')
     ? leaChooseIntention(comportamentNume, hiq, depth, state)
     : { primary: null, secondary: null };
+
+  // Override intention pentru achievement pozitiv clar
+  if (isPositiveAchievement && intentionObj.primary !== 'uplift') {
+    intentionObj = { primary: 'uplift', secondary: 'create_closeness' };
+  }
 
   // VV Speech — raspuns cu intentie + state + cadence + micro + silence + mod
   var raspuns = leaSpeech(his, hiq, ctx, intentionObj, state, text.length, mod);
