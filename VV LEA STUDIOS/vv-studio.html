@@ -178,7 +178,7 @@
   }
   .tone-chip.sel { border-color:rgba(200,150,62,0.3); color:rgba(200,150,62,0.8); background:var(--acc-dim); }
 
-  .proj-columns { display:grid; grid-template-columns:1fr 290px; gap:36px; }
+  .proj-columns { display:grid; grid-template-columns:1fr 270px; gap:48px; }
 
   /* Ideas in project */
   .section-label { font-size:8.5px; letter-spacing:2px; color:var(--dim); text-transform:uppercase; margin-bottom:14px; font-weight:500; }
@@ -205,11 +205,13 @@
 
   .ideas-list { display:flex; flex-direction:column; gap:7px; }
   .idea-item {
-    padding:11px 15px; background:var(--glass); border:1px solid var(--glass-b);
-    border-radius:10px; font-size:13px; line-height:1.65; color:rgba(255,248,235,0.72);
+    padding:13px 16px; background:transparent; border:none;
+    border-bottom:1px solid rgba(255,255,255,0.03);
+    font-size:13.5px; line-height:1.75; color:rgba(255,248,235,0.68);
     transition:all .4s; display:flex; justify-content:space-between; align-items:flex-start;
     animation:ideaIn .45s ease-out forwards;
   }
+  .idea-item:hover { color:rgba(255,248,235,0.82); }
   @keyframes ideaIn { from{opacity:0;transform:translateY(5px)} to{opacity:1;transform:translateY(0)} }
   .idea-item:hover { border-color:rgba(255,248,235,0.065); }
   .idea-text { flex:1; }
@@ -403,20 +405,26 @@
   .mbtn.primary:hover { background:rgba(200,150,62,1); }
 
   /* ── FOCUS MODE ── */
-  body.focus-mode header { opacity:0; pointer-events:none; transition:opacity .6s; }
-  body.focus-mode nav    { opacity:0; pointer-events:none; transition:opacity .6s; }
-  body.focus-mode .proj-topbar { opacity:.3; transition:opacity .6s; }
-  body.focus-mode .proj-sidebar { opacity:0; pointer-events:none; transition:opacity .8s; }
-  body.focus-mode .proj-columns { grid-template-columns:1fr; transition:all .6s; }
-  body.focus-mode #focus-toggle { opacity:.35; }
+  /* FOCUS MODE — sacru, absolut minimal */
+  body.focus-mode header       { opacity:0; pointer-events:none; transition:opacity .7s ease; }
+  body.focus-mode nav          { opacity:0; pointer-events:none; transition:opacity .7s ease; }
+  body.focus-mode .proj-topbar { opacity:0; pointer-events:none; transition:opacity .5s ease; }
+  body.focus-mode .proj-tone-strip { opacity:0; pointer-events:none; transition:opacity .5s ease; }
+  body.focus-mode .proj-sidebar    { opacity:0; pointer-events:none; transition:opacity .7s ease; }
+  body.focus-mode .proj-columns    { grid-template-columns:1fr; }
+  body.focus-mode .orb             { opacity:0 !important; transition:opacity 1.2s ease; }
+  body.focus-mode #lea-action-bar  { background:rgba(7,7,13,0.98); border-top-color:rgba(255,255,255,0.025); }
+  body.focus-mode .action-chips    { display:none; }
+  body.focus-mode #focus-toggle    { opacity:.18; }
+  body.focus-mode { background:#050508; }
 
   #focus-toggle {
-    position:fixed; top:14px; right:16px; z-index:90;
+    position:fixed; top:16px; right:20px; z-index:90;
     background:none; border:none; color:var(--dim); cursor:pointer;
-    font-size:12px; letter-spacing:1px; font-family:inherit;
-    transition:opacity .4s; padding:6px 10px;
+    font-size:10px; letter-spacing:1.5px; font-family:inherit;
+    opacity:.5; transition:opacity .5s; padding:6px 10px; text-transform:uppercase;
   }
-  #focus-toggle:hover { opacity:1 !important; color:var(--mid); }
+  #focus-toggle:hover { opacity:1; }
 
   /* "Unde m-am blocat" field */
   .blocat-box {
@@ -1083,15 +1091,51 @@ function addIdea() {
   if (!_proj) return;
   var inp = document.getElementById('idea-input');
   var text = inp.value.trim(); if (!text) return;
+
+  // Detectare idee similară — înainte de save
+  var similar = _findSimilarIdea(text, _proj.ideas || []);
+  if (similar) {
+    var simDiv = document.getElementById('idea-similar-hint');
+    if (!simDiv) {
+      simDiv = document.createElement('div');
+      simDiv.id = 'idea-similar-hint';
+      simDiv.style.cssText = 'margin-bottom:10px;padding:9px 13px;background:rgba(139,92,246,0.06);border:1px solid rgba(139,92,246,0.14);border-radius:9px;font-size:11.5px;color:rgba(180,150,255,0.65);line-height:1.6;';
+      inp.parentElement.parentElement.insertBefore(simDiv, inp.parentElement);
+    }
+    simDiv.innerHTML = 'pare similar cu: <em>"' + escH(similar.slice(0,60)) + (similar.length>60?'…':'') + '"</em>' +
+      ' <span style="cursor:pointer;color:rgba(180,150,255,0.4);margin-left:8px;font-size:10px;" onclick="this.parentElement.remove()">ignoră</span>';
+    simDiv.style.display = 'block';
+  } else {
+    var old = document.getElementById('idea-similar-hint');
+    if (old) old.remove();
+  }
+
   var p = getProj(_proj.id);
   if (!p.ideas) p.ideas = [];
   p.ideas.push({ text:text, ts:Date.now() });
   p.lastActivity = Date.now();
-  saveProj(p);
-  _proj = p;
+  saveProj(p); _proj = p;
   save(S.active, { id:p.id, name:p.name, cat:p.cat, context:p.context||'', tone:p.tone, goals:p.goals||[], lastIdea:text });
   inp.value=''; inp.style.height='auto';
   renderIdeas(_proj.id);
+}
+
+// Găsește idee similară — overlap de cuvinte > 35%
+function _findSimilarIdea(newText, ideas) {
+  if (!ideas || !ideas.length) return null;
+  var newWords = _ideaWords(newText);
+  if (newWords.length < 2) return null;
+  var best = null; var bestScore = 0;
+  ideas.slice(-20).forEach(function(idea) { // cauta in ultimele 20
+    var oldWords = _ideaWords(idea.text);
+    var common = newWords.filter(function(w){ return oldWords.indexOf(w) !== -1; });
+    var score = common.length / Math.min(newWords.length, oldWords.length);
+    if (score > 0.35 && score > bestScore) { bestScore = score; best = idea.text; }
+  });
+  return best;
+}
+function _ideaWords(text) {
+  return text.toLowerCase().replace(/[.,!?;:]/g,'').split(/\s+/).filter(function(w){ return w.length > 3; });
 }
 
 function delIdea(projId, idx) {
