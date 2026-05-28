@@ -2095,6 +2095,8 @@
     // HiK — ANIMUS a prins info personală (nume, vârstă, job, loc)
     if (result.type === 'memorie') {
       if (window.VVProfile) VVProfile.learnFromText(textForAnimus);
+      // Înlocuiește răspunsul ANIMUS generic cu ceva uman
+      result.response = _leaWarmProfileResp(textForAnimus, result.response);
       finishWithLea(function() {
         showTyping(false);
         addLeaMsg(result.response, result, null);
@@ -2358,6 +2360,45 @@
     });
 
     // preferinte-list eliminat din sidebar — skip
+  }
+
+  // Răspuns cald când LEA înțelege ceva personal — în loc de "Interesant." generic
+  function _leaWarmProfileResp(text, original) {
+    var t = text.toLowerCase();
+    // Partener / familie
+    if (/soți[ae]|soț|iubit[ăa]|iubit|partener[ăa]?|prietenă|prieten/.test(t)) {
+      var r = ['hm… pari să ții la ea.', 'mă bucur că ai pe cineva.', 'frumos să ai pe cineva lângă.', 'spune-mi mai mult.'];
+      return r[Math.floor(Math.random()*r.length)];
+    }
+    // Job / muncă
+    if (/lucrez|muncesc|job|serviciu|angajat|freelance/.test(t)) {
+      var r2 = ['și cum e?', 'îți place ce faci?', 'spune-mi mai mult.', 'asta te consumă sau te împlinește?'];
+      return r2[Math.floor(Math.random()*r2.length)];
+    }
+    // Nume
+    if (/mă cheamă|cheamă|numele meu/.test(t)) {
+      var kb = window.Lea && Lea.getKB ? Lea.getKB() : {};
+      var n = kb && kb.nume && kb.nume.val ? kb.nume.val : '';
+      var r3 = n ? ['bine, ' + n + '.', 'am reținut, ' + n + '.', n + '. bine.'] : ['am reținut.', 'bine.'];
+      return r3[Math.floor(Math.random()*r3.length)];
+    }
+    // Vârstă
+    if (/am\s+\d+\s+ani|\d+\s+ani/.test(t)) {
+      var r4 = ['notat.', 'am reținut.', 'bine.'];
+      return r4[Math.floor(Math.random()*r4.length)];
+    }
+    // Hobby / sport
+    if (/alerg|sală|fitness|hobby|îmi place|ador|pasionat/.test(t)) {
+      var r5 = ['bine asta.', 'de mult?', 'ce simți după?', 'important să ai asta.'];
+      return r5[Math.floor(Math.random()*r5.length)];
+    }
+    // Locație
+    if (/locuiesc|stau în|din\s+\w+|trăiesc în/.test(t)) {
+      var r6 = ['notat.', 'știu acum.', 'bine.'];
+      return r6[Math.floor(Math.random()*r6.length)];
+    }
+    // Fallback — dacă ANIMUS a prins ceva dar nu știm ce
+    return original || 'am reținut.';
   }
 
   function showTyping(show) {
