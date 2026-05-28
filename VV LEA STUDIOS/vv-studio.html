@@ -1,0 +1,1295 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VV Studio</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  :root {
+    --bg:      #07070d;
+    --glass:   rgba(255,255,255,0.025);
+    --glass-b: rgba(255,255,255,0.042);
+    --text:    rgba(255,248,235,0.84);
+    --dim:     rgba(255,248,235,0.22);
+    --mid:     rgba(255,248,235,0.44);
+    --accent:  #c8963e;
+    --acc-dim: rgba(200,150,62,0.10);
+    --tone-orb1: rgba(28,16,58,0.48);
+    --tone-orb2: rgba(80,44,14,0.22);
+  }
+
+  /* Tone → vizual subtil */
+  body.tone-calm    { --tone-orb1: rgba(18,12,40,0.38); --tone-orb2: rgba(60,34,8,0.16); --glass-b: rgba(255,255,255,0.035); }
+  body.tone-urgent  { --tone-orb1: rgba(60,12,12,0.42); --tone-orb2: rgba(180,50,20,0.18); --glass-b: rgba(255,200,180,0.045); }
+  body.tone-creativ { --tone-orb1: rgba(50,20,90,0.52); --tone-orb2: rgba(100,50,160,0.20); --glass-b: rgba(160,100,255,0.05); }
+  body.tone-tehnic  { --bg: #06060f; --tone-orb1: rgba(10,20,50,0.5); --tone-orb2: rgba(20,40,80,0.20); --glass-b: rgba(100,150,220,0.045); }
+  body.tone-intens  { --tone-orb1: rgba(50,16,16,0.55); --tone-orb2: rgba(120,44,14,0.28); }
+  body.tone-exploratoriu { --tone-orb1: rgba(20,40,60,0.45); --tone-orb2: rgba(30,80,50,0.18); }
+
+  body {
+    background:var(--bg); color:var(--text);
+    font-family:-apple-system,'SF Pro Text','Segoe UI',system-ui,sans-serif;
+    min-height:100vh; display:flex; flex-direction:column; overflow:hidden;
+  }
+
+  .orb { position:fixed; border-radius:50%; pointer-events:none; z-index:0; transition:background 2.5s ease; }
+  #o1 { width:600px;height:600px; background:radial-gradient(circle,var(--tone-orb1) 0%,transparent 65%); top:-200px;left:-180px; animation:ob 13s ease-in-out infinite; }
+  #o2 { width:380px;height:380px; background:radial-gradient(circle,var(--tone-orb2) 0%,transparent 65%); bottom:-80px;right:-60px; animation:ob 17s ease-in-out infinite 3s; }
+  @keyframes ob { 0%,100%{opacity:.55} 50%{opacity:.8} }
+
+  #app { position:relative; z-index:1; display:flex; flex-direction:column; height:100vh; }
+
+  /* ── HEADER ── */
+  header {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:0 32px; height:50px; flex-shrink:0;
+    background:rgba(7,7,13,0.7); backdrop-filter:blur(14px);
+    border-bottom:1px solid var(--glass-b);
+  }
+  .h-left { display:flex; align-items:center; gap:14px; }
+  .h-logo { font-size:10px; letter-spacing:3.5px; color:rgba(255,248,235,0.65); }
+  .h-sep  { width:1px; height:14px; background:var(--glass-b); }
+  .h-sub  { font-size:10px; letter-spacing:2px; color:var(--dim); }
+  .h-right { display:flex; gap:8px; align-items:center; }
+  .hbtn {
+    background:var(--glass); border:1px solid var(--glass-b); color:var(--dim);
+    padding:4px 13px; border-radius:20px; font-size:11px; cursor:pointer;
+    letter-spacing:.5px; transition:all .4s; font-family:inherit;
+  }
+  .hbtn:hover { color:var(--text); border-color:rgba(255,255,255,0.1); }
+  .hbtn.amber { background:var(--acc-dim); border-color:rgba(200,150,62,0.22); color:rgba(200,150,62,0.85); }
+
+  /* ── NAV ── */
+  nav { display:flex; gap:0; padding:0 32px; flex-shrink:0; border-bottom:1px solid var(--glass-b); }
+  .nav-btn {
+    background:transparent; border:none; color:var(--dim);
+    padding:11px 16px; font-size:11.5px; cursor:pointer; font-family:inherit;
+    letter-spacing:.3px; transition:all .35s; border-bottom:1.5px solid transparent;
+    margin-bottom:-1px;
+  }
+  .nav-btn:hover { color:var(--mid); }
+  .nav-btn.active { color:var(--text); border-bottom-color:rgba(200,150,62,0.45); }
+
+  /* ── VIEWS ── */
+  .view { display:none; flex:1; overflow-y:auto; scrollbar-width:none; }
+  .view::-webkit-scrollbar { display:none; }
+  .view.show { display:flex; flex-direction:column; }
+  .view-pad { padding:36px 40px; }
+
+  .view-title { font-size:10px; letter-spacing:2.5px; color:var(--dim); text-transform:uppercase; margin-bottom:28px; font-weight:500; }
+
+  /* ══════════════════════════════════════
+     TODAY VIEW
+  ══════════════════════════════════════ */
+  #view-today {}
+
+  .today-greeting {
+    font-size:22px; color:rgba(255,248,235,0.75); font-weight:300;
+    letter-spacing:.5px; margin-bottom:4px;
+  }
+  .today-sub { font-size:12px; color:var(--dim); margin-bottom:40px; letter-spacing:.3px; }
+
+  .today-section { margin-bottom:36px; }
+  .today-section-label {
+    font-size:8.5px; letter-spacing:2px; color:rgba(255,248,235,0.18);
+    text-transform:uppercase; margin-bottom:14px; font-weight:500;
+  }
+
+  /* Active projects strip */
+  .today-projs { display:flex; gap:12px; flex-wrap:wrap; }
+  .today-proj-card {
+    background:var(--glass); border:1px solid var(--glass-b);
+    border-radius:12px; padding:14px 18px; cursor:pointer; transition:all .4s;
+    min-width:160px; position:relative; overflow:hidden;
+  }
+  .today-proj-card:hover { border-color:rgba(255,255,255,0.07); }
+  .today-proj-card.active-p { border-color:rgba(200,150,62,0.22); }
+  .today-proj-glow {
+    position:absolute; top:0;left:0;right:0; height:40px; border-radius:12px 12px 0 0; opacity:.15;
+  }
+  .today-proj-name { font-size:13px; color:rgba(255,248,235,0.78); position:relative; z-index:1; }
+  .today-proj-last { font-size:9.5px; color:var(--dim); margin-top:4px; position:relative; z-index:1; line-height:1.5; }
+
+  /* Continue working */
+  .continue-card {
+    background:var(--glass); border:1px solid var(--glass-b);
+    border-radius:12px; padding:18px 20px; cursor:pointer; transition:all .4s;
+    max-width:560px;
+  }
+  .continue-card:hover { border-color:rgba(200,150,62,0.15); }
+  .continue-proj { font-size:9px; letter-spacing:1.5px; color:var(--dim); text-transform:uppercase; margin-bottom:8px; }
+  .continue-idea { font-size:13.5px; color:rgba(255,248,235,0.72); line-height:1.65; }
+  .continue-ts   { font-size:9px; color:rgba(255,248,235,0.18); margin-top:6px; }
+  .continue-action { font-size:10px; color:rgba(200,150,62,0.55); margin-top:10px; letter-spacing:.5px; }
+
+  /* Recent ideas today strip */
+  .today-ideas-list { display:flex; flex-direction:column; gap:7px; max-width:620px; }
+  .today-idea-item {
+    display:flex; align-items:baseline; gap:10px;
+    font-size:12.5px; color:rgba(255,248,235,0.5); line-height:1.6;
+    padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.025);
+  }
+  .today-idea-item::before { content:'·'; color:var(--dim); flex-shrink:0; }
+  .today-idea-proj { font-size:9px; color:rgba(255,255,255,0.18); margin-left:auto; flex-shrink:0; letter-spacing:.5px; }
+
+  /* ══════════════════════════════════════
+     PROJECTS VIEW
+  ══════════════════════════════════════ */
+  .projects-grid {
+    display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:14px;
+  }
+  .proj-card {
+    background:var(--glass); border:1px solid var(--glass-b);
+    border-radius:14px; padding:22px 18px; cursor:pointer; transition:all .5s;
+    min-height:130px; display:flex; flex-direction:column; justify-content:flex-end;
+    position:relative; overflow:hidden;
+  }
+  .proj-card:hover { border-color:rgba(255,248,235,0.07); }
+  .proj-card.active-p { border-color:rgba(200,150,62,0.22); }
+  .proj-glow { position:absolute; top:0;left:0;right:0; height:55px; border-radius:14px 14px 0 0; opacity:.16; transition:opacity .4s; }
+  .proj-card:hover .proj-glow { opacity:.26; }
+  .proj-cat  { font-size:8px; letter-spacing:1.5px; color:rgba(255,248,235,0.18); text-transform:uppercase; margin-bottom:8px; position:relative;z-index:1; }
+  .proj-name { font-size:14.5px; color:rgba(255,248,235,0.8); font-weight:400; letter-spacing:.3px; margin-bottom:4px; position:relative;z-index:1; }
+  .proj-desc { font-size:10.5px; color:var(--dim); line-height:1.5; position:relative;z-index:1; }
+  .proj-card.new-p { border-style:dashed; justify-content:center; align-items:center; background:transparent; }
+  .proj-card.new-p span { font-size:11px; color:var(--dim); letter-spacing:1px; }
+
+  /* ══════════════════════════════════════
+     PROJECT DETAIL VIEW
+  ══════════════════════════════════════ */
+  #view-project { padding-bottom:120px; } /* space for action bar */
+
+  .proj-topbar {
+    display:flex; align-items:center; gap:12px; margin-bottom:32px;
+  }
+  .proj-back { background:none; border:none; color:var(--dim); cursor:pointer; font-size:18px; padding:4px 8px; border-radius:8px; transition:color .3s; }
+  .proj-back:hover { color:var(--text); }
+  .proj-header-info {}
+  .proj-header-name { font-size:19px; color:var(--text); font-weight:300; letter-spacing:.5px; }
+  .proj-header-cat  { font-size:9px; letter-spacing:1.5px; color:var(--dim); text-transform:uppercase; margin-top:2px; }
+
+  .proj-tone-strip { display:flex; gap:6px; margin-bottom:28px; flex-wrap:wrap; }
+  .tone-chip {
+    background:transparent; border:1px solid var(--glass-b); color:var(--dim);
+    padding:4px 12px; border-radius:20px; font-size:10px; cursor:pointer;
+    transition:all .3s; font-family:inherit; letter-spacing:.3px;
+  }
+  .tone-chip.sel { border-color:rgba(200,150,62,0.3); color:rgba(200,150,62,0.8); background:var(--acc-dim); }
+
+  .proj-columns { display:grid; grid-template-columns:1fr 290px; gap:36px; }
+
+  /* Ideas in project */
+  .section-label { font-size:8.5px; letter-spacing:2px; color:var(--dim); text-transform:uppercase; margin-bottom:14px; font-weight:500; }
+
+  .idea-input-wrap {
+    display:flex; gap:10px; align-items:flex-end;
+    background:rgba(255,248,235,0.028); border:1px solid rgba(255,248,235,0.05);
+    border-radius:12px; padding:10px 14px; transition:border-color .4s; margin-bottom:22px;
+  }
+  .idea-input-wrap:focus-within { border-color:rgba(200,150,62,0.18); }
+  .idea-input {
+    flex:1; background:transparent; border:none; outline:none;
+    color:var(--text); font-size:13.5px; font-family:inherit;
+    resize:none; max-height:100px; line-height:1.6;
+  }
+  .idea-input::placeholder { color:var(--dim); }
+  .idea-add-btn {
+    background:rgba(200,150,62,0.8); border:none; color:#07070d;
+    width:28px;height:28px; border-radius:8px; cursor:pointer;
+    font-size:16px; font-weight:700; display:flex; align-items:center;
+    justify-content:center; transition:all .2s; flex-shrink:0;
+  }
+  .idea-add-btn:hover { background:rgba(200,150,62,1); }
+
+  .ideas-list { display:flex; flex-direction:column; gap:7px; }
+  .idea-item {
+    padding:11px 15px; background:var(--glass); border:1px solid var(--glass-b);
+    border-radius:10px; font-size:13px; line-height:1.65; color:rgba(255,248,235,0.72);
+    transition:all .4s; display:flex; justify-content:space-between; align-items:flex-start;
+    animation:ideaIn .45s ease-out forwards;
+  }
+  @keyframes ideaIn { from{opacity:0;transform:translateY(5px)} to{opacity:1;transform:translateY(0)} }
+  .idea-item:hover { border-color:rgba(255,248,235,0.065); }
+  .idea-text { flex:1; }
+  .idea-ts   { font-size:9px; color:rgba(255,248,235,0.14); margin-top:4px; }
+  .idea-del  { background:none; border:none; color:rgba(255,255,255,0.1); cursor:pointer; font-size:13px; padding:0 3px; transition:color .2s; flex-shrink:0; margin-left:8px; }
+  .idea-del:hover { color:rgba(255,80,80,0.6); }
+  .empty-state { text-align:center; padding:40px 20px; color:rgba(255,248,235,0.14); font-size:12px; line-height:2; }
+
+  /* Project sidebar */
+  .proj-sidebar {}
+  .sidebar-box {
+    background:var(--glass); border:1px solid var(--glass-b);
+    border-radius:12px; padding:16px; margin-bottom:16px;
+  }
+  .sidebar-box-label { font-size:8px; letter-spacing:1.8px; color:var(--dim); text-transform:uppercase; margin-bottom:10px; font-weight:500; }
+  .ctx-textarea {
+    width:100%; background:transparent; border:none; outline:none;
+    color:rgba(255,248,235,0.55); font-size:12px; font-family:inherit;
+    resize:none; line-height:1.7; min-height:56px;
+  }
+  .ctx-textarea::placeholder { color:rgba(255,248,235,0.18); }
+  .lea-aware-note { font-size:10px; color:rgba(200,150,62,0.5); margin-top:8px; font-style:italic; }
+
+  .goals-list { display:flex; flex-direction:column; gap:6px; margin-bottom:10px; }
+  .goal-item { display:flex; align-items:center; gap:8px; font-size:11.5px; color:rgba(255,248,235,0.55); }
+  .goal-item::before { content:'—'; color:rgba(255,255,255,0.15); flex-shrink:0; }
+  .goal-del { background:none;border:none;color:rgba(255,255,255,0.1);cursor:pointer;font-size:11px;transition:color .2s; }
+  .goal-del:hover { color:rgba(255,80,80,0.5); }
+  .goal-input-row { display:flex; gap:8px; }
+  .goal-input {
+    flex:1; background:rgba(255,255,255,0.03); border:1px solid var(--glass-b);
+    border-radius:8px; padding:6px 10px; color:var(--text); font-size:11.5px;
+    font-family:inherit; outline:none; transition:border-color .3s;
+  }
+  .goal-input:focus { border-color:rgba(200,150,62,0.2); }
+  .goal-add { background:var(--glass);border:1px solid var(--glass-b);color:var(--dim);padding:6px 10px;border-radius:8px;font-size:11px;cursor:pointer;transition:all .3s;font-family:inherit; }
+  .goal-add:hover { color:var(--text); }
+
+  .files-list { display:flex; flex-direction:column; gap:5px; margin-bottom:8px; }
+  .file-item { display:flex;align-items:center;gap:8px;padding:6px 10px;background:var(--glass);border:1px solid var(--glass-b);border-radius:8px;font-size:11px;color:var(--mid);cursor:pointer;transition:all .3s; }
+  .file-item:hover { border-color:rgba(255,255,255,0.07); }
+  .file-name { flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+  .file-del { background:none;border:none;color:rgba(255,255,255,0.1);cursor:pointer;font-size:11px;transition:color .2s; }
+  .file-del:hover { color:rgba(255,80,80,0.5); }
+  .add-file-btn { width:100%;background:transparent;border:1px dashed rgba(255,255,255,0.06);color:var(--dim);padding:7px;border-radius:8px;font-size:11px;cursor:pointer;letter-spacing:.5px;transition:all .3s;font-family:inherit; }
+  .add-file-btn:hover { border-color:rgba(255,255,255,0.1);color:var(--mid); }
+
+  /* ── LEA ACTION BAR ── */
+  #lea-action-bar {
+    position:fixed; bottom:0; left:0; right:0; z-index:50;
+    background:rgba(7,7,13,0.92); backdrop-filter:blur(20px);
+    border-top:1px solid var(--glass-b); padding:12px 40px 16px;
+    display:none;
+  }
+  #lea-action-bar.show { display:block; }
+  .action-chips { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px; }
+  .action-chip {
+    background:var(--glass);border:1px solid var(--glass-b);color:var(--dim);
+    padding:5px 13px;border-radius:20px;font-size:11px;cursor:pointer;
+    transition:all .3s;font-family:inherit;letter-spacing:.3px;
+  }
+  .action-chip:hover { color:var(--mid);border-color:rgba(255,255,255,0.07); }
+  .lea-action-wrap {
+    display:flex;gap:10px;align-items:center;
+    background:rgba(255,248,235,0.03);border:1px solid rgba(255,248,235,0.06);
+    border-radius:12px;padding:10px 14px;
+  }
+  .lea-action-wrap:focus-within { border-color:rgba(200,150,62,0.2); }
+  .lea-action-input {
+    flex:1;background:transparent;border:none;outline:none;
+    color:var(--text);font-size:13.5px;font-family:inherit;
+  }
+  .lea-action-input::placeholder { color:var(--dim); }
+  .lea-action-send {
+    background:rgba(200,150,62,0.8);border:none;color:#07070d;
+    padding:7px 16px;border-radius:9px;cursor:pointer;font-size:12px;
+    font-family:inherit;font-weight:600;transition:all .2s;
+  }
+  .lea-action-send:hover { background:rgba(200,150,62,1); }
+  .lea-action-result {
+    margin-top:10px;font-size:12.5px;color:rgba(255,248,235,0.6);
+    line-height:1.7;font-style:italic;display:none;
+  }
+  .lea-action-result.show { display:block; animation:ideaIn .4s ease-out forwards; }
+
+  /* ══════════════════════════════════════
+     IDEAS GLOBAL
+  ══════════════════════════════════════ */
+  .ideas-global-wrap { max-width:660px; }
+
+  /* ══════════════════════════════════════
+     SEARCH
+  ══════════════════════════════════════ */
+  #view-search { align-items:center; }
+  .search-center { width:100%;max-width:560px;margin:0 auto;padding:40px 0 0; }
+  .search-title { font-size:14px;color:var(--dim);letter-spacing:2px;text-align:center;margin-bottom:32px;font-weight:400; }
+  .search-wrap {
+    display:flex;gap:10px;align-items:center;
+    background:rgba(255,248,235,0.028);border:1px solid rgba(255,248,235,0.05);
+    border-radius:14px;padding:14px 18px;transition:border-color .4s;margin-bottom:20px;
+  }
+  .search-wrap:focus-within { border-color:rgba(200,150,62,0.18); }
+  .search-input { flex:1;background:transparent;border:none;outline:none;color:var(--text);font-size:14.5px;font-family:inherit; }
+  .search-input::placeholder { color:var(--dim); }
+  .search-btn { background:rgba(200,150,62,0.8);border:none;color:#07070d;padding:8px 18px;border-radius:9px;cursor:pointer;font-size:12px;font-family:inherit;font-weight:600;transition:all .2s; }
+  .search-btn:hover { background:rgba(200,150,62,1); }
+  .search-hints { display:flex;flex-wrap:wrap;gap:8px;justify-content:center; }
+  .search-hint { background:var(--glass);border:1px solid var(--glass-b);color:var(--dim);padding:5px 13px;border-radius:20px;font-size:11px;cursor:pointer;transition:all .4s;font-family:inherit; }
+  .search-hint:hover { color:var(--mid); }
+  .search-recent { margin-top:32px; }
+  .s-rec-label { font-size:9px;letter-spacing:2px;color:rgba(255,248,235,0.12);text-transform:uppercase;margin-bottom:10px; }
+  .s-rec-item { font-size:12px;color:rgba(255,248,235,0.28);padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.025);cursor:pointer;transition:color .3s; }
+  .s-rec-item:hover { color:var(--mid); }
+
+  /* ══════════════════════════════════════
+     QUICK CAPTURE OVERLAY (Ctrl+Space)
+  ══════════════════════════════════════ */
+  #capture-overlay {
+    position:fixed;inset:0;background:rgba(0,0,0,0.55);backdrop-filter:blur(6px);
+    z-index:200;display:none;align-items:center;justify-content:center;
+  }
+  #capture-overlay.show { display:flex; }
+  .capture-box {
+    background:#0e0e1a;border:1px solid rgba(255,255,255,0.07);
+    border-radius:18px;padding:24px;width:480px;
+    box-shadow:0 30px 70px rgba(0,0,0,0.7);
+    animation:capIn .25s ease-out forwards;
+  }
+  @keyframes capIn { from{opacity:0;transform:translateY(-10px)scale(.97)} to{opacity:1;transform:translateY(0)scale(1)} }
+  .capture-label { font-size:9px;letter-spacing:2px;color:var(--dim);text-transform:uppercase;margin-bottom:10px; }
+  .capture-proj-tag {
+    display:inline-block;background:var(--acc-dim);border:1px solid rgba(200,150,62,0.2);
+    color:rgba(200,150,62,0.7);padding:3px 10px;border-radius:20px;
+    font-size:10px;letter-spacing:.5px;margin-bottom:12px;
+  }
+  .capture-textarea {
+    width:100%;background:transparent;border:none;outline:none;
+    color:var(--text);font-size:15px;font-family:inherit;
+    resize:none;line-height:1.65;min-height:72px;max-height:200px;
+  }
+  .capture-textarea::placeholder { color:var(--dim); }
+  .capture-actions { display:flex;justify-content:space-between;align-items:center;margin-top:16px; }
+  .capture-hint { font-size:10px;color:rgba(255,255,255,0.15); }
+  .cap-btns { display:flex;gap:8px; }
+  .cap-btn { background:var(--glass);border:1px solid var(--glass-b);color:var(--dim);padding:7px 14px;border-radius:9px;font-size:11px;cursor:pointer;transition:all .3s;font-family:inherit; }
+  .cap-btn:hover { color:var(--text); }
+  .cap-btn.primary { background:rgba(200,150,62,0.8);border-color:transparent;color:#07070d;font-weight:600; }
+  .cap-btn.primary:hover { background:rgba(200,150,62,1); }
+
+  /* ══════════════════════════════════════
+     MODALS
+  ══════════════════════════════════════ */
+  .modal-overlay { position:fixed;inset:0;background:rgba(0,0,0,0.42);backdrop-filter:blur(4px);z-index:100;display:none;align-items:center;justify-content:center; }
+  .modal-overlay.show { display:flex; }
+  .modal { background:#0e0e18;border:1px solid rgba(255,255,255,0.06);border-radius:18px;padding:26px 26px 22px;width:360px;box-shadow:0 24px 60px rgba(0,0,0,0.6);animation:capIn .28s ease-out forwards; }
+  .modal-title { font-size:14px;color:var(--text);font-weight:300;margin-bottom:18px;letter-spacing:.5px; }
+  .modal-label { font-size:9px;letter-spacing:1.5px;color:var(--dim);text-transform:uppercase;margin-bottom:7px;margin-top:13px; }
+  .modal-input { width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:9px;padding:9px 13px;color:var(--text);font-size:13.5px;font-family:inherit;outline:none;transition:border-color .3s; }
+  .modal-input:focus { border-color:rgba(200,150,62,0.25); }
+  .cat-grid { display:flex;gap:7px;flex-wrap:wrap; }
+  .cat-btn { background:var(--glass);border:1px solid var(--glass-b);color:var(--dim);padding:5px 12px;border-radius:20px;font-size:10.5px;cursor:pointer;transition:all .3s;font-family:inherit; }
+  .cat-btn.sel { background:var(--acc-dim);border-color:rgba(200,150,62,0.3);color:rgba(200,150,62,0.9); }
+  .modal-actions { display:flex;gap:8px;margin-top:20px;justify-content:flex-end; }
+  .mbtn { background:transparent;border:1px solid var(--glass-b);color:var(--dim);padding:7px 16px;border-radius:9px;font-size:11.5px;cursor:pointer;transition:all .3s;font-family:inherit; }
+  .mbtn:hover { color:var(--text); }
+  .mbtn.primary { background:rgba(200,150,62,0.82);border-color:transparent;color:#07070d;font-weight:600; }
+  .mbtn.primary:hover { background:rgba(200,150,62,1); }
+
+  /* LEA notification */
+  #lea-toast {
+    position:fixed;bottom:80px;left:50%;transform:translateX(-50%);
+    background:rgba(200,150,62,0.09);border:1px solid rgba(200,150,62,0.18);
+    border-radius:20px;padding:6px 18px;font-size:11px;color:rgba(200,150,62,0.7);
+    letter-spacing:.5px;opacity:0;transition:opacity .7s;pointer-events:none;z-index:60;
+  }
+  #lea-toast.show { opacity:1; }
+</style>
+</head>
+<body>
+<div class="orb" id="o1"></div>
+<div class="orb" id="o2"></div>
+
+<div id="app">
+
+  <header>
+    <div class="h-left">
+      <span class="h-logo">VV</span>
+      <div class="h-sep"></div>
+      <span class="h-sub">Studio</span>
+    </div>
+    <div class="h-right">
+      <span id="active-proj-header" style="font-size:10px;color:rgba(200,150,62,0.6);letter-spacing:.5px;display:none"></span>
+      <button class="hbtn" onclick="openCapture()" title="Ctrl+Space">+ captură</button>
+      <button class="hbtn" onclick="goToLea()">← LEA</button>
+    </div>
+  </header>
+
+  <nav>
+    <button class="nav-btn active" data-v="today"    onclick="switchView('today')">Azi</button>
+    <button class="nav-btn" data-v="projects" onclick="switchView('projects')">Proiecte</button>
+    <button class="nav-btn" data-v="ideas"    onclick="switchView('ideas')">Idei</button>
+    <button class="nav-btn" data-v="search"   onclick="switchView('search')">Caută</button>
+  </nav>
+
+  <!-- TODAY -->
+  <div class="view show view-pad" id="view-today"></div>
+
+  <!-- PROJECTS -->
+  <div class="view view-pad" id="view-projects">
+    <div class="view-title">camerele tale</div>
+    <div class="projects-grid" id="projects-grid"></div>
+  </div>
+
+  <!-- PROJECT DETAIL -->
+  <div class="view view-pad" id="view-project">
+    <div class="proj-topbar">
+      <button class="proj-back" onclick="switchView('projects')">←</button>
+      <div class="proj-header-info">
+        <div class="proj-header-name" id="pd-name">—</div>
+        <div class="proj-header-cat"  id="pd-cat">—</div>
+      </div>
+    </div>
+    <div class="proj-tone-strip" id="tone-strip"></div>
+    <div class="proj-columns">
+      <div>
+        <div class="section-label">idei</div>
+        <div class="idea-input-wrap">
+          <textarea class="idea-input" id="idea-input" rows="1"
+            placeholder="o idee nouă…"
+            onkeydown="ideaKey(event)" oninput="autoResize(this)"></textarea>
+          <button class="idea-add-btn" onclick="addIdea()">↑</button>
+        </div>
+        <div class="ideas-list" id="ideas-list"></div>
+      </div>
+      <div class="proj-sidebar">
+        <div class="sidebar-box">
+          <div class="sidebar-box-label">context LEA</div>
+          <textarea class="ctx-textarea" id="ctx-input" rows="3"
+            placeholder="despre ce e proiectul…" oninput="saveCtx()"></textarea>
+          <div class="lea-aware-note" id="lea-aware-note"></div>
+        </div>
+        <div class="sidebar-box">
+          <div class="sidebar-box-label">obiective</div>
+          <div class="goals-list" id="goals-list"></div>
+          <div class="goal-input-row">
+            <input class="goal-input" id="goal-input" type="text" placeholder="adaugă obiectiv…" onkeydown="goalKey(event)">
+            <button class="goal-add" onclick="addGoal()">+</button>
+          </div>
+        </div>
+        <div class="sidebar-box">
+          <div class="sidebar-box-label">fișiere</div>
+          <div class="files-list" id="files-list"></div>
+          <button class="add-file-btn" onclick="pickFile()">+ adaugă fișier</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- IDEAS GLOBAL -->
+  <div class="view view-pad" id="view-ideas">
+    <div class="view-title">gânduri salvate</div>
+    <div class="ideas-global-wrap">
+      <div class="idea-input-wrap">
+        <textarea class="idea-input" id="gi-input" rows="1"
+          placeholder="un gând…"
+          onkeydown="giKey(event)" oninput="autoResize(this)"></textarea>
+        <button class="idea-add-btn" onclick="addGI()">↑</button>
+      </div>
+      <div class="ideas-list" id="gi-list"></div>
+    </div>
+  </div>
+
+  <!-- SEARCH -->
+  <div class="view" id="view-search">
+    <div class="search-center">
+      <div class="search-title">caută</div>
+      <div class="search-wrap">
+        <input class="search-input" id="search-input" type="text"
+          placeholder="ce cauți?" onkeydown="searchKey(event)">
+        <button class="search-btn" onclick="doSearch()">caută</button>
+      </div>
+      <div class="search-hints" id="search-hints"></div>
+      <div class="search-recent" id="search-recent-wrap">
+        <div class="s-rec-label">recente</div>
+        <div id="search-recent"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LEA ACTION BAR (proiect activ) -->
+  <div id="lea-action-bar">
+    <div class="action-chips" id="action-chips"></div>
+    <div class="lea-action-wrap">
+      <input class="lea-action-input" id="lea-action-input" type="text"
+        placeholder="ce vrei să fac cu asta?"
+        onkeydown="leaActionKey(event)">
+      <button class="lea-action-send" onclick="doLeaAction()">→</button>
+    </div>
+    <div class="lea-action-result" id="lea-action-result"></div>
+  </div>
+
+</div>
+
+<!-- QUICK CAPTURE -->
+<div id="capture-overlay" onclick="captureOverlayClick(event)">
+  <div class="capture-box">
+    <div class="capture-label">captură rapidă</div>
+    <div class="capture-proj-tag" id="capture-proj-tag" style="display:none"></div>
+    <textarea class="capture-textarea" id="capture-input" rows="3"
+      placeholder="ce ți-a venit în minte?"
+      oninput="autoResize(this)"></textarea>
+    <div class="capture-actions">
+      <span class="capture-hint">Enter = salvează · Esc = închide</span>
+      <div class="cap-btns">
+        <button class="cap-btn" onclick="closeCapture()">anulează</button>
+        <button class="cap-btn primary" onclick="saveCapture()">salvează</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL NOU PROIECT -->
+<div class="modal-overlay" id="modal-new" onclick="modalClick(event,'modal-new')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-title">proiect nou</div>
+    <div class="modal-label">nume</div>
+    <input class="modal-input" id="new-proj-name" type="text" placeholder="ex. Album, VV Hybrid…" onkeydown="newProjKey(event)">
+    <div class="modal-label">tip</div>
+    <div class="cat-grid" id="cat-grid">
+      <button class="cat-btn sel" data-cat="creativ"  onclick="selCat(this)">creativ</button>
+      <button class="cat-btn"     data-cat="muncă"    onclick="selCat(this)">muncă</button>
+      <button class="cat-btn"     data-cat="personal" onclick="selCat(this)">personal</button>
+      <button class="cat-btn"     data-cat="learning" onclick="selCat(this)">learning</button>
+    </div>
+    <div class="modal-label">descriere (opțional)</div>
+    <input class="modal-input" id="new-proj-desc" type="text" placeholder="două cuvinte…">
+    <div class="modal-actions">
+      <button class="mbtn" onclick="closeNewProj()">anulează</button>
+      <button class="mbtn primary" onclick="createProject()">creează</button>
+    </div>
+  </div>
+</div>
+
+<div id="lea-toast">LEA știe contextul</div>
+
+<script>
+// ══════════════════════════════════════════════════════════════
+// STORAGE
+// ══════════════════════════════════════════════════════════════
+
+var S = {
+  projects: 'vv_studio_projects',
+  gi:       'vv_studio_ideas_global',
+  search:   'vv_studio_search_hist',
+  active:   'vv_active_project'
+};
+
+function load(k)   { try { return JSON.parse(localStorage.getItem(k)); } catch(e) { return null; } }
+function save(k,v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch(e) {} }
+
+function getProjects()  { return load(S.projects) || []; }
+function getGI()        { return load(S.gi)        || []; }
+function getSearch()    { return load(S.search)    || []; }
+function getProj(id)    { return getProjects().find(function(p){ return p.id===id; }) || null; }
+
+function saveProj(p) {
+  var list = getProjects();
+  var i = list.findIndex(function(x){ return x.id===p.id; });
+  if (i >= 0) list[i] = p; else list.unshift(p);
+  save(S.projects, list);
+}
+
+// ══════════════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════════════
+
+var _view = 'today';
+var _proj = null; // project object actualy open
+
+// ══════════════════════════════════════════════════════════════
+// VIEWS
+// ══════════════════════════════════════════════════════════════
+
+function switchView(v) {
+  document.querySelectorAll('.view').forEach(function(el){ el.classList.remove('show'); });
+  document.querySelectorAll('.nav-btn').forEach(function(b){ b.classList.remove('active'); });
+  var target = v === 'project' ? 'view-project' : 'view-' + v;
+  var el = document.getElementById(target);
+  if (el) el.classList.add('show');
+  var navKey = v === 'project' ? 'projects' : v;
+  var nb = document.querySelector('[data-v="'+navKey+'"]');
+  if (nb) nb.classList.add('active');
+  _view = v;
+
+  document.getElementById('lea-action-bar').classList.toggle('show', v === 'project' && !!_proj);
+
+  if (v === 'today')    renderToday();
+  if (v === 'projects') renderProjects();
+  if (v === 'project' && _proj) renderProject(_proj.id);
+  if (v === 'ideas')    renderGI();
+  if (v === 'search')   renderSearch();
+}
+
+// ══════════════════════════════════════════════════════════════
+// TODAY
+// ══════════════════════════════════════════════════════════════
+
+// LEA observă — o singură observație, rară, reală
+function _leaObservationHtml(projects, gi) {
+  var obs = null;
+  var week = 7 * 86400000;
+  var now  = Date.now();
+
+  // Proiecte cu activitate intensă recent
+  var activ = projects.filter(function(p) {
+    var recent = (p.ideas||[]).filter(function(i){ return now - i.ts < week; });
+    return recent.length >= 3;
+  });
+  if (activ.length === 1) {
+    obs = 'lucrezi mult la "' + activ[0].name + '" în ultima vreme.';
+  } else if (projects.filter(function(p){ return p.ideas && p.ideas.length > 0; }).length >= 4) {
+    obs = 'ai multe proiecte deschise simultan.';
+  } else if (gi.length >= 10) {
+    obs = 'ai multe gânduri nesortate. poate e momentul să le pui undeva.';
+  } else {
+    // Proiect inactiv mai mult de 3 zile
+    var stale = projects.filter(function(p) {
+      return p.lastActivity && (now - p.lastActivity) > 3 * 86400000 && p.ideas && p.ideas.length;
+    });
+    if (stale.length) obs = '"' + stale[0].name + '" n-a mai avut activitate de câteva zile.';
+  }
+
+  if (!obs) return '';
+  return '<div class="today-section">'+
+    '<div style="font-size:11.5px;color:rgba(255,248,235,0.3);font-style:italic;line-height:1.7;padding:2px 0">'+
+      '— ' + escH(obs) +
+    '</div></div>';
+}
+
+// Continue Working — sugestie LEA la 1 click
+function continueProject(id) {
+  var p = getProj(id);
+  if (!p) return;
+  openProject(id);
+  // Generează sugestie după 400ms (după ce s-a deschis)
+  setTimeout(function() {
+    if (!p.ideas || !p.ideas.length) return;
+    var lastIdea = p.ideas[p.ideas.length-1].text;
+    var suggestion = _leaNextStep(lastIdea, p);
+    if (suggestion) {
+      var resEl = document.getElementById('lea-action-result');
+      if (resEl) { resEl.textContent = suggestion; resEl.classList.add('show'); }
+    }
+    // Focus pe idea input
+    var inp = document.getElementById('idea-input');
+    if (inp) { setTimeout(function(){ inp.focus(); }, 200); }
+  }, 450);
+}
+
+function _leaNextStep(lastIdea, p) {
+  var goals = p.goals || [];
+  var ideaCount = p.ideas ? p.ideas.length : 0;
+
+  if (ideaCount >= 8) {
+    return 'ai ' + ideaCount + ' idei. vrei să le grupez ca să vezi structura?';
+  }
+  if (goals.length) {
+    return 'obiectivul tău e "' + goals[0] + '". ultima idee e un pas bun. ce urmează?';
+  }
+  var starters = [
+    'ce urmează după asta?',
+    'unde duce ideea asta?',
+    'ce altceva ai nevoie?',
+    'ce lipsește?'
+  ];
+  return starters[Math.floor(Math.random() * starters.length)];
+}
+
+function renderToday() {
+  var el = document.getElementById('view-today');
+  var projects = getProjects();
+  var gi       = getGI();
+  var activeP  = load(S.active);
+
+  var hour = new Date().getHours();
+  var greet = hour < 6  ? 'E noaptea.' :
+              hour < 12 ? 'Bună dimineața.' :
+              hour < 18 ? 'Bună ziua.' :
+              hour < 22 ? 'Bună seara.' : 'E târziu.';
+
+  var dateStr = new Date().toLocaleDateString('ro-RO',{weekday:'long',day:'numeric',month:'long'});
+
+  // Active projects (recent 3)
+  var activeProjs = projects.slice(0,3);
+  var projsHtml = activeProjs.map(function(p) {
+    var color = CAT_COLORS[p.cat] || CAT_COLORS['creativ'];
+    var last = p.ideas && p.ideas.length ? p.ideas[p.ideas.length-1].text.slice(0,50)+'…' : '—';
+    var isActive = activeP && activeP.id === p.id;
+    return '<div class="today-proj-card'+(isActive?' active-p':'')+'" onclick="openProject(\''+p.id+'\')">'+
+      '<div class="today-proj-glow" style="background:radial-gradient(circle at 50% 0%,'+color+',transparent)"></div>'+
+      '<div class="today-proj-name">'+escH(p.name)+'</div>'+
+      '<div class="today-proj-last">'+escH(last)+'</div>'+
+    '</div>';
+  }).join('');
+  projsHtml += '<div class="today-proj-card" style="border-style:dashed;justify-content:center;align-items:center;display:flex;" onclick="openNewProj()"><span style="font-size:11px;color:var(--dim)">+ nou</span></div>';
+
+  // Continue working — last active project's last idea
+  var continueHtml = '';
+  if (activeP) {
+    var cp = projects.find(function(p){ return p.id===activeP.id; });
+    if (cp && cp.ideas && cp.ideas.length) {
+      var lastIdea = cp.ideas[cp.ideas.length-1];
+      continueHtml =
+        '<div class="continue-card" onclick="continueProject(\''+cp.id+'\')">' +
+          '<div class="continue-proj">'+escH(cp.name)+'</div>'+
+          '<div class="continue-idea">"'+escH(lastIdea.text)+'"</div>'+
+          '<div class="continue-ts">'+fmtDateFull(lastIdea.ts)+'</div>'+
+          '<div class="continue-action">deschide și continuă →</div>'+
+        '</div>';
+    }
+  }
+
+  // Recent ideas (all projects + global, last 5)
+  var allIdeas = [];
+  projects.forEach(function(p){
+    if (p.ideas) p.ideas.forEach(function(i){ allIdeas.push({text:i.text, ts:i.ts, proj:p.name}); });
+  });
+  gi.forEach(function(i){ allIdeas.push({text:i.text, ts:i.ts, proj:''}); });
+  allIdeas.sort(function(a,b){ return b.ts-a.ts; });
+  var recentHtml = allIdeas.slice(0,5).map(function(i){
+    return '<div class="today-idea-item">'+escH(i.text.slice(0,80))+(i.text.length>80?'…':'')+
+      (i.proj?'<span class="today-idea-proj">'+escH(i.proj)+'</span>':'')+
+    '</div>';
+  }).join('');
+
+  el.innerHTML =
+    '<div class="view-pad" style="max-width:760px">' +
+      '<div class="today-greeting">'+greet+'</div>'+
+      '<div class="today-sub">'+dateStr+'</div>'+
+
+      '<div class="today-section">'+
+        '<div class="today-section-label">proiecte active</div>'+
+        '<div class="today-projs">'+projsHtml+'</div>'+
+      '</div>'+
+
+      (continueHtml ?
+        '<div class="today-section">'+
+          '<div class="today-section-label">continuă de unde ai rămas</div>'+
+          continueHtml+
+        '</div>' : '') +
+
+      _leaObservationHtml(projects, gi)+
+
+      (recentHtml ?
+        '<div class="today-section">'+
+          '<div class="today-section-label">idei recente</div>'+
+          '<div class="today-ideas-list">'+recentHtml+'</div>'+
+        '</div>' : '') +
+    '</div>';
+}
+
+// ══════════════════════════════════════════════════════════════
+// PROJECTS
+// ══════════════════════════════════════════════════════════════
+
+var CAT_COLORS = {
+  'creativ':'rgba(139,92,246,0.55)','muncă':'rgba(200,150,62,0.5)',
+  'personal':'rgba(80,200,140,0.45)','learning':'rgba(100,160,255,0.45)'
+};
+
+function renderProjects() {
+  var grid = document.getElementById('projects-grid');
+  var list = getProjects();
+  var activeP = load(S.active);
+  grid.innerHTML = '';
+  list.forEach(function(p){
+    var color = CAT_COLORS[p.cat] || CAT_COLORS['creativ'];
+    var isA = activeP && activeP.id === p.id;
+    var card = document.createElement('div');
+    card.className = 'proj-card'+(isA?' active-p':'');
+    card.innerHTML =
+      '<div class="proj-glow" style="background:radial-gradient(circle at 50% 0%,'+color+',transparent)"></div>'+
+      '<div class="proj-cat">'+escH(p.cat||'creativ')+'</div>'+
+      '<div class="proj-name">'+escH(p.name)+'</div>'+
+      '<div class="proj-desc">'+escH(p.desc||'')+'</div>';
+    card.onclick = function(){ openProject(p.id); };
+    grid.appendChild(card);
+  });
+  var nc = document.createElement('div');
+  nc.className = 'proj-card new-p';
+  nc.innerHTML = '<span>+ proiect nou</span>';
+  nc.onclick = openNewProj;
+  grid.appendChild(nc);
+}
+
+function openProject(id) {
+  var p = getProj(id);
+  if (!p) return;
+  _proj = p;
+  // Update lastActivity
+  p.lastActivity = Date.now();
+  saveProj(p);
+  // Share cu LEA
+  save(S.active, { id:p.id, name:p.name, cat:p.cat, context:p.context||'', goals:p.goals||[], lastIdea: p.ideas&&p.ideas.length ? p.ideas[p.ideas.length-1].text : '' });
+  showToast('LEA știe contextul');
+  switchView('project');
+  updateActiveHeader();
+}
+
+function updateActiveHeader() {
+  var el = document.getElementById('active-proj-header');
+  if (_proj) { el.textContent = _proj.name; el.style.display=''; }
+  else el.style.display='none';
+}
+
+function renderProject(id) {
+  var p = getProj(id);
+  if (!p) return;
+  _proj = p;
+  document.getElementById('pd-name').textContent = p.name;
+  document.getElementById('pd-cat').textContent  = p.cat||'creativ';
+  document.getElementById('ctx-input').value     = p.context||'';
+  document.getElementById('lea-aware-note').textContent = p.context
+    ? 'LEA știe contextul acestui proiect.'
+    : 'adaugă context ca LEA să știe.';
+  renderToneStrip(p);
+  renderIdeas(id);
+  renderGoals(id);
+  renderFiles(id);
+  renderActionChips(p);
+}
+
+// Tone
+var TONES = ['calm','intens','exploratoriu','creativ','urgent','tehnic'];
+function renderToneStrip(p) {
+  var strip = document.getElementById('tone-strip');
+  strip.innerHTML = TONES.map(function(t){
+    return '<button class="tone-chip'+(p.tone===t?' sel':'')+'" onclick="setTone(\''+t+'\')" data-tone="'+t+'">'+t+'</button>';
+  }).join('');
+}
+function setTone(t) {
+  if (!_proj) return;
+  _proj.tone = _proj.tone === t ? null : t;
+  saveProj(_proj);
+  renderToneStrip(_proj);
+  applyToneToBody(_proj.tone);
+  save(S.active, { id:_proj.id, name:_proj.name, cat:_proj.cat, context:_proj.context||'', tone:_proj.tone, goals:_proj.goals||[], lastIdea: _proj.ideas&&_proj.ideas.length ? _proj.ideas[_proj.ideas.length-1].text : '' });
+}
+
+function applyToneToBody(tone) {
+  var allTones = ['calm','urgent','creativ','tehnic','intens','exploratoriu'];
+  allTones.forEach(function(t){ document.body.classList.remove('tone-'+t); });
+  if (tone) document.body.classList.add('tone-'+tone);
+}
+
+// LEA Action Bar chips
+var ACTION_CHIPS = ['organizează ideile','rezumă proiectul','continuă ultima idee','fă un plan','caută referințe'];
+function renderActionChips(p) {
+  var el = document.getElementById('action-chips');
+  el.innerHTML = ACTION_CHIPS.map(function(a){
+    return '<button class="action-chip" onclick="setLeaAction(\''+escH(a)+'\')">'+escH(a)+'</button>';
+  }).join('');
+}
+function setLeaAction(text) {
+  document.getElementById('lea-action-input').value = text;
+  document.getElementById('lea-action-input').focus();
+}
+function leaActionKey(e) { if(e.key==='Enter') doLeaAction(); }
+function doLeaAction() {
+  var q = document.getElementById('lea-action-input').value.trim();
+  if (!q || !_proj) return;
+  var result = processLeaAction(q, _proj);
+  var resEl = document.getElementById('lea-action-result');
+  resEl.textContent = result;
+  resEl.classList.add('show');
+  document.getElementById('lea-action-input').value = '';
+}
+function processLeaAction(q, p) {
+  var ql = q.toLowerCase();
+  var ideas = p.ideas || [];
+  var goals = p.goals || [];
+
+  if (/organiz/i.test(ql)) {
+    if (!ideas.length) return 'Nu ai idei în proiect încă.';
+    return 'Idei principale: ' + ideas.slice(-5).map(function(i){ return '"'+i.text.slice(0,40)+'"'; }).join(', ') + '.';
+  }
+  if (/rezum/i.test(ql)) {
+    var ctx = p.context || '';
+    var goalStr = goals.length ? 'Obiective: '+goals.slice(0,2).join(', ')+'. ' : '';
+    var lastStr = ideas.length ? 'Ultima idee: "'+ideas[ideas.length-1].text.slice(0,60)+'". ' : '';
+    return (ctx ? ctx.slice(0,80)+'. ' : '') + goalStr + lastStr + 'Categorie: ' + (p.cat||'creativ') + '.';
+  }
+  if (/continu/i.test(ql)) {
+    if (!ideas.length) return 'Nu ai idei de continuat. Adaugă prima.';
+    return 'Continuând: "' + ideas[ideas.length-1].text + '" — ce urmează?';
+  }
+  if (/plan/i.test(ql)) {
+    if (!goals.length && !ideas.length) return 'Adaugă câteva obiective sau idei ca să pot face un plan.';
+    var planParts = [];
+    if (goals.length) planParts.push('1. ' + goals.slice(0,3).join('\n2. '));
+    if (ideas.length) planParts.push('Idei de explorat: ' + ideas.slice(-3).map(function(i){ return i.text.slice(0,40); }).join(' / '));
+    return planParts.join('\n');
+  }
+  if (/caut|referint/i.test(ql)) {
+    var searchQ = (p.name + ' ' + (p.context||'').split(' ').slice(0,3).join(' ')).trim();
+    window.open('https://duckduckgo.com/?q=' + encodeURIComponent(searchQ), '_blank');
+    return 'Am deschis căutarea pentru "' + p.name + '".';
+  }
+  return 'Poți cere: "organizează ideile", "rezumă proiectul", "continuă ultima idee", "fă un plan", "caută referințe".';
+}
+
+// ══════════════════════════════════════════════════════════════
+// IDEAS (per proiect)
+// ══════════════════════════════════════════════════════════════
+
+function renderIdeas(id) {
+  var p = getProj(id);
+  var list = document.getElementById('ideas-list');
+  list.innerHTML = '';
+  if (!p || !p.ideas || !p.ideas.length) {
+    list.innerHTML = '<div class="empty-state">nicio idee încă.<br>prima poate fi orice.</div>';
+    return;
+  }
+
+  // Auto-grupare offer la 8+ idei
+  if (p.ideas.length >= 8 && !p._grouped) {
+    var offerEl = document.createElement('div');
+    offerEl.style.cssText = 'margin-bottom:14px;padding:10px 14px;background:rgba(200,150,62,0.06);border:1px solid rgba(200,150,62,0.14);border-radius:10px;display:flex;align-items:center;justify-content:space-between;';
+    offerEl.innerHTML =
+      '<span style="font-size:11.5px;color:rgba(200,150,62,0.7)">ai '+p.ideas.length+' idei. vrei să le grupez?</span>'+
+      '<button onclick="groupIdeas(\''+id+'\')" style="background:rgba(200,150,62,0.8);border:none;color:#07070d;padding:5px 12px;border-radius:8px;font-size:11px;cursor:pointer;font-family:inherit;font-weight:600;">grupează</button>';
+    list.appendChild(offerEl);
+  }
+
+  p.ideas.slice().reverse().forEach(function(idea, ri) {
+    var origIdx = p.ideas.length - 1 - ri;
+    var item = document.createElement('div');
+    item.className = 'idea-item';
+    item.innerHTML =
+      '<div class="idea-text">'+escH(idea.text)+'<div class="idea-ts">'+fmtDate(idea.ts)+'</div></div>'+
+      '<button class="idea-del" onclick="delIdea(\''+id+'\','+origIdx+')">×</button>';
+    list.appendChild(item);
+  });
+}
+
+function groupIdeas(projId) {
+  var p = getProj(projId);
+  if (!p || !p.ideas) return;
+  // Grupare simplă: primele cuvinte cheie → categorii
+  var groups = {};
+  p.ideas.forEach(function(idea) {
+    var words = idea.text.toLowerCase().split(/\s+/).slice(0,3);
+    var matched = false;
+    Object.keys(groups).forEach(function(k) {
+      var kWords = k.split('/');
+      if (kWords.some(function(kw){ return words.some(function(w){ return w.length > 3 && kw.includes(w); }); })) {
+        groups[k].push(idea); matched = true;
+      }
+    });
+    if (!matched) { var key = words.filter(function(w){ return w.length > 3; })[0] || 'altele'; groups[key] = groups[key] || []; groups[key].push(idea); }
+  });
+  // Afișează grupurile
+  var list = document.getElementById('ideas-list');
+  list.innerHTML = '';
+  Object.keys(groups).forEach(function(g) {
+    var header = document.createElement('div');
+    header.style.cssText = 'font-size:9px;letter-spacing:1.5px;color:var(--dim);text-transform:uppercase;margin:14px 0 8px;font-weight:500;';
+    header.textContent = g;
+    list.appendChild(header);
+    groups[g].forEach(function(idea) {
+      var item = document.createElement('div');
+      item.className = 'idea-item';
+      item.innerHTML = '<div class="idea-text">'+escH(idea.text)+'</div>';
+      list.appendChild(item);
+    });
+  });
+  var note = document.createElement('div');
+  note.style.cssText = 'margin-top:14px;font-size:10.5px;color:rgba(255,248,235,0.22);font-style:italic;cursor:pointer;';
+  note.textContent = '← înapoi la lista normală';
+  note.onclick = function(){ renderIdeas(projId); };
+  list.appendChild(note);
+}
+
+function addIdea() {
+  if (!_proj) return;
+  var inp = document.getElementById('idea-input');
+  var text = inp.value.trim(); if (!text) return;
+  var p = getProj(_proj.id);
+  if (!p.ideas) p.ideas = [];
+  p.ideas.push({ text:text, ts:Date.now() });
+  p.lastActivity = Date.now();
+  saveProj(p);
+  _proj = p;
+  save(S.active, { id:p.id, name:p.name, cat:p.cat, context:p.context||'', tone:p.tone, goals:p.goals||[], lastIdea:text });
+  inp.value=''; inp.style.height='auto';
+  renderIdeas(_proj.id);
+}
+
+function delIdea(projId, idx) {
+  var p = getProj(projId);
+  if (!p || !p.ideas) return;
+  p.ideas.splice(idx, 1);
+  saveProj(p);
+  renderIdeas(projId);
+}
+
+function ideaKey(e) { if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();addIdea();} }
+
+// ══════════════════════════════════════════════════════════════
+// GOALS
+// ══════════════════════════════════════════════════════════════
+
+function renderGoals(id) {
+  var p = getProj(id);
+  var list = document.getElementById('goals-list');
+  list.innerHTML = '';
+  if (!p || !p.goals || !p.goals.length) return;
+  p.goals.forEach(function(g, i) {
+    var item = document.createElement('div');
+    item.className = 'goal-item';
+    item.innerHTML = escH(g) + '<button class="goal-del" onclick="delGoal(\''+id+'\','+i+')">×</button>';
+    list.appendChild(item);
+  });
+}
+
+function addGoal() {
+  if (!_proj) return;
+  var inp = document.getElementById('goal-input');
+  var text = inp.value.trim(); if (!text) return;
+  var p = getProj(_proj.id);
+  if (!p.goals) p.goals = [];
+  p.goals.push(text);
+  saveProj(p);
+  inp.value='';
+  renderGoals(_proj.id);
+}
+
+function delGoal(projId, idx) {
+  var p = getProj(projId);
+  if (!p || !p.goals) return;
+  p.goals.splice(idx, 1);
+  saveProj(p);
+  renderGoals(projId);
+}
+
+function goalKey(e) { if(e.key==='Enter') addGoal(); }
+
+// Context
+function saveCtx() {
+  if (!_proj) return;
+  var p = getProj(_proj.id);
+  p.context = document.getElementById('ctx-input').value;
+  saveProj(p); _proj = p;
+  save(S.active, { id:p.id, name:p.name, cat:p.cat, context:p.context, tone:p.tone, goals:p.goals||[], lastIdea:p.ideas&&p.ideas.length?p.ideas[p.ideas.length-1].text:'' });
+  document.getElementById('lea-aware-note').textContent = p.context ? 'LEA știe contextul acestui proiect.' : 'adaugă context ca LEA să știe.';
+}
+
+// ══════════════════════════════════════════════════════════════
+// FILES
+// ══════════════════════════════════════════════════════════════
+
+function renderFiles(id) {
+  var p = getProj(id);
+  var list = document.getElementById('files-list');
+  list.innerHTML = '';
+  if (!p || !p.files || !p.files.length) return;
+  p.files.forEach(function(f, i){
+    var item = document.createElement('div');
+    item.className = 'file-item';
+    item.innerHTML = '📄 <span class="file-name" title="'+escH(f.name)+'">'+escH(f.name)+'</span>'+
+      '<button class="file-del" onclick="delFile(\''+id+'\','+i+')">×</button>';
+    list.appendChild(item);
+  });
+}
+
+async function pickFile() {
+  if (!_proj) return;
+  if (window.showOpenFilePicker) {
+    try { var [h] = await window.showOpenFilePicker(); addFile(_proj.id, h.name); return; } catch(e){}
+  }
+  var n = prompt('Numele fișierului:'); if (n) addFile(_proj.id, n);
+}
+function addFile(projId, name) {
+  var p = getProj(projId);
+  if (!p.files) p.files = [];
+  p.files.push({ name:name });
+  saveProj(p); renderFiles(projId);
+}
+function delFile(projId, idx) {
+  var p = getProj(projId);
+  if (!p.files) return;
+  p.files.splice(idx, 1);
+  saveProj(p); renderFiles(projId);
+}
+
+// ══════════════════════════════════════════════════════════════
+// IDEAS GLOBAL
+// ══════════════════════════════════════════════════════════════
+
+function renderGI() {
+  var ideas = getGI();
+  var list = document.getElementById('gi-list');
+  list.innerHTML = '';
+  if (!ideas.length) { list.innerHTML = '<div class="empty-state">niciun gând salvat.</div>'; return; }
+  ideas.slice().reverse().forEach(function(idea, ri){
+    var origIdx = ideas.length-1-ri;
+    var item = document.createElement('div');
+    item.className = 'idea-item';
+    item.innerHTML = '<div class="idea-text">'+escH(idea.text)+'<div class="idea-ts">'+fmtDate(idea.ts)+'</div></div>'+
+      '<button class="idea-del" onclick="delGI('+origIdx+')">×</button>';
+    list.appendChild(item);
+  });
+}
+function addGI() {
+  var inp = document.getElementById('gi-input');
+  var text = inp.value.trim(); if (!text) return;
+  var ideas = getGI();
+  ideas.push({ text:text, ts:Date.now() });
+  save(S.gi, ideas);
+  inp.value=''; inp.style.height='auto';
+  renderGI();
+}
+function delGI(idx) {
+  var ideas = getGI(); ideas.splice(idx,1); save(S.gi,ideas); renderGI();
+}
+function giKey(e) { if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();addGI();} }
+
+// ══════════════════════════════════════════════════════════════
+// QUICK CAPTURE (Ctrl+Space)
+// ══════════════════════════════════════════════════════════════
+
+function openCapture() {
+  var overlay = document.getElementById('capture-overlay');
+  var tag = document.getElementById('capture-proj-tag');
+  if (_proj) { tag.textContent = _proj.name; tag.style.display='inline-block'; }
+  else tag.style.display='none';
+  overlay.classList.add('show');
+  setTimeout(function(){ document.getElementById('capture-input').focus(); }, 50);
+}
+function closeCapture() {
+  document.getElementById('capture-overlay').classList.remove('show');
+  document.getElementById('capture-input').value = '';
+  document.getElementById('capture-input').style.height = 'auto';
+}
+function captureOverlayClick(e) { if(e.target.id==='capture-overlay') closeCapture(); }
+function saveCapture() {
+  var text = document.getElementById('capture-input').value.trim();
+  if (!text) return;
+  if (_proj) {
+    var p = getProj(_proj.id);
+    if (!p.ideas) p.ideas = [];
+    p.ideas.push({ text:text, ts:Date.now() });
+    p.lastActivity = Date.now();
+    saveProj(p); _proj = p;
+    save(S.active, { id:p.id, name:p.name, cat:p.cat, context:p.context||'', tone:p.tone, goals:p.goals||[], lastIdea:text });
+    if (_view==='project') renderIdeas(_proj.id);
+  } else {
+    var ideas = getGI(); ideas.push({ text:text, ts:Date.now() }); save(S.gi, ideas);
+    if (_view==='ideas') renderGI();
+  }
+  closeCapture();
+  showToast('salvat');
+}
+
+document.addEventListener('keydown', function(e) {
+  if (e.ctrlKey && e.code === 'Space') { e.preventDefault(); openCapture(); return; }
+  if (e.key === 'Escape') {
+    if (document.getElementById('capture-overlay').classList.contains('show')) { closeCapture(); return; }
+    if (document.getElementById('modal-new').classList.contains('show')) { closeNewProj(); return; }
+  }
+  if (e.key === 'Enter' && document.getElementById('capture-overlay').classList.contains('show')) {
+    if (!e.shiftKey) { e.preventDefault(); saveCapture(); }
+  }
+});
+
+// ══════════════════════════════════════════════════════════════
+// MODAL NOU PROIECT
+// ══════════════════════════════════════════════════════════════
+
+var _selCat = 'creativ';
+function openNewProj() {
+  document.getElementById('modal-new').classList.add('show');
+  setTimeout(function(){ document.getElementById('new-proj-name').focus(); }, 50);
+}
+function closeNewProj() {
+  document.getElementById('modal-new').classList.remove('show');
+  document.getElementById('new-proj-name').value = '';
+  document.getElementById('new-proj-desc').value = '';
+}
+function modalClick(e, id) { if(e.target.id===id) closeNewProj(); }
+function selCat(btn) {
+  document.querySelectorAll('.cat-btn').forEach(function(b){ b.classList.remove('sel'); });
+  btn.classList.add('sel'); _selCat = btn.dataset.cat;
+}
+function newProjKey(e) { if(e.key==='Enter') createProject(); }
+function createProject() {
+  var name = document.getElementById('new-proj-name').value.trim();
+  if (!name) return;
+  var p = { id:'proj_'+Date.now(), name:name, cat:_selCat, desc:document.getElementById('new-proj-desc').value.trim(), context:'', ideas:[], files:[], goals:[], tone:null, lastActivity:Date.now(), createdAt:Date.now() };
+  var list = getProjects(); list.unshift(p); save(S.projects, list);
+  closeNewProj();
+  openProject(p.id);
+}
+
+// ══════════════════════════════════════════════════════════════
+// SEARCH
+// ══════════════════════════════════════════════════════════════
+
+function renderSearch() {
+  var hints = document.getElementById('search-hints');
+  hints.innerHTML = '';
+  var def = ['referințe muzicale','trasee alergare','productivitate','design UI','AI local'];
+  try {
+    var profile = JSON.parse(localStorage.getItem('vv_profile_v1'));
+    if (profile) {
+      if (profile.placeri && profile.placeri.sport) def.unshift(profile.placeri.sport);
+      if (profile.job && profile.job.domeniu) def.unshift(profile.job.domeniu);
+    }
+  } catch(e) {}
+  def.slice(0,5).forEach(function(h){
+    var b = document.createElement('button'); b.className='search-hint'; b.textContent=h;
+    b.onclick=function(){ document.getElementById('search-input').value=h; doSearch(); };
+    hints.appendChild(b);
+  });
+  var hist = getSearch();
+  var rw = document.getElementById('search-recent-wrap');
+  var rl = document.getElementById('search-recent');
+  rl.innerHTML=''; rw.style.display = hist.length?'':'none';
+  hist.slice(-5).reverse().forEach(function(q){
+    var d=document.createElement('div'); d.className='s-rec-item'; d.textContent=q;
+    d.onclick=function(){ document.getElementById('search-input').value=q; doSearch(); };
+    rl.appendChild(d);
+  });
+}
+function doSearch() {
+  var q = document.getElementById('search-input').value.trim(); if (!q) return;
+  var hist = getSearch();
+  if (hist[hist.length-1]!==q) { hist.push(q); if(hist.length>20)hist.shift(); }
+  save(S.search, hist);
+  var activeP = load(S.active);
+  var fullQ = q;
+  if (activeP && activeP.context) fullQ = q+' '+activeP.context.split(' ').slice(0,3).join(' ');
+  window.open('https://duckduckgo.com/?q='+encodeURIComponent(fullQ), '_blank');
+  renderSearch();
+}
+function searchKey(e) { if(e.key==='Enter') doSearch(); }
+
+// ══════════════════════════════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════════════════════════════
+
+function escH(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function fmtDate(ts) { if(!ts)return''; var d=new Date(ts); return d.getDate()+'.'+(d.getMonth()+1)+'.'+d.getFullYear().toString().slice(2); }
+function fmtDateFull(ts) {
+  if(!ts)return''; var d=new Date(ts);
+  var now=Date.now(); var diff=now-ts;
+  if (diff < 60000) return 'acum';
+  if (diff < 3600000) return Math.floor(diff/60000)+' min. în urmă';
+  if (diff < 86400000) return Math.floor(diff/3600000)+' ore în urmă';
+  return fmtDate(ts);
+}
+function autoResize(el) { el.style.height='auto'; el.style.height=el.scrollHeight+'px'; }
+function goToLea() { window.location.href='lea-home.html'; }
+function showToast(msg) {
+  var t = document.getElementById('lea-toast'); t.textContent=msg;
+  t.classList.add('show'); setTimeout(function(){ t.classList.remove('show'); }, 2800);
+}
+
+// ══════════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════════
+
+window.addEventListener('load', function() {
+  var activeP = load(S.active);
+  if (activeP) {
+    var p = getProj(activeP.id);
+    if (p) { _proj=p; updateActiveHeader(); if (p.tone) applyToneToBody(p.tone); }
+  }
+  switchView('today');
+});
+</script>
+</body>
+</html>
