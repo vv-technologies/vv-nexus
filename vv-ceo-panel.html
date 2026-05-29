@@ -496,38 +496,37 @@ main { flex: 1; padding: 32px; overflow-y: auto; max-width: 900px; }
 
     <!-- ── SETTINGS PANEL ── -->
     <div class="panel" id="panel-settings">
-      <div class="section-title">Setup & Settings</div>
+      <div class="section-title">Settings</div>
 
       <div style="display:flex;flex-direction:column;gap:16px;">
 
-        <div class="settings-card">
-          <h4>Formspree Setup — Collect emails from landing page</h4>
-          <p>Formspree preia emailurile din landing page și ți le trimite pe Gmail. Gratuit, 50 submisii/lună.</p>
-          <ul class="step-list">
-            <li><span class="step-num">1.</span> Du-te pe <span class="code-inline">formspree.io</span> → Sign up cu Gmail</li>
-            <li><span class="step-num">2.</span> New Form → numește-l "LEA Early Access"</li>
-            <li><span class="step-num">3.</span> Copiază Form ID (arată ca <span class="code-inline">xvgodxyz</span>)</li>
-            <li><span class="step-num">4.</span> Deschide <span class="code-inline">lea-landing.html</span>, caută <span class="code-inline">YOUR_FORM_ID</span> și înlocuiește cu ID-ul tău</li>
-            <li><span class="step-num">5.</span> Urcă pe GitHub (Claude face asta automat)</li>
-            <li><span class="step-num">6.</span> Done — fiecare signup îți trimite email pe Gmail + apare în dashboard Formspree</li>
-          </ul>
-          <a class="link-btn" href="https://formspree.io" target="_blank">formspree.io →</a>
-        </div>
-
-        <div class="settings-card">
-          <h4>Formspree Form ID</h4>
-          <p>Salvat local în browser. Folosit pentru link-uri directe.</p>
-          <div style="display:flex;gap:8px;margin-top:8px;">
-            <input class="field-input" id="formspree-id-input" placeholder="xvgodxyz" style="max-width:200px;">
-            <button class="btn primary" onclick="saveFormspreeId()">Save</button>
+        <div class="settings-card" style="border-color:rgba(52,201,122,0.2);background:rgba(52,201,122,0.04);">
+          <h4 style="color:var(--green);">✓ Formspree activ — meepavqj</h4>
+          <p>Landing-ul colectează emailuri direct pe <strong>vv.ep.team@gmail.com</strong>. Fiecare signup îți vine pe Gmail automat.</p>
+          <div style="display:flex;gap:8px;margin-top:4px;">
+            <a class="link-btn" href="https://formspree.io/forms/meepavqj/submissions" target="_blank">Vezi submissions →</a>
+            <a class="link-btn" href="https://formspree.io/forms/meepavqj/integration" target="_blank">Settings form →</a>
           </div>
         </div>
 
         <div class="settings-card">
-          <h4>Admin Panel Notes</h4>
-          <p>Toate datele din acest panel sunt salvate în <span class="code-inline">localStorage</span> — doar pe acest browser, nu în cloud. Exportă CSV regulat ca backup.</p>
+          <h4>Landing page live</h4>
+          <p>Link de share pentru landing. Trimite-l oriunde — funcționează fără domeniu propriu.</p>
+          <div class="bcc-box" style="font-size:11px;margin-bottom:10px;">https://htmlpreview.github.io/?https://raw.githubusercontent.com/vv-technologies/vv-nexus/main/lea-landing.html</div>
+          <button class="btn primary" onclick="copyLink('https://htmlpreview.github.io/?https://raw.githubusercontent.com/vv-technologies/vv-nexus/main/lea-landing.html')">Copy link</button>
+        </div>
+
+        <div class="settings-card">
+          <h4>Import emailuri din Formspree</h4>
+          <p>Când vrei să aduci emailurile colectate în CEO Panel: mergi la <strong>formspree.io/forms/meepavqj/submissions</strong> → Export CSV → importă în tab-ul Signups.</p>
+          <a class="link-btn" href="https://formspree.io/forms/meepavqj/submissions" target="_blank">Formspree submissions →</a>
+        </div>
+
+        <div class="settings-card">
+          <h4>Date panel</h4>
+          <p>Toate datele sunt salvate în <span class="code-inline">localStorage</span> — doar pe acest browser. Exportă CSV regulat ca backup.</p>
           <div style="display:flex;gap:8px;margin-top:12px;">
-            <button class="btn" onclick="exportCSV()">Export all emails CSV</button>
+            <button class="btn" onclick="exportCSV()">Export CSV</button>
             <button class="btn danger" onclick="clearAll()">Clear all data</button>
           </div>
         </div>
