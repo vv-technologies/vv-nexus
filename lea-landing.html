@@ -668,6 +668,51 @@ footer {
 
 <div class="divider"></div>
 
+<!-- How LEA learns -->
+<section class="section-statement" id="how-it-learns" style="background:linear-gradient(180deg,transparent,rgba(139,92,246,0.04),transparent);">
+  <div class="statement-grid">
+    <div>
+      <div class="statement-label">
+        <span data-lang="en">How LEA learns</span>
+        <span data-lang="ro">Cum învață LEA</span>
+      </div>
+      <div class="statement-text">
+        <span data-lang="en"><strong>The more you use LEA,</strong> the better it understands how you work.</span>
+        <span data-lang="ro"><strong>Cu cât folosești LEA mai mult,</strong> cu atât te înțelege mai bine.</span>
+      </div>
+      <p style="font-size:14px;color:var(--text-dim);line-height:1.8;margin-top:20px;">
+        <span data-lang="en">LEA builds context locally to better support your workflow. Not to profile you. Not to train cloud models. Just to help you continue work naturally — on your device, for your eyes only.</span>
+        <span data-lang="ro">LEA construiește context local pentru a-ți susține munca mai bine. Nu ca să te profileze. Nu ca să antreneze modele în cloud. Doar ca să te ajute să continui natural — pe device-ul tău, doar pentru tine.</span>
+      </p>
+    </div>
+    <div class="statement-items">
+      <div class="statement-item">
+        <div class="statement-item-icon" style="background:rgba(139,92,246,0.08);border-color:rgba(139,92,246,0.15);">◎</div>
+        <div class="statement-item-text">
+          <h4><span data-lang="en">Not surveillance. Context.</span><span data-lang="ro">Nu supraveghere. Context.</span></h4>
+          <p><span data-lang="en">LEA learns your project patterns and work style to give better continuity — nothing leaves your device.</span><span data-lang="ro">LEA învață tiparul proiectelor și stilul tău de lucru — nimic nu iese de pe device-ul tău.</span></p>
+        </div>
+      </div>
+      <div class="statement-item">
+        <div class="statement-item-icon" style="background:rgba(139,92,246,0.08);border-color:rgba(139,92,246,0.15);">◈</div>
+        <div class="statement-item-text">
+          <h4><span data-lang="en">Zero cloud training</span><span data-lang="ro">Zero antrenament cloud</span></h4>
+          <p><span data-lang="en">Your data never feeds a model. No opt-out needed — it's just not how LEA works.</span><span data-lang="ro">Datele tale nu hrănesc niciun model. Nu trebuie să te dezabonezi — pur și simplu nu așa funcționează LEA.</span></p>
+        </div>
+      </div>
+      <div class="statement-item">
+        <div class="statement-item-icon" style="background:rgba(139,92,246,0.08);border-color:rgba(139,92,246,0.15);">◇</div>
+        <div class="statement-item-text">
+          <h4><span data-lang="en">Different for every person</span><span data-lang="ro">Diferit pentru fiecare</span></h4>
+          <p><span data-lang="en">LEA doesn't treat everyone the same. It adapts to how you specifically work, think and organize.</span><span data-lang="ro">LEA nu tratează toți la fel. Se adaptează la modul în care TU lucrezi, gândești și organizezi.</span></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
 <!-- Comparison -->
 <section class="section-diff">
   <div class="diff-header">
@@ -731,12 +776,15 @@ footer {
       <span data-lang="en">Support the development of LEA and get early access to every future build. You shape what it becomes.</span>
       <span data-lang="ro">Susții dezvoltarea LEA și primești acces la fiecare build viitor. Tu influențezi ce devine.</span>
     </p>
-    <form class="cta-form" onsubmit="handleSubmit(event)">
-      <input type="email" class="cta-input" id="email-input" placeholder="your@email.com" required>
-      <button type="submit" class="cta-submit" id="submit-btn">
-        <span data-lang="en">Get access</span>
-        <span data-lang="ro">Vreau acces</span>
-      </button>
+    <form class="cta-form" onsubmit="handleSubmit(event)" style="flex-direction:column;max-width:460px;">
+      <div style="display:flex;gap:10px;">
+        <input type="email" class="cta-input" id="email-input" placeholder="your@email.com" required>
+        <button type="submit" class="cta-submit" id="submit-btn">
+          <span data-lang="en">Get access</span>
+          <span data-lang="ro">Vreau acces</span>
+        </button>
+      </div>
+      <textarea id="msg-input" class="cta-input" rows="2" placeholder="What's your biggest challenge with unfinished projects? (optional)" style="border-radius:12px;resize:none;font-family:inherit;margin-top:8px;padding:10px 18px;font-size:12px;"></textarea>
     </form>
     <div class="cta-features">
       <span class="cta-feature"><span data-lang="en">Persistent memory</span><span data-lang="ro">Memorie persistentă</span></span>
@@ -788,11 +836,12 @@ function handleSubmit(e) {
   btn.style.opacity = '0.6';
   btn.disabled = true;
 
-  // Replace YOUR_FORM_ID with real Formspree ID
+  const msg = document.getElementById('msg-input') ? document.getElementById('msg-input').value : '';
+
   fetch('https://formspree.io/f/YOUR_FORM_ID', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-    body: JSON.stringify({ email, source: 'lea-landing', lang: document.body.className })
+    body: JSON.stringify({ email, message: msg, source: 'lea-landing', lang: document.body.className })
   })
   .then(r => r.json())
   .then(() => {
