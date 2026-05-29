@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VV CEO Team Panel</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg:       #07070d;
+  --bg2:      #0d0d16;
+  --bg3:      #111120;
+  --text:     rgba(255,248,235,0.84);
+  --text-dim: rgba(255,248,235,0.34);
+  --text-mid: rgba(255,248,235,0.54);
+  --accent:   #c8963e;
+  --alo:      rgba(200,150,62,0.12);
+  --aglow:    rgba(200,150,62,0.2);
+  --violet:   #8b5cf6;
+  --green:    #34c97a;
+  --red:      #ff453a;
+  --glass:    rgba(255,255,255,0.028);
+  --glass2:   rgba(255,255,255,0.055);
+  --border:   rgba(255,255,255,0.06);
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, 'SF Pro Text', 'Segoe UI', system-ui, sans-serif;
+  min-height: 100vh; display: flex; flex-direction: column;
+}
+
+/* ── HEADER ── */
+header {
+  padding: 0 32px; height: 56px;
+  display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  background: rgba(7,7,13,0.8);
+  backdrop-filter: blur(20px);
+  position: sticky; top: 0; z-index: 50;
+}
+.header-left { display: flex; align-items: center; gap: 12px; }
+.logo-mark {
+  width: 28px; height: 28px; border-radius: 8px;
+  background: linear-gradient(135deg, rgba(200,150,62,0.25), rgba(139,92,246,0.2));
+  border: 1px solid rgba(200,150,62,0.3);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.5px; color: var(--accent);
+}
+.header-title { font-size: 12px; color: rgba(255,248,235,0.7); letter-spacing: 2px; }
+.header-sub   { font-size: 9px; color: var(--text-dim); letter-spacing: 1px; }
+.header-right { display: flex; align-items: center; gap: 12px; }
+.header-badge {
+  font-size: 9px; letter-spacing: 1.5px; color: var(--green);
+  border: 1px solid rgba(52,201,122,0.25); background: rgba(52,201,122,0.07);
+  padding: 3px 10px; border-radius: 20px;
+}
+.header-date { font-size: 11px; color: var(--text-dim); }
+
+/* ── LAYOUT ── */
+.layout { display: flex; flex: 1; }
+
+/* ── SIDEBAR NAV ── */
+.sidebar {
+  width: 200px; flex-shrink: 0;
+  border-right: 1px solid var(--border);
+  padding: 24px 12px; display: flex; flex-direction: column; gap: 4px;
+  background: rgba(7,7,13,0.5);
+}
+.nav-section-label {
+  font-size: 9px; letter-spacing: 2px; color: var(--text-dim);
+  text-transform: uppercase; padding: 0 10px; margin: 12px 0 6px;
+}
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 10px; border-radius: 8px; cursor: pointer;
+  font-size: 12px; color: var(--text-dim);
+  transition: all 0.15s; user-select: none;
+  border: 1px solid transparent;
+}
+.nav-item:hover { background: var(--glass2); color: var(--text-mid); }
+.nav-item.active {
+  background: var(--alo); color: var(--accent);
+  border-color: rgba(200,150,62,0.15);
+}
+.nav-item-icon { font-size: 14px; width: 18px; text-align: center; }
+.nav-count {
+  margin-left: auto; font-size: 10px;
+  background: var(--alo); color: var(--accent);
+  padding: 1px 7px; border-radius: 10px;
+}
+
+/* ── MAIN ── */
+main { flex: 1; padding: 32px; overflow-y: auto; max-width: 900px; }
+
+/* ── TABS (panels) ── */
+.panel { display: none; }
+.panel.active { display: block; }
+
+/* ── STAT CARDS ── */
+.stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 32px; }
+.stat-card {
+  background: var(--glass); border: 1px solid var(--border);
+  border-radius: 12px; padding: 18px 20px;
+}
+.stat-label { font-size: 9px; letter-spacing: 1.5px; color: var(--text-dim); text-transform: uppercase; margin-bottom: 8px; }
+.stat-value { font-size: 28px; font-weight: 300; color: rgba(255,248,235,0.9); letter-spacing: -1px; }
+.stat-sub   { font-size: 10px; color: var(--text-dim); margin-top: 4px; }
+.stat-value.accent { color: var(--accent); }
+.stat-value.green  { color: var(--green); }
+
+/* ── SECTION TITLE ── */
+.section-title {
+  font-size: 11px; letter-spacing: 2px; color: var(--text-dim);
+  text-transform: uppercase; margin-bottom: 16px;
+}
+
+/* ── EMAIL LIST ── */
+.email-toolbar {
+  display: flex; gap: 8px; align-items: center; margin-bottom: 16px; flex-wrap: wrap;
+}
+.toolbar-input {
+  flex: 1; min-width: 200px;
+  background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+  border-radius: 8px; padding: 8px 14px; font-size: 12px; color: var(--text);
+  outline: none; font-family: inherit; transition: border-color 0.2s;
+}
+.toolbar-input:focus { border-color: rgba(200,150,62,0.3); }
+.toolbar-input::placeholder { color: var(--text-dim); }
+.btn {
+  padding: 8px 16px; border-radius: 8px; font-size: 11px;
+  font-family: inherit; cursor: pointer; border: 1px solid var(--border);
+  background: var(--glass); color: var(--text-mid); letter-spacing: 0.3px;
+  transition: all 0.15s; white-space: nowrap;
+}
+.btn:hover { background: var(--glass2); color: var(--text); border-color: rgba(255,255,255,0.1); }
+.btn.primary { background: var(--alo); color: var(--accent); border-color: rgba(200,150,62,0.25); }
+.btn.primary:hover { background: rgba(200,150,62,0.18); }
+.btn.danger  { color: rgba(255,69,58,0.7); border-color: rgba(255,69,58,0.2); }
+.btn.danger:hover { background: rgba(255,69,58,0.08); color: var(--red); }
+.btn.green-btn { color: var(--green); border-color: rgba(52,201,122,0.25); }
+.btn.green-btn:hover { background: rgba(52,201,122,0.08); }
+
+.email-table {
+  width: 100%; border: 1px solid var(--border); border-radius: 12px; overflow: hidden;
+}
+.email-table-header {
+  display: grid; grid-template-columns: 1fr 140px 180px 80px;
+  background: rgba(255,255,255,0.02); border-bottom: 1px solid var(--border);
+  padding: 10px 16px;
+}
+.email-table-header span { font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-dim); }
+.email-row {
+  display: grid; grid-template-columns: 1fr 140px 180px 80px;
+  padding: 12px 16px; border-bottom: 1px solid rgba(255,255,255,0.03);
+  align-items: center; transition: background 0.1s;
+}
+.email-row:last-child { border-bottom: none; }
+.email-row:hover { background: var(--glass); }
+.email-addr { font-size: 12px; color: rgba(255,248,235,0.8); }
+.email-lang { font-size: 10px; color: var(--text-dim); }
+.email-msg  { font-size: 11px; color: var(--text-dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding-right: 8px; }
+.email-date { font-size: 10px; color: var(--text-dim); }
+.email-empty {
+  text-align: center; padding: 48px 24px; font-size: 13px; color: var(--text-dim);
+  background: var(--glass); border: 1px solid var(--border); border-radius: 12px;
+}
+.email-empty strong { display: block; font-size: 16px; color: var(--text-mid); margin-bottom: 8px; font-weight: 400; }
+
+/* ── IMPORT AREA ── */
+.import-area {
+  background: var(--glass); border: 1px solid var(--border); border-radius: 12px;
+  padding: 20px;
+}
+.import-area h4 { font-size: 12px; color: var(--text-mid); margin-bottom: 8px; font-weight: 400; }
+.import-area p  { font-size: 11px; color: var(--text-dim); margin-bottom: 12px; line-height: 1.6; }
+.import-textarea {
+  width: 100%; height: 100px;
+  background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+  border-radius: 8px; padding: 10px 14px; font-size: 11px; color: var(--text-mid);
+  outline: none; resize: vertical; font-family: monospace; margin-bottom: 10px;
+}
+.import-textarea::placeholder { color: var(--text-dim); }
+.import-textarea:focus { border-color: rgba(200,150,62,0.3); }
+
+/* ── UPDATE COMPOSER ── */
+.update-composer { display: flex; flex-direction: column; gap: 16px; }
+.composer-meta {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+}
+.field-label { font-size: 10px; letter-spacing: 1px; color: var(--text-dim); text-transform: uppercase; margin-bottom: 6px; }
+.field-input {
+  width: 100%; background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+  border-radius: 8px; padding: 9px 14px; font-size: 12px; color: var(--text);
+  outline: none; font-family: inherit; transition: border-color 0.2s;
+}
+.field-input:focus { border-color: rgba(200,150,62,0.3); }
+.field-input::placeholder { color: var(--text-dim); }
+.field-textarea {
+  width: 100%; height: 180px;
+  background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+  border-radius: 8px; padding: 12px 14px; font-size: 13px; color: var(--text);
+  outline: none; resize: vertical; font-family: inherit; line-height: 1.6;
+  transition: border-color 0.2s;
+}
+.field-textarea:focus { border-color: rgba(200,150,62,0.3); }
+.field-textarea::placeholder { color: var(--text-dim); }
+.preview-box {
+  background: var(--glass); border: 1px solid var(--border); border-radius: 10px;
+  padding: 20px; font-size: 13px; color: var(--text-mid); line-height: 1.7;
+  white-space: pre-wrap; min-height: 80px;
+}
+.bcc-box {
+  background: rgba(52,201,122,0.06); border: 1px solid rgba(52,201,122,0.2);
+  border-radius: 10px; padding: 14px 16px; font-size: 11px; color: var(--green);
+  word-break: break-all; font-family: monospace; line-height: 1.6;
+}
+.composer-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+
+/* ── FEEDBACK NOTES ── */
+.feedback-list { display: flex; flex-direction: column; gap: 10px; }
+.feedback-card {
+  background: var(--glass); border: 1px solid var(--border);
+  border-radius: 10px; padding: 16px 18px;
+}
+.feedback-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.feedback-from   { font-size: 11px; color: var(--accent); }
+.feedback-date   { font-size: 10px; color: var(--text-dim); }
+.feedback-text   { font-size: 12px; color: var(--text-mid); line-height: 1.6; }
+.feedback-add {
+  background: var(--glass); border: 1px dashed var(--border);
+  border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 10px;
+}
+
+/* ── SETTINGS ── */
+.settings-group { display: flex; flex-direction: column; gap: 12px; margin-bottom: 28px; }
+.settings-row { display: grid; grid-template-columns: 200px 1fr; gap: 12px; align-items: center; }
+.settings-label { font-size: 12px; color: var(--text-mid); }
+.settings-desc  { font-size: 11px; color: var(--text-dim); margin-top: 4px; line-height: 1.5; }
+.settings-card {
+  background: var(--glass); border: 1px solid var(--border); border-radius: 12px; padding: 24px;
+}
+.settings-card h4 { font-size: 13px; color: rgba(255,248,235,0.8); font-weight: 400; margin-bottom: 6px; }
+.settings-card p  { font-size: 12px; color: var(--text-dim); line-height: 1.6; margin-bottom: 14px; }
+.step-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.step-list li { font-size: 12px; color: var(--text-mid); display: flex; gap: 10px; line-height: 1.5; }
+.step-num { color: var(--accent); font-weight: 600; flex-shrink: 0; }
+.code-inline {
+  font-family: monospace; font-size: 11px;
+  background: rgba(255,255,255,0.06); padding: 2px 6px; border-radius: 4px;
+  color: rgba(255,248,235,0.7);
+}
+.link-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 12px; color: var(--accent); text-decoration: none;
+  border: 1px solid rgba(200,150,62,0.25); padding: 7px 14px; border-radius: 8px;
+  background: var(--alo); transition: all 0.15s; margin-top: 12px;
+}
+.link-btn:hover { background: rgba(200,150,62,0.18); }
+
+/* ── TOAST ── */
+#toast {
+  position: fixed; bottom: 24px; right: 24px;
+  background: rgba(52,201,122,0.12); border: 1px solid rgba(52,201,122,0.3);
+  color: var(--green); font-size: 12px; padding: 10px 18px; border-radius: 10px;
+  opacity: 0; transform: translateY(8px); transition: all 0.25s;
+  pointer-events: none; z-index: 999;
+}
+#toast.show { opacity: 1; transform: translateY(0); }
+
+/* Divider */
+.hr { height: 1px; background: var(--border); margin: 24px 0; }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<header>
+  <div class="header-left">
+    <div class="logo-mark">VV</div>
+    <div>
+      <div class="header-title">VV CEO TEAM PANEL</div>
+      <div class="header-sub">LEA Early Access · Dashboard</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <span class="header-badge">● LIVE</span>
+    <span class="header-date" id="current-date"></span>
+  </div>
+</header>
+
+<div class="layout">
+
+  <!-- Sidebar -->
+  <nav class="sidebar">
+    <div class="nav-section-label">Overview</div>
+    <div class="nav-item active" onclick="showPanel('signups')">
+      <span class="nav-item-icon">◎</span>
+      Signups
+      <span class="nav-count" id="nc-signups">0</span>
+    </div>
+    <div class="nav-item" onclick="showPanel('updates')">
+      <span class="nav-item-icon">✦</span>
+      Send Update
+    </div>
+    <div class="nav-item" onclick="showPanel('feedback')">
+      <span class="nav-item-icon">◈</span>
+      Feedback
+      <span class="nav-count" id="nc-feedback">0</span>
+    </div>
+    <div class="nav-section-label">Tools</div>
+    <div class="nav-item" onclick="showPanel('landing')">
+      <span class="nav-item-icon">⊹</span>
+      Landing Links
+    </div>
+    <div class="nav-item" onclick="showPanel('settings')">
+      <span class="nav-item-icon">⌥</span>
+      Settings
+    </div>
+  </nav>
+
+  <!-- Main -->
+  <main>
+
+    <!-- ── SIGNUPS PANEL ── -->
+    <div class="panel active" id="panel-signups">
+
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-label">Total Signups</div>
+          <div class="stat-value accent" id="stat-total">0</div>
+          <div class="stat-sub">early supporters</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">This Week</div>
+          <div class="stat-value" id="stat-week">0</div>
+          <div class="stat-sub">new emails</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">With Message</div>
+          <div class="stat-value green" id="stat-msg">0</div>
+          <div class="stat-sub">wrote something</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Last Signup</div>
+          <div class="stat-value" id="stat-last" style="font-size:16px;margin-top:4px;">—</div>
+          <div class="stat-sub" id="stat-last-email">no signups yet</div>
+        </div>
+      </div>
+
+      <div class="section-title">Email List</div>
+
+      <div class="email-toolbar">
+        <input class="toolbar-input" id="add-email-input" type="email" placeholder="Add email manually...">
+        <input class="toolbar-input" id="add-msg-input" type="text" placeholder="Note (optional)" style="max-width:180px;">
+        <button class="btn primary" onclick="addEmailManually()">Add</button>
+        <button class="btn" onclick="copyAllEmails()">Copy all emails</button>
+        <button class="btn" onclick="exportCSV()">Export CSV</button>
+        <button class="btn danger" onclick="clearAll()">Clear all</button>
+      </div>
+
+      <div id="email-list-container"></div>
+
+      <div class="hr"></div>
+
+      <!-- Import from Formspree CSV -->
+      <div class="import-area">
+        <h4>Import from Formspree CSV</h4>
+        <p>Export your submissions from <strong>formspree.io/forms</strong> → Export → CSV. Then paste the CSV content below:</p>
+        <textarea class="import-textarea" id="csv-import" placeholder="Paste CSV here...&#10;email,message,date&#10;user@example.com,great idea,2026-05-29"></textarea>
+        <button class="btn primary" onclick="importCSV()">Import CSV</button>
+      </div>
+    </div>
+
+    <!-- ── UPDATES PANEL ── -->
+    <div class="panel" id="panel-updates">
+      <div class="section-title">Compose Update</div>
+
+      <div class="update-composer">
+        <div class="composer-meta">
+          <div>
+            <div class="field-label">Subject</div>
+            <input class="field-input" id="upd-subject" placeholder="LEA Update #1 — What's new" type="text">
+          </div>
+          <div>
+            <div class="field-label">Version / Tag</div>
+            <input class="field-input" id="upd-version" placeholder="v0.2 · May 2026" type="text">
+          </div>
+        </div>
+
+        <div>
+          <div class="field-label">Message body</div>
+          <textarea class="field-textarea" id="upd-body" placeholder="Hey,&#10;&#10;Quick update on LEA...&#10;&#10;What's new:&#10;- ...&#10;- ...&#10;&#10;What's next:&#10;- ...&#10;&#10;Thanks for being here early.&#10;— Cosmin" oninput="updatePreview()"></textarea>
+        </div>
+
+        <div>
+          <div class="field-label">Preview</div>
+          <div class="preview-box" id="upd-preview">Your message will appear here...</div>
+        </div>
+
+        <div>
+          <div class="field-label" style="margin-bottom:8px;">BCC — all signups</div>
+          <div class="bcc-box" id="bcc-list">No emails in list yet.</div>
+        </div>
+
+        <div class="composer-actions">
+          <button class="btn green-btn" onclick="openGmailDraft()">Open in Gmail</button>
+          <button class="btn primary" onclick="copyBCC()">Copy BCC emails</button>
+          <button class="btn" onclick="copyFullEmail()">Copy full email text</button>
+          <span style="font-size:11px;color:var(--text-dim);">Then paste BCC in Gmail and send to your list</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── FEEDBACK PANEL ── -->
+    <div class="panel" id="panel-feedback">
+      <div class="section-title">Feedback & Notes</div>
+
+      <div class="feedback-add" style="margin-bottom:20px;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div>
+            <div class="field-label">From (email or name)</div>
+            <input class="field-input" id="fb-from" placeholder="user@email.com or tester name">
+          </div>
+          <div>
+            <div class="field-label">Rating</div>
+            <select class="field-input" id="fb-rating" style="cursor:pointer;">
+              <option value="">—</option>
+              <option value="★★★★★">★★★★★ WOW</option>
+              <option value="★★★★">★★★★ Good</option>
+              <option value="★★★">★★★ OK</option>
+              <option value="★★">★★ Needs work</option>
+              <option value="★">★ Confused</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <div class="field-label">Feedback / Note</div>
+          <textarea class="field-textarea" id="fb-text" placeholder="What they said, what broke, what they loved..." style="height:100px;"></textarea>
+        </div>
+        <button class="btn primary" onclick="addFeedback()">Save feedback</button>
+      </div>
+
+      <div id="feedback-list-container"></div>
+    </div>
+
+    <!-- ── LANDING LINKS PANEL ── -->
+    <div class="panel" id="panel-landing">
+      <div class="section-title">Landing Page Links</div>
+
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div class="settings-card">
+          <h4>Preview Link (GitHub htmlpreview)</h4>
+          <p>Share this with testers to see the landing page instantly, no domain needed.</p>
+          <div class="bcc-box" style="font-size:12px;margin-bottom:10px;">
+            https://htmlpreview.github.io/?https://raw.githubusercontent.com/vv-technologies/vv-nexus/main/lea-landing.html
+          </div>
+          <button class="btn primary" onclick="copyLink('https://htmlpreview.github.io/?https://raw.githubusercontent.com/vv-technologies/vv-nexus/main/lea-landing.html')">Copy link</button>
+        </div>
+
+        <div class="settings-card">
+          <h4>Share LEA App with Testers</h4>
+          <p>For testers to try LEA directly, share the raw GitHub file link. They open it in browser and it works instantly — no install needed.</p>
+          <div class="bcc-box" style="font-size:12px;margin-bottom:10px;">
+            https://htmlpreview.github.io/?https://raw.githubusercontent.com/vv-technologies/vv-nexus/main/lea-home.html
+          </div>
+          <p style="color:rgba(255,69,58,0.7);font-size:11px;margin-bottom:8px;">⚠ Note: lea-home.html loads JS files from the same folder. For external testers, you need to upload all LEA files to GitHub or host on domain.</p>
+          <button class="btn" onclick="copyLink('https://htmlpreview.github.io/?https://raw.githubusercontent.com/vv-technologies/vv-nexus/main/lea-home.html')">Copy app link</button>
+        </div>
+
+        <div class="settings-card">
+          <h4>GitHub Pages — Enable for free hosting</h4>
+          <p>Enable GitHub Pages and ALL your HTML files become live URLs — perfect for testers.</p>
+          <ul class="step-list">
+            <li><span class="step-num">1.</span> Go to: github.com/vv-technologies/vv-nexus → Settings → Pages</li>
+            <li><span class="step-num">2.</span> Source: Deploy from branch → main → / (root)</li>
+            <li><span class="step-num">3.</span> Save. In ~2 min your site is live at: <span class="code-inline">vv-technologies.github.io/vv-nexus/lea-landing.html</span></li>
+            <li><span class="step-num">4.</span> Landing: <span class="code-inline">/lea-landing.html</span> · App: <span class="code-inline">/lea-home.html</span></li>
+          </ul>
+          <a class="link-btn" href="https://github.com/vv-technologies/vv-nexus/settings/pages" target="_blank">Open GitHub Pages settings →</a>
+        </div>
+
+        <div class="settings-card">
+          <h4>Custom Domain Setup (domeniu.eu)</h4>
+          <ul class="step-list">
+            <li><span class="step-num">1.</span> After GitHub Pages e activ, adaugă domeniu în Settings → Pages → Custom domain</li>
+            <li><span class="step-num">2.</span> La provider-ul domeniului, adaugă CNAME record: <span class="code-inline">www → vv-technologies.github.io</span></li>
+            <li><span class="step-num">3.</span> Sau A records pentru apex domain (găsești în GitHub Pages docs)</li>
+            <li><span class="step-num">4.</span> SSL e automat din GitHub Pages</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SETTINGS PANEL ── -->
+    <div class="panel" id="panel-settings">
+      <div class="section-title">Setup & Settings</div>
+
+      <div style="display:flex;flex-direction:column;gap:16px;">
+
+        <div class="settings-card">
+          <h4>Formspree Setup — Collect emails from landing page</h4>
+          <p>Formspree preia emailurile din landing page și ți le trimite pe Gmail. Gratuit, 50 submisii/lună.</p>
+          <ul class="step-list">
+            <li><span class="step-num">1.</span> Du-te pe <span class="code-inline">formspree.io</span> → Sign up cu Gmail</li>
+            <li><span class="step-num">2.</span> New Form → numește-l "LEA Early Access"</li>
+            <li><span class="step-num">3.</span> Copiază Form ID (arată ca <span class="code-inline">xvgodxyz</span>)</li>
+            <li><span class="step-num">4.</span> Deschide <span class="code-inline">lea-landing.html</span>, caută <span class="code-inline">YOUR_FORM_ID</span> și înlocuiește cu ID-ul tău</li>
+            <li><span class="step-num">5.</span> Urcă pe GitHub (Claude face asta automat)</li>
+            <li><span class="step-num">6.</span> Done — fiecare signup îți trimite email pe Gmail + apare în dashboard Formspree</li>
+          </ul>
+          <a class="link-btn" href="https://formspree.io" target="_blank">formspree.io →</a>
+        </div>
+
+        <div class="settings-card">
+          <h4>Formspree Form ID</h4>
+          <p>Salvat local în browser. Folosit pentru link-uri directe.</p>
+          <div style="display:flex;gap:8px;margin-top:8px;">
+            <input class="field-input" id="formspree-id-input" placeholder="xvgodxyz" style="max-width:200px;">
+            <button class="btn primary" onclick="saveFormspreeId()">Save</button>
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <h4>Admin Panel Notes</h4>
+          <p>Toate datele din acest panel sunt salvate în <span class="code-inline">localStorage</span> — doar pe acest browser, nu în cloud. Exportă CSV regulat ca backup.</p>
+          <div style="display:flex;gap:8px;margin-top:12px;">
+            <button class="btn" onclick="exportCSV()">Export all emails CSV</button>
+            <button class="btn danger" onclick="clearAll()">Clear all data</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ── STATE ──────────────────────────────────────────────
+const KEYS = { emails: 'vv_ceo_emails', feedback: 'vv_ceo_feedback', settings: 'vv_ceo_settings' };
+
+function loadEmails()   { try { return JSON.parse(localStorage.getItem(KEYS.emails)  || '[]'); } catch(e){ return []; } }
+function saveEmails(d)  { localStorage.setItem(KEYS.emails,   JSON.stringify(d)); }
+function loadFeedback() { try { return JSON.parse(localStorage.getItem(KEYS.feedback) || '[]'); } catch(e){ return []; } }
+function saveFeedback(d){ localStorage.setItem(KEYS.feedback, JSON.stringify(d)); }
+function loadSettings() { try { return JSON.parse(localStorage.getItem(KEYS.settings) || '{}'); } catch(e){ return {}; } }
+function saveSettings(d){ localStorage.setItem(KEYS.settings, JSON.stringify(d)); }
+
+// ── INIT ───────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  updateDate();
+  renderEmails();
+  renderFeedback();
+  updateBCC();
+  loadSettingsUI();
+  updateStats();
+});
+
+function updateDate() {
+  document.getElementById('current-date').textContent =
+    new Date().toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
+}
+
+// ── NAVIGATION ─────────────────────────────────────────
+function showPanel(name) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  event.currentTarget.classList.add('active');
+  if (name === 'updates') updateBCC();
+}
+
+// ── STATS ──────────────────────────────────────────────
+function updateStats() {
+  const emails = loadEmails();
+  const feedback = loadFeedback();
+  const now = Date.now();
+  const weekAgo = now - 7 * 24 * 3600 * 1000;
+
+  document.getElementById('stat-total').textContent = emails.length;
+  document.getElementById('stat-week').textContent  = emails.filter(e => new Date(e.date).getTime() > weekAgo).length;
+  document.getElementById('stat-msg').textContent   = emails.filter(e => e.message && e.message.trim()).length;
+  document.getElementById('nc-signups').textContent = emails.length;
+  document.getElementById('nc-feedback').textContent = feedback.length;
+
+  if (emails.length > 0) {
+    const last = emails[emails.length - 1];
+    document.getElementById('stat-last').textContent       = new Date(last.date).toLocaleDateString('en-GB', {day:'numeric', month:'short'});
+    document.getElementById('stat-last-email').textContent = last.email;
+  }
+}
+
+// ── EMAIL LIST ─────────────────────────────────────────
+function renderEmails() {
+  const emails = loadEmails();
+  const container = document.getElementById('email-list-container');
+
+  if (emails.length === 0) {
+    container.innerHTML = `<div class="email-empty"><strong>No signups yet</strong>Add emails manually or import from Formspree CSV export.</div>`;
+    return;
+  }
+
+  const rows = emails.map((e, i) => `
+    <div class="email-row">
+      <div class="email-addr">${esc(e.email)}</div>
+      <div class="email-lang">${esc(e.lang || 'en')}</div>
+      <div class="email-msg"  title="${esc(e.message || '')}">${esc(e.message || '—')}</div>
+      <div class="email-date">${fmtDate(e.date)} <span onclick="removeEmail(${i})" style="cursor:pointer;color:rgba(255,69,58,0.5);margin-left:6px;" title="Remove">×</span></div>
+    </div>`).join('');
+
+  container.innerHTML = `
+    <div class="email-table">
+      <div class="email-table-header">
+        <span>Email</span><span>Lang</span><span>Message</span><span>Date</span>
+      </div>
+      ${rows}
+    </div>`;
+  updateStats();
+}
+
+function addEmailManually() {
+  const emailInput = document.getElementById('add-email-input');
+  const msgInput   = document.getElementById('add-msg-input');
+  const email = emailInput.value.trim();
+  if (!email || !email.includes('@')) { showToast('Enter a valid email'); return; }
+  const emails = loadEmails();
+  if (emails.find(e => e.email === email)) { showToast('Already in list'); return; }
+  emails.push({ email, message: msgInput.value.trim(), lang: 'manual', date: new Date().toISOString() });
+  saveEmails(emails);
+  emailInput.value = ''; msgInput.value = '';
+  renderEmails(); updateBCC();
+  showToast('Email added ✓');
+}
+
+function removeEmail(i) {
+  const emails = loadEmails();
+  emails.splice(i, 1); saveEmails(emails);
+  renderEmails(); updateBCC(); updateStats();
+  showToast('Removed');
+}
+
+function copyAllEmails() {
+  const emails = loadEmails().map(e => e.email).join(', ');
+  if (!emails) { showToast('No emails yet'); return; }
+  navigator.clipboard.writeText(emails).then(() => showToast('All emails copied ✓'));
+}
+
+function clearAll() {
+  if (!confirm('Delete all emails? This cannot be undone.')) return;
+  saveEmails([]); renderEmails(); updateBCC(); updateStats();
+  showToast('Cleared');
+}
+
+function exportCSV() {
+  const emails = loadEmails();
+  if (!emails.length) { showToast('No emails to export'); return; }
+  const csv = 'email,message,lang,date\n' +
+    emails.map(e => `"${e.email}","${(e.message||'').replace(/"/g,'""')}","${e.lang||''}","${e.date||''}"`).join('\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  a.download = 'lea-signups-' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+  showToast('CSV downloaded ✓');
+}
+
+function importCSV() {
+  const raw = document.getElementById('csv-import').value.trim();
+  if (!raw) { showToast('Paste CSV first'); return; }
+  const lines = raw.split('\n').map(l => l.trim()).filter(Boolean);
+  const header = lines[0].toLowerCase().split(',').map(h => h.replace(/"/g,'').trim());
+  const emailIdx   = header.indexOf('email');
+  const messageIdx = header.findIndex(h => h.includes('message') || h.includes('msg'));
+  const dateIdx    = header.findIndex(h => h.includes('date') || h.includes('time'));
+  if (emailIdx < 0) { showToast('No "email" column found'); return; }
+
+  const emails = loadEmails();
+  let added = 0;
+  lines.slice(1).forEach(line => {
+    const cols = parseCSVLine(line);
+    const email = cols[emailIdx]?.replace(/"/g,'').trim();
+    if (!email || !email.includes('@')) return;
+    if (emails.find(e => e.email === email)) return;
+    emails.push({
+      email,
+      message: messageIdx >= 0 ? (cols[messageIdx]?.replace(/"/g,'').trim() || '') : '',
+      date: dateIdx >= 0 ? (cols[dateIdx]?.replace(/"/g,'').trim() || new Date().toISOString()) : new Date().toISOString(),
+      lang: 'import'
+    });
+    added++;
+  });
+
+  saveEmails(emails);
+  document.getElementById('csv-import').value = '';
+  renderEmails(); updateBCC(); updateStats();
+  showToast(`Imported ${added} emails ✓`);
+}
+
+function parseCSVLine(line) {
+  const result = []; let cur = ''; let inQ = false;
+  for (let i = 0; i < line.length; i++) {
+    if (line[i] === '"') { inQ = !inQ; }
+    else if (line[i] === ',' && !inQ) { result.push(cur); cur = ''; }
+    else { cur += line[i]; }
+  }
+  result.push(cur);
+  return result;
+}
+
+// ── UPDATE COMPOSER ────────────────────────────────────
+function updatePreview() {
+  const body = document.getElementById('upd-body').value;
+  document.getElementById('upd-preview').textContent = body || 'Your message will appear here...';
+}
+
+function updateBCC() {
+  const emails = loadEmails().map(e => e.email).join('; ');
+  document.getElementById('bcc-list').textContent = emails || 'No emails in list yet.';
+}
+
+function copyBCC() {
+  const emails = loadEmails().map(e => e.email).join(', ');
+  if (!emails) { showToast('No emails yet'); return; }
+  navigator.clipboard.writeText(emails).then(() => showToast('BCC copied ✓ — paste in Gmail BCC field'));
+}
+
+function copyFullEmail() {
+  const subject = document.getElementById('upd-subject').value;
+  const body    = document.getElementById('upd-body').value;
+  navigator.clipboard.writeText(`Subject: ${subject}\n\n${body}`).then(() => showToast('Full email copied ✓'));
+}
+
+function openGmailDraft() {
+  const subject = encodeURIComponent(document.getElementById('upd-subject').value || 'LEA Update');
+  const body    = encodeURIComponent(document.getElementById('upd-body').value || '');
+  window.open(`https://mail.google.com/mail/?view=cm&fs=1&su=${subject}&body=${body}`, '_blank');
+  showToast('Gmail draft opened — paste BCC emails');
+}
+
+// ── FEEDBACK ───────────────────────────────────────────
+function addFeedback() {
+  const from   = document.getElementById('fb-from').value.trim();
+  const rating = document.getElementById('fb-rating').value;
+  const text   = document.getElementById('fb-text').value.trim();
+  if (!text) { showToast('Enter feedback text'); return; }
+  const fb = loadFeedback();
+  fb.unshift({ from: from || 'Anonymous', rating, text, date: new Date().toISOString() });
+  saveFeedback(fb);
+  document.getElementById('fb-from').value  = '';
+  document.getElementById('fb-rating').value = '';
+  document.getElementById('fb-text').value  = '';
+  renderFeedback(); updateStats();
+  showToast('Feedback saved ✓');
+}
+
+function renderFeedback() {
+  const fb = loadFeedback();
+  const container = document.getElementById('feedback-list-container');
+  if (!fb.length) {
+    container.innerHTML = '<div class="email-empty"><strong>No feedback yet</strong>Add feedback from testers manually here.</div>';
+    return;
+  }
+  container.innerHTML = fb.map((f, i) => `
+    <div class="feedback-card">
+      <div class="feedback-header">
+        <span class="feedback-from">${esc(f.from)} ${f.rating ? '<span style="margin-left:6px;">' + f.rating + '</span>' : ''}</span>
+        <span style="display:flex;align-items:center;gap:12px;">
+          <span class="feedback-date">${fmtDate(f.date)}</span>
+          <span onclick="removeFeedback(${i})" style="cursor:pointer;color:rgba(255,69,58,0.5);font-size:12px;" title="Remove">×</span>
+        </span>
+      </div>
+      <div class="feedback-text">${esc(f.text)}</div>
+    </div>`).join('');
+}
+
+function removeFeedback(i) {
+  const fb = loadFeedback(); fb.splice(i, 1); saveFeedback(fb);
+  renderFeedback(); updateStats();
+}
+
+// ── SETTINGS ───────────────────────────────────────────
+function saveFormspreeId() {
+  const id = document.getElementById('formspree-id-input').value.trim();
+  const s  = loadSettings(); s.formspreeId = id; saveSettings(s);
+  showToast('Saved ✓');
+}
+
+function loadSettingsUI() {
+  const s = loadSettings();
+  if (s.formspreeId) document.getElementById('formspree-id-input').value = s.formspreeId;
+}
+
+// ── UTILS ──────────────────────────────────────────────
+function copyLink(url) {
+  navigator.clipboard.writeText(url).then(() => showToast('Link copied ✓'));
+}
+
+function esc(str) {
+  return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function fmtDate(d) {
+  if (!d) return '—';
+  try { return new Date(d).toLocaleDateString('en-GB', {day:'numeric', month:'short'}); }
+  catch(e) { return String(d).slice(0,10); }
+}
+
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// Keyboard: Enter to add email
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && document.getElementById('add-email-input') === document.activeElement) addEmailManually();
+});
+</script>
+
+</body>
+</html>
