@@ -448,49 +448,39 @@ main { flex: 1; padding: 32px; overflow-y: auto; max-width: 900px; }
 
     <!-- ── LANDING LINKS PANEL ── -->
     <div class="panel" id="panel-landing">
-      <div class="section-title">Landing Page Links</div>
+      <div class="section-title">Link-uri Live</div>
 
       <div style="display:flex;flex-direction:column;gap:12px;">
-        <div class="settings-card">
-          <h4>Preview Link (GitHub htmlpreview)</h4>
-          <p>Share this with testers to see the landing page instantly, no domain needed.</p>
-          <div class="bcc-box" style="font-size:12px;margin-bottom:10px;">
-            https://vv-technologies.github.io/vv-nexus/lea-landing.html
-          </div>
-          <button class="btn primary" onclick="copyLink('https://vv-technologies.github.io/vv-nexus/lea-landing.html')">Copy link</button>
+
+        <div class="settings-card" style="border-color:rgba(52,201,122,0.2);background:rgba(52,201,122,0.04);">
+          <h4 style="color:var(--green);">✓ hilea.eu e live</h4>
+          <p>Domeniul tău e activ și conectat. Toate link-urile de mai jos merg acum.</p>
         </div>
 
         <div class="settings-card">
-          <h4>Share LEA App with Testers</h4>
-          <p>For testers to try LEA directly, share the raw GitHub file link. They open it in browser and it works instantly — no install needed.</p>
-          <div class="bcc-box" style="font-size:12px;margin-bottom:10px;">
-            https://vv-technologies.github.io/vv-nexus/lea-home.html
-          </div>
-          <p style="color:rgba(255,69,58,0.7);font-size:11px;margin-bottom:8px;">⚠ Note: lea-home.html loads JS files from the same folder. For external testers, you need to upload all LEA files to GitHub or host on domain.</p>
-          <button class="btn" onclick="copyLink('https://vv-technologies.github.io/vv-nexus/lea-home.html')">Copy app link</button>
+          <h4>Landing Page — share pentru înregistrări</h4>
+          <div class="bcc-box" style="font-size:12px;margin-bottom:10px;">https://hilea.eu/lea-landing.html</div>
+          <button class="btn primary" onclick="copyLink('https://hilea.eu/lea-landing.html')">Copy link landing</button>
         </div>
 
         <div class="settings-card">
-          <h4>GitHub Pages — Enable for free hosting</h4>
-          <p>Enable GitHub Pages and ALL your HTML files become live URLs — perfect for testers.</p>
-          <ul class="step-list">
-            <li><span class="step-num">1.</span> Go to: github.com/vv-technologies/vv-nexus → Settings → Pages</li>
-            <li><span class="step-num">2.</span> Source: Deploy from branch → main → / (root)</li>
-            <li><span class="step-num">3.</span> Save. In ~2 min your site is live at: <span class="code-inline">vv-technologies.github.io/vv-nexus/lea-landing.html</span></li>
-            <li><span class="step-num">4.</span> Landing: <span class="code-inline">/lea-landing.html</span> · App: <span class="code-inline">/lea-home.html</span></li>
-          </ul>
-          <a class="link-btn" href="https://github.com/vv-technologies/vv-nexus/settings/pages" target="_blank">Open GitHub Pages settings →</a>
+          <h4>LEA App — share pentru testeri</h4>
+          <div class="bcc-box" style="font-size:12px;margin-bottom:10px;">https://hilea.eu/lea-home.html</div>
+          <button class="btn primary" onclick="copyLink('https://hilea.eu/lea-home.html')">Copy link app</button>
         </div>
 
         <div class="settings-card">
-          <h4>Custom Domain Setup (domeniu.eu)</h4>
-          <ul class="step-list">
-            <li><span class="step-num">1.</span> After GitHub Pages e activ, adaugă domeniu în Settings → Pages → Custom domain</li>
-            <li><span class="step-num">2.</span> La provider-ul domeniului, adaugă CNAME record: <span class="code-inline">www → vv-technologies.github.io</span></li>
-            <li><span class="step-num">3.</span> Sau A records pentru apex domain (găsești în GitHub Pages docs)</li>
-            <li><span class="step-num">4.</span> SSL e automat din GitHub Pages</li>
-          </ul>
+          <h4>CEO Panel — doar tu</h4>
+          <div class="bcc-box" style="font-size:12px;margin-bottom:10px;">https://hilea.eu/vv-ceo-panel.html</div>
+          <button class="btn" onclick="copyLink('https://hilea.eu/vv-ceo-panel.html')">Copy link panel</button>
         </div>
+
+        <div class="settings-card">
+          <h4>Ko-fi — support</h4>
+          <div class="bcc-box" style="font-size:12px;margin-bottom:10px;">https://ko-fi.com/vvteam</div>
+          <a class="link-btn" href="https://ko-fi.com/vvteam" target="_blank">Deschide Ko-fi →</a>
+        </div>
+
       </div>
     </div>
 
@@ -512,8 +502,8 @@ main { flex: 1; padding: 32px; overflow-y: auto; max-width: 900px; }
         <div class="settings-card">
           <h4>Landing page live</h4>
           <p>Link de share pentru landing. Trimite-l oriunde — funcționează fără domeniu propriu.</p>
-          <div class="bcc-box" style="font-size:11px;margin-bottom:10px;">https://vv-technologies.github.io/vv-nexus/lea-landing.html</div>
-          <button class="btn primary" onclick="copyLink('https://vv-technologies.github.io/vv-nexus/lea-landing.html')">Copy link</button>
+          <div class="bcc-box" style="font-size:11px;margin-bottom:10px;">https://hilea.eu/lea-landing.html</div>
+          <button class="btn primary" onclick="copyLink('https://hilea.eu/lea-landing.html')">Copy link</button>
         </div>
 
         <div class="settings-card">
