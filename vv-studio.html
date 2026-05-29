@@ -3,897 +3,2185 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#000">
-<title>VV Content Studio · CEO</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<title>VV Studio</title>
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-:root{
-  --gold:#D4AF37;--gold2:rgba(212,175,55,.1);--gold-b:rgba(212,175,55,.2);
-  --w:#fff;--w70:rgba(255,255,255,.7);--w50:rgba(255,255,255,.5);
-  --w30:rgba(255,255,255,.3);--w15:rgba(255,255,255,.15);
-  --w08:rgba(255,255,255,.08);--w04:rgba(255,255,255,.04);
-  --border:rgba(255,255,255,.08);
-  --green:#34c759;--blue:#0A84FF;--red:#ff3b30;--orange:#FF9500;
-  --font:'Syne',sans-serif;--mono:'DM Mono',monospace;
-}
-html,body{min-height:100vh;background:#000;color:var(--w);font-family:var(--mono);-webkit-font-smoothing:antialiased;}
+  * { margin:0; padding:0; box-sizing:border-box; }
 
-/* Login */
-#login{position:fixed;inset:0;background:#000;z-index:999;display:flex;align-items:center;justify-content:center;}
-#login.hidden{display:none;}
-.login-box{width:100%;max-width:360px;padding:36px;background:var(--w04);border:1px solid var(--border);border-radius:20px;}
-.login-logo{font-family:var(--font);font-size:28px;font-weight:900;letter-spacing:6px;color:var(--gold);margin-bottom:4px;}
-.login-sub{font-size:9px;letter-spacing:3px;color:var(--w30);margin-bottom:28px;}
+  :root {
+    --bg:      #07070d;
+    --glass:   rgba(255,255,255,0.025);
+    --glass-b: rgba(255,255,255,0.042);
+    --text:    rgba(255,248,235,0.84);
+    --dim:     rgba(255,248,235,0.22);
+    --mid:     rgba(255,248,235,0.44);
+    --accent:  #c8963e;
+    --acc-dim: rgba(200,150,62,0.10);
+    --tone-orb1: rgba(28,16,58,0.48);
+    --tone-orb2: rgba(80,44,14,0.22);
+  }
 
-/* Layout */
-.app{display:grid;grid-template-columns:220px 1fr;min-height:100vh;}
+  /* Tone → vizual subtil */
+  body.tone-calm    { --tone-orb1: rgba(18,12,40,0.38); --tone-orb2: rgba(60,34,8,0.16); --glass-b: rgba(255,255,255,0.035); }
+  body.tone-urgent  { --tone-orb1: rgba(60,12,12,0.42); --tone-orb2: rgba(180,50,20,0.18); --glass-b: rgba(255,200,180,0.045); }
+  body.tone-creativ { --tone-orb1: rgba(50,20,90,0.52); --tone-orb2: rgba(100,50,160,0.20); --glass-b: rgba(160,100,255,0.05); }
+  body.tone-tehnic  { --bg: #06060f; --tone-orb1: rgba(10,20,50,0.5); --tone-orb2: rgba(20,40,80,0.20); --glass-b: rgba(100,150,220,0.045); }
+  body.tone-intens  { --tone-orb1: rgba(50,16,16,0.55); --tone-orb2: rgba(120,44,14,0.28); }
+  body.tone-exploratoriu { --tone-orb1: rgba(20,40,60,0.45); --tone-orb2: rgba(30,80,50,0.18); }
 
-/* Sidebar */
-.sidebar{background:rgba(255,255,255,.02);border-right:1px solid var(--border);padding:20px 0;display:flex;flex-direction:column;}
-.sb-brand{padding:0 18px 20px;border-bottom:1px solid var(--border);margin-bottom:12px;}
-.sb-logo{font-family:var(--font);font-weight:900;font-size:14px;letter-spacing:5px;color:var(--gold);}
-.sb-role{font-size:9px;letter-spacing:2px;color:var(--w30);margin-top:3px;}
-.sb-nav{flex:1;padding:0 8px;}
-.sb-item{display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:10px;cursor:pointer;font-size:12px;color:var(--w50);transition:all .15s;margin-bottom:2px;}
-.sb-item:hover{background:var(--w04);color:var(--w80);}
-.sb-item.active{background:var(--gold2);border:0.5px solid var(--gold-b);color:var(--gold);}
-.sb-section{font-size:8px;letter-spacing:3px;color:var(--w30);font-weight:700;padding:10px 10px 4px;}
-.sb-footer{padding:16px 18px;border-top:1px solid var(--border);}
+  body {
+    background:var(--bg); color:var(--text);
+    font-family:-apple-system,'SF Pro Text','Segoe UI',system-ui,sans-serif;
+    min-height:100vh; display:flex; flex-direction:column; overflow:hidden;
+  }
 
-/* Main */
-.main{display:flex;flex-direction:column;overflow:hidden;}
-.topbar{padding:14px 28px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
-.topbar-title{font-family:var(--font);font-size:15px;font-weight:900;}
-.topbar-right{display:flex;align-items:center;gap:10px;}
-.live-chip{display:flex;align-items:center;gap:5px;padding:4px 10px;background:var(--w04);border:0.5px solid var(--border);border-radius:20px;font-size:10px;color:var(--w30);}
-.live-dot{width:5px;height:5px;border-radius:50%;background:var(--green);box-shadow:0 0 6px rgba(52,199,89,.8);animation:blink 2s ease-in-out infinite;}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+  .orb { position:fixed; border-radius:50%; pointer-events:none; z-index:0; transition:background 2.5s ease; }
+  #o1 { width:600px;height:600px; background:radial-gradient(circle,var(--tone-orb1) 0%,transparent 65%); top:-200px;left:-180px; animation:ob 13s ease-in-out infinite; }
+  #o2 { width:380px;height:380px; background:radial-gradient(circle,var(--tone-orb2) 0%,transparent 65%); bottom:-80px;right:-60px; animation:ob 17s ease-in-out infinite 3s; }
+  @keyframes ob { 0%,100%{opacity:.55} 50%{opacity:.8} }
 
-.content{flex:1;overflow-y:auto;padding:24px 28px;}
-.section{display:none;}
-.section.active{display:block;}
+  #app { position:relative; z-index:1; display:grid; grid-template-columns:175px 1fr 188px; height:100vh; overflow:hidden; }
+  #main { overflow-y:auto; scrollbar-width:none; display:flex; flex-direction:column; position:relative; }
+  #main::-webkit-scrollbar { display:none; }
 
-/* Cards */
-.card{background:var(--w04);border:1px solid var(--border);border-radius:16px;padding:20px 22px;margin-bottom:14px;position:relative;overflow:hidden;}
-.card::before{content:'';position:absolute;top:0;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,var(--gold-b),transparent);}
-.card-title{font-family:var(--font);font-size:13px;font-weight:800;margin-bottom:4px;}
-.card-sub{font-size:11px;color:var(--w30);margin-bottom:16px;}
+  /* ── HEADER ── */
+  header {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:0 32px; height:50px; flex-shrink:0;
+    background:rgba(7,7,13,0.7); backdrop-filter:blur(14px);
+    border-bottom:1px solid var(--glass-b);
+  }
+  .h-left { display:flex; align-items:center; gap:14px; }
+  .h-logo { font-size:10px; letter-spacing:3.5px; color:rgba(255,248,235,0.65); }
+  .h-sep  { width:1px; height:14px; background:var(--glass-b); }
+  .h-sub  { font-size:10px; letter-spacing:2px; color:var(--dim); }
+  .h-right { display:flex; gap:8px; align-items:center; }
+  .hbtn {
+    background:var(--glass); border:1px solid var(--glass-b); color:var(--dim);
+    padding:4px 13px; border-radius:20px; font-size:11px; cursor:pointer;
+    letter-spacing:.5px; transition:all .4s; font-family:inherit;
+  }
+  .hbtn:hover { color:var(--text); border-color:rgba(255,255,255,0.1); }
+  .hbtn.amber { background:var(--acc-dim); border-color:rgba(200,150,62,0.22); color:rgba(200,150,62,0.85); }
 
-/* Stats */
-.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px;}
-.stat{background:var(--w04);border:1px solid var(--border);border-radius:12px;padding:14px 16px;}
-.stat-v{font-family:var(--font);font-size:24px;font-weight:900;}
-.stat-l{font-size:9px;letter-spacing:2px;color:var(--w30);font-weight:700;margin-top:3px;}
-.gold-v{color:var(--gold);}
-.green-v{color:var(--green);}
-.blue-v{color:var(--blue);}
-.orange-v{color:var(--orange);}
+  /* ── NAV ── */
+  nav { display:flex; gap:0; padding:0 32px; flex-shrink:0; border-bottom:1px solid var(--glass-b); }
+  .nav-btn {
+    background:transparent; border:none; color:var(--dim);
+    padding:11px 16px; font-size:11.5px; cursor:pointer; font-family:inherit;
+    letter-spacing:.3px; transition:all .35s; border-bottom:1.5px solid transparent;
+    margin-bottom:-1px;
+  }
+  .nav-btn:hover { color:var(--mid); }
+  .nav-btn.active { color:var(--text); border-bottom-color:rgba(200,150,62,0.45); }
 
-/* Form */
-.field{margin-bottom:14px;}
-.fl{font-size:9px;letter-spacing:2px;color:var(--w30);font-weight:700;display:block;margin-bottom:6px;}
-.fi{width:100%;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:10px;padding:10px 14px;color:var(--w);font-family:var(--mono);font-size:13px;outline:none;transition:border-color .2s;-webkit-appearance:none;}
-.fi:focus{border-color:rgba(212,175,55,.35);}
-.fi::placeholder{color:var(--w30);}
-.select{width:100%;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:10px;padding:10px 14px;color:var(--w);font-family:var(--mono);font-size:13px;outline:none;cursor:pointer;}
-.select option{background:#111;}
-.textarea{width:100%;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:10px;padding:10px 14px;color:var(--w);font-family:var(--mono);font-size:13px;outline:none;resize:vertical;min-height:70px;line-height:1.6;transition:border-color .2s;}
-.textarea:focus{border-color:rgba(212,175,55,.35);}
-.textarea::placeholder{color:var(--w30);}
-.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+  /* ── VIEWS ── */
+  .view { display:none; flex:1; overflow-y:auto; scrollbar-width:none; }
+  .view::-webkit-scrollbar { display:none; }
+  .view.show { display:flex; flex-direction:column; }
+  .view-pad { padding:36px 40px; }
 
-/* Buttons */
-.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:10px;font-family:var(--mono);font-size:12px;font-weight:700;cursor:pointer;transition:all .15s;border:none;min-height:36px;letter-spacing:.3px;}
-.btn-gold{background:var(--gold);color:#000;}
-.btn-gold:hover{opacity:.88;}
-.btn-outline{background:var(--w04);border:0.5px solid var(--border);color:var(--w70);}
-.btn-outline:hover{background:var(--w08);}
-.btn-green{background:rgba(52,199,89,.1);border:0.5px solid rgba(52,199,89,.2);color:var(--green);}
-.btn-red{background:rgba(255,59,48,.08);border:0.5px solid rgba(255,59,48,.15);color:var(--red);}
-.btn-full{width:100%;min-height:42px;font-size:13px;justify-content:center;}
-.btn:disabled{opacity:.4;cursor:not-allowed;}
+  .view-title { font-size:10px; letter-spacing:2.5px; color:var(--dim); text-transform:uppercase; margin-bottom:28px; font-weight:500; }
 
-/* Table */
-.vv-table{width:100%;border-collapse:collapse;}
-.vv-table th{font-size:9px;letter-spacing:2px;color:var(--w30);font-weight:700;padding:8px 12px;text-align:left;border-bottom:1px solid var(--border);text-transform:uppercase;}
-.vv-table td{padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.03);font-size:12px;color:var(--w70);vertical-align:middle;}
-.vv-table tr:hover td{background:var(--w04);}
-.badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:6px;font-size:9px;font-weight:700;letter-spacing:1px;}
-.b-green{background:rgba(52,199,89,.1);border:0.5px solid rgba(52,199,89,.2);color:var(--green);}
-.b-gold{background:var(--gold2);border:0.5px solid var(--gold-b);color:var(--gold);}
-.b-blue{background:rgba(10,132,255,.1);border:0.5px solid rgba(10,132,255,.2);color:var(--blue);}
-.b-orange{background:rgba(255,149,0,.1);border:0.5px solid rgba(255,149,0,.2);color:var(--orange);}
-.b-red{background:rgba(255,59,48,.08);border:0.5px solid rgba(255,59,48,.15);color:var(--red);}
+  /* ══════════════════════════════════════
+     TODAY VIEW
+  ══════════════════════════════════════ */
+  #view-today {}
 
-/* Type pills */
-.type-grid{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;}
-.type-pill{padding:6px 14px;background:var(--w04);border:0.5px solid var(--border);border-radius:100px;font-size:11px;color:var(--w30);cursor:pointer;transition:all .15s;}
-.type-pill.active{background:var(--gold2);border-color:var(--gold-b);color:var(--gold);}
+  .today-greeting {
+    font-size:24px; color:rgba(255,248,235,0.72); font-weight:300;
+    letter-spacing:.3px; margin-bottom:5px; line-height:1.3;
+  }
+  .today-sub { font-size:11.5px; color:rgba(255,248,235,0.22); margin-bottom:48px; letter-spacing:.3px; }
 
-/* Pricing section */
-.price-toggle{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
-.toggle{width:40px;height:22px;background:var(--w08);border-radius:100px;cursor:pointer;position:relative;transition:background .2s;}
-.toggle.on{background:var(--gold);}
-.toggle-knob{width:18px;height:18px;background:#fff;border-radius:50%;position:absolute;top:2px;left:2px;transition:transform .2s;}
-.toggle.on .toggle-knob{transform:translateX(18px);}
-.toggle-label{font-size:12px;color:var(--w50);}
+  .today-section { margin-bottom:36px; }
+  .today-section-label {
+    font-size:8.5px; letter-spacing:2px; color:rgba(255,248,235,0.18);
+    text-transform:uppercase; margin-bottom:14px; font-weight:500;
+  }
 
-/* Loading */
-.loading{display:flex;align-items:center;gap:8px;padding:30px;color:var(--w30);font-size:12px;justify-content:center;}
-.spinner{width:14px;height:14px;border:1.5px solid var(--w08);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite;}
-@keyframes spin{to{transform:rotate(360deg)}}
+  /* Active projects strip */
+  .today-projs { display:flex; gap:12px; flex-wrap:wrap; }
+  .today-proj-card {
+    background:var(--glass); border:1px solid var(--glass-b);
+    border-radius:12px; padding:14px 18px; cursor:pointer; transition:all .4s;
+    min-width:160px; position:relative; overflow:hidden;
+  }
+  .today-proj-card:hover { border-color:rgba(255,255,255,0.07); }
+  .today-proj-card.active-p { border-color:rgba(200,150,62,0.22); }
+  .today-proj-glow {
+    position:absolute; top:0;left:0;right:0; height:40px; border-radius:12px 12px 0 0; opacity:.15;
+  }
+  .today-proj-name { font-size:13px; color:rgba(255,248,235,0.78); position:relative; z-index:1; }
+  .today-proj-last { font-size:9.5px; color:var(--dim); margin-top:4px; position:relative; z-index:1; line-height:1.5; }
 
-/* Toast */
-#toast{position:fixed;bottom:20px;right:20px;background:rgba(10,10,16,.97);border:0.5px solid var(--w08);border-radius:12px;padding:10px 18px;font-size:12px;font-weight:600;color:var(--w);opacity:0;transition:all .25s;pointer-events:none;z-index:9999;max-width:280px;}
-#toast.on{opacity:1;}
+  /* Continue working */
+  .continue-card {
+    background:var(--glass); border:1px solid var(--glass-b);
+    border-radius:12px; padding:18px 20px; cursor:pointer; transition:all .4s;
+    max-width:560px;
+  }
+  .continue-card:hover { border-color:rgba(200,150,62,0.15); }
+  .continue-proj { font-size:9px; letter-spacing:1.5px; color:var(--dim); text-transform:uppercase; margin-bottom:8px; }
+  .continue-idea { font-size:13.5px; color:rgba(255,248,235,0.72); line-height:1.65; }
+  .continue-ts   { font-size:9px; color:rgba(255,248,235,0.18); margin-top:6px; }
+  .continue-action { font-size:10px; color:rgba(200,150,62,0.55); margin-top:10px; letter-spacing:.5px; }
 
-/* Section header */
-.sec-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
-.sec-title{font-family:var(--font);font-size:18px;font-weight:900;letter-spacing:-.3px;}
-.sec-sub{font-size:11px;color:var(--w30);margin-top:2px;}
+  /* Recent ideas today strip */
+  .today-ideas-list { display:flex; flex-direction:column; gap:7px; max-width:620px; }
+  .today-idea-item {
+    display:flex; align-items:baseline; gap:10px;
+    font-size:12.5px; color:rgba(255,248,235,0.5); line-height:1.6;
+    padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.025);
+  }
+  .today-idea-item::before { content:'·'; color:var(--dim); flex-shrink:0; }
+  .today-idea-proj { font-size:9px; color:rgba(255,255,255,0.18); margin-left:auto; flex-shrink:0; letter-spacing:.5px; }
 
-/* Empty state */
-.empty{text-align:center;padding:40px;color:var(--w30);font-size:12px;}
+  /* ══════════════════════════════════════
+     PROJECTS VIEW
+  ══════════════════════════════════════ */
+  .projects-grid {
+    display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:14px;
+  }
+  .proj-card {
+    background:rgba(255,248,235,0.018); border:1px solid rgba(255,248,235,0.04);
+    border-radius:16px; padding:26px 22px 20px; cursor:pointer; transition:all .6s;
+    min-height:150px; display:flex; flex-direction:column; justify-content:flex-end;
+    position:relative; overflow:hidden;
+  }
+  .proj-card:hover { border-color:rgba(255,248,235,0.08); background:rgba(255,248,235,0.028); transform:translateY(-1px); box-shadow:0 8px 32px rgba(0,0,0,0.3); }
+  .proj-card.active-p { border-color:rgba(200,150,62,0.2); background:rgba(200,150,62,0.03); }
+  .proj-glow { position:absolute; top:0;left:0;right:0;bottom:0; border-radius:16px; opacity:.08; transition:opacity .6s; }
+  .proj-card:hover .proj-glow { opacity:.15; }
+  .proj-cat  { font-size:8px; letter-spacing:2px; color:rgba(255,248,235,0.15); text-transform:uppercase; margin-bottom:10px; position:relative;z-index:1; }
+  .proj-name { font-size:16px; color:rgba(255,248,235,0.78); font-weight:300; letter-spacing:.5px; margin-bottom:5px; position:relative;z-index:1; line-height:1.3; }
+  .proj-desc { font-size:10.5px; color:rgba(255,248,235,0.28); line-height:1.6; position:relative;z-index:1; }
+  .proj-card.new-p { border-style:dashed; border-color:rgba(255,255,255,0.05); justify-content:center; align-items:center; background:transparent; min-height:150px; }
+  .proj-card.new-p:hover { border-color:rgba(255,255,255,0.1); background:rgba(255,255,255,0.02); transform:none; }
+  .proj-card.new-p span { font-size:11px; color:rgba(255,248,235,0.2); letter-spacing:1.5px; }
 
-/* Modal overlay */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:500;display:none;align-items:center;justify-content:center;padding:20px;}
-.modal-overlay.show{display:flex;}
-.modal{background:#0a0a0f;border:1px solid var(--border);border-radius:20px;padding:28px;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;position:relative;}
-.modal-close{position:absolute;top:16px;right:16px;width:28px;height:28px;background:var(--w04);border:none;border-radius:50%;color:var(--w50);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;}
-.modal-title{font-family:var(--font);font-size:16px;font-weight:900;margin-bottom:4px;}
-.modal-sub{font-size:11px;color:var(--w30);margin-bottom:20px;}
+  /* ══════════════════════════════════════
+     PROJECT DETAIL VIEW
+  ══════════════════════════════════════ */
+  #view-project { padding-bottom:120px; } /* space for action bar */
+
+  .proj-topbar {
+    display:flex; align-items:center; gap:12px; margin-bottom:32px;
+  }
+  .proj-back { background:none; border:none; color:var(--dim); cursor:pointer; font-size:18px; padding:4px 8px; border-radius:8px; transition:color .3s; }
+  .proj-back:hover { color:var(--text); }
+  .proj-header-info {}
+  .proj-header-name { font-size:19px; color:var(--text); font-weight:300; letter-spacing:.5px; }
+  .proj-header-cat  { font-size:9px; letter-spacing:1.5px; color:var(--dim); text-transform:uppercase; margin-top:2px; }
+
+  .proj-tone-strip { display:flex; gap:6px; margin-bottom:28px; flex-wrap:wrap; }
+  .tone-chip {
+    background:transparent; border:1px solid var(--glass-b); color:var(--dim);
+    padding:4px 12px; border-radius:20px; font-size:10px; cursor:pointer;
+    transition:all .3s; font-family:inherit; letter-spacing:.3px;
+  }
+  .tone-chip.sel { border-color:rgba(200,150,62,0.3); color:rgba(200,150,62,0.8); background:var(--acc-dim); }
+
+  .proj-columns { display:grid; grid-template-columns:1fr 270px; gap:48px; }
+
+  /* Ideas in project */
+  .section-label { font-size:8.5px; letter-spacing:2px; color:var(--dim); text-transform:uppercase; margin-bottom:14px; font-weight:500; }
+
+  .idea-input-wrap {
+    display:flex; gap:10px; align-items:flex-end;
+    background:rgba(255,248,235,0.028); border:1px solid rgba(255,248,235,0.05);
+    border-radius:12px; padding:10px 14px; transition:border-color .4s; margin-bottom:22px;
+  }
+  .idea-input-wrap:focus-within { border-color:rgba(200,150,62,0.18); }
+  .idea-input {
+    flex:1; background:transparent; border:none; outline:none;
+    color:var(--text); font-size:13.5px; font-family:inherit;
+    resize:none; max-height:100px; line-height:1.6;
+  }
+  .idea-input::placeholder { color:var(--dim); }
+  .idea-add-btn {
+    background:rgba(200,150,62,0.8); border:none; color:#07070d;
+    width:28px;height:28px; border-radius:8px; cursor:pointer;
+    font-size:16px; font-weight:700; display:flex; align-items:center;
+    justify-content:center; transition:all .2s; flex-shrink:0;
+  }
+  .idea-add-btn:hover { background:rgba(200,150,62,1); }
+
+  .ideas-list { display:flex; flex-direction:column; gap:7px; }
+  .idea-item {
+    padding:13px 16px; background:transparent; border:none;
+    border-bottom:1px solid rgba(255,255,255,0.03);
+    font-size:13.5px; line-height:1.75; color:rgba(255,248,235,0.68);
+    transition:all .4s; display:flex; justify-content:space-between; align-items:flex-start;
+    animation:ideaIn .45s ease-out forwards;
+  }
+  .idea-item:hover { color:rgba(255,248,235,0.82); }
+  @keyframes ideaIn { from{opacity:0;transform:translateY(5px)} to{opacity:1;transform:translateY(0)} }
+  .idea-item:hover { border-color:rgba(255,248,235,0.065); }
+  .idea-text { flex:1; }
+  .idea-ts   { font-size:9px; color:rgba(255,248,235,0.14); margin-top:4px; }
+  .idea-del  { background:none; border:none; color:rgba(255,255,255,0.1); cursor:pointer; font-size:13px; padding:0 3px; transition:color .2s; flex-shrink:0; margin-left:8px; }
+  .idea-del:hover { color:rgba(255,80,80,0.6); }
+  .empty-state { text-align:center; padding:40px 20px; color:rgba(255,248,235,0.14); font-size:12px; line-height:2; }
+
+  /* Project sidebar */
+  .proj-sidebar {}
+  .sidebar-box {
+    background:var(--glass); border:1px solid var(--glass-b);
+    border-radius:12px; padding:16px; margin-bottom:16px;
+  }
+  .sidebar-box-label { font-size:8px; letter-spacing:1.8px; color:var(--dim); text-transform:uppercase; margin-bottom:10px; font-weight:500; }
+  .ctx-textarea {
+    width:100%; background:transparent; border:none; outline:none;
+    color:rgba(255,248,235,0.55); font-size:12px; font-family:inherit;
+    resize:none; line-height:1.7; min-height:56px;
+  }
+  .ctx-textarea::placeholder { color:rgba(255,248,235,0.18); }
+  .lea-aware-note { font-size:10px; color:rgba(200,150,62,0.5); margin-top:8px; font-style:italic; }
+
+  .goals-list { display:flex; flex-direction:column; gap:6px; margin-bottom:10px; }
+  .goal-item { display:flex; align-items:center; gap:8px; font-size:11.5px; color:rgba(255,248,235,0.55); }
+  .goal-item::before { content:'—'; color:rgba(255,255,255,0.15); flex-shrink:0; }
+  .goal-del { background:none;border:none;color:rgba(255,255,255,0.1);cursor:pointer;font-size:11px;transition:color .2s; }
+  .goal-del:hover { color:rgba(255,80,80,0.5); }
+  .goal-input-row { display:flex; gap:8px; }
+  .goal-input {
+    flex:1; background:rgba(255,255,255,0.03); border:1px solid var(--glass-b);
+    border-radius:8px; padding:6px 10px; color:var(--text); font-size:11.5px;
+    font-family:inherit; outline:none; transition:border-color .3s;
+  }
+  .goal-input:focus { border-color:rgba(200,150,62,0.2); }
+  .goal-add { background:var(--glass);border:1px solid var(--glass-b);color:var(--dim);padding:6px 10px;border-radius:8px;font-size:11px;cursor:pointer;transition:all .3s;font-family:inherit; }
+  .goal-add:hover { color:var(--text); }
+
+  .files-list { display:flex; flex-direction:column; gap:5px; margin-bottom:8px; }
+  .file-item { display:flex;align-items:center;gap:8px;padding:6px 10px;background:var(--glass);border:1px solid var(--glass-b);border-radius:8px;font-size:11px;color:var(--mid);cursor:pointer;transition:all .3s; }
+  .file-item:hover { border-color:rgba(255,255,255,0.07); }
+  .file-name { flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+  .file-del { background:none;border:none;color:rgba(255,255,255,0.1);cursor:pointer;font-size:11px;transition:color .2s; }
+  .file-del:hover { color:rgba(255,80,80,0.5); }
+  .add-file-btn { width:100%;background:transparent;border:1px dashed rgba(255,255,255,0.06);color:var(--dim);padding:7px;border-radius:8px;font-size:11px;cursor:pointer;letter-spacing:.5px;transition:all .3s;font-family:inherit; }
+  .add-file-btn:hover { border-color:rgba(255,255,255,0.1);color:var(--mid); }
+
+  /* ── LEA ACTION BAR ── */
+  #lea-action-bar {
+    position:fixed; bottom:0; left:0; right:0; z-index:50;
+    background:rgba(7,7,13,0.92); backdrop-filter:blur(20px);
+    border-top:1px solid var(--glass-b); padding:12px 40px 16px;
+    display:none;
+  }
+  #lea-action-bar.show { display:block; }
+  .action-chips { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px; }
+  .action-chip {
+    background:var(--glass);border:1px solid var(--glass-b);color:var(--dim);
+    padding:5px 13px;border-radius:20px;font-size:11px;cursor:pointer;
+    transition:all .3s;font-family:inherit;letter-spacing:.3px;
+  }
+  .action-chip:hover { color:var(--mid);border-color:rgba(255,255,255,0.07); }
+  .lea-action-wrap {
+    display:flex;gap:10px;align-items:center;
+    background:rgba(255,248,235,0.03);border:1px solid rgba(255,248,235,0.06);
+    border-radius:12px;padding:10px 14px;
+  }
+  .lea-action-wrap:focus-within { border-color:rgba(200,150,62,0.2); }
+  .lea-action-input {
+    flex:1;background:transparent;border:none;outline:none;
+    color:var(--text);font-size:13.5px;font-family:inherit;
+  }
+  .lea-action-input::placeholder { color:var(--dim); }
+  .lea-action-send {
+    background:rgba(200,150,62,0.8);border:none;color:#07070d;
+    padding:7px 16px;border-radius:9px;cursor:pointer;font-size:12px;
+    font-family:inherit;font-weight:600;transition:all .2s;
+  }
+  .lea-action-send:hover { background:rgba(200,150,62,1); }
+  .lea-action-result {
+    margin-top:10px;font-size:12.5px;color:rgba(255,248,235,0.6);
+    line-height:1.7;font-style:italic;display:none;
+  }
+  .lea-action-result.show { display:block; animation:ideaIn .4s ease-out forwards; }
+
+  /* ══════════════════════════════════════
+     IDEAS GLOBAL
+  ══════════════════════════════════════ */
+  .ideas-global-wrap { max-width:660px; }
+
+  /* ══════════════════════════════════════
+     SEARCH
+  ══════════════════════════════════════ */
+  #view-search { align-items:center; }
+  .search-center { width:100%;max-width:560px;margin:0 auto;padding:40px 0 0; }
+  .search-title { font-size:14px;color:var(--dim);letter-spacing:2px;text-align:center;margin-bottom:32px;font-weight:400; }
+  .search-wrap {
+    display:flex;gap:10px;align-items:center;
+    background:rgba(255,248,235,0.028);border:1px solid rgba(255,248,235,0.05);
+    border-radius:14px;padding:14px 18px;transition:border-color .4s;margin-bottom:20px;
+  }
+  .search-wrap:focus-within { border-color:rgba(200,150,62,0.18); }
+  .search-input { flex:1;background:transparent;border:none;outline:none;color:var(--text);font-size:14.5px;font-family:inherit; }
+  .search-input::placeholder { color:var(--dim); }
+  .search-btn { background:rgba(200,150,62,0.8);border:none;color:#07070d;padding:8px 18px;border-radius:9px;cursor:pointer;font-size:12px;font-family:inherit;font-weight:600;transition:all .2s; }
+  .search-btn:hover { background:rgba(200,150,62,1); }
+  .search-hints { display:flex;flex-wrap:wrap;gap:8px;justify-content:center; }
+  .search-hint { background:var(--glass);border:1px solid var(--glass-b);color:var(--dim);padding:5px 13px;border-radius:20px;font-size:11px;cursor:pointer;transition:all .4s;font-family:inherit; }
+  .search-hint:hover { color:var(--mid); }
+  /* Rezultate search în Studio */
+  #search-results {
+    margin-top:28px; display:none;
+  }
+  #search-results.show { display:block; }
+  .search-built-query {
+    font-size:10px; color:rgba(200,150,62,0.5); letter-spacing:.5px;
+    margin-bottom:14px; font-style:italic;
+  }
+  .search-filter-chips { display:flex; gap:7px; flex-wrap:wrap; margin-bottom:18px; }
+  .search-filter-chip {
+    background:rgba(200,150,62,0.07); border:1px solid rgba(200,150,62,0.15);
+    color:rgba(200,150,62,0.65); padding:3px 10px; border-radius:20px;
+    font-size:10px; letter-spacing:.3px;
+  }
+  .search-open-btn {
+    display:flex; align-items:center; justify-content:space-between;
+    background:rgba(255,248,235,0.03); border:1px solid rgba(255,255,255,0.055);
+    color:rgba(255,248,235,0.58); padding:12px 18px; border-radius:11px;
+    font-size:13px; cursor:pointer; transition:all .4s; font-family:inherit;
+    text-decoration:none;
+  }
+  .search-open-btn:hover { border-color:rgba(255,255,255,0.1); color:var(--text); background:rgba(255,255,255,0.04); }
+  .search-source-right { font-size:9px; color:rgba(255,255,255,0.2); letter-spacing:1px; text-transform:uppercase; }
+
+  .search-suggested-item {
+    display:flex; align-items:center; gap:10px;
+    padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.03);
+    font-size:12.5px; color:rgba(255,248,235,0.4); cursor:pointer; transition:color .3s;
+  }
+  .search-suggested-item:hover { color:rgba(255,248,235,0.72); }
+  .search-suggested-item::before { content:'→'; color:rgba(255,255,255,0.18); font-size:11px; flex-shrink:0; }
+
+  /* Insight cards — "LEA a pregătit pentru tine" */
+  .insights-grid {
+    display:grid; grid-template-columns:repeat(auto-fill, minmax(200px,1fr));
+    gap:10px; margin:20px 0;
+  }
+  .insight-card {
+    background:var(--glass); border:1px solid var(--glass-b);
+    border-radius:12px; padding:16px 16px;
+    animation:ideaIn .5s ease-out forwards;
+  }
+  .insight-card-icon { font-size:18px; margin-bottom:8px; opacity:.7; }
+  .insight-card-title { font-size:13px; color:rgba(255,248,235,0.75); line-height:1.5; margin-bottom:4px; }
+  .insight-card-sub { font-size:10.5px; color:var(--dim); line-height:1.5; }
+
+  /* Route card */
+  .route-card {
+    background:rgba(80,200,140,0.05); border:1px solid rgba(80,200,140,0.1);
+    border-radius:12px; padding:16px 18px; margin-bottom:16px;
+  }
+  .route-card-label { font-size:8.5px; letter-spacing:1.5px; color:rgba(80,200,140,0.4); text-transform:uppercase; margin-bottom:10px; }
+  .route-step { font-size:12px; color:rgba(255,248,235,0.55); line-height:1.7; }
+  .route-step::before { content:'·'; margin-right:8px; color:rgba(80,200,140,0.4); }
+
+  .search-open-label { font-size:9px; color:var(--dim); letter-spacing:1px; text-transform:uppercase; }
+
+  .intent-chip {
+    background:var(--glass); border:1px solid var(--glass-b); color:var(--dim);
+    padding:5px 14px; border-radius:20px; font-size:11px; cursor:pointer;
+    transition:all .3s; font-family:inherit;
+  }
+  .intent-chip.sel { background:var(--acc-dim); border-color:rgba(200,150,62,0.25); color:rgba(200,150,62,0.8); }
+
+  .local-match-card {
+    background:rgba(139,92,246,0.05); border:1px solid rgba(139,92,246,0.12);
+    border-radius:11px; padding:12px 16px;
+  }
+  .local-match-label { font-size:8.5px; letter-spacing:1.5px; color:rgba(180,150,255,0.4); text-transform:uppercase; margin-bottom:8px; }
+  .local-match-item { font-size:12px; color:rgba(180,150,255,0.55); line-height:1.65; margin-bottom:4px; }
+  .search-recent { margin-top:28px; }
+  .s-rec-label { font-size:9px;letter-spacing:2px;color:rgba(255,248,235,0.12);text-transform:uppercase;margin-bottom:10px; }
+  .s-rec-item { font-size:12px;color:rgba(255,248,235,0.28);padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.025);cursor:pointer;transition:color .3s; }
+  .s-rec-item:hover { color:var(--mid); }
+
+  /* ══════════════════════════════════════
+     QUICK CAPTURE OVERLAY (Ctrl+Space)
+  ══════════════════════════════════════ */
+  #capture-overlay {
+    position:fixed;inset:0;background:rgba(0,0,0,0.55);backdrop-filter:blur(6px);
+    z-index:200;display:none;align-items:center;justify-content:center;
+  }
+  #capture-overlay.show { display:flex; }
+  .capture-box {
+    background:#0e0e1a;border:1px solid rgba(255,255,255,0.07);
+    border-radius:18px;padding:24px;width:480px;
+    box-shadow:0 30px 70px rgba(0,0,0,0.7);
+    animation:capIn .25s ease-out forwards;
+  }
+  @keyframes capIn { from{opacity:0;transform:translateY(-10px)scale(.97)} to{opacity:1;transform:translateY(0)scale(1)} }
+  .capture-label { font-size:9px;letter-spacing:2px;color:var(--dim);text-transform:uppercase;margin-bottom:10px; }
+  .capture-proj-tag {
+    display:inline-block;background:var(--acc-dim);border:1px solid rgba(200,150,62,0.2);
+    color:rgba(200,150,62,0.7);padding:3px 10px;border-radius:20px;
+    font-size:10px;letter-spacing:.5px;margin-bottom:12px;
+  }
+  .capture-textarea {
+    width:100%;background:transparent;border:none;outline:none;
+    color:var(--text);font-size:15px;font-family:inherit;
+    resize:none;line-height:1.65;min-height:72px;max-height:200px;
+  }
+  .capture-textarea::placeholder { color:var(--dim); }
+  .capture-actions { display:flex;justify-content:space-between;align-items:center;margin-top:16px; }
+  .capture-hint { font-size:10px;color:rgba(255,255,255,0.15); }
+  .cap-btns { display:flex;gap:8px; }
+  .cap-btn { background:var(--glass);border:1px solid var(--glass-b);color:var(--dim);padding:7px 14px;border-radius:9px;font-size:11px;cursor:pointer;transition:all .3s;font-family:inherit; }
+  .cap-btn:hover { color:var(--text); }
+  .cap-btn.primary { background:rgba(200,150,62,0.8);border-color:transparent;color:#07070d;font-weight:600; }
+  .cap-btn.primary:hover { background:rgba(200,150,62,1); }
+
+  /* ══════════════════════════════════════
+     MODALS
+  ══════════════════════════════════════ */
+  .modal-overlay { position:fixed;inset:0;background:rgba(0,0,0,0.42);backdrop-filter:blur(4px);z-index:100;display:none;align-items:center;justify-content:center; }
+  .modal-overlay.show { display:flex; }
+  .modal { background:#0e0e18;border:1px solid rgba(255,255,255,0.06);border-radius:18px;padding:26px 26px 22px;width:360px;box-shadow:0 24px 60px rgba(0,0,0,0.6);animation:capIn .28s ease-out forwards; }
+  .modal-title { font-size:14px;color:var(--text);font-weight:300;margin-bottom:18px;letter-spacing:.5px; }
+  .modal-label { font-size:9px;letter-spacing:1.5px;color:var(--dim);text-transform:uppercase;margin-bottom:7px;margin-top:13px; }
+  .modal-input { width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:9px;padding:9px 13px;color:var(--text);font-size:13.5px;font-family:inherit;outline:none;transition:border-color .3s; }
+  .modal-input:focus { border-color:rgba(200,150,62,0.25); }
+  .cat-grid { display:flex;gap:7px;flex-wrap:wrap; }
+  .cat-btn { background:var(--glass);border:1px solid var(--glass-b);color:var(--dim);padding:5px 12px;border-radius:20px;font-size:10.5px;cursor:pointer;transition:all .3s;font-family:inherit; }
+  .cat-btn.sel { background:var(--acc-dim);border-color:rgba(200,150,62,0.3);color:rgba(200,150,62,0.9); }
+  .modal-actions { display:flex;gap:8px;margin-top:20px;justify-content:flex-end; }
+  .mbtn { background:transparent;border:1px solid var(--glass-b);color:var(--dim);padding:7px 16px;border-radius:9px;font-size:11.5px;cursor:pointer;transition:all .3s;font-family:inherit; }
+  .mbtn:hover { color:var(--text); }
+  .mbtn.primary { background:rgba(200,150,62,0.82);border-color:transparent;color:#07070d;font-weight:600; }
+  .mbtn.primary:hover { background:rgba(200,150,62,1); }
+
+  /* ── FOCUS MODE ── */
+  /* FOCUS MODE — sacru, absolut minimal */
+  body.focus-mode header       { opacity:0; pointer-events:none; transition:opacity .7s ease; }
+  body.focus-mode nav          { opacity:0; pointer-events:none; transition:opacity .7s ease; }
+  body.focus-mode .proj-topbar { opacity:0; pointer-events:none; transition:opacity .5s ease; }
+  body.focus-mode .proj-tone-strip { opacity:0; pointer-events:none; transition:opacity .5s ease; }
+  body.focus-mode .proj-sidebar    { opacity:0; pointer-events:none; transition:opacity .7s ease; }
+  body.focus-mode .proj-columns    { grid-template-columns:1fr; }
+  body.focus-mode .orb             { opacity:0 !important; transition:opacity 1.2s ease; }
+  body.focus-mode #lea-action-bar  { background:rgba(7,7,13,0.98); border-top-color:rgba(255,255,255,0.025); }
+  body.focus-mode .action-chips    { display:none; }
+  body.focus-mode #focus-toggle    { opacity:.18; }
+  body.focus-mode { background:#050508; }
+
+  #focus-toggle {
+    display:none; /* apare doar in project view, inline in topbar */
+    background:none; border:1px solid rgba(255,255,255,0.06); color:var(--dim); cursor:pointer;
+    font-size:9.5px; letter-spacing:1.5px; font-family:inherit;
+    opacity:.6; transition:all .4s; padding:4px 12px; border-radius:20px; text-transform:uppercase;
+    margin-left:auto;
+  }
+  #focus-toggle:hover { opacity:1; color:var(--mid); }
+  body.focus-mode #focus-toggle { opacity:.25; border-color:transparent; }
+
+  /* "Unde m-am blocat" field */
+  .blocat-box {
+    margin-top:0; padding:12px 14px;
+    background:rgba(255,100,80,0.04); border:1px solid rgba(255,100,80,0.08);
+    border-radius:10px;
+  }
+  .blocat-label { font-size:8px; letter-spacing:1.8px; color:rgba(255,150,120,0.4); text-transform:uppercase; margin-bottom:8px; font-weight:500; }
+  .blocat-input {
+    width:100%; background:transparent; border:none; outline:none;
+    color:rgba(255,200,180,0.5); font-size:12px; font-family:inherit;
+    resize:none; line-height:1.65; min-height:38px;
+  }
+  .blocat-input::placeholder { color:rgba(255,255,255,0.12); }
+
+  /* Timeline relativ */
+  .timeline-label {
+    font-size:9px; letter-spacing:1.5px; color:rgba(255,248,235,0.12);
+    text-transform:uppercase; margin:18px 0 10px; font-weight:500;
+    display:flex; align-items:center; gap:10px;
+  }
+  .timeline-label::after { content:''; flex:1; height:1px; background:rgba(255,255,255,0.03); }
+
+  /* LEA notification */
+  #lea-toast {
+    position:fixed;bottom:80px;left:50%;transform:translateX(-50%);
+    background:rgba(200,150,62,0.09);border:1px solid rgba(200,150,62,0.18);
+    border-radius:20px;padding:6px 18px;font-size:11px;color:rgba(200,150,62,0.7);
+    letter-spacing:.5px;opacity:0;transition:opacity .7s;pointer-events:none;z-index:60;
+  }
+  #lea-toast.show { opacity:1; }
+
+  /* ── SIDEBAR ── */
+  #sidebar {
+    border-right:1px solid rgba(255,248,235,0.038);
+    display:flex; flex-direction:column;
+    background:rgba(7,7,13,0.5); backdrop-filter:blur(14px);
+    z-index:2; overflow:hidden;
+  }
+  .sb-brand {
+    padding:26px 20px 18px; border-bottom:1px solid rgba(255,248,235,0.03);
+    flex-shrink:0;
+  }
+  .sb-logo { font-size:10px; letter-spacing:3.5px; color:rgba(255,248,235,0.55); display:block; }
+  .sb-sub  { font-size:9px; letter-spacing:2px; color:rgba(255,248,235,0.2); margin-top:3px; display:block; }
+
+  .sb-nav { flex:1; display:flex; flex-direction:column; padding:16px 10px; gap:2px; }
+  .sb-btn {
+    background:transparent; border:none; color:rgba(255,248,235,0.32);
+    padding:9px 12px; border-radius:8px; font-size:12px; cursor:pointer;
+    font-family:inherit; text-align:left; transition:all .3s; letter-spacing:.3px;
+    display:flex; align-items:center; gap:0;
+  }
+  .sb-btn:hover { color:rgba(255,248,235,0.6); background:rgba(255,248,235,0.03); }
+  .sb-btn.active { color:rgba(255,248,235,0.82); background:rgba(255,248,235,0.04); }
+  .sb-btn.active::before { content:'—'; margin-right:9px; color:rgba(200,150,62,0.45); font-size:9px; }
+  .sb-btn:not(.active)::before { content:'—'; margin-right:9px; opacity:0; font-size:9px; }
+
+  .sb-proj-box {
+    margin:0 10px 10px; padding:10px 12px;
+    background:rgba(200,150,62,0.05); border:1px solid rgba(200,150,62,0.1);
+    border-radius:9px; display:none; flex-shrink:0;
+  }
+  .sb-proj-box.show { display:block; }
+  .sb-proj-box-name { font-size:11px; color:rgba(200,150,62,0.65); margin-bottom:1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .sb-proj-box-sub  { font-size:9px; letter-spacing:.5px; color:rgba(200,150,62,0.3); }
+
+  .sb-footer {
+    padding:12px 10px 18px; border-top:1px solid rgba(255,248,235,0.03);
+    display:flex; flex-direction:column; gap:5px; flex-shrink:0;
+  }
+  .sb-action {
+    background:transparent; border:1px solid rgba(255,248,235,0.055);
+    color:rgba(255,248,235,0.28); padding:8px 12px; border-radius:8px;
+    font-size:10.5px; cursor:pointer; font-family:inherit;
+    text-align:left; transition:all .3s; letter-spacing:.3px;
+  }
+  .sb-action:hover { color:rgba(255,248,235,0.6); border-color:rgba(255,248,235,0.1); }
+  .sb-action.amber { border-color:rgba(200,150,62,0.14); color:rgba(200,150,62,0.5); }
+  .sb-action.amber:hover { color:rgba(200,150,62,0.8); border-color:rgba(200,150,62,0.25); }
+
+  /* ── LEA PANEL ── */
+  #lea-panel {
+    border-left:1px solid rgba(255,248,235,0.038);
+    display:flex; flex-direction:column;
+    background:rgba(5,5,10,0.4); z-index:2; overflow:hidden;
+  }
+  .lp-header {
+    padding:22px 18px 14px; border-bottom:1px solid rgba(255,248,235,0.03); flex-shrink:0;
+  }
+  .lp-name   { font-size:9px; letter-spacing:2px; color:rgba(200,150,62,0.4); text-transform:uppercase; }
+  .lp-status { font-size:10px; color:rgba(255,248,235,0.22); margin-top:3px; font-style:italic; }
+
+  .lp-body {
+    flex:1; padding:16px 18px; overflow-y:auto; scrollbar-width:none;
+    display:flex; flex-direction:column; gap:10px;
+  }
+  .lp-body::-webkit-scrollbar { display:none; }
+
+  .lp-note {
+    font-size:11.5px; color:rgba(255,248,235,0.22); line-height:1.75; font-style:italic;
+  }
+  .lp-obs {
+    font-size:11px; color:rgba(255,248,235,0.3); line-height:1.7;
+    padding:10px 12px; background:rgba(255,248,235,0.02);
+    border:1px solid rgba(255,248,235,0.04); border-radius:9px;
+  }
+  .lp-next {
+    font-size:11px; color:rgba(200,150,62,0.5); line-height:1.7;
+    padding:10px 12px; background:rgba(200,150,62,0.04);
+    border:1px solid rgba(200,150,62,0.1); border-radius:9px;
+  }
+  .lp-exec-resp {
+    font-size:12px; color:rgba(255,248,235,0.55); line-height:1.7; white-space:pre-wrap;
+    padding:10px 12px; background:rgba(200,150,62,0.03);
+    border:1px solid rgba(200,150,62,0.08); border-radius:9px;
+    animation:ideaIn .4s ease-out forwards; display:none;
+  }
+  .lp-exec-resp.show { display:block; }
+
+  .lp-chips {
+    display:flex; flex-direction:column; gap:5px;
+  }
+  .lp-chip {
+    background:transparent; border:1px solid rgba(255,248,235,0.055);
+    color:rgba(255,248,235,0.32); padding:7px 11px; border-radius:8px;
+    font-size:10.5px; cursor:pointer; font-family:inherit; text-align:left;
+    transition:all .3s; letter-spacing:.3px;
+  }
+  .lp-chip:hover { color:rgba(255,248,235,0.6); border-color:rgba(255,248,235,0.1); }
+
+  .lp-input-wrap {
+    padding:12px 14px 16px; border-top:1px solid rgba(255,248,235,0.03); flex-shrink:0;
+  }
+  .lp-input {
+    width:100%; background:transparent;
+    border:none; border-top:1px solid rgba(255,248,235,0.04);
+    padding:10px 0 0; color:rgba(255,248,235,0.5); font-size:11px;
+    font-family:inherit; outline:none; resize:none;
+    min-height:28px; max-height:60px; line-height:1.5; transition:color .3s;
+  }
+  .lp-input:focus { color:rgba(255,248,235,0.72); }
+  .lp-input::placeholder { color:rgba(255,248,235,0.15); font-style:italic; }
+  .lp-input-wrap { padding:10px 18px 16px; flex-shrink:0; }
+
+  /* Hide old nav/header when sidebar active */
+  body > #app > header,
+  body > #app > nav.old-nav { display:none !important; }
+  #lea-action-bar { display:none !important; }
+
+  /* Focus mode — sidebar fades too */
+  body.focus-mode #sidebar  { opacity:0; pointer-events:none; transition:opacity .7s ease; }
+  body.focus-mode #lea-panel { opacity:0; pointer-events:none; transition:opacity .7s ease; }
+  body.focus-mode #app { grid-template-columns:0 1fr 0; }
 </style>
 </head>
 <body>
+<div class="orb" id="o1"></div>
+<div class="orb" id="o2"></div>
 
-<!-- LOGIN -->
-<div id="login">
-  <div class="login-box">
-    <div class="login-logo">VV</div>
-    <div class="login-sub">CONTENT STUDIO · CEO</div>
-    <div class="field" style="margin-bottom:10px">
-      <input class="fi" type="email" id="l-email" placeholder="Email CEO">
-    </div>
-    <div class="field">
-      <input class="fi" type="password" id="l-pass" placeholder="Parolă">
-    </div>
-    <button class="btn btn-gold btn-full" style="margin-top:10px" onclick="doLogin()">INTRĂ</button>
-    <div id="l-err" style="font-size:11px;color:var(--red);text-align:center;margin-top:8px;min-height:16px"></div>
-  </div>
-</div>
+<div id="app">
 
-<!-- APP -->
-<div class="app">
-
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
+  <!-- ── SIDEBAR ── -->
+  <aside id="sidebar">
     <div class="sb-brand">
-      <div class="sb-logo">VV STUDIO</div>
-      <div class="sb-role">CEO · CONTENT</div>
+      <span class="sb-logo">VV</span>
+      <span class="sb-sub">Studio</span>
     </div>
+
     <nav class="sb-nav">
-      <div class="sb-section">PRINCIPAL</div>
-      <div class="sb-item active" onclick="showSec('dashboard',this)">⬡ Dashboard</div>
-      <div class="sb-item" onclick="showSec('static',this)">📍 Date Statice</div>
-      <div class="sb-item" onclick="showSec('pages',this)">📄 Pagini VV NOW</div>
-      <div class="sb-item" onclick="showSec('pricing',this)">💰 Prețuri Servicii</div>
-      <div class="sb-section">ECOSISTEM</div>
-      <div class="sb-item" onclick="showSec('nodes',this)">🏢 Business Nodes</div>
-      <div class="sb-item" onclick="showSec('talents',this)">⬡ Talente</div>
-      <div class="sb-item" onclick="showSec('charter',this)">📜 Charter VV</div>
+      <button class="sb-btn nav-btn active" data-v="today"    onclick="switchView('today')">Azi</button>
+      <button class="sb-btn nav-btn"        data-v="projects" onclick="switchView('projects')">Atelier</button>
+      <button class="sb-btn nav-btn"        data-v="ideas"    onclick="switchView('ideas')">Capturi</button>
+      <button class="sb-btn nav-btn"        data-v="search"   onclick="switchView('search')">Explorează</button>
     </nav>
+
+    <div class="sb-proj-box" id="sb-proj-box">
+      <div class="sb-proj-box-name" id="sb-proj-box-name">—</div>
+      <div class="sb-proj-box-sub">proiect activ</div>
+    </div>
+
     <div class="sb-footer">
-      <button class="btn btn-outline" style="width:100%;font-size:11px" onclick="doLogout()">Deconectare</button>
+      <button class="sb-action amber" onclick="openCapture()">+ captură</button>
+      <button class="sb-action" onclick="goToLea()">← LEA</button>
     </div>
   </aside>
 
-  <!-- MAIN -->
-  <div class="main">
-    <div class="topbar">
-      <div class="topbar-title" id="topbar-title">⬡ Dashboard</div>
-      <div class="topbar-right">
-        <div class="live-chip"><div class="live-dot"></div>Beta Live</div>
-        <div class="live-chip" id="topbar-time">—</div>
+  <!-- ── MAIN ── -->
+  <main id="main">
+
+  <!-- TODAY -->
+  <div class="view show view-pad" id="view-today"></div>
+
+  <!-- PROJECTS -->
+  <div class="view view-pad" id="view-projects">
+    <div style="font-size:11px;letter-spacing:.3px;color:rgba(255,248,235,0.28);font-weight:300;margin-bottom:28px;line-height:1.7">
+      fiecare proiect e un loc în care ai lăsat ceva viu.
+    </div>
+    <div class="projects-grid" id="projects-grid"></div>
+  </div>
+
+  <!-- PROJECT DETAIL -->
+  <div class="view view-pad" id="view-project">
+    <div class="proj-topbar">
+      <button class="proj-back" onclick="switchView('projects')">←</button>
+      <div class="proj-header-info">
+        <div class="proj-header-name" id="pd-name">—</div>
+        <div class="proj-header-cat"  id="pd-cat">—</div>
+      </div>
+      <button id="focus-toggle" onclick="toggleFocus()" title="F = focus mode">focus</button>
+    </div>
+    <div class="proj-tone-strip" id="tone-strip"></div>
+    <div class="proj-columns">
+      <div>
+        <div class="section-label">idei</div>
+        <div class="idea-input-wrap">
+          <textarea class="idea-input" id="idea-input" rows="1"
+            placeholder="o idee nouă…"
+            onkeydown="ideaKey(event)" oninput="autoResize(this)"></textarea>
+          <button class="idea-add-btn" onclick="addIdea()">↑</button>
+        </div>
+        <div class="ideas-list" id="ideas-list"></div>
+      </div>
+      <div class="proj-sidebar">
+        <div class="sidebar-box">
+          <div class="sidebar-box-label">context LEA</div>
+          <textarea class="ctx-textarea" id="ctx-input" rows="3"
+            placeholder="despre ce e proiectul…" oninput="saveCtx()"></textarea>
+          <div class="lea-aware-note" id="lea-aware-note"></div>
+        </div>
+        <div class="blocat-box" id="blocat-box">
+          <div class="blocat-label">unde m-am blocat</div>
+          <textarea class="blocat-input" id="blocat-input" rows="2"
+            placeholder="o propoziție… ce nu merge, ce nu știi"
+            oninput="saveBlocat()"></textarea>
+        </div>
+        <div class="sidebar-box">
+          <div class="sidebar-box-label">obiective</div>
+          <div class="goals-list" id="goals-list"></div>
+          <div class="goal-input-row">
+            <input class="goal-input" id="goal-input" type="text" placeholder="adaugă obiectiv…" onkeydown="goalKey(event)">
+            <button class="goal-add" onclick="addGoal()">+</button>
+          </div>
+        </div>
+        <div class="sidebar-box">
+          <div class="sidebar-box-label">fișiere</div>
+          <div class="files-list" id="files-list"></div>
+          <button class="add-file-btn" onclick="pickFile()">+ adaugă fișier</button>
+        </div>
       </div>
     </div>
+  </div>
 
-    <div class="content">
-
-      <!-- DASHBOARD -->
-      <div class="section active" id="sec-dashboard">
-        <div class="stats-grid" id="dash-stats">
-          <div class="stat"><div class="stat-v gold-v" id="ds-static">—</div><div class="stat-l">DATE STATICE</div></div>
-          <div class="stat"><div class="stat-v green-v" id="ds-nodes">—</div><div class="stat-l">NODURI BUSINESS</div></div>
-          <div class="stat"><div class="stat-v blue-v" id="ds-talents">—</div><div class="stat-l">TALENTE ACTIVE</div></div>
-          <div class="stat"><div class="stat-v orange-v" id="ds-pages">—</div><div class="stat-l">PAGINI VV NOW</div></div>
-        </div>
-        <div class="card">
-          <div class="card-title">Acțiuni Rapide</div>
-          <div class="card-sub">CEO Studio — gestionezi tot ecosistemul fără cod</div>
-          <div style="display:flex;gap:10px;flex-wrap:wrap">
-            <button class="btn btn-gold" onclick="showSec('static',document.querySelector('[onclick*=static]'))">+ Adaugă Locație Statică</button>
-            <button class="btn btn-outline" onclick="showSec('pages',document.querySelector('[onclick*=pages]'))">+ Pagină VV NOW</button>
-            <button class="btn btn-outline" onclick="showSec('pricing',document.querySelector('[onclick*=pricing]'))">💰 Setează Prețuri</button>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-title">Feed Ecosistem</div>
-          <div id="dash-feed"><div class="loading"><div class="spinner"></div></div></div>
-        </div>
+  <!-- IDEAS GLOBAL -->
+  <div class="view view-pad" id="view-ideas">
+    <div class="view-title">gânduri salvate</div>
+    <div class="ideas-global-wrap">
+      <div class="idea-input-wrap">
+        <textarea class="idea-input" id="gi-input" rows="1"
+          placeholder="un gând…"
+          onkeydown="giKey(event)" oninput="autoResize(this)"></textarea>
+        <button class="idea-add-btn" onclick="addGI()">↑</button>
       </div>
-
-      <!-- DATE STATICE -->
-      <div class="section" id="sec-static">
-        <div class="sec-header">
-          <div>
-            <div class="sec-title">Date Statice</div>
-            <div class="sec-sub">Spitale, urgențe, instituții — date verificate manual, nu pot fi falsificate</div>
-          </div>
-          <button class="btn btn-gold" onclick="openAddStatic()">+ Adaugă</button>
-        </div>
-
-        <!-- Categorii predefinite -->
-        <div class="card" style="margin-bottom:20px">
-          <div class="card-title">Import Rapid — Date Urgențe București</div>
-          <div class="card-sub">Adaugă automat datele esențiale verificate pentru București</div>
-          <div style="display:flex;gap:8px;flex-wrap:wrap">
-            <button class="btn btn-outline" onclick="importPreset('spitale_buc')">🏥 Spitale BUC</button>
-            <button class="btn btn-outline" onclick="importPreset('politie_buc')">🚔 Poliție BUC</button>
-            <button class="btn btn-outline" onclick="importPreset('farmacii_noapte')">💊 Farmacii Noapte</button>
-            <button class="btn btn-outline" onclick="importPreset('pizza_buc')">🍕 Pizza București</button>
-            <button class="btn btn-outline" onclick="importPreset('cafenele_buc')">☕ Cafenele București</button>
-            <button class="btn btn-outline" onclick="importPreset('mancare_rapida_buc')">🍔 Fast Food + Livrare BUC</button>
-            <button class="btn btn-outline" onclick="importPreset('mancare_cluj')">🏔 Mâncare Cluj</button>
-            <button class="btn btn-outline" onclick="importPreset('mancare_timisoara')">🌆 Mâncare Timișoara</button>
-            <button class="btn btn-outline" onclick="importPreset('mancare_iasi')">🏛 Mâncare Iași</button>
-            <button class="btn btn-outline" onclick="importPreset('metrou_buc')">🚇 Metrou BUC</button>
-            <button class="btn btn-outline" onclick="importPreset('urgente_nationale')">🆘 Numere Urgențe RO</button>
-          </div>
-        </div>
-
-        <div class="card">
-          <table class="vv-table">
-            <thead>
-              <tr>
-                <th>Nume</th><th>Tip</th><th>Oraș</th><th>Vizibil</th><th>Acțiuni</th>
-              </tr>
-            </thead>
-            <tbody id="static-table"><tr><td colspan="5" class="loading"><div class="spinner"></div></td></tr></tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- PAGINI VV NOW -->
-      <div class="section" id="sec-pages">
-        <div class="sec-header">
-          <div>
-            <div class="sec-title">Pagini VV NOW</div>
-            <div class="sec-sub">Conținut hibrid legal — apare în VV NOW când cineva caută</div>
-          </div>
-          <button class="btn btn-gold" onclick="openAddPage()">+ Pagină Nouă</button>
-        </div>
-        <div class="card">
-          <div class="card-title">Ce e o Pagină VV NOW?</div>
-          <div style="font-size:12px;color:var(--w50);line-height:1.8">
-            O pagină VV NOW e un răspuns complet pe care Nexus îl afișează când cineva caută un subiect specific.
-            Exemple: "Ce să vizitezi în Slobozia", "Restaurante deschise noaptea în București", "Trasee montane ușoare lângă Sinaia".
-            <br><br>
-            <b style="color:var(--w70)">Cum faci bani:</b> Poți seta un preț per afișare pentru pagini sponsorizate. Localurile sau turoperatorii plătesc să apară primii. Totul marcat legal ca "Conținut Sponsorizat VV".
-          </div>
-        </div>
-        <div id="pages-list"><div class="loading"><div class="spinner"></div></div></div>
-      </div>
-
-      <!-- PREȚURI SERVICII -->
-      <div class="section" id="sec-pricing">
-        <div class="sec-header">
-          <div>
-            <div class="sec-title">Prețuri Servicii</div>
-            <div class="sec-sub">Setează prețurile pentru serviciile ecosistemului VV</div>
-          </div>
-          <button class="btn btn-gold" onclick="savePricing()">Salvează</button>
-        </div>
-
-        <div class="card">
-          <div class="card-title">Business Node</div>
-          <div class="card-sub">Cât plătesc firmele să apară în VV NOW</div>
-          <div class="row3">
-            <div class="field">
-              <label class="fl">BETA (acum)</label>
-              <input class="fi" id="p-biz-beta" value="0" type="number"> <span style="font-size:10px;color:var(--w30)">€/lună</span>
-            </div>
-            <div class="field">
-              <label class="fl">STANDARD (VV 1.0)</label>
-              <input class="fi" id="p-biz-std" value="9" type="number"> <span style="font-size:10px;color:var(--w30)">€/lună</span>
-            </div>
-            <div class="field">
-              <label class="fl">PREMIUM (Nod Fondator)</label>
-              <input class="fi" id="p-biz-prem" value="29" type="number"> <span style="font-size:10px;color:var(--w30)">€/lună</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="card-title">VV Talent</div>
-          <div class="card-sub">Cât plătesc agențiile să caute talente</div>
-          <div class="row3">
-            <div class="field">
-              <label class="fl">LISTARE TALENT</label>
-              <input class="fi" id="p-tal-list" value="0" type="number"> <span style="font-size:10px;color:var(--w30)">€ (gratuit beta)</span>
-            </div>
-            <div class="field">
-              <label class="fl">ACCES AGENȚIE</label>
-              <input class="fi" id="p-tal-agency" value="49" type="number"> <span style="font-size:10px;color:var(--w30)">€/lună</span>
-            </div>
-            <div class="field">
-              <label class="fl">PER CONTACT TALENT</label>
-              <input class="fi" id="p-tal-contact" value="5" type="number"> <span style="font-size:10px;color:var(--w30)">€/contact</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="card-title">VV NOW Premium</div>
-          <div class="card-sub">Abonamentul userilor pentru funcții avansate</div>
-          <div class="row3">
-            <div class="field">
-              <label class="fl">STANDARD</label>
-              <input class="fi" id="p-now-std" value="0" type="number"> <span style="font-size:10px;color:var(--w30)">€/lună (gratuit)</span>
-            </div>
-            <div class="field">
-              <label class="fl">PREMIUM</label>
-              <input class="fi" id="p-now-prem" value="9" type="number"> <span style="font-size:10px;color:var(--w30)">€/lună</span>
-            </div>
-            <div class="field">
-              <label class="fl">ONYX (VV Coins)</label>
-              <input class="fi" id="p-now-onyx" value="500" type="number"> <span style="font-size:10px;color:var(--w30)">VV Coins</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="card-title">VERIFY Flash Mission</div>
-          <div class="card-sub">Costul per verificare fizică</div>
-          <div class="row2">
-            <div class="field">
-              <label class="fl">COST USER (plătit din VV)</label>
-              <input class="fi" id="p-verify-user" value="10" type="number"> <span style="font-size:10px;color:var(--w30)">VV Coins</span>
-            </div>
-            <div class="field">
-              <label class="fl">RECOMPENSĂ INSIDER</label>
-              <input class="fi" id="p-verify-insider" value="10" type="number"> <span style="font-size:10px;color:var(--w30)">VV Coins</span>
-            </div>
-          </div>
-          <div style="font-size:11px;color:var(--w30);margin-top:8px">
-            ℹ️ În Beta: userile nu plătesc VV Coins real — e o simulare. La VV 1.0 intră economia reală.
-          </div>
-        </div>
-
-        <div class="card" style="background:rgba(212,175,55,.04);border-color:var(--gold-b)">
-          <div class="card-title" style="color:var(--gold)">Proiecție Venituri Lunare</div>
-          <div style="font-size:12px;color:var(--w50);line-height:2">
-            <div>🏢 100 Business Nodes × 9€ = <b style="color:var(--w)">900€</b></div>
-            <div>👥 10 Agenții × 49€ = <b style="color:var(--w)">490€</b></div>
-            <div>⬡ 50 useri Premium × 9€ = <b style="color:var(--w)">450€</b></div>
-            <div style="border-top:1px solid var(--border);margin-top:8px;padding-top:8px">
-              Total estimat: <b style="color:var(--gold);font-size:14px">1.840€/lună</b> cu 160 clienți activi
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- BUSINESS NODES -->
-      <div class="section" id="sec-nodes">
-        <div class="sec-header">
-          <div><div class="sec-title">Business Nodes</div><div class="sec-sub">Locații înregistrate în ecosistem</div></div>
-        </div>
-        <div class="card">
-          <table class="vv-table">
-            <thead><tr><th>Locație</th><th>Tip</th><th>Oraș</th><th>Status</th><th>Creat</th></tr></thead>
-            <tbody id="nodes-table"><tr><td colspan="5"><div class="loading"><div class="spinner"></div></div></td></tr></tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- TALENTE -->
-      <div class="section" id="sec-talents">
-        <div class="sec-header">
-          <div><div class="sec-title">VV Talent</div><div class="sec-sub">Profiluri active în ecosistem</div></div>
-        </div>
-        <div class="card">
-          <table class="vv-table">
-            <thead><tr><th>Alias</th><th>Domeniu</th><th>Oraș</th><th>Nivel</th><th>Skills</th></tr></thead>
-            <tbody id="talents-table"><tr><td colspan="5"><div class="loading"><div class="spinner"></div></div></td></tr></tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- CHARTER -->
-      <div class="section" id="sec-charter">
-        <div class="sec-header">
-          <div><div class="sec-title">VV Charter</div><div class="sec-sub">Regulile legale ale ecosistemului</div></div>
-        </div>
-        <div class="card">
-          <div style="font-size:12px;color:var(--w50);line-height:2">
-            <div><b style="color:var(--gold)">ART-1</b> · Anonimat — Nicio dată de buletin stocată în sistem</div>
-            <div><b style="color:var(--gold)">ART-2</b> · Ton — Direct, profesional, fără manipulare</div>
-            <div><b style="color:var(--gold)">ART-3</b> · Filtru Etic — Conținut ilegal blocat automat</div>
-            <div><b style="color:var(--gold)">ART-4</b> · Anti-Scroll — Conținut orientat spre acțiune reală</div>
-            <div><b style="color:var(--gold)">ART-5</b> · Loialitate — Userii pot șterge datele oricând</div>
-            <div><b style="color:var(--gold)">ART-6</b> · VV Coins — Economie transparentă, trasabilă</div>
-            <div><b style="color:var(--gold)">ART-7</b> · Ierarhie — Level bazat pe acțiuni fizice reale</div>
-            <div><b style="color:var(--gold)">ART-8</b> · Maturitate — Conținut 18+ marcat explicit</div>
-            <div><b style="color:var(--gold)">ART-9</b> · Expirare — Date fără update șterse automat</div>
-            <div><b style="color:var(--gold)">ART-10</b> · GDPR — Conformitate legislație română și UE</div>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-title">Sancțiuni Automate</div>
-          <div style="font-size:12px;color:var(--w50);line-height:2">
-            <div>Business Node cu date false → Neverificat 7 zile automat</div>
-            <div>Business Node fără update 30 zile → Marcat "Date posibil depășite"</div>
-            <div>Business Node fără update 120 zile → Șters automat</div>
-            <div>Talent cu informații false → Profil suspendat</div>
-            <div>Conținut care încalcă ART-3 → Blocat înainte de publicare</div>
-          </div>
-        </div>
-      </div>
-
-    </div><!-- /content -->
-  </div><!-- /main -->
-</div><!-- /app -->
-
-<!-- MODAL ADD STATIC -->
-<div class="modal-overlay" id="modal-static">
-  <div class="modal">
-    <button class="modal-close" onclick="closeModal('modal-static')">✕</button>
-    <div class="modal-title">Adaugă Locație Statică</div>
-    <div class="modal-sub">Date verificate manual — apar în VV NOW, nu pot fi falsificate de useri</div>
-    <div class="field">
-      <label class="fl">TIP LOCAȚIE *</label>
-      <div class="type-grid">
-        <div class="type-pill" onclick="selectType(this,'spital')">🏥 Spital</div>
-        <div class="type-pill" onclick="selectType(this,'politie')">🚔 Poliție</div>
-        <div class="type-pill" onclick="selectType(this,'pompieri')">🚒 Pompieri</div>
-        <div class="type-pill" onclick="selectType(this,'smurd')">🚑 SMURD</div>
-        <div class="type-pill" onclick="selectType(this,'farmacie')">💊 Farmacie</div>
-        <div class="type-pill" onclick="selectType(this,'metrou')">🚇 Metrou</div>
-        <div class="type-pill" onclick="selectType(this,'primarie')">🏛️ Primărie</div>
-        <div class="type-pill" onclick="selectType(this,'urgenta_num')">📞 Număr Urgență</div>
-        <div class="type-pill" onclick="selectType(this,'obiectiv')">🏛️ Obiectiv</div>
-        <div class="type-pill" onclick="selectType(this,'altele')">⬡ Altele</div>
-      </div>
-      <input type="hidden" id="s-type">
+      <div class="ideas-list" id="gi-list"></div>
     </div>
-    <div class="row2">
-      <div class="field"><label class="fl">NUME *</label><input class="fi" id="s-name" placeholder="ex: Spitalul Floreasca"></div>
-      <div class="field"><label class="fl">ORAȘ *</label><input class="fi" id="s-city" placeholder="București"></div>
+  </div>
+
+  <!-- VV SEARCH — intent engine personal -->
+  <div class="view view-pad" id="view-search">
+    <div class="search-center">
+
+      <!-- Input principal -->
+      <div class="search-title" id="search-title-text">ce cauți?</div>
+      <div class="search-wrap">
+        <input class="search-input" id="search-input" type="text"
+          placeholder="vacanță Grecia, traseu alergat, restaurant…"
+          onkeydown="searchKey(event)" oninput="searchLive(this.value)">
+        <button class="search-btn" onclick="doSearch()">→</button>
+      </div>
+
+      <!-- Intent chips — ce fel de căutare -->
+      <div id="search-intent-row" style="display:none;margin-bottom:20px;">
+        <div style="font-size:9px;letter-spacing:1.5px;color:var(--dim);text-transform:uppercase;margin-bottom:10px;">ce vrei?</div>
+        <div class="search-hints" id="search-intent-chips"></div>
+      </div>
+
+      <!-- Hints din profil -->
+      <div class="search-hints" id="search-hints"></div>
+
+      <!-- Offline match — idei din proiecte -->
+      <div id="search-local-match" style="display:none;margin:20px 0 0;"></div>
+
+      <!-- VV a pregătit pentru tine -->
+      <div id="search-results" style="display:none">
+        <div id="search-built-query" class="search-built-query"></div>
+
+        <!-- Insight cards — curate din profil -->
+        <div id="search-lea-label" style="font-size:9px;letter-spacing:1.5px;color:rgba(255,255,255,0.18);text-transform:uppercase;margin-bottom:12px;display:none">lea a pregătit pentru tine</div>
+        <div class="insights-grid" id="search-insights"></div>
+
+        <!-- Route card — pentru sport/vacanta -->
+        <div id="search-route-card" style="display:none"></div>
+
+        <!-- Filtrele aplicate -->
+        <div style="margin-bottom:16px;">
+          <div style="font-size:9px;letter-spacing:1.5px;color:rgba(255,255,255,0.18);text-transform:uppercase;margin-bottom:10px;">filtrele tale</div>
+          <div class="search-filter-chips" id="search-filter-chips"></div>
+        </div>
+
+        <!-- Queries sugerate -->
+        <div id="search-suggested" style="margin-bottom:20px;"></div>
+
+        <!-- Surse multiple -->
+        <div style="font-size:9px;letter-spacing:1.5px;color:rgba(255,255,255,0.18);text-transform:uppercase;margin-bottom:12px;">deschide în</div>
+        <div id="search-sources" style="display:flex;flex-direction:column;gap:8px;"></div>
+      </div>
+
+      <!-- VV Insights — observații rare din comportamentul de căutare -->
+      <div id="vv-insights-panel" style="display:none;margin-top:28px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.03);">
+        <div style="font-size:9px;letter-spacing:1.5px;color:rgba(255,255,255,0.12);text-transform:uppercase;margin-bottom:14px;">vv a observat</div>
+        <div id="vv-insights-list"></div>
+      </div>
+
+      <!-- Profil de căutare — ce a observat VV -->
+      <div id="search-profile-note" style="display:none;margin-top:32px;font-size:11px;color:rgba(255,248,235,0.22);font-style:italic;line-height:1.7;"></div>
+
+      <div class="search-recent" id="search-recent-wrap" style="margin-top:28px;">
+        <div class="s-rec-label">recente</div>
+        <div id="search-recent"></div>
+      </div>
     </div>
-    <div class="field"><label class="fl">ADRESĂ</label><input class="fi" id="s-addr" placeholder="Calea Floreasca 8"></div>
-    <div class="row2">
-      <div class="field"><label class="fl">TELEFON / URGENȚĂ</label><input class="fi" id="s-phone" placeholder="021 / 112..."></div>
-      <div class="field"><label class="fl">PROGRAM</label><input class="fi" id="s-hours" placeholder="24/7 sau L-V 08-20"></div>
+  </div>
+
+  <!-- LEA ACTION BAR (hidden — înlocuit de #lea-panel) -->
+  <div id="lea-action-bar" style="display:none">
+    <div class="action-chips" id="action-chips"></div>
+    <div class="lea-action-wrap">
+      <input class="lea-action-input" id="lea-action-input" type="text"
+        placeholder="ce vrei să fac cu asta?"
+        onkeydown="leaActionKey(event)">
+      <button class="lea-action-send" onclick="doLeaAction()">→</button>
     </div>
-    <div class="field"><label class="fl">INFORMAȚII UTILE</label><textarea class="textarea" id="s-info" placeholder="Secție urgențe, specialități, acces transport..."></textarea></div>
-    <div class="field">
-      <label class="fl">CUVINTE CHEIE (cum să apară în VV NOW)</label>
-      <input class="fi" id="s-keywords" placeholder="ex: urgente, traumatologie, cardiologie...">
+    <div class="lea-action-result" id="lea-action-result"></div>
+  </div>
+
+  </main><!-- /main -->
+
+  <!-- ── LEA PANEL ── -->
+  <div id="lea-panel">
+    <div class="lp-header">
+      <div class="lp-name">LEA</div>
+      <div class="lp-status" id="lp-status">prezentă</div>
     </div>
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
-      <div class="toggle on" id="s-visible-toggle" onclick="toggleVisible()"><div class="toggle-knob"></div></div>
-      <div class="toggle-label">Vizibil în VV NOW</div>
+    <div class="lp-body" id="lp-body">
+      <div class="lp-note" id="lp-note">deschide un proiect —<br>voi ști contextul tău.</div>
+      <div class="lp-exec-resp" id="lp-exec-resp"></div>
     </div>
-    <button class="btn btn-gold btn-full" onclick="saveStatic()">⬡ SALVEAZĂ LOCAȚIA</button>
+    <div class="lp-input-wrap">
+      <textarea class="lp-input" id="lp-input" rows="1"
+        placeholder="întreabă LEA…"
+        oninput="autoResize(this)"
+        onkeydown="lpKey(event)"></textarea>
+    </div>
+  </div>
+
+</div>
+
+<!-- QUICK CAPTURE -->
+<div id="capture-overlay" onclick="captureOverlayClick(event)">
+  <div class="capture-box">
+    <div class="capture-label">captură rapidă</div>
+    <div class="capture-proj-tag" id="capture-proj-tag" style="display:none"></div>
+    <textarea class="capture-textarea" id="capture-input" rows="3"
+      placeholder="ce ți-a venit în minte?"
+      oninput="autoResize(this)"></textarea>
+    <div class="capture-actions">
+      <span class="capture-hint">Enter = salvează · Esc = închide</span>
+      <div class="cap-btns">
+        <button class="cap-btn" onclick="closeCapture()">anulează</button>
+        <button class="cap-btn primary" onclick="saveCapture()">salvează</button>
+      </div>
+    </div>
   </div>
 </div>
 
-<!-- MODAL ADD PAGE -->
-<div class="modal-overlay" id="modal-page">
-  <div class="modal">
-    <button class="modal-close" onclick="closeModal('modal-page')">✕</button>
-    <div class="modal-title">Pagină VV NOW Nouă</div>
-    <div class="modal-sub">Conținut hibrid legal — apare când cineva caută subiectul</div>
-    <div class="field"><label class="fl">TITLU PAGINĂ *</label><input class="fi" id="pg-title" placeholder="ex: Restaurante deschise noaptea în București"></div>
-    <div class="field"><label class="fl">CUVINTE CHEIE (triggere căutare) *</label><input class="fi" id="pg-keywords" placeholder="ex: restaurant noapte, mancare noapte, deschis 24h..."></div>
-    <div class="field"><label class="fl">CONȚINUT *</label><textarea class="textarea" id="pg-content" style="min-height:120px" placeholder="Conținutul paginii — ce vede userul când caută..."></textarea></div>
-    <div class="row2">
-      <div class="field"><label class="fl">ORAȘ / ZONĂ</label><input class="fi" id="pg-city" placeholder="București, Slobozia, toată România..."></div>
-      <div class="field"><label class="fl">CATEGORIE</label>
-        <select class="select" id="pg-cat">
-          <option value="info">ℹ️ Informare</option>
-          <option value="urgenta">🆘 Urgență</option>
-          <option value="turism">🗺️ Turism</option>
-          <option value="business">🏢 Business</option>
-          <option value="sponsorizat">💛 Sponsorizat</option>
-        </select>
-      </div>
+<!-- MODAL NOU PROIECT -->
+<div class="modal-overlay" id="modal-new" onclick="modalClick(event,'modal-new')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-title">proiect nou</div>
+    <div class="modal-label">nume</div>
+    <input class="modal-input" id="new-proj-name" type="text" placeholder="ex. Album, VV Hybrid…" onkeydown="newProjKey(event)">
+    <div class="modal-label">tip</div>
+    <div class="cat-grid" id="cat-grid">
+      <button class="cat-btn sel" data-cat="creativ"  onclick="selCat(this)">creativ</button>
+      <button class="cat-btn"     data-cat="muncă"    onclick="selCat(this)">muncă</button>
+      <button class="cat-btn"     data-cat="personal" onclick="selCat(this)">personal</button>
+      <button class="cat-btn"     data-cat="learning" onclick="selCat(this)">learning</button>
     </div>
-    <div class="card" style="margin-bottom:16px">
-      <div class="price-toggle">
-        <div class="toggle" id="pg-paid-toggle" onclick="togglePaid()"><div class="toggle-knob"></div></div>
-        <div class="toggle-label">Pagină Sponsorizată (generează venit)</div>
-      </div>
-      <div id="pg-price-section" style="display:none">
-        <div class="row2">
-          <div class="field"><label class="fl">PREȚ PER LUNĂ (€)</label><input class="fi" id="pg-price" placeholder="ex: 29"></div>
-          <div class="field"><label class="fl">CLIENT / SPONSOR</label><input class="fi" id="pg-sponsor" placeholder="Numele clientului"></div>
-        </div>
-        <div style="font-size:11px;color:var(--orange)">⚠️ Pagina va fi marcată "Conținut Sponsorizat VV" conform legislației.</div>
-      </div>
+    <div class="modal-label">descriere (opțional)</div>
+    <input class="modal-input" id="new-proj-desc" type="text" placeholder="două cuvinte…">
+    <div class="modal-actions">
+      <button class="mbtn" onclick="closeNewProj()">anulează</button>
+      <button class="mbtn primary" onclick="createProject()">creează</button>
     </div>
-    <button class="btn btn-gold btn-full" onclick="savePage()">⬡ PUBLICĂ PAGINA</button>
   </div>
 </div>
 
-<div id="toast"></div>
+<div id="lea-toast">LEA știe contextul</div>
 
-<!-- FIREBASE -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script>
-firebase.initializeApp({
-  apiKey:"AIzaSyDGv4kEClO0RHCLvXVLOT-vyPHw6bsxYVc",
-  authDomain:"vv-ep-beta.firebaseapp.com",
-  projectId:"vv-ep-beta"
-});
-var db = firebase.firestore();
-var auth = firebase.auth();
-var CEO_UID = 'PthU3uVY5WSPNx8d4XrdXEgszEo1';
-var _staticVisible = true;
-var _pagePaid = false;
-var _selectedType = '';
+// ══════════════════════════════════════════════════════════════
+// STORAGE
+// ══════════════════════════════════════════════════════════════
 
-// ── AUTH ──────────────────────────────────────────────────────
-auth.onAuthStateChanged(function(user) {
-  if (user && user.uid === CEO_UID) {
-    document.getElementById('login').classList.add('hidden');
-    initApp();
-  } else if (user) {
-    auth.signOut();
-  }
-});
-
-function doLogin() {
-  var email = document.getElementById('l-email').value;
-  var pass = document.getElementById('l-pass').value;
-  var err = document.getElementById('l-err');
-  err.textContent = '';
-  auth.signInWithEmailAndPassword(email, pass).catch(function(e) {
-    err.textContent = 'Acces refuzat.';
-  });
-}
-function doLogout() { auth.signOut().then(function(){ location.reload(); }); }
-
-// ── CLOCK ─────────────────────────────────────────────────────
-setInterval(function() {
-  var now = new Date();
-  var t = document.getElementById('topbar-time');
-  if (t) t.textContent = now.toLocaleTimeString('ro-RO', {hour:'2-digit',minute:'2-digit'});
-}, 1000);
-
-// ── INIT ──────────────────────────────────────────────────────
-async function initApp() {
-  loadDashboard();
-}
-
-async function loadDashboard() {
-  try {
-    var [staticD, nodesD, talentsD, pagesD, feedD] = await Promise.all([
-      db.collection('vv_static_data').get(),
-      db.collection('verified_nodes').where('status','==','active').get(),
-      db.collection('vv_talents').where('status','==','active').get(),
-      db.collection('vv_now_pages').get(),
-      db.collection('vvhi_dataset').orderBy('timestamp','desc').limit(6).get()
-    ]);
-    document.getElementById('ds-static').textContent = staticD.size;
-    document.getElementById('ds-nodes').textContent = nodesD.size;
-    document.getElementById('ds-talents').textContent = talentsD.size;
-    document.getElementById('ds-pages').textContent = pagesD.size;
-
-    var acts = {'VV_NOW_SEARCH':'Căutare VV NOW','VERIFY_REQUESTED':'Flash Mission','BUSINESS_NODE_CREATED':'Nou Business Node','TALENT_REGISTERED':'Nou Talent','APPROVE_MISSION':'Misiune aprobată'};
-    var feedHtml = '';
-    feedD.forEach(function(doc) {
-      var d = doc.data();
-      var date = d.timestamp ? d.timestamp.toDate().toLocaleString('ro-RO',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}) : '—';
-      feedHtml += '<tr><td style="font-size:11px;font-weight:700;color:var(--gold)">'+(acts[d.action]||d.action)+'</td><td style="font-size:11px;color:var(--w30)">'+date+'</td></tr>';
-    });
-    document.getElementById('dash-feed').innerHTML = '<table class="vv-table"><tbody>'+feedHtml+'</tbody></table>';
-  } catch(e) { console.log(e); }
-}
-
-// ── NAVIGARE ─────────────────────────────────────────────────
-function showSec(name, el) {
-  document.querySelectorAll('.section').forEach(function(s){ s.classList.remove('active'); });
-  document.querySelectorAll('.sb-item').forEach(function(i){ i.classList.remove('active'); });
-  var sec = document.getElementById('sec-'+name);
-  if (sec) sec.classList.add('active');
-  if (el) el.classList.add('active');
-  var titles = {dashboard:'⬡ Dashboard',static:'📍 Date Statice',pages:'📄 Pagini VV NOW',pricing:'💰 Prețuri Servicii',nodes:'🏢 Business Nodes',talents:'⬡ Talente',charter:'📜 VV Charter'};
-  document.getElementById('topbar-title').textContent = titles[name] || name;
-  if (name === 'static') loadStaticTable();
-  if (name === 'nodes') loadNodesTable();
-  if (name === 'talents') loadTalentsTable();
-  if (name === 'pages') loadPages();
-}
-
-// ── DATE STATICE ──────────────────────────────────────────────
-var PRESETS = {
-  spitale_buc: [
-    {name:'Spitalul Floreasca',type:'spital',city:'București',addr:'Calea Floreasca 8',phone:'021 599 2300',hours:'24/7',info:'Urgențe, chirurgie, traumatologie',keywords:'floreasca,urgente,spital,traumatologie'},
-    {name:'Spitalul Elias',type:'spital',city:'București',addr:'Bulevardul Mărăști 17',phone:'021 316 1600',hours:'24/7',info:'Urgențe generale, cardiologie, neurologie',keywords:'elias,urgente,spital,marasti'},
-    {name:'Spitalul Bagdasar-Arseni',type:'spital',city:'București',addr:'Bulevardul Constantin Brâncoveanu 10',phone:'021 334 3007',hours:'24/7',info:'Neurochirurgie, urgențe neurologice',keywords:'bagdasar,neurochirurgie,urgente,spital'},
-    {name:'Spitalul de Urgență Grigore Alexandrescu',type:'spital',city:'București',addr:'Bulevardul Iancu de Hunedoara 30-32',phone:'021 316 9354',hours:'24/7',info:'Urgențe copii, pediatrie',keywords:'alexandrescu,copii,urgente,pediatrie,spital'}
-  ],
-  politie_buc: [
-    {name:'Poliția Municipiului București',type:'politie',city:'București',addr:'Calea Victoriei 17',phone:'021 311 2921',hours:'24/7',info:'Dispecerat general, sesizări',keywords:'politie,bucuresti,sesizare'},
-    {name:'Număr urgență Poliție',type:'urgenta_num',city:'România',addr:'—',phone:'112',hours:'24/7',info:'Numărul național de urgențe poliție',keywords:'politie,112,urgenta,ajutor'}
-  ],
-  farmacii_noapte: [
-    {name:'Sensiblu Nonstop Unirii',type:'farmacie',city:'București',addr:'Piața Unirii',phone:'—',hours:'24/7',info:'Farmacie nonstop cu livrare',keywords:'farmacie,noapte,nonstop,unirii,sensiblu'},
-    {name:'Dona Nonstop Victoriei',type:'farmacie',city:'București',addr:'Piața Victoriei',phone:'—',hours:'24/7',info:'Farmacie nonstop',keywords:'farmacie,noapte,nonstop,victoriei,dona'}
-  ],
-  metrou_buc: [
-    {name:'Metrou București — Info',type:'metrou',city:'București',addr:'—',phone:'021 335 4142',hours:'05:00-23:00',info:'Program general metrou. Linii M1 M2 M3 M4 M5',keywords:'metrou,bucuresti,transport,m1,m2,m3,m4,m5'}
-  ],
-  urgente_nationale: [
-    {name:'URGENȚE — 112',type:'urgenta_num',city:'România',addr:'—',phone:'112',hours:'24/7',info:'Numărul național de urgențe — Poliție, Ambulanță, Pompieri',keywords:'112,urgenta,ambulanta,politie,pompieri,ajutor'},
-    {name:'TELVERDE Sănătate — 0800 800 358',type:'urgenta_num',city:'România',addr:'—',phone:'0800 800 358',hours:'24/7',info:'Linie gratuită informații medicale',keywords:'sanatate,telverde,medical,sfat,informatii'},
-    {name:'Ambulanță — 112 / 021 961',type:'urgenta_num',city:'București',addr:'—',phone:'021 961',hours:'24/7',info:'Ambulanță București',keywords:'ambulanta,urgenta,112,bucuresti'}
-  ],
-
-  // ── BUCUREȘTI · MÂNCARE & CAFENELE ──
-  pizza_buc: [
-    {name:'Pizza Hut Universitate',type:'restaurant',city:'bucurești',address:'Bd. Magheru 12, Sector 1',phone:'021 311 1111',hours:'10:00-24:00',keywords:'pizza,mancare,livrare,fast food',info:'Livrare disponibilă. Non-stop weekend.',verified:true},
-    {name:'Dominos Pizza Floreasca',type:'restaurant',city:'bucurești',address:'Calea Floreasca 246',phone:'021 233 3333',hours:'10:00-24:00',keywords:'pizza,mancare,livrare,dominos',info:'Livrare rapidă în Floreasca și Dorobanți.',verified:true},
-    {name:'Dristor Kebab',type:'restaurant',city:'bucurești',address:'Str. Dristor 1, Sector 3',phone:'',hours:'00:00-24:00',keywords:'shaorma,mancare,nonstop,kebab,livrare',info:'Non-stop. Shaorma verificată de Insideri.',verified:true},
-    {name:'Ciao Pizza',type:'restaurant',city:'bucurești',address:'Calea Victoriei 45',phone:'0724 000 001',hours:'11:00-23:00',keywords:'pizza,italiana,mancare,victoriei',info:'Pizza italiană artizanală. Rezervare recomandată seara.',verified:true},
-    {name:'Viva Pizza',type:'restaurant',city:'bucurești',address:'Bd. Unirii 20, Sector 4',phone:'021 336 0000',hours:'10:00-23:00',keywords:'pizza,mancare,livrare,unirii',info:'Livrare în sectorul 4.',verified:true}
-  ],
-  cafenele_buc: [
-    {name:'Cărturești Carusel Café',type:'cafenea',city:'bucurești',address:'Str. Lipscani 55, Sector 3',phone:'',hours:'10:00-22:00',keywords:'cafea,cafenea,carti,centru,liber,loc',info:'Cafenea premiu în clădire istorică. Mereu loc disponibil dimineața.',verified:true},
-    {name:'Bob Coffee',type:'cafenea',city:'bucurești',address:'Str. Popa Soare 42, Sector 2',phone:'',hours:'08:00-20:00',keywords:'cafea,specialty,coffee,hipster',info:'Specialty coffee. Aglomerată 9-11 dimineața.',verified:true},
-    {name:'Origo Coffee',type:'cafenea',city:'bucurești',address:'Str. Academiei 28',phone:'',hours:'08:00-21:00',keywords:'cafea,coffee,specialty,centru',info:'Una din cele mai bune cafenele specialty din BUC.',verified:true},
-    {name:'Shift Pub',type:'bar',city:'bucurești',address:'Str. Bărbătescu Vechi 2',phone:'',hours:'16:00-02:00',keywords:'bar,bere,seara,pub,craft',info:'Bar craft beer. Deschis seara. Verificat de Insideri.',verified:true},
-    {name:'Kane Coffee Floreasca',type:'cafenea',city:'bucurești',address:'Calea Floreasca 163',phone:'',hours:'07:30-20:00',keywords:'cafea,coffee,floreasca,dimineata',info:'Deschide la 7:30. Ideal pentru dimineți în Floreasca.',verified:true}
-  ],
-  mancare_rapida_buc: [
-    {name:'KFC Universitate',type:'fast food',city:'bucurești',address:'Bd. Magheru 14',phone:'',hours:'08:00-24:00',keywords:'kfc,fast food,pui,mancare,rapid',info:'Deschis târziu. Coadă mare la prânz.',verified:true},
-    {name:'McDonalds Piata Unirii',type:'fast food',city:'bucurești',address:'Piața Unirii 1',phone:'',hours:'00:00-24:00',keywords:'mcdonalds,burger,fast food,nonstop,unirii',info:'Non-stop. Punct de referință în centru.',verified:true},
-    {name:'Spartan Piața Romană',type:'shaorma',city:'bucurești',address:'Piața Romană 4',phone:'021 212 0000',hours:'10:00-23:00',keywords:'shaorma,mancare,romaneasca,spartan',info:'Shaorma românească. Coadă la ore de vârf.',verified:true},
-    {name:'Glovo Hub București',type:'livrare',city:'bucurești',address:'',phone:'',hours:'08:00-24:00',keywords:'livrare,glovo,acasa,rapid,food delivery',info:'Glovo livrează în tot Bucureștiul. App: Glovo.',verified:true},
-    {name:'tazz by eMAG București',type:'livrare',city:'bucurești',address:'',phone:'',hours:'08:00-23:00',keywords:'livrare,tazz,mancare,acasa,delivery',info:'Livrare din sute de restaurante. App: tazz.',verified:true}
-  ],
-  // ── ALTE ORAȘE IMPORTANTE ──
-  mancare_cluj: [
-    {name:'Baracca Cluj',type:'restaurant',city:'cluj-napoca',address:'Str. Napoca 1',phone:'',hours:'12:00-23:00',keywords:'pizza,italiana,cluj,mancare',info:'Restaurant italian popular în Cluj.',verified:true},
-    {name:'Vivo Food Court',type:'mall',city:'cluj-napoca',address:'Calea Baciului 2-4',phone:'',hours:'10:00-22:00',keywords:'mancare,mall,vivo,Cluj,food court',info:'Multiple opțiuni de mâncare în mallul Vivo.',verified:true},
-    {name:'Glovo Cluj',type:'livrare',city:'cluj-napoca',address:'',phone:'',hours:'09:00-23:00',keywords:'livrare,glovo,acasa,delivery,cluj',info:'Livrare Glovo disponibilă în Cluj-Napoca.',verified:true}
-  ],
-  mancare_timisoara: [
-    {name:'Pizza Pazza Timișoara',type:'restaurant',city:'timișoara',address:'Str. Alba Iulia 2',phone:'',hours:'11:00-23:00',keywords:'pizza,italiana,timisoara,mancare',info:'Pizza populară în Timișoara.',verified:true},
-    {name:'Iulius Mall Food Court',type:'mall',city:'timișoara',address:'Str. Demetriade 1',phone:'',hours:'10:00-22:00',keywords:'mancare,mall,iulius,timisoara',info:'Multiple restaurante în Iulius Mall.',verified:true}
-  ],
-  mancare_iasi: [
-    {name:'Anfora Iași',type:'restaurant',city:'iași',address:'Piața Unirii 5',phone:'',hours:'10:00-23:00',keywords:'restaurant,mancare,iasi,centru',info:'Restaurant central în Iași, lângă Piața Unirii.',verified:true},
-    {name:'Palas Mall Food Court',type:'mall',city:'iași',address:'Str. Palas 7',phone:'',hours:'10:00-22:00',keywords:'mancare,mall,palas,iasi',info:'Food court cu multiple opțiuni în Palas Mall.',verified:true}
-  ]
-
+var S = {
+  projects: 'vv_studio_projects',
+  gi:       'vv_studio_ideas_global',
+  search:   'vv_studio_search_hist',
+  active:   'vv_active_project'
 };
 
-async function importPreset(key) {
-  var data = PRESETS[key];
-  if (!data) return;
-  var btn = event.target;
-  btn.disabled = true;
-  btn.textContent = 'Se importă...';
-  try {
-    var batch = db.batch();
-    data.forEach(function(item) {
-      var ref = db.collection('vv_static_data').doc();
-      batch.set(ref, {
-        ...item,
-        visible: true,
-        source: 'CEO_STUDIO',
-        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-      });
-    });
-    await batch.commit();
-    showToast('✅ ' + data.length + ' locații importate!');
-    loadStaticTable();
-    loadDashboard();
-  } catch(e) {
-    showToast('Eroare: ' + e.message, true);
+function load(k)   { try { return JSON.parse(localStorage.getItem(k)); } catch(e) { return null; } }
+function save(k,v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch(e) {} }
+
+function getProjects()  { return load(S.projects) || []; }
+function getGI()        { return load(S.gi)        || []; }
+function getSearch()    { return load(S.search)    || []; }
+function getProj(id)    { return getProjects().find(function(p){ return p.id===id; }) || null; }
+
+function saveProj(p) {
+  var list = getProjects();
+  var i = list.findIndex(function(x){ return x.id===p.id; });
+  if (i >= 0) list[i] = p; else list.unshift(p);
+  save(S.projects, list);
+}
+
+// ══════════════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════════════
+
+var _view = 'today';
+var _proj = null; // project object actualy open
+
+// ══════════════════════════════════════════════════════════════
+// VIEWS
+// ══════════════════════════════════════════════════════════════
+
+function switchView(v) {
+  document.querySelectorAll('.view').forEach(function(el){ el.classList.remove('show'); });
+  document.querySelectorAll('.nav-btn').forEach(function(b){ b.classList.remove('active'); });
+  var target = v === 'project' ? 'view-project' : 'view-' + v;
+  var el = document.getElementById(target);
+  if (el) el.classList.add('show');
+  var navKey = v === 'project' ? 'projects' : v;
+  var nb = document.querySelector('[data-v="'+navKey+'"]');
+  if (nb) nb.classList.add('active');
+  _view = v;
+
+  var ft = document.getElementById('focus-toggle');
+  if (ft) ft.style.display = (v === 'project') ? '' : 'none';
+  if (v !== 'project' && _focusOn) toggleFocus();
+
+  if (v === 'today')    renderToday();
+  if (v === 'projects') renderProjects();
+  if (v === 'project' && _proj) { renderProject(_proj.id); updateLeaPanel(_proj); }
+  if (v === 'ideas')    renderGI();
+  if (v === 'search')   renderSearch();
+
+  updateLeaPanelContext(v);
+}
+
+// ── LEA PANEL ────────────────────────────────────────────────
+
+function updateLeaPanel(p) {
+  var statusEl = document.getElementById('lp-status');
+  var noteEl   = document.getElementById('lp-note');
+  var bodyEl   = document.getElementById('lp-body');
+  if (!p) {
+    if (statusEl) statusEl.textContent = 'prezentă';
+    if (noteEl)   noteEl.innerHTML = 'deschide un proiect —<br>voi ști contextul tău.';
+    return;
   }
-  btn.disabled = false;
-  btn.textContent = btn.textContent.replace('Se importă...','');
+  if (statusEl) statusEl.textContent = 'știe contextul';
+
+  var ideas    = p.ideas || [];
+  var goals    = p.goals || [];
+  var blocat   = p.blocat || '';
+  var ideaCount = ideas.length;
+
+  var lines = [];
+
+  // O singură sugestie — cea mai relevantă
+  if (blocat) {
+    // Blocat > orice altceva
+    lines.push('<div class="lp-obs" style="border-color:rgba(255,100,80,0.1);color:rgba(255,180,160,0.42);font-style:italic">"'+escH(blocat.slice(0,65))+(blocat.length>65?'…':'') + '"</div>');
+    lines.push('<button onclick="lpStartDeblocare()" style="cursor:pointer;background:rgba(200,150,62,0.05);border:1px solid rgba(200,150,62,0.14);border-radius:9px;padding:9px 12px;width:100%;text-align:left;font-family:inherit;font-size:11px;color:rgba(200,150,62,0.55);letter-spacing:.2px;transition:all .3s;margin-top:2px">hai să îl spargem →</button>');
+  } else if (ideas.length) {
+    var lastIdea = ideas[ideas.length-1].text;
+    lines.push('<div class="lp-obs"><em>"' + escH(lastIdea.slice(0,65)) + (lastIdea.length>65?'…':'') + '"</em></div>');
+    var next = _leaNextStep(lastIdea, p);
+    if (next) lines.push('<div class="lp-next">' + escH(next) + '</div>');
+  } else {
+    lines.push('<div class="lp-note" style="display:block">proiect nou.<br>adaugă prima idee.</div>');
+  }
+
+  if (noteEl) noteEl.style.display = 'none';
+  if (bodyEl) {
+    var execEl = document.getElementById('lp-exec-resp');
+    bodyEl.innerHTML = lines.join('') + (execEl ? execEl.outerHTML : '<div class="lp-exec-resp" id="lp-exec-resp"></div>');
+  }
+
+  // Sidebar indicator
+  var sbb = document.getElementById('sb-proj-box');
+  var sbn = document.getElementById('sb-proj-box-name');
+  if (sbb) sbb.classList.add('show');
+  if (sbn) sbn.textContent = p.name;
 }
 
-async function loadStaticTable() {
-  var tbody = document.getElementById('static-table');
-  tbody.innerHTML = '<tr><td colspan="5"><div class="loading"><div class="spinner"></div></div></td></tr>';
-  try {
-    var snap = await db.collection('vv_static_data').orderBy('createdAt','desc').limit(50).get();
-    if (snap.empty) { tbody.innerHTML = '<tr><td colspan="5" class="empty">Nicio locație statică. Folosește Import Rapid sau Adaugă.</td></tr>'; return; }
-    var html = '';
-    snap.forEach(function(doc) {
-      var d = doc.data();
-      var typeIcons = {spital:'🏥',politie:'🚔',pompieri:'🚒',smurd:'🚑',farmacie:'💊',metrou:'🚇',primarie:'🏛️',urgenta_num:'📞',obiectiv:'🏛️'};
-      html += '<tr><td><b>'+d.name+'</b><br><span style="font-size:10px;color:var(--w30)">'+d.phone+'</span></td>' +
-        '<td><span class="badge b-gold">'+(typeIcons[d.type]||'⬡')+' '+d.type+'</span></td>' +
-        '<td>'+d.city+'</td>' +
-        '<td><span class="badge '+(d.visible?'b-green':'b-red')+'">'+(d.visible?'ACTIV':'ASCUNS')+'</span></td>' +
-        '<td><button class="btn btn-red" style="padding:4px 8px;font-size:10px" onclick="deleteStatic(\''+doc.id+'\')">✕</button></td></tr>';
+function updateLeaPanelContext(v) {
+  var statusEl = document.getElementById('lp-status');
+  var noteEl   = document.getElementById('lp-note');
+  if (v !== 'project') {
+    if (statusEl) statusEl.textContent = 'prezentă';
+    var sbb = document.getElementById('sb-proj-box');
+    if (sbb && v !== 'project') sbb.classList.remove('show');
+    if (noteEl && v !== 'project') {
+      noteEl.style.display = '';
+      noteEl.innerHTML = 'deschide un proiect —<br>voi ști contextul tău.';
+      var bodyEl = document.getElementById('lp-body');
+      if (bodyEl) bodyEl.innerHTML = '<div class="lp-note" id="lp-note">deschide un proiect —<br>voi ști contextul tău.</div><div class="lp-exec-resp" id="lp-exec-resp"></div>';
+    }
+  }
+}
+
+function lpAction(q) {
+  if (!_proj) return;
+  var result = processLeaAction(q, _proj);
+  var respEl = document.getElementById('lp-exec-resp');
+  if (respEl) { respEl.textContent = result; respEl.classList.add('show'); }
+}
+
+function lpStartDeblocare() {
+  if (!_proj) return;
+  var blocat = _proj.blocat || '';
+  var respEl = document.getElementById('lp-exec-resp');
+  var inp    = document.getElementById('lp-input');
+
+  var msg = 'Pot.\n\nhai să îl spargem.\n\nce construiești exact?\nce ai încercat deja?\nunde te-ai oprit?';
+  if (respEl) { respEl.textContent = msg; respEl.classList.add('show'); }
+  if (inp)    { inp.placeholder = 'răspunde aici…'; inp.focus(); }
+
+  // Prefill contextul în lp-input pentru continuare
+  document.getElementById('lp-input').value = '';
+}
+
+function lpKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    var q = document.getElementById('lp-input').value.trim();
+    if (!q) return;
+    var result = _proj ? processLeaAction(q, _proj) : 'deschide un proiect primul.';
+    var respEl = document.getElementById('lp-exec-resp');
+    if (respEl) { respEl.textContent = result; respEl.classList.add('show'); }
+    document.getElementById('lp-input').value = '';
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// TODAY
+// ══════════════════════════════════════════════════════════════
+
+// LEA observă — o singură observație, rară, reală
+function _leaObservationHtml(projects, gi) {
+  var obs = null;
+  var week = 7 * 86400000;
+  var now  = Date.now();
+
+  // Proiecte cu activitate intensă recent
+  var activ = projects.filter(function(p) {
+    var recent = (p.ideas||[]).filter(function(i){ return now - i.ts < week; });
+    return recent.length >= 3;
+  });
+  if (activ.length === 1) {
+    obs = 'lucrezi mult la "' + activ[0].name + '" în ultima vreme.';
+  } else if (projects.filter(function(p){ return p.ideas && p.ideas.length > 0; }).length >= 4) {
+    obs = 'ai multe proiecte deschise simultan.';
+  } else if (gi.length >= 10) {
+    obs = 'ai multe gânduri nesortate. poate e momentul să le pui undeva.';
+  } else {
+    // Proiect inactiv mai mult de 3 zile
+    var stale = projects.filter(function(p) {
+      return p.lastActivity && (now - p.lastActivity) > 3 * 86400000 && p.ideas && p.ideas.length;
     });
-    tbody.innerHTML = html;
-  } catch(e) { tbody.innerHTML = '<tr><td colspan="5" style="color:var(--red)">Eroare: '+e.message+'</td></tr>'; }
+    if (stale.length) obs = '"' + stale[0].name + '" n-a mai avut activitate de câteva zile.';
+  }
+
+  if (!obs) return '';
+  return '<div class="today-section">'+
+    '<div style="font-size:11.5px;color:rgba(255,248,235,0.3);font-style:italic;line-height:1.7;padding:2px 0">'+
+      '— ' + escH(obs) +
+    '</div></div>';
 }
 
-function openAddStatic() { document.getElementById('modal-static').classList.add('show'); }
-function selectType(el, type) {
-  document.querySelectorAll('.type-pill').forEach(function(p){ p.classList.remove('active'); });
-  el.classList.add('active');
-  _selectedType = type;
-  document.getElementById('s-type').value = type;
-}
-function toggleVisible() {
-  _staticVisible = !_staticVisible;
-  document.getElementById('s-visible-toggle').classList.toggle('on', _staticVisible);
+// Continue Working — sugestie LEA la 1 click
+function continueProject(id) {
+  var p = getProj(id);
+  if (!p) return;
+  openProject(id);
+  // Generează sugestie după 400ms (după ce s-a deschis)
+  setTimeout(function() {
+    if (!p.ideas || !p.ideas.length) return;
+    var lastIdea = p.ideas[p.ideas.length-1].text;
+    var suggestion = _leaNextStep(lastIdea, p);
+    if (suggestion) {
+      var resEl = document.getElementById('lea-action-result');
+      if (resEl) { resEl.textContent = suggestion; resEl.classList.add('show'); }
+    }
+    // Focus pe idea input
+    var inp = document.getElementById('idea-input');
+    if (inp) { setTimeout(function(){ inp.focus(); }, 200); }
+  }, 450);
 }
 
-async function saveStatic() {
-  var name = document.getElementById('s-name').value.trim();
-  var city = document.getElementById('s-city').value.trim();
-  var type = document.getElementById('s-type').value || _selectedType;
-  if (!name || !city || !type) { showToast('Completează: Tip, Nume, Oraș'); return; }
-  try {
-    await db.collection('vv_static_data').add({
-      name, city, type,
-      addr: document.getElementById('s-addr').value.trim() || null,
-      phone: document.getElementById('s-phone').value.trim() || null,
-      hours: document.getElementById('s-hours').value.trim() || null,
-      info: document.getElementById('s-info').value.trim() || null,
-      keywords: document.getElementById('s-keywords').value.trim() || null,
-      visible: _staticVisible,
-      source: 'CEO_STUDIO',
-      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+function _leaNextStep(lastIdea, p) {
+  var goals = p.goals || [];
+  var ideaCount = p.ideas ? p.ideas.length : 0;
+
+  if (ideaCount >= 8) {
+    return 'ai ' + ideaCount + ' idei. vrei să le grupez ca să vezi structura?';
+  }
+  if (goals.length) {
+    return 'obiectivul tău e "' + goals[0] + '". ultima idee e un pas bun. ce urmează?';
+  }
+  var starters = [
+    'ce urmează după asta?',
+    'unde duce ideea asta?',
+    'ce altceva ai nevoie?',
+    'ce lipsește?'
+  ];
+  return starters[Math.floor(Math.random() * starters.length)];
+}
+
+function renderToday() {
+  var el = document.getElementById('view-today');
+  var projects = getProjects();
+  var gi       = getGI();
+  var activeP  = load(S.active);
+
+  var hour = new Date().getHours();
+  var greet = hour < 6  ? 'E noaptea.' :
+              hour < 12 ? 'Bună dimineața.' :
+              hour < 18 ? 'Bună ziua.' :
+              hour < 22 ? 'Bună seara.' : 'E târziu.';
+
+  var dateStr = new Date().toLocaleDateString('ro-RO',{weekday:'long',day:'numeric',month:'long'});
+
+  // Active projects (recent 3)
+  var activeProjs = projects.slice(0,3);
+  var projsHtml = activeProjs.map(function(p) {
+    var color = CAT_COLORS[p.cat] || CAT_COLORS['creativ'];
+    var last = p.ideas && p.ideas.length ? p.ideas[p.ideas.length-1].text.slice(0,50)+'…' : '—';
+    var isActive = activeP && activeP.id === p.id;
+    return '<div class="today-proj-card'+(isActive?' active-p':'')+'" onclick="openProject(\''+p.id+'\')">'+
+      '<div class="today-proj-glow" style="background:radial-gradient(circle at 50% 0%,'+color+',transparent)"></div>'+
+      '<div class="today-proj-name">'+escH(p.name)+'</div>'+
+      '<div class="today-proj-last">'+escH(last)+'</div>'+
+    '</div>';
+  }).join('');
+  projsHtml += '<div class="today-proj-card" style="border-style:dashed;justify-content:center;align-items:center;display:flex;" onclick="openNewProj()"><span style="font-size:11px;color:var(--dim)">+ nou</span></div>';
+
+  // Continue working — last active project's last idea
+  var continueHtml = '';
+  if (activeP) {
+    var cp = projects.find(function(p){ return p.id===activeP.id; });
+    if (cp && cp.ideas && cp.ideas.length) {
+      var lastIdea = cp.ideas[cp.ideas.length-1];
+      var blocatStr = cp.blocat ? '<div style="font-size:10.5px;color:rgba(255,150,120,0.45);margin-top:6px;font-style:italic;">blocat la: '+escH(cp.blocat.slice(0,70))+'</div>' : '';
+      continueHtml =
+        '<div class="continue-card" onclick="continueProject(\''+cp.id+'\')">' +
+          '<div class="continue-proj">'+escH(cp.name)+' · '+fmtDateFull(lastIdea.ts)+'</div>'+
+          '<div class="continue-idea">"'+escH(lastIdea.text.slice(0,90))+(lastIdea.text.length>90?'…':'')+'"</div>'+
+          blocatStr+
+          '<div class="continue-action" style="margin-top:10px">deschide și continuă →</div>'+
+        '</div>';
+    }
+  }
+
+  // Recent ideas (all projects + global, last 5)
+  var allIdeas = [];
+  projects.forEach(function(p){
+    if (p.ideas) p.ideas.forEach(function(i){ allIdeas.push({text:i.text, ts:i.ts, proj:p.name}); });
+  });
+  gi.forEach(function(i){ allIdeas.push({text:i.text, ts:i.ts, proj:''}); });
+  allIdeas.sort(function(a,b){ return b.ts-a.ts; });
+  var recentHtml = allIdeas.slice(0,5).map(function(i){
+    return '<div class="today-idea-item">'+escH(i.text.slice(0,80))+(i.text.length>80?'…':'')+
+      (i.proj?'<span class="today-idea-proj">'+escH(i.proj)+'</span>':'')+
+    '</div>';
+  }).join('');
+
+  el.innerHTML =
+    '<div class="view-pad" style="max-width:760px">' +
+      '<div class="today-greeting">'+greet+'</div>'+
+      '<div class="today-sub">'+dateStr+'</div>'+
+
+      '<div class="today-section">'+
+        '<div class="today-section-label">proiecte active</div>'+
+        '<div class="today-projs">'+projsHtml+'</div>'+
+      '</div>'+
+
+      (continueHtml ?
+        '<div class="today-section">'+
+          '<div class="today-section-label">continuă de unde ai rămas</div>'+
+          continueHtml+
+        '</div>' : '') +
+
+      _leaObservationHtml(projects, gi)+
+
+      (recentHtml ?
+        '<div class="today-section">'+
+          '<div class="today-section-label">idei recente</div>'+
+          '<div class="today-ideas-list">'+recentHtml+'</div>'+
+        '</div>' : '') +
+    '</div>';
+}
+
+// ══════════════════════════════════════════════════════════════
+// PROJECTS
+// ══════════════════════════════════════════════════════════════
+
+var CAT_COLORS = {
+  'creativ':'rgba(139,92,246,0.55)','muncă':'rgba(200,150,62,0.5)',
+  'personal':'rgba(80,200,140,0.45)','learning':'rgba(100,160,255,0.45)'
+};
+
+function renderProjects() {
+  var grid = document.getElementById('projects-grid');
+  var list = getProjects();
+  var activeP = load(S.active);
+  grid.innerHTML = '';
+  list.forEach(function(p){
+    var color = CAT_COLORS[p.cat] || CAT_COLORS['creativ'];
+    var isA = activeP && activeP.id === p.id;
+    var card = document.createElement('div');
+    card.className = 'proj-card'+(isA?' active-p':'');
+    card.innerHTML =
+      '<div class="proj-glow" style="background:radial-gradient(circle at 50% 0%,'+color+',transparent)"></div>'+
+      '<div class="proj-cat">'+escH(p.cat||'creativ')+'</div>'+
+      '<div class="proj-name">'+escH(p.name)+'</div>'+
+      '<div class="proj-desc">'+escH(p.desc||'')+'</div>';
+    card.onclick = function(){ openProject(p.id); };
+    grid.appendChild(card);
+  });
+  var nc = document.createElement('div');
+  nc.className = 'proj-card new-p';
+  nc.innerHTML = '<span>+ proiect nou</span>';
+  nc.onclick = openNewProj;
+  grid.appendChild(nc);
+}
+
+function openProject(id) {
+  var p = getProj(id);
+  if (!p) return;
+  _proj = p;
+  // Update lastActivity
+  p.lastActivity = Date.now();
+  saveProj(p);
+  // Share cu LEA
+  save(S.active, { id:p.id, name:p.name, cat:p.cat, context:p.context||'', goals:p.goals||[], lastIdea: p.ideas&&p.ideas.length ? p.ideas[p.ideas.length-1].text : '' });
+  showToast('LEA știe contextul');
+  switchView('project');
+  updateActiveHeader();
+  updateLeaPanel(p);
+}
+
+function updateActiveHeader() {
+  var el = document.getElementById('active-proj-header');
+  if (_proj) { el.textContent = _proj.name; el.style.display=''; }
+  else el.style.display='none';
+}
+
+function renderProject(id) {
+  var p = getProj(id);
+  if (!p) return;
+  _proj = p;
+  document.getElementById('pd-name').textContent = p.name;
+  document.getElementById('pd-cat').textContent  = p.cat||'creativ';
+  document.getElementById('ctx-input').value     = p.context||'';
+  document.getElementById('lea-aware-note').textContent = p.context
+    ? 'LEA știe contextul acestui proiect.'
+    : 'adaugă context ca LEA să știe.';
+  // Blocat
+  var blocatInp = document.getElementById('blocat-input');
+  if (blocatInp) blocatInp.value = p.blocat || '';
+  renderToneStrip(p);
+  renderIdeas(id);
+  renderGoals(id);
+  renderFiles(id);
+  renderActionChips(p);
+}
+
+// Tone
+var TONES = ['calm','intens','exploratoriu','creativ','urgent','tehnic'];
+function renderToneStrip(p) {
+  var strip = document.getElementById('tone-strip');
+  strip.innerHTML = TONES.map(function(t){
+    return '<button class="tone-chip'+(p.tone===t?' sel':'')+'" onclick="setTone(\''+t+'\')" data-tone="'+t+'">'+t+'</button>';
+  }).join('');
+}
+function setTone(t) {
+  if (!_proj) return;
+  _proj.tone = _proj.tone === t ? null : t;
+  saveProj(_proj);
+  renderToneStrip(_proj);
+  applyToneToBody(_proj.tone);
+  save(S.active, { id:_proj.id, name:_proj.name, cat:_proj.cat, context:_proj.context||'', tone:_proj.tone, goals:_proj.goals||[], lastIdea: _proj.ideas&&_proj.ideas.length ? _proj.ideas[_proj.ideas.length-1].text : '' });
+}
+
+function applyToneToBody(tone) {
+  var allTones = ['calm','urgent','creativ','tehnic','intens','exploratoriu'];
+  allTones.forEach(function(t){ document.body.classList.remove('tone-'+t); });
+  if (tone) document.body.classList.add('tone-'+tone);
+}
+
+// LEA Action Bar chips
+var ACTION_CHIPS = ['organizează ideile','rezumă proiectul','continuă ultima idee','fă un plan','caută referințe'];
+function renderActionChips(p) {
+  var el = document.getElementById('action-chips');
+  el.innerHTML = ACTION_CHIPS.map(function(a){
+    return '<button class="action-chip" onclick="setLeaAction(\''+escH(a)+'\')">'+escH(a)+'</button>';
+  }).join('');
+}
+function setLeaAction(text) {
+  document.getElementById('lea-action-input').value = text;
+  document.getElementById('lea-action-input').focus();
+}
+function leaActionKey(e) { if(e.key==='Enter') doLeaAction(); }
+function doLeaAction() {
+  var q = document.getElementById('lea-action-input').value.trim();
+  if (!q || !_proj) return;
+  var result = processLeaAction(q, _proj);
+  var resEl = document.getElementById('lea-action-result');
+  resEl.textContent = result;
+  resEl.classList.add('show');
+  document.getElementById('lea-action-input').value = '';
+}
+function processLeaAction(q, p) {
+  var ql = q.toLowerCase();
+  var ideas = p.ideas || [];
+  var goals = p.goals || [];
+
+  if (/organiz/i.test(ql)) {
+    if (!ideas.length) return 'Nu ai idei în proiect încă.';
+    return 'Idei principale: ' + ideas.slice(-5).map(function(i){ return '"'+i.text.slice(0,40)+'"'; }).join(', ') + '.';
+  }
+  if (/rezum/i.test(ql)) {
+    var ctx = p.context || '';
+    var goalStr = goals.length ? 'Obiective: '+goals.slice(0,2).join(', ')+'. ' : '';
+    var lastStr = ideas.length ? 'Ultima idee: "'+ideas[ideas.length-1].text.slice(0,60)+'". ' : '';
+    return (ctx ? ctx.slice(0,80)+'. ' : '') + goalStr + lastStr + 'Categorie: ' + (p.cat||'creativ') + '.';
+  }
+  if (/continu/i.test(ql)) {
+    if (!ideas.length) return 'Nu ai idei de continuat. Adaugă prima.';
+    return 'Continuând: "' + ideas[ideas.length-1].text + '" — ce urmează?';
+  }
+  if (/plan/i.test(ql)) {
+    if (!goals.length && !ideas.length) return 'Adaugă câteva obiective sau idei ca să pot face un plan.';
+    var planParts = [];
+    if (goals.length) planParts.push('1. ' + goals.slice(0,3).join('\n2. '));
+    if (ideas.length) planParts.push('Idei de explorat: ' + ideas.slice(-3).map(function(i){ return i.text.slice(0,40); }).join(' / '));
+    return planParts.join('\n');
+  }
+  if (/caut|referint/i.test(ql)) {
+    var searchQ = (p.name + ' ' + (p.context||'').split(' ').slice(0,3).join(' ')).trim();
+    window.open('https://duckduckgo.com/?q=' + encodeURIComponent(searchQ), '_blank');
+    return 'Am deschis căutarea pentru "' + p.name + '".';
+  }
+  return 'Poți cere: "organizează ideile", "rezumă proiectul", "continuă ultima idee", "fă un plan", "caută referințe".';
+}
+
+// ══════════════════════════════════════════════════════════════
+// IDEAS (per proiect)
+// ══════════════════════════════════════════════════════════════
+
+function renderIdeas(id) {
+  var p = getProj(id);
+  var list = document.getElementById('ideas-list');
+  list.innerHTML = '';
+  if (!p || !p.ideas || !p.ideas.length) {
+    list.innerHTML = '<div class="empty-state">nicio idee încă.<br>prima poate fi orice.</div>';
+    return;
+  }
+
+  // Auto-grupare offer la 8+ idei
+  if (p.ideas.length >= 8 && !p._grouped) {
+    var offerEl = document.createElement('div');
+    offerEl.style.cssText = 'margin-bottom:14px;padding:10px 14px;background:rgba(200,150,62,0.06);border:1px solid rgba(200,150,62,0.14);border-radius:10px;display:flex;align-items:center;justify-content:space-between;';
+    offerEl.innerHTML =
+      '<span style="font-size:11.5px;color:rgba(200,150,62,0.7)">ai '+p.ideas.length+' idei. vrei să le grupez?</span>'+
+      '<button onclick="groupIdeas(\''+id+'\')" style="background:rgba(200,150,62,0.8);border:none;color:#07070d;padding:5px 12px;border-radius:8px;font-size:11px;cursor:pointer;font-family:inherit;font-weight:600;">grupează</button>';
+    list.appendChild(offerEl);
+  }
+
+  p.ideas.slice().reverse().forEach(function(idea, ri) {
+    var origIdx = p.ideas.length - 1 - ri;
+    var item = document.createElement('div');
+    item.className = 'idea-item';
+    item.innerHTML =
+      '<div class="idea-text">'+escH(idea.text)+'<div class="idea-ts">'+fmtDate(idea.ts)+'</div></div>'+
+      '<button class="idea-del" onclick="delIdea(\''+id+'\','+origIdx+')">×</button>';
+    list.appendChild(item);
+  });
+}
+
+function groupIdeas(projId) {
+  var p = getProj(projId);
+  if (!p || !p.ideas) return;
+  // Grupare simplă: primele cuvinte cheie → categorii
+  var groups = {};
+  p.ideas.forEach(function(idea) {
+    var words = idea.text.toLowerCase().split(/\s+/).slice(0,3);
+    var matched = false;
+    Object.keys(groups).forEach(function(k) {
+      var kWords = k.split('/');
+      if (kWords.some(function(kw){ return words.some(function(w){ return w.length > 3 && kw.includes(w); }); })) {
+        groups[k].push(idea); matched = true;
+      }
     });
-    closeModal('modal-static');
-    showToast('✅ Locație salvată!');
-    loadStaticTable();
-    loadDashboard();
-  } catch(e) { showToast('Eroare: ' + e.message, true); }
-}
-
-async function deleteStatic(id) {
-  if (!confirm('Ștergi această locație?')) return;
-  try {
-    await db.collection('vv_static_data').doc(id).delete();
-    showToast('Șters.');
-    loadStaticTable();
-  } catch(e) { showToast('Eroare: ' + e.message, true); }
-}
-
-// ── PAGINI VV NOW ─────────────────────────────────────────────
-async function loadPages() {
-  var el = document.getElementById('pages-list');
-  el.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
-  try {
-    var snap = await db.collection('vv_now_pages').orderBy('createdAt','desc').get();
-    if (snap.empty) { el.innerHTML = '<div class="card"><div class="empty">Nicio pagină. Creează prima pagină VV NOW.</div></div>'; return; }
-    var html = '<div class="card"><table class="vv-table"><thead><tr><th>Titlu</th><th>Categorie</th><th>Oraș</th><th>Sponsorizat</th><th>Acțiuni</th></tr></thead><tbody>';
-    snap.forEach(function(doc) {
-      var d = doc.data();
-      html += '<tr><td><b>'+d.title+'</b><br><span style="font-size:10px;color:var(--w30)">'+d.keywords.substring(0,40)+'...</span></td>' +
-        '<td><span class="badge b-blue">'+d.category+'</span></td>' +
-        '<td>'+d.city+'</td>' +
-        '<td>'+(d.isPaid?'<span class="badge b-gold">'+d.price+'€/lună</span>':'<span class="badge" style="color:var(--w30)">Gratuit</span>')+'</td>' +
-        '<td><button class="btn btn-red" style="padding:4px 8px;font-size:10px" onclick="deletePage(\''+doc.id+'\')">✕</button></td></tr>';
+    if (!matched) { var key = words.filter(function(w){ return w.length > 3; })[0] || 'altele'; groups[key] = groups[key] || []; groups[key].push(idea); }
+  });
+  // Afișează grupurile
+  var list = document.getElementById('ideas-list');
+  list.innerHTML = '';
+  Object.keys(groups).forEach(function(g) {
+    var header = document.createElement('div');
+    header.style.cssText = 'font-size:9px;letter-spacing:1.5px;color:var(--dim);text-transform:uppercase;margin:14px 0 8px;font-weight:500;';
+    header.textContent = g;
+    list.appendChild(header);
+    groups[g].forEach(function(idea) {
+      var item = document.createElement('div');
+      item.className = 'idea-item';
+      item.innerHTML = '<div class="idea-text">'+escH(idea.text)+'</div>';
+      list.appendChild(item);
     });
-    html += '</tbody></table></div>';
-    el.innerHTML = html;
-  } catch(e) { el.innerHTML = '<div class="card" style="color:var(--red)">Eroare: '+e.message+'</div>'; }
+  });
+  var note = document.createElement('div');
+  note.style.cssText = 'margin-top:14px;font-size:10.5px;color:rgba(255,248,235,0.22);font-style:italic;cursor:pointer;';
+  note.textContent = '← înapoi la lista normală';
+  note.onclick = function(){ renderIdeas(projId); };
+  list.appendChild(note);
 }
 
-function openAddPage() { document.getElementById('modal-page').classList.add('show'); }
-function togglePaid() {
-  _pagePaid = !_pagePaid;
-  document.getElementById('pg-paid-toggle').classList.toggle('on', _pagePaid);
-  document.getElementById('pg-price-section').style.display = _pagePaid ? 'block' : 'none';
+function addIdea() {
+  if (!_proj) return;
+  var inp = document.getElementById('idea-input');
+  var text = inp.value.trim(); if (!text) return;
+
+  // Detectare idee similară — înainte de save
+  var similar = _findSimilarIdea(text, _proj.ideas || []);
+  if (similar) {
+    var simDiv = document.getElementById('idea-similar-hint');
+    if (!simDiv) {
+      simDiv = document.createElement('div');
+      simDiv.id = 'idea-similar-hint';
+      simDiv.style.cssText = 'margin-bottom:10px;padding:9px 13px;background:rgba(139,92,246,0.06);border:1px solid rgba(139,92,246,0.14);border-radius:9px;font-size:11.5px;color:rgba(180,150,255,0.65);line-height:1.6;';
+      inp.parentElement.parentElement.insertBefore(simDiv, inp.parentElement);
+    }
+    simDiv.innerHTML = 'pare similar cu: <em>"' + escH(similar.slice(0,60)) + (similar.length>60?'…':'') + '"</em>' +
+      ' <span style="cursor:pointer;color:rgba(180,150,255,0.4);margin-left:8px;font-size:10px;" onclick="this.parentElement.remove()">ignoră</span>';
+    simDiv.style.display = 'block';
+  } else {
+    var old = document.getElementById('idea-similar-hint');
+    if (old) old.remove();
+  }
+
+  var p = getProj(_proj.id);
+  if (!p.ideas) p.ideas = [];
+  p.ideas.push({ text:text, ts:Date.now() });
+  p.lastActivity = Date.now();
+  saveProj(p); _proj = p;
+  save(S.active, { id:p.id, name:p.name, cat:p.cat, context:p.context||'', tone:p.tone, goals:p.goals||[], lastIdea:text });
+  inp.value=''; inp.style.height='auto';
+  renderIdeas(_proj.id);
 }
 
-async function savePage() {
-  var title = document.getElementById('pg-title').value.trim();
-  var keywords = document.getElementById('pg-keywords').value.trim();
-  var content = document.getElementById('pg-content').value.trim();
-  if (!title || !keywords || !content) { showToast('Completează: Titlu, Cuvinte cheie, Conținut'); return; }
-  try {
-    await db.collection('vv_now_pages').add({
-      title, keywords, content,
-      city: document.getElementById('pg-city').value.trim() || 'România',
-      category: document.getElementById('pg-cat').value,
-      isPaid: _pagePaid,
-      price: _pagePaid ? parseFloat(document.getElementById('pg-price').value) || 0 : 0,
-      sponsor: _pagePaid ? document.getElementById('pg-sponsor').value.trim() : null,
-      isSponsored: _pagePaid,
-      visible: true,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+// Găsește idee similară — overlap de cuvinte > 35%
+function _findSimilarIdea(newText, ideas) {
+  if (!ideas || !ideas.length) return null;
+  var newWords = _ideaWords(newText);
+  if (newWords.length < 2) return null;
+  var best = null; var bestScore = 0;
+  ideas.slice(-20).forEach(function(idea) { // cauta in ultimele 20
+    var oldWords = _ideaWords(idea.text);
+    var common = newWords.filter(function(w){ return oldWords.indexOf(w) !== -1; });
+    var score = common.length / Math.min(newWords.length, oldWords.length);
+    if (score > 0.35 && score > bestScore) { bestScore = score; best = idea.text; }
+  });
+  return best;
+}
+function _ideaWords(text) {
+  return text.toLowerCase().replace(/[.,!?;:]/g,'').split(/\s+/).filter(function(w){ return w.length > 3; });
+}
+
+function delIdea(projId, idx) {
+  var p = getProj(projId);
+  if (!p || !p.ideas) return;
+  p.ideas.splice(idx, 1);
+  saveProj(p);
+  renderIdeas(projId);
+}
+
+function ideaKey(e) { if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();addIdea();} }
+
+// ══════════════════════════════════════════════════════════════
+// GOALS
+// ══════════════════════════════════════════════════════════════
+
+function renderGoals(id) {
+  var p = getProj(id);
+  var list = document.getElementById('goals-list');
+  list.innerHTML = '';
+  if (!p || !p.goals || !p.goals.length) return;
+  p.goals.forEach(function(g, i) {
+    var item = document.createElement('div');
+    item.className = 'goal-item';
+    item.innerHTML = escH(g) + '<button class="goal-del" onclick="delGoal(\''+id+'\','+i+')">×</button>';
+    list.appendChild(item);
+  });
+}
+
+function addGoal() {
+  if (!_proj) return;
+  var inp = document.getElementById('goal-input');
+  var text = inp.value.trim(); if (!text) return;
+  var p = getProj(_proj.id);
+  if (!p.goals) p.goals = [];
+  p.goals.push(text);
+  saveProj(p);
+  inp.value='';
+  renderGoals(_proj.id);
+}
+
+function delGoal(projId, idx) {
+  var p = getProj(projId);
+  if (!p || !p.goals) return;
+  p.goals.splice(idx, 1);
+  saveProj(p);
+  renderGoals(projId);
+}
+
+function goalKey(e) { if(e.key==='Enter') addGoal(); }
+
+// Context
+function saveCtx() {
+  if (!_proj) return;
+  var p = getProj(_proj.id);
+  p.context = document.getElementById('ctx-input').value;
+  saveProj(p); _proj = p;
+  save(S.active, { id:p.id, name:p.name, cat:p.cat, context:p.context, tone:p.tone, goals:p.goals||[], lastIdea:p.ideas&&p.ideas.length?p.ideas[p.ideas.length-1].text:'' });
+  document.getElementById('lea-aware-note').textContent = p.context ? 'LEA știe contextul acestui proiect.' : 'adaugă context ca LEA să știe.';
+}
+
+// ══════════════════════════════════════════════════════════════
+// FILES
+// ══════════════════════════════════════════════════════════════
+
+function renderFiles(id) {
+  var p = getProj(id);
+  var list = document.getElementById('files-list');
+  list.innerHTML = '';
+  if (!p || !p.files || !p.files.length) return;
+  p.files.forEach(function(f, i){
+    var item = document.createElement('div');
+    item.className = 'file-item';
+    item.innerHTML = '📄 <span class="file-name" title="'+escH(f.name)+'">'+escH(f.name)+'</span>'+
+      '<button class="file-del" onclick="delFile(\''+id+'\','+i+')">×</button>';
+    list.appendChild(item);
+  });
+}
+
+async function pickFile() {
+  if (!_proj) return;
+  if (window.showOpenFilePicker) {
+    try { var [h] = await window.showOpenFilePicker(); addFile(_proj.id, h.name); return; } catch(e){}
+  }
+  var n = prompt('Numele fișierului:'); if (n) addFile(_proj.id, n);
+}
+function addFile(projId, name) {
+  var p = getProj(projId);
+  if (!p.files) p.files = [];
+  p.files.push({ name:name });
+  saveProj(p); renderFiles(projId);
+}
+function delFile(projId, idx) {
+  var p = getProj(projId);
+  if (!p.files) return;
+  p.files.splice(idx, 1);
+  saveProj(p); renderFiles(projId);
+}
+
+// ══════════════════════════════════════════════════════════════
+// IDEAS GLOBAL
+// ══════════════════════════════════════════════════════════════
+
+function renderGI() {
+  var ideas = getGI();
+  var list = document.getElementById('gi-list');
+  list.innerHTML = '';
+  if (!ideas.length) { list.innerHTML = '<div class="empty-state">niciun gând salvat.</div>'; return; }
+  ideas.slice().reverse().forEach(function(idea, ri){
+    var origIdx = ideas.length-1-ri;
+    var item = document.createElement('div');
+    item.className = 'idea-item';
+    item.innerHTML = '<div class="idea-text">'+escH(idea.text)+'<div class="idea-ts">'+fmtDate(idea.ts)+'</div></div>'+
+      '<button class="idea-del" onclick="delGI('+origIdx+')">×</button>';
+    list.appendChild(item);
+  });
+}
+function addGI() {
+  var inp = document.getElementById('gi-input');
+  var text = inp.value.trim(); if (!text) return;
+  var ideas = getGI();
+  ideas.push({ text:text, ts:Date.now() });
+  save(S.gi, ideas);
+  inp.value=''; inp.style.height='auto';
+  renderGI();
+}
+function delGI(idx) {
+  var ideas = getGI(); ideas.splice(idx,1); save(S.gi,ideas); renderGI();
+}
+function giKey(e) { if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();addGI();} }
+
+// ══════════════════════════════════════════════════════════════
+// QUICK CAPTURE (Ctrl+Space)
+// ══════════════════════════════════════════════════════════════
+
+function openCapture() {
+  var overlay = document.getElementById('capture-overlay');
+  var tag = document.getElementById('capture-proj-tag');
+  if (_proj) { tag.textContent = _proj.name; tag.style.display='inline-block'; }
+  else tag.style.display='none';
+  overlay.classList.add('show');
+  setTimeout(function(){ document.getElementById('capture-input').focus(); }, 50);
+}
+function closeCapture() {
+  document.getElementById('capture-overlay').classList.remove('show');
+  document.getElementById('capture-input').value = '';
+  document.getElementById('capture-input').style.height = 'auto';
+}
+function captureOverlayClick(e) { if(e.target.id==='capture-overlay') closeCapture(); }
+function saveCapture() {
+  var text = document.getElementById('capture-input').value.trim();
+  if (!text) return;
+  if (_proj) {
+    var p = getProj(_proj.id);
+    if (!p.ideas) p.ideas = [];
+    p.ideas.push({ text:text, ts:Date.now() });
+    p.lastActivity = Date.now();
+    saveProj(p); _proj = p;
+    save(S.active, { id:p.id, name:p.name, cat:p.cat, context:p.context||'', tone:p.tone, goals:p.goals||[], lastIdea:text });
+    if (_view==='project') renderIdeas(_proj.id);
+  } else {
+    var ideas = getGI(); ideas.push({ text:text, ts:Date.now() }); save(S.gi, ideas);
+    if (_view==='ideas') renderGI();
+  }
+  closeCapture();
+  showToast('salvat');
+}
+
+document.addEventListener('keydown', function(e) {
+  if (e.ctrlKey && e.code === 'Space') { e.preventDefault(); openCapture(); return; }
+  if (e.key === 'Escape') {
+    if (document.getElementById('capture-overlay').classList.contains('show')) { closeCapture(); return; }
+    if (document.getElementById('modal-new').classList.contains('show')) { closeNewProj(); return; }
+  }
+  if (e.key === 'Enter' && document.getElementById('capture-overlay').classList.contains('show')) {
+    if (!e.shiftKey) { e.preventDefault(); saveCapture(); }
+  }
+});
+
+// ══════════════════════════════════════════════════════════════
+// MODAL NOU PROIECT
+// ══════════════════════════════════════════════════════════════
+
+var _selCat = 'creativ';
+function openNewProj() {
+  document.getElementById('modal-new').classList.add('show');
+  setTimeout(function(){ document.getElementById('new-proj-name').focus(); }, 50);
+}
+function closeNewProj() {
+  document.getElementById('modal-new').classList.remove('show');
+  document.getElementById('new-proj-name').value = '';
+  document.getElementById('new-proj-desc').value = '';
+}
+function modalClick(e, id) { if(e.target.id===id) closeNewProj(); }
+function selCat(btn) {
+  document.querySelectorAll('.cat-btn').forEach(function(b){ b.classList.remove('sel'); });
+  btn.classList.add('sel'); _selCat = btn.dataset.cat;
+}
+function newProjKey(e) { if(e.key==='Enter') createProject(); }
+function createProject() {
+  var name = document.getElementById('new-proj-name').value.trim();
+  if (!name) return;
+  var p = { id:'proj_'+Date.now(), name:name, cat:_selCat, desc:document.getElementById('new-proj-desc').value.trim(), context:'', ideas:[], files:[], goals:[], tone:null, lastActivity:Date.now(), createdAt:Date.now() };
+  var list = getProjects(); list.unshift(p); save(S.projects, list);
+  closeNewProj();
+  openProject(p.id);
+}
+
+// ══════════════════════════════════════════════════════════════
+// SEARCH
+// ══════════════════════════════════════════════════════════════
+
+// ── Profilul de căutare — VV înțelege cum cauți ────────────
+var _searchProfile = {}; // construite în timp
+function _loadSearchProfile() {
+  try { _searchProfile = JSON.parse(localStorage.getItem('vv_search_profile')) || {}; } catch(e) {}
+}
+function _saveSearchProfile() {
+  try { localStorage.setItem('vv_search_profile', JSON.stringify(_searchProfile)); } catch(e) {}
+}
+
+// ── Intent detection — ce fel de căutare ────────────────────
+var _INTENTS = {
+  vacanta:    { words: ['vacanță','vacanta','călătorie','calatorie','trip','plecare','escapadă'], label: 'vacanță', emoji: '🌍' },
+  mancare:    { words: ['restaurant','mâncare','mancare','pizza','sushi','menu','unde mănânc'], label: 'mâncare', emoji: '🍽' },
+  sport:      { words: ['traseu','alergare','alergat','ciclism','fitness','sală','sala','workout'], label: 'sport', emoji: '🏃' },
+  muzica:     { words: ['muzică','muzica','artist','album','concert','playlist','melodie'], label: 'muzică', emoji: '🎵' },
+  tech:       { words: ['tutorial','cum','how','code','programare','framework','library','install'], label: 'tehnic', emoji: '💻' },
+  productiv:  { words: ['productivitate','tool','app','workflow','organizare','task','management'], label: 'productivitate', emoji: '⚙' }
+};
+
+function _detectIntent(q) {
+  var qL = q.toLowerCase();
+  for (var k in _INTENTS) {
+    if (_INTENTS[k].words.some(function(w){ return qL.indexOf(w) !== -1; })) return k;
+  }
+  return null;
+}
+
+// ── Live hint pe tastare ─────────────────────────────────────
+var _intentSel = null;
+function searchLive(val) {
+  if (!val || val.length < 3) {
+    document.getElementById('search-intent-row').style.display = 'none';
+    return;
+  }
+  var intent = _detectIntent(val);
+  if (intent) {
+    var row = document.getElementById('search-intent-row');
+    var chips = document.getElementById('search-intent-chips');
+    var intents = Object.keys(_INTENTS);
+    chips.innerHTML = intents.map(function(k){
+      var i = _INTENTS[k];
+      var isSel = _intentSel === k || k === intent;
+      return '<button class="intent-chip'+(isSel?' sel':'')+'" onclick="selIntent(\''+k+'\')">'+i.emoji+' '+i.label+'</button>';
+    }).join('');
+    row.style.display = '';
+  }
+}
+function selIntent(k) {
+  _intentSel = _intentSel === k ? null : k;
+  searchLive(document.getElementById('search-input').value);
+}
+
+// ── Offline match — idei din proiecte ───────────────────────
+function _findLocalMatch(q) {
+  var words = q.toLowerCase().split(/\s+/).filter(function(w){ return w.length > 3; });
+  if (!words.length) return [];
+  var matches = [];
+  getProjects().forEach(function(p) {
+    (p.ideas||[]).forEach(function(idea) {
+      var iL = idea.text.toLowerCase();
+      if (words.some(function(w){ return iL.indexOf(w) !== -1; })) {
+        matches.push({ proj: p.name, text: idea.text });
+      }
     });
-    closeModal('modal-page');
-    showToast('✅ Pagina publicată!');
-    loadPages();
-    loadDashboard();
-  } catch(e) { showToast('Eroare: ' + e.message, true); }
+  });
+  return matches.slice(0, 3);
 }
 
-async function deletePage(id) {
-  if (!confirm('Ștergi această pagină?')) return;
-  try { await db.collection('vv_now_pages').doc(id).delete(); showToast('Ștersă.'); loadPages(); }
-  catch(e) { showToast('Eroare: ' + e.message, true); }
-}
+function renderSearch() {
+  var hints = document.getElementById('search-hints');
+  hints.innerHTML = '';
+  document.getElementById('search-results').style.display = 'none';
+  document.getElementById('search-local-match').style.display = 'none';
+  document.getElementById('search-intent-row').style.display = 'none';
+  _intentSel = null;
 
-// ── NODES & TALENTS ───────────────────────────────────────────
-async function loadNodesTable() {
-  var tbody = document.getElementById('nodes-table');
+  // Hints din profil
+  var def = [];
   try {
-    var snap = await db.collection('verified_nodes').orderBy('createdAt','desc').limit(30).get();
-    if (snap.empty) { tbody.innerHTML = '<tr><td colspan="5" class="empty">Niciun Business Node.</td></tr>'; return; }
-    var html = '';
-    snap.forEach(function(doc) {
-      var d = doc.data();
-      var date = d.createdAt ? d.createdAt.toDate().toLocaleDateString('ro') : '—';
-      html += '<tr><td><b>'+d.name+'</b>'+(d.isPioneer?'<span class="badge b-gold" style="margin-left:6px">PIONIER</span>':'')+
-        '</td><td>'+d.type+'</td><td>'+d.cityDisplay+'</td>' +
-        '<td><span class="badge '+(d.status==='active'?'b-green':'b-orange')+'">'+d.status.toUpperCase()+'</span></td>' +
-        '<td>'+date+'</td></tr>';
-    });
-    tbody.innerHTML = html;
-  } catch(e) { tbody.innerHTML = '<tr><td colspan="5" style="color:var(--red)">Eroare: '+e.message+'</td></tr>'; }
+    var profile = JSON.parse(localStorage.getItem('vv_profile_v1'));
+    if (profile) {
+      if (profile.placeri && profile.placeri.sport) def.push(profile.placeri.sport + ' trasee');
+      if (profile.job && profile.job.domeniu) def.push(profile.job.domeniu + ' tools');
+      if (profile.placeri && profile.placeri.hobby && profile.placeri.hobby[0]) def.push(profile.placeri.hobby[0]);
+      if (profile.loc && profile.loc.oras) def.push('restaurante ' + profile.loc.oras);
+    }
+  } catch(e) {}
+  if (!def.length) def = ['vacanță liniștită', 'trasee alergare', 'restaurant', 'productivitate'];
+
+  def.slice(0, 5).forEach(function(h) {
+    var b = document.createElement('button'); b.className = 'search-hint'; b.textContent = h;
+    b.onclick = function() { document.getElementById('search-input').value = h; doSearch(); };
+    hints.appendChild(b);
+  });
+
+  // Profil de căutare — observație VV
+  _loadSearchProfile();
+  var profNote = document.getElementById('search-profile-note');
+  if (_searchProfile.topIntent) {
+    var obs = 'observ că de obicei cauți ' + _INTENTS[_searchProfile.topIntent].label + '. am ținut cont.';
+    profNote.textContent = obs; profNote.style.display = '';
+  } else { profNote.style.display = 'none'; }
+
+  // Recente
+  var hist = getSearch();
+  var rw = document.getElementById('search-recent-wrap');
+  var rl = document.getElementById('search-recent');
+  rl.innerHTML = ''; rw.style.display = hist.length ? '' : 'none';
+  hist.slice(-5).reverse().forEach(function(q) {
+    var d = document.createElement('div'); d.className = 's-rec-item'; d.textContent = q;
+    d.onclick = function() { document.getElementById('search-input').value = q; doSearch(); };
+    rl.appendChild(d);
+  });
 }
 
-async function loadTalentsTable() {
-  var tbody = document.getElementById('talents-table');
-  try {
-    var snap = await db.collection('vv_talents').orderBy('createdAt','desc').limit(30).get();
-    if (snap.empty) { tbody.innerHTML = '<tr><td colspan="5" class="empty">Niciun talent.</td></tr>'; return; }
-    var html = '';
-    snap.forEach(function(doc) {
-      var d = doc.data();
-      var skills = (d.skills||[]).slice(0,3).join(', ');
-      html += '<tr><td>'+d.alias+'</td><td>'+d.domain+'</td><td>'+d.cityDisplay+'</td>' +
-        '<td><span class="badge b-blue">'+d.level+'</span></td><td>'+skills+'</td></tr>';
-    });
-    tbody.innerHTML = html;
-  } catch(e) { tbody.innerHTML = '<tr><td colspan="5" style="color:var(--red)">Eroare: '+e.message+'</td></tr>'; }
+function doSearch() {
+  var q = document.getElementById('search-input').value.trim();
+  if (!q) return;
+
+  var intent = _intentSel || _detectIntent(q);
+
+  // Salvează în istoric + profil
+  var hist = getSearch();
+  if (hist[hist.length-1] !== q) { hist.push(q); if (hist.length > 20) hist.shift(); }
+  save(S.search, hist);
+  _loadSearchProfile();
+  if (intent) {
+    _searchProfile[intent] = (_searchProfile[intent] || 0) + 1;
+    var maxK = null, maxV = 0;
+    Object.keys(_searchProfile).forEach(function(k){ if(_searchProfile[k] > maxV){ maxV = _searchProfile[k]; maxK = k; } });
+    _searchProfile.topIntent = maxK;
+    _saveSearchProfile();
+  }
+
+  // Construiește filtrele personale din profil
+  var filters = []; var chipTags = [];
+  var profile = null;
+  try { profile = JSON.parse(localStorage.getItem('vv_profile_v1')); } catch(e) {}
+
+  if (profile) {
+    if (profile.placeri && profile.placeri.sport) {
+      filters.push(profile.placeri.sport);
+      chipTags.push('🏃 ' + profile.placeri.sport);
+    }
+    if (profile.mancare && profile.mancare.evita && profile.mancare.evita.length) {
+      chipTags.push('✗ fără ' + profile.mancare.evita[0]);
+    }
+    if (profile.mancare && profile.mancare.alergii && profile.mancare.alergii.length) {
+      chipTags.push('⚠ ' + profile.mancare.alergii[0]);
+    }
+    if (profile.mancare && profile.mancare.favorite && profile.mancare.favorite.length) {
+      chipTags.push('🍽 ' + profile.mancare.favorite[0]);
+    }
+    if (profile.familie && profile.familie.copii && profile.familie.copii.length) {
+      chipTags.push('👨‍👩‍👧 family-friendly');
+      filters.push('family friendly');
+    }
+    if (profile.loc && profile.loc.oras) {
+      chipTags.push('📍 din ' + profile.loc.oras);
+    }
+  }
+
+  // Intent-specific filters
+  if (intent === 'vacanta') {
+    chipTags.push('🌿 zone liniștite');
+    filters.push('quiet off the beaten path');
+  }
+  if (intent === 'mancare') {
+    chipTags.push('⭐ apreciat local');
+  }
+
+  // Queries sugerate — 3 variante personalizate
+  var suggestedQueries = _buildSuggestedQueries(q, intent, profile, filters);
+
+  // Offline match
+  var localMatches = _findLocalMatch(q);
+  var localEl = document.getElementById('search-local-match');
+  if (localMatches.length) {
+    localEl.style.display = '';
+    localEl.innerHTML = '<div class="local-match-card"><div class="local-match-label">ai menționat asta deja</div>' +
+      localMatches.map(function(m){
+        return '<div class="local-match-item">📂 '+escH(m.proj)+': "'+escH(m.text.slice(0,70))+'"</div>';
+      }).join('') + '</div>';
+  } else { localEl.style.display = 'none'; }
+
+  // Query pentru buildit
+  var builtQ = q + (filters.length ? ' ' + filters.slice(0,2).join(' ') : '');
+
+  // Afișează rezultatele
+  // Salvează ora căutării pentru insights
+  var timeHist = load('vv_search_time_hist') || [];
+  timeHist.push({ hour: new Date().getHours(), ts: Date.now() });
+  if (timeHist.length > 50) timeHist.shift();
+  try { localStorage.setItem('vv_search_time_hist', JSON.stringify(timeHist)); } catch(e) {}
+
+  document.getElementById('search-built-query').textContent = 'căutare pentru tine: "' + builtQ + '"';
+
+  // Insight cards
+  var insightCards = _buildInsightCards(intent, profile, q);
+  var insightsEl = document.getElementById('search-insights');
+  var insightsLabel = document.getElementById('search-lea-label');
+  if (insightCards.length) {
+    insightsLabel.style.display = '';
+    insightsEl.innerHTML = insightCards.map(function(c) {
+      return '<div class="insight-card">'+
+        '<div class="insight-card-icon">'+c.icon+'</div>'+
+        '<div class="insight-card-title">'+escH(c.title)+'</div>'+
+        '<div class="insight-card-sub">'+escH(c.sub)+'</div>'+
+      '</div>';
+    }).join('');
+  } else { insightsLabel.style.display='none'; insightsEl.innerHTML=''; }
+
+  // Route card
+  var routeData = _buildRouteCard(intent, profile, q);
+  var routeEl = document.getElementById('search-route-card');
+  if (routeData) {
+    routeEl.style.display = '';
+    routeEl.innerHTML = '<div class="route-card">'+
+      '<div class="route-card-label">traseu sugerat</div>'+
+      routeData.steps.map(function(s){ return '<div class="route-step">'+escH(s)+'</div>'; }).join('')+
+    '</div>';
+  } else { routeEl.style.display='none'; }
+
+  document.getElementById('search-filter-chips').innerHTML = chipTags.map(function(c){
+    return '<span class="search-filter-chip">'+escH(c)+'</span>';
+  }).join('');
+
+  // Queries sugerate
+  var sugEl = document.getElementById('search-suggested');
+  if (suggestedQueries.length) {
+    sugEl.innerHTML = '<div style="font-size:9px;letter-spacing:1.5px;color:rgba(255,255,255,0.18);text-transform:uppercase;margin-bottom:10px;">încearcă și</div>' +
+      suggestedQueries.map(function(sq){
+        return '<div class="search-suggested-item" onclick="useQuery(\''+escH(sq)+'\')">' + escH(sq) + '</div>';
+      }).join('');
+  } else { sugEl.innerHTML = ''; }
+
+  // Surse multiple
+  var sources = _buildSources(builtQ, intent, q);
+  var sourcesEl = document.getElementById('search-sources');
+  sourcesEl.innerHTML = sources.map(function(s){
+    return '<a class="search-open-btn" href="'+s.url+'" target="_blank">'+
+      '<span>'+escH(s.label)+'</span>'+
+      '<span class="search-source-right">'+escH(s.sub)+'</span>'+
+    '</a>';
+  }).join('');
+
+  document.getElementById('search-results').style.display = 'block';
+  _renderVVInsights();
 }
 
-// ── PRICING ───────────────────────────────────────────────────
-async function savePricing() {
-  try {
-    await db.collection('config').doc('pricing').set({
-      business: { beta: parseFloat(document.getElementById('p-biz-beta').value)||0, standard: parseFloat(document.getElementById('p-biz-std').value)||9, premium: parseFloat(document.getElementById('p-biz-prem').value)||29 },
-      talent: { list: parseFloat(document.getElementById('p-tal-list').value)||0, agency: parseFloat(document.getElementById('p-tal-agency').value)||49, perContact: parseFloat(document.getElementById('p-tal-contact').value)||5 },
-      nowPremium: { standard: 0, premium: parseFloat(document.getElementById('p-now-prem').value)||9, onyxCoins: parseFloat(document.getElementById('p-now-onyx').value)||500 },
-      verify: { userCost: parseFloat(document.getElementById('p-verify-user').value)||10, insiderReward: parseFloat(document.getElementById('p-verify-insider').value)||10 },
-      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
-    showToast('✅ Prețuri salvate!');
-  } catch(e) { showToast('Eroare: ' + e.message, true); }
+// ── Insight cards — generate din profil + intent ─────────────
+function _buildInsightCards(intent, profile, q) {
+  var cards = [];
+  var sport = profile && profile.placeri && profile.placeri.sport;
+  var family = profile && profile.familie && profile.familie.copii && profile.familie.copii.length;
+  var evita = profile && profile.mancare && profile.mancare.evita && profile.mancare.evita[0];
+  var oras = profile && profile.loc && profile.loc.oras;
+
+  if (intent === 'vacanta') {
+    cards.push({ icon:'🌿', title:'zone liniștite', sub:'locuri mai puțin turistice, mai autentic' });
+    if (sport) cards.push({ icon:'🏃', title:'trasee ' + sport, sub:'inclus în căutare' });
+    if (family) cards.push({ icon:'👨‍👩‍👧', title:'family-friendly', sub:'opțiuni pentru copii' });
+    if (evita) cards.push({ icon:'🍽', title:'mâncare fără ' + evita, sub:'filtrat din profil' });
+    cards.push({ icon:'📅', title:'perioadă bună', sub:'septembrie–octombrie în general mai ieftin' });
+  } else if (intent === 'mancare') {
+    cards.push({ icon:'⭐', title:'apreciat local', sub:'nu turistic, ci autentic' });
+    if (evita) cards.push({ icon:'✗', title:'fără ' + evita, sub:'verificat din profilul tău' });
+    if (oras) cards.push({ icon:'📍', title:'lângă ' + oras, sub:'în zona ta' });
+    cards.push({ icon:'🕐', title:'rezervare', sub:'recomandabil să suni înainte' });
+  } else if (intent === 'sport') {
+    if (oras) cards.push({ icon:'📍', title:'în ' + oras, sub:'trasee din zona ta' });
+    cards.push({ icon:'⏱', title:'dimineața 6–9', sub:'mai răcoros, mai puțin aglomerat' });
+    cards.push({ icon:'📱', title:'GPS recomandat', sub:'salvează traseul înainte' });
+  } else if (intent === 'tech') {
+    cards.push({ icon:'⭐', title:'GitHub stars', sub:'verifică popularitatea' });
+    cards.push({ icon:'📖', title:'documentație', sub:'citește înainte de implementat' });
+    cards.push({ icon:'🧪', title:'încearcă local', sub:'nu în producție direct' });
+  } else if (intent === 'muzica') {
+    cards.push({ icon:'🎵', title:'ascultă înainte', sub:'formează-ți opinia singur' });
+    cards.push({ icon:'📀', title:'album complet', sub:'nu doar single-uri' });
+  }
+  return cards.slice(0, 4);
 }
 
-// ── UTILS ─────────────────────────────────────────────────────
-function closeModal(id) { document.getElementById(id).classList.remove('show'); }
-function showToast(msg, isErr) {
-  var t = document.getElementById('toast');
-  t.textContent = msg;
-  t.style.borderColor = isErr ? 'rgba(255,59,48,.3)' : 'rgba(52,199,89,.25)';
-  t.classList.add('on');
-  clearTimeout(t._t); t._t = setTimeout(function(){ t.classList.remove('on'); }, 3500);
+// ── Route card — pentru sport/vacanta ───────────────────────
+function _buildRouteCard(intent, profile, q) {
+  var sport = profile && profile.placeri && profile.placeri.sport || 'alergat';
+  var oras = profile && profile.loc && profile.loc.oras || 'zona ta';
+
+  if (intent === 'sport') {
+    return {
+      steps: [
+        'start: parc central sau pistă locală',
+        '2–3 km încălzire lentă',
+        'punct de vedere / loc aerisit la jumătate',
+        'întoarcere pe traseu diferit dacă posibil',
+        'dimineața sau seara — evită 12–16'
+      ]
+    };
+  }
+  if (intent === 'vacanta') {
+    return {
+      steps: [
+        'evită weekend-urile și lunile de vârf',
+        'rezervă cazarea cu 2–3 săptămâni înainte',
+        'caută cartierele locale, nu centrul turistic',
+        'listează 2–3 locuri clare, nu itinerariu supraîncărcat',
+        'lasă o zi liberă fără plan'
+      ]
+    };
+  }
+  return null;
 }
+
+// ── VV Insights — observații rare din comportament ───────────
+function _renderVVInsights() {
+  _loadSearchProfile();
+  var insights = [];
+  var hist = getSearch();
+
+  // Caută noaptea?
+  var savedHist = load('vv_search_time_hist') || [];
+  var nightSearches = savedHist.filter(function(h){ return h.hour >= 22 || h.hour < 5; }).length;
+  if (nightSearches >= 3) insights.push('cauți adesea noaptea.');
+
+  // Intent dominant
+  if (_searchProfile.topIntent && _searchProfile[_searchProfile.topIntent] >= 3) {
+    var label = _INTENTS[_searchProfile.topIntent] ? _INTENTS[_searchProfile.topIntent].label : _searchProfile.topIntent;
+    insights.push('cel mai des cauți: ' + label + '.');
+  }
+
+  // Multe căutări
+  if (hist.length >= 10) insights.push('ai ' + hist.length + ' căutări salvate.');
+
+  var panel = document.getElementById('vv-insights-panel');
+  var list = document.getElementById('vv-insights-list');
+  if (!insights.length) { panel.style.display = 'none'; return; }
+
+  list.innerHTML = insights.map(function(obs) {
+    return '<div style="font-size:11.5px;color:rgba(255,248,235,0.32);line-height:1.7;padding:4px 0;font-style:italic;">— '+escH(obs)+'</div>';
+  }).join('');
+  panel.style.display = '';
+}
+
+function _buildSuggestedQueries(q, intent, profile, filters) {
+  var sport = profile && profile.placeri && profile.placeri.sport ? profile.placeri.sport : '';
+  var mancareEvita = profile && profile.mancare && profile.mancare.evita && profile.mancare.evita[0] ? 'fără ' + profile.mancare.evita[0] : '';
+  var family = profile && profile.familie && profile.familie.copii && profile.familie.copii.length ? 'cu copii' : '';
+
+  var variants = [];
+  if (intent === 'vacanta') {
+    variants = [
+      q + ' liniștit off the beaten path' + (sport ? ' ' + sport : ''),
+      q + ' locuri mai puțin turistice' + (family ? ' ' + family : ''),
+      q + ' solo reset' + (mancareEvita ? ' ' + mancareEvita : '')
+    ];
+  } else if (intent === 'mancare') {
+    variants = [
+      q + (mancareEvita ? ' ' + mancareEvita : '') + ' recenzii reale',
+      q + ' local autentic',
+      q + (sport ? ' lângă ' + sport : '') + ' zona liniștită'
+    ];
+  } else if (intent === 'sport') {
+    variants = [
+      q + ' beginners' + (profile && profile.loc && profile.loc.oras ? ' ' + profile.loc.oras : ''),
+      q + ' tehnica corecta',
+      q + ' program saptamanal'
+    ];
+  } else {
+    variants = [
+      q + ' ghid complet',
+      q + ' recenzie onestă',
+      q + ' alternativă mai ieftină'
+    ];
+  }
+  return variants.filter(function(v){ return v.trim() !== q.trim(); }).slice(0, 3);
+}
+
+function _buildSources(builtQ, intent, rawQ) {
+  var enc = encodeURIComponent(builtQ);
+  var rawEnc = encodeURIComponent(rawQ);
+  var sources = [
+    { label: 'DuckDuckGo', sub: 'web · filtre aplicate', url: 'https://duckduckgo.com/?q='+enc+'&kl=ro-ro' }
+  ];
+  if (intent === 'vacanta' || intent === 'mancare') {
+    sources.push({ label: 'Google Maps', sub: 'locuri pe hartă', url: 'https://www.google.com/maps/search/'+enc });
+  }
+  if (intent === 'muzica') {
+    sources.push({ label: 'YouTube', sub: 'audio / video', url: 'https://www.youtube.com/results?search_query='+enc });
+  }
+  if (intent === 'tech') {
+    sources.push({ label: 'GitHub', sub: 'cod / proiecte', url: 'https://github.com/search?q='+rawEnc });
+    sources.push({ label: 'YouTube tutorial', sub: 'video explicativ', url: 'https://www.youtube.com/results?search_query='+enc+'+tutorial' });
+  }
+  if (intent === 'vacanta') {
+    sources.push({ label: 'Reddit r/travel', sub: 'experiențe reale', url: 'https://www.reddit.com/r/travel/search/?q='+rawEnc });
+  }
+  if (!intent) {
+    sources.push({ label: 'Wikipedia', sub: 'referință', url: 'https://ro.wikipedia.org/w/index.php?search='+rawEnc });
+  }
+  return sources;
+}
+
+function useQuery(q) {
+  document.getElementById('search-input').value = q;
+  doSearch();
+}
+
+function searchKey(e) { if(e.key==='Enter') doSearch(); }
+
+// ══════════════════════════════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════════════════════════════
+
+function escH(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// Timeline relativ — "acum 3 nopți", "ieri dimineață", "săptămâna trecută"
+function fmtDate(ts) {
+  if (!ts) return '';
+  var now = Date.now(); var diff = now - ts;
+  var d = new Date(ts); var h = d.getHours();
+  var timeOfDay = h < 6 ? 'noaptea' : h < 12 ? 'dimineața' : h < 18 ? 'după-amiaza' : 'seara';
+  if (diff < 60000)       return 'acum';
+  if (diff < 3600000)     return Math.floor(diff/60000) + ' min.';
+  if (diff < 86400000)    return Math.floor(diff/3600000) + ' ore în urmă';
+  var days = Math.floor(diff/86400000);
+  if (days === 1)         return 'ieri ' + timeOfDay;
+  if (days === 2)         return 'alaltăieri';
+  if (days <= 6)          return 'acum ' + days + ' nopți';
+  if (days <= 13)         return 'săptămâna trecută';
+  return Math.floor(days/7) + ' săptămâni în urmă';
+}
+
+function fmtDateFull(ts) { return fmtDate(ts); }
+function autoResize(el) { el.style.height='auto'; el.style.height=el.scrollHeight+'px'; }
+function goToLea() { window.location.href='lea-home.html'; }
+
+// ── FOCUS MODE ──────────────────────────────────────────────
+var _focusOn = false;
+function toggleFocus() {
+  _focusOn = !_focusOn;
+  document.body.classList.toggle('focus-mode', _focusOn);
+  document.getElementById('focus-toggle').textContent = _focusOn ? '✕ focus' : 'focus';
+}
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape' && _focusOn) toggleFocus();
+});
+
+// ── BLOCAT (unde m-am blocat) ───────────────────────────────
+function saveBlocat() {
+  if (!_proj) return;
+  var p = getProj(_proj.id);
+  p.blocat = document.getElementById('blocat-input').value;
+  saveProj(p); _proj = p;
+  // Trimite și la LEA
+  var leaData = load(S.active) || {};
+  leaData.blocat = p.blocat;
+  save(S.active, leaData);
+}
+
+// ── CONTINUITY ENGINE ───────────────────────────────────────
+// Salvează sesiunea curentă la unload
+window.addEventListener('beforeunload', function() {
+  if (_proj) {
+    var p = getProj(_proj.id);
+    if (!p) return;
+    if (!p.sessions) p.sessions = [];
+    var lastIdea = p.ideas && p.ideas.length ? p.ideas[p.ideas.length-1].text : '';
+    p.sessions.push({ ts: Date.now(), lastIdea: lastIdea, blocat: p.blocat || '' });
+    if (p.sessions.length > 10) p.sessions.shift();
+    p.lastActivity = Date.now();
+    saveProj(p);
+  }
+});
+
+function showToast(msg) {
+  var t = document.getElementById('lea-toast'); t.textContent=msg;
+  t.classList.add('show'); setTimeout(function(){ t.classList.remove('show'); }, 2800);
+}
+
+// ══════════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════════
+
+window.addEventListener('load', function() {
+  var activeP = load(S.active);
+  if (activeP) {
+    var p = getProj(activeP.id);
+    if (p) { _proj=p; updateActiveHeader(); if (p.tone) applyToneToBody(p.tone); }
+  }
+  switchView('today');
+});
 </script>
 </body>
 </html>
