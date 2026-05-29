@@ -838,7 +838,7 @@ function handleSubmit(e) {
 
   const msg = document.getElementById('msg-input') ? document.getElementById('msg-input').value : '';
 
-  fetch('https://formspree.io/f/YOUR_FORM_ID', {
+  fetch('https://formspree.io/f/meepavqj', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
     body: JSON.stringify({ email, message: msg, source: 'lea-landing', lang: document.body.className })
