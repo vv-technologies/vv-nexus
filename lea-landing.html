@@ -765,17 +765,34 @@ footer {
 <section class="section-cta" id="access">
   <div class="cta-box">
     <span class="cta-badge">
-      <span data-lang="en">Early Access Supporter</span>
-      <span data-lang="ro">Early Access Supporter</span>
+      <span data-lang="en">Early Access · Built independently</span>
+      <span data-lang="ro">Early Access · Construit independent</span>
     </span>
     <h2 class="cta-title">
       <span data-lang="en">Support LEA.<br>Get in early.</span>
       <span data-lang="ro">Susține LEA.<br>Intră primul.</span>
     </h2>
     <p class="cta-sub">
-      <span data-lang="en">Support the development of LEA and get early access to every future build. You shape what it becomes.</span>
-      <span data-lang="ro">Susții dezvoltarea LEA și primești acces la fiecare build viitor. Tu influențezi ce devine.</span>
+      <span data-lang="en">I'm building LEA alone. It's not perfect yet — but it's real, it works, and €9 helps me keep going. You get early access to every build and a direct line to shape what it becomes.</span>
+      <span data-lang="ro">Construiesc LEA singur. Nu e perfect încă — dar e real, funcționează, și €9 mă ajută să continui. Primești acces la fiecare build și poți influența direct ce devine.</span>
     </p>
+
+    <!-- Try it first -->
+    <div style="margin-bottom:24px;padding:16px 20px;background:rgba(52,201,122,0.06);border:1px solid rgba(52,201,122,0.15);border-radius:12px;">
+      <p style="font-size:12px;color:rgba(52,201,122,0.8);margin-bottom:10px;letter-spacing:0.3px;">
+        <span data-lang="en">→ Try LEA first — free, no account, opens in browser</span>
+        <span data-lang="ro">→ Încearcă LEA mai întâi — gratis, fără cont, se deschide în browser</span>
+      </p>
+      <a href="https://hilea.eu/lea-home.html" target="_blank" class="btn-secondary" style="font-size:12px;padding:9px 20px;border-radius:16px;text-decoration:none;display:inline-flex;align-items:center;gap:6px;">
+        <span data-lang="en">Open LEA →</span>
+        <span data-lang="ro">Deschide LEA →</span>
+      </a>
+      <span style="font-size:11px;color:var(--text-dim);margin-left:12px;">
+        <span data-lang="en">laptop & desktop only for now · mobile coming soon</span>
+        <span data-lang="ro">laptop & desktop momentan · mobil urmează</span>
+      </span>
+    </div>
+
     <form class="cta-form" onsubmit="handleSubmit(event)" style="flex-direction:column;max-width:460px;">
       <div style="display:flex;gap:10px;">
         <input type="email" class="cta-input" id="email-input" placeholder="your@email.com" required>
@@ -786,25 +803,27 @@ footer {
       </div>
       <textarea id="msg-input" class="cta-input" rows="2" placeholder="What's your biggest challenge with unfinished projects? (optional)" style="border-radius:12px;resize:none;font-family:inherit;margin-top:8px;padding:10px 18px;font-size:12px;"></textarea>
     </form>
+
     <div class="cta-features">
       <span class="cta-feature"><span data-lang="en">Persistent memory</span><span data-lang="ro">Memorie persistentă</span></span>
       <span class="cta-feature"><span data-lang="en">Project organization</span><span data-lang="ro">Organizare proiecte</span></span>
       <span class="cta-feature"><span data-lang="en">Session continuity</span><span data-lang="ro">Continuitate sesiuni</span></span>
       <span class="cta-feature"><span data-lang="en">Local-first</span><span data-lang="ro">Local-first</span></span>
-      <span class="cta-feature"><span data-lang="en">Offline-ready</span><span data-lang="ro">Offline</span></span>
+      <span class="cta-feature"><span data-lang="en">Every future build</span><span data-lang="ro">Fiecare build viitor</span></span>
     </div>
+
     <p class="cta-price-note">
-      <span data-lang="en">Free during early access · <strong>€9/mo</strong> when PRO launches · No commitment</span>
-      <span data-lang="ro">Gratuit în early access · <strong>€9/lună</strong> la PRO · Fără angajament</span>
+      <span data-lang="en">Free to try · Support with <strong>€9</strong> to keep it independent · No subscription yet</span>
+      <span data-lang="ro">Gratis de încercat · Susține cu <strong>€9</strong> să rămână independent · Fără abonament acum</span>
     </p>
 
-    <div style="margin-top:28px;padding-top:24px;border-top:1px solid var(--border);">
-      <p style="font-size:12px;color:var(--text-dim);margin-bottom:14px;">
-        <span data-lang="en">Or support the project directly — helps keep LEA independent.</span>
-        <span data-lang="ro">Sau susține proiectul direct — ajută LEA să rămână independent.</span>
-      </p>
-      <a href="https://ko-fi.com/vvteam" target="_blank" style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,94,91,0.1);border:1px solid rgba(255,94,91,0.25);color:rgba(255,180,178,0.9);font-size:12px;padding:10px 20px;border-radius:20px;text-decoration:none;transition:all 0.2s;" onmouseover="this.style.background='rgba(255,94,91,0.18)'" onmouseout="this.style.background='rgba(255,94,91,0.1)'">
-        ♥ Support on Ko-fi
+    <div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--border);display:flex;align-items:center;gap:12px;justify-content:center;flex-wrap:wrap;">
+      <span style="font-size:11px;color:var(--text-dim);">
+        <span data-lang="en">Support directly:</span>
+        <span data-lang="ro">Susține direct:</span>
+      </span>
+      <a href="https://ko-fi.com/vvteam" target="_blank" style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,94,91,0.1);border:1px solid rgba(255,94,91,0.25);color:rgba(255,180,178,0.9);font-size:12px;padding:9px 18px;border-radius:20px;text-decoration:none;transition:all 0.2s;" onmouseover="this.style.background='rgba(255,94,91,0.18)'" onmouseout="this.style.background='rgba(255,94,91,0.1)'">
+        ♥ Ko-fi — €9
       </a>
     </div>
   </div>
