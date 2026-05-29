@@ -3,558 +3,996 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LEA — Acasă</title>
+<title>Lea</title>
 <style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
   :root {
-    --gold: #c8a040;
-    --gold-dim: #7a5f20;
-    --blue: #4a9eff;
-    --blue-dim: #1a3a6a;
-    --bg: #07070f;
-    --bg2: #0d0d1a;
-    --bg3: #12121f;
-    --border: #1e1e30;
-    --text: #d0d0e0;
-    --text-dim: #5a5a7a;
+    --bg:         #07070d;
+    --glass:      rgba(255,255,255,0.025);
+    --glass-2:    rgba(255,255,255,0.045);
+    --glass-b:    rgba(255,255,255,0.042);
+    --glass-b2:   rgba(255,255,255,0.075);
+    --text:       rgba(255,248,235,0.84);
+    --text-dim:   rgba(255,248,235,0.22);
+    --text-mid:   rgba(255,248,235,0.44);
+    --accent:     #c8963e;
+    --accent-dim: rgba(200,150,62,0.09);
+    --violet:     #8b5cf6;
+    --green:      #34c97a;
+    --red:        #ff453a;
   }
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+  /* TIPAR VIZIBIL — Alexandria pattern display */
+  .alex-pattern {
+    display: flex; flex-wrap: wrap; gap: 4px;
+    margin-top: 6px;
+  }
+  .alex-tag {
+    font-size: 9px; letter-spacing: 0.5px;
+    color: rgba(255,255,255,0.25);
+    padding: 2px 6px; border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.08);
+    font-family: monospace;
+  }
+  @keyframes alexFade {
+    0%   { opacity: 0; transform: translateY(4px); }
+    20%  { opacity: 0.6; transform: translateY(0); }
+    70%  { opacity: 0.6; }
+    100% { opacity: 0; }
+  }
 
   body {
     background: var(--bg);
     color: var(--text);
-    font-family: 'Segoe UI', system-ui, sans-serif;
+    font-family: -apple-system, 'SF Pro Text', 'Segoe UI', system-ui, sans-serif;
     height: 100vh;
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    position: relative;
   }
+
+  /* Orbs — fundal pentru efect glass */
+  .orb {
+    position: fixed;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+  }
+  @keyframes orbAmbient {
+    0%,100% { opacity: 0.55; transform: scale(1); }
+    50%      { opacity: 0.78; transform: scale(1.03); }
+  }
+  @keyframes orbAmbient2 {
+    0%,100% { opacity: 0.42; transform: scale(1); }
+    50%      { opacity: 0.65; transform: scale(1.05); }
+  }
+
+  #orb1 {
+    width: 700px; height: 700px;
+    background: radial-gradient(circle, rgba(28,16,58,0.65) 0%, transparent 65%);
+    top: -250px; left: -220px;
+    transition: background 3s ease;
+    animation: orbAmbient 11s ease-in-out infinite;
+  }
+  #orb2 {
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(80,44,14,0.32) 0%, transparent 65%);
+    bottom: -140px; right: -100px;
+    transition: background 3s ease;
+    animation: orbAmbient2 14s ease-in-out infinite 2s;
+  }
+  #orb3 {
+    width: 320px; height: 320px;
+    background: radial-gradient(circle, rgba(50,24,80,0.22) 0%, transparent 65%);
+    top: 38%; right: 30%;
+    animation: orbAmbient 18s ease-in-out infinite 5s;
+  }
+
+  #header, #main { position: relative; z-index: 1; }
 
   /* HEADER */
   #header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 14px 24px;
-    background: var(--bg2);
-    border-bottom: 1px solid var(--border);
+    padding: 0 28px;
+    height: 48px;
+    background: rgba(7,7,13,0.75);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255,255,255,0.042);
     flex-shrink: 0;
   }
 
-  #header-left {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
+  #header-left { display: flex; align-items: center; gap: 14px; }
 
   #lea-logo {
-    width: 36px; height: 36px;
+    width: 28px; height: 28px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #1a2a4a, #0a1020);
-    border: 1.5px solid var(--gold);
+    background: linear-gradient(135deg, rgba(200,150,62,0.18), rgba(139,92,246,0.14));
+    border: 1px solid rgba(200,150,62,0.22);
     display: flex; align-items: center; justify-content: center;
-    font-size: 16px;
-    color: var(--gold);
-    font-weight: bold;
-    letter-spacing: 1px;
-  }
-
-  #header-title {
-    display: flex;
-    flex-direction: column;
-  }
-
-  #header-title span:first-child {
-    font-size: 16px;
-    font-weight: 600;
-    color: var(--gold);
-    letter-spacing: 2px;
-  }
-
-  #header-title span:last-child {
-    font-size: 10px;
-    color: var(--text-dim);
-    letter-spacing: 1px;
-  }
-
-  #status-dot {
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    background: #40e878;
-    box-shadow: 0 0 6px #40e878;
-    animation: pulse 2s infinite;
-  }
-
-  @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.4; }
-  }
-
-  #header-right {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-  }
-
-  .hbtn {
-    background: var(--bg3);
-    border: 1px solid var(--border);
-    color: var(--text-dim);
-    padding: 6px 14px;
-    border-radius: 6px;
-    font-size: 11px;
-    cursor: pointer;
-    letter-spacing: 1px;
-    transition: all 0.2s;
-  }
-
-  .hbtn:hover {
-    border-color: var(--gold-dim);
-    color: var(--gold);
-  }
-
-  /* MAIN LAYOUT */
-  #main {
-    display: flex;
-    flex: 1;
-    overflow: hidden;
-  }
-
-  /* SIDEBAR */
-  #sidebar {
-    width: 220px;
-    background: var(--bg2);
-    border-right: 1px solid var(--border);
-    display: flex;
-    flex-direction: column;
-    flex-shrink: 0;
-    overflow-y: auto;
-  }
-
-  .sidebar-section {
-    padding: 16px;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .sidebar-label {
-    font-size: 9px;
-    letter-spacing: 2px;
-    color: var(--text-dim);
-    text-transform: uppercase;
-    margin-bottom: 10px;
-  }
-
-  #mem-emotie {
-    font-size: 12px;
-    color: var(--blue);
-    margin-bottom: 6px;
-  }
-
-  #mem-vreme {
-    font-size: 11px;
-    color: var(--text-dim);
-    margin-bottom: 4px;
-  }
-
-  #mem-subiecte {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px;
-    margin-top: 8px;
-  }
-
-  .mem-chip {
-    background: var(--bg3);
-    border: 1px solid var(--border);
-    color: var(--text-dim);
-    font-size: 9px;
-    padding: 2px 7px;
-    border-radius: 10px;
+    font-size: 11px; color: rgba(255,248,235,0.8); font-weight: 600;
+    box-shadow: 0 0 14px rgba(200,150,62,0.1), inset 0 1px 0 rgba(255,255,255,0.08);
     letter-spacing: 0.5px;
   }
 
-  #preferinte-list {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
+  #header-title { display: flex; flex-direction: column; }
+  #header-title span:first-child {
+    font-size: 13px; font-weight: 400;
+    color: rgba(255,248,235,0.82); letter-spacing: 3px;
+  }
+  #header-title span:last-child {
+    font-size: 9px; color: var(--text-dim); letter-spacing: 0.8px; margin-top: 1px;
   }
 
-  .pref-item {
-    font-size: 10px;
-    color: var(--gold-dim);
-    display: flex;
-    align-items: center;
-    gap: 6px;
+  #status-dot {
+    width: 5px; height: 5px; border-radius: 50%;
+    background: var(--green); box-shadow: 0 0 5px var(--green);
+    animation: pulse 3s infinite;
   }
 
-  .pref-item::before {
-    content: '';
-    width: 4px; height: 4px;
-    border-radius: 50%;
-    background: var(--gold-dim);
-    flex-shrink: 0;
-  }
 
-  #sidebar-footer {
-    margin-top: auto;
-    padding: 12px 16px;
-    border-top: 1px solid var(--border);
+  /* STAREA LEA */
+  #lea-stare {
+    display: flex; align-items: center; gap: 6px;
+    padding: 4px 12px; border-radius: 20px;
+    background: var(--glass);
+    border: 1px solid rgba(255,255,255,0.04);
+    font-size: 10px; letter-spacing: 0.5px;
+    color: var(--text-dim);
+    transition: all 0.8s ease;
   }
+  #lea-stare-dot {
+    width: 5px; height: 5px; border-radius: 50%;
+    background: var(--text-dim);
+    transition: background 0.8s ease;
+  }
+  #lea-stare.energie  { border-color: rgba(48,209,88,0.25); color: rgba(48,209,88,0.8); }
+  #lea-stare.energie  #lea-stare-dot { background: var(--green); box-shadow: 0 0 4px var(--green); }
+  #lea-stare.atentie  { border-color: rgba(10,132,255,0.25); color: rgba(10,132,255,0.8); }
+  #lea-stare.atentie  #lea-stare-dot { background: var(--accent); box-shadow: 0 0 4px var(--accent); }
+  #lea-stare.oboseala { border-color: rgba(255,255,255,0.1); color: rgba(255,255,255,0.3); }
+  #lea-stare.curiozitate { border-color: rgba(191,90,242,0.25); color: rgba(191,90,242,0.8); }
+  #lea-stare.curiozitate #lea-stare-dot { background: #bf5af2; box-shadow: 0 0 4px #bf5af2; }
 
-  #clear-mem-btn {
-    width: 100%;
+  /* MODURI */
+  #moduri {
+    display: flex; gap: 3px; align-items: center;
+  }
+  .mod-btn {
     background: transparent;
-    border: 1px solid var(--border);
+    border: 1px solid transparent;
     color: var(--text-dim);
-    padding: 6px;
-    border-radius: 6px;
-    font-size: 10px;
-    cursor: pointer;
-    letter-spacing: 1px;
-    transition: all 0.2s;
+    padding: 3px 11px; border-radius: 20px;
+    font-size: 10.5px; cursor: pointer; letter-spacing: 0.5px;
+    transition: all 0.45s ease; font-family: inherit; font-weight: 400;
+  }
+  .mod-btn:hover { color: var(--text-mid); }
+  .mod-btn.activ {
+    background: rgba(200,150,62,0.09);
+    border-color: rgba(200,150,62,0.22);
+    color: rgba(200,150,62,0.9);
+  }
+  @keyframes pulse {
+    0%,100% { opacity:1; box-shadow: 0 0 6px var(--green); }
+    50%      { opacity:.45; box-shadow: 0 0 3px var(--green); }
   }
 
-  #clear-mem-btn:hover {
-    border-color: #5a2a2a;
-    color: #c05050;
-  }
+  #header-right { display: flex; gap: 8px; align-items: center; }
 
-  /* CHAT AREA */
-  #chat-area {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-  }
-
-  #messages {
-    flex: 1;
-    overflow-y: auto;
-    padding: 24px 32px;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    scroll-behavior: smooth;
-  }
-
-  #messages::-webkit-scrollbar { width: 4px; }
-  #messages::-webkit-scrollbar-track { background: transparent; }
-  #messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-
-  /* WELCOME */
-  #welcome {
-    text-align: center;
-    padding: 60px 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 16px;
-  }
-
-  #welcome-logo {
-    width: 64px; height: 64px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #1a2a4a, #0a1020);
-    border: 2px solid var(--gold);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 24px;
-    color: var(--gold);
-    font-weight: bold;
-    letter-spacing: 2px;
-    margin-bottom: 8px;
-  }
-
-  #welcome h2 {
-    font-size: 22px;
-    color: var(--gold);
-    font-weight: 300;
-    letter-spacing: 4px;
-  }
-
-  #welcome p {
-    font-size: 13px;
+  .hbtn {
+    background: var(--glass);
+    border: 1px solid var(--glass-b);
     color: var(--text-dim);
-    max-width: 400px;
-    line-height: 1.7;
+    padding: 5px 14px; border-radius: 20px;
+    font-size: 11px; cursor: pointer; letter-spacing: 0.5px;
+    transition: all 0.2s; font-family: inherit;
+  }
+  .hbtn:hover {
+    border-color: rgba(255,255,255,0.18);
+    color: var(--text); background: var(--glass-2);
   }
 
-  .welcome-chips {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    justify-content: center;
-    margin-top: 8px;
+  /* LAYOUT */
+  #main { display: flex; flex: 1; overflow: hidden; }
+
+  /* SIDEBAR */
+  #sidebar {
+    width: 208px;
+    background: rgba(0,0,0,0.28);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-right: 1px solid var(--glass-b);
+    display: flex; flex-direction: column;
+    flex-shrink: 0; overflow-y: auto; scrollbar-width: none;
+  }
+  #sidebar::-webkit-scrollbar { display: none; }
+
+  .sidebar-section {
+    padding: 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
   }
 
-  .welcome-chip {
-    background: var(--bg3);
-    border: 1px solid var(--border);
-    color: var(--text-dim);
-    padding: 7px 14px;
-    border-radius: 20px;
-    font-size: 11px;
-    cursor: pointer;
-    transition: all 0.2s;
+  .sidebar-label {
+    font-size: 9px; letter-spacing: 1.5px; color: var(--text-dim);
+    text-transform: uppercase; margin-bottom: 10px; font-weight: 500;
   }
 
-  .welcome-chip:hover {
-    border-color: var(--gold-dim);
-    color: var(--gold);
-    background: #1a1508;
+  #mem-emotie { font-size: 13px; color: rgba(255,255,255,0.65); margin-bottom: 5px; }
+  #mem-vreme  { font-size: 10px; color: var(--text-dim); margin-bottom: 3px; }
+
+  #mem-subiecte { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 7px; }
+
+  .mem-chip {
+    background: var(--glass); border: 1px solid var(--glass-b);
+    color: var(--text-mid); font-size: 9px;
+    padding: 2px 8px; border-radius: 20px; letter-spacing: 0.3px;
   }
 
-  /* MESAJE */
-  .msg-row {
-    display: flex;
-    gap: 12px;
-    max-width: 720px;
+  #preferinte-list { display: flex; flex-direction: column; gap: 5px; }
+  .pref-item {
+    font-size: 10px; color: var(--text-mid);
+    display: flex; align-items: center; gap: 7px;
+  }
+  .pref-item::before {
+    content:''; width:3px; height:3px; border-radius:50%;
+    background: rgba(255,255,255,0.25); flex-shrink:0;
   }
 
-  .msg-row.user {
-    align-self: flex-end;
-    flex-direction: row-reverse;
-  }
-
-  .msg-row.lea {
-    align-self: flex-start;
-  }
-
-  .msg-avatar {
-    width: 32px; height: 32px;
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 11px;
-    font-weight: bold;
-    flex-shrink: 0;
-    margin-top: 2px;
-  }
-
-  .msg-row.lea .msg-avatar {
-    background: linear-gradient(135deg, #1a2a4a, #0a1020);
-    border: 1px solid var(--gold);
-    color: var(--gold);
-  }
-
-  .msg-row.user .msg-avatar {
-    background: var(--bg3);
-    border: 1px solid var(--blue-dim);
-    color: var(--blue);
-  }
-
-  .msg-body {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    max-width: 600px;
-  }
-
-  .msg-bubble {
-    padding: 12px 16px;
-    border-radius: 12px;
-    font-size: 14px;
-    line-height: 1.6;
-  }
-
-  .msg-row.lea .msg-bubble {
-    background: var(--bg3);
-    border: 1px solid var(--border);
-    color: var(--text);
-    border-top-left-radius: 4px;
-  }
-
-  .msg-row.user .msg-bubble {
-    background: var(--blue-dim);
-    border: 1px solid #2a5a9a;
-    color: #c0d8ff;
-    border-top-right-radius: 4px;
-  }
-
-  /* META — ascuns, vizibil doar la hover */
-  .msg-meta {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    flex-wrap: wrap;
-    padding: 0 2px;
-    max-height: 0;
-    overflow: hidden;
-    opacity: 0;
-    transition: opacity 0.2s, max-height 0.2s;
-  }
-
-  .msg-body:hover .msg-meta {
-    max-height: 30px;
-    opacity: 1;
-    margin-top: 4px;
-  }
-
-  .meta-type {
-    font-size: 8px;
-    letter-spacing: 1px;
-    padding: 1px 6px;
-    border-radius: 8px;
-    text-transform: uppercase;
-  }
-
-  .meta-type.scena    { background: #0a1520; color: #305880; border: 1px solid #10304a; }
-  .meta-type.emotie   { background: #150a15; color: #804060; border: 1px solid #2a1025; }
-  .meta-type.comanda  { background: #151500; color: #706010; border: 1px solid #302800; }
-  .meta-type.intrebare{ background: #0a150a; color: #306040; border: 1px solid #102510; }
-  .meta-type.creativ  { background: #150a00; color: #804030; border: 1px solid #2a1500; }
-  .meta-type.feedback { background: #0a150a; color: #306040; border: 1px solid #102510; }
-  .meta-type.memorie  { background: #100a18; color: #604090; border: 1px solid #20103a; }
-  .meta-type.salut    { background: #0a150a; color: #406050; border: 1px solid #102510; }
-  .meta-type.expresie { background: #101010; color: #404040; border: 1px solid #202020; }
+  .engines-list { display: flex; flex-direction: column; gap: 5px; }
+  .engine-item  { font-size: 9px; color: rgba(48,209,88,0.65); letter-spacing: 0.5px; }
 
   .kb-item {
     display: flex; justify-content: space-between; align-items: center;
     font-size: 10px; color: var(--text-dim);
-    padding: 3px 0; border-bottom: 1px solid var(--border);
-    gap: 6px;
+    padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.04); gap: 6px;
   }
-  .kb-item span { flex: 1; color: #c0a0e0; }
-  .kb-del { background: none; border: none; color: #5a3a5a; cursor: pointer; font-size: 11px; padding: 0 2px; }
-  .kb-del:hover { color: #e05050; }
-
-  .meta-tone {
-    font-size: 9px;
-    color: var(--text-dim);
-    letter-spacing: 0.5px;
+  .kb-item span { flex:1; color: rgba(255,255,255,0.55); }
+  .kb-del {
+    background: none; border: none; color: rgba(255,255,255,0.18);
+    cursor: pointer; font-size: 11px; padding: 0 2px; transition: color 0.15s;
   }
+  .kb-del:hover { color: rgba(255,80,80,0.65); }
 
-  .meta-concept {
-    font-size: 9px;
-    padding: 2px 6px;
-    border-radius: 8px;
-    background: #1a1020;
-    border: 1px solid #3a2040;
-    color: #b090d0;
+  #sidebar-footer {
+    margin-top: auto; padding: 12px 16px;
+    border-top: 1px solid rgba(255,255,255,0.04);
   }
 
-  /* Feedback buttons */
-  .msg-feedback {
-    display: flex;
-    gap: 6px;
-    margin-top: 2px;
+  #clear-mem-btn {
+    width: 100%; background: transparent;
+    border: 1px solid rgba(255,255,255,0.06);
+    color: var(--text-dim); padding: 7px; border-radius: 8px;
+    font-size: 10px; cursor: pointer; letter-spacing: 0.5px;
+    transition: all 0.2s; font-family: inherit;
   }
+  #clear-mem-btn:hover {
+    border-color: rgba(255,60,60,0.3); color: rgba(255,100,100,0.65);
+  }
+
+  /* CHAT */
+  #chat-area {
+    flex: 1; display: flex; flex-direction: column; overflow: hidden;
+  }
+
+  #messages {
+    flex: 1; overflow-y: auto;
+    padding: 44px 52px;
+    display: flex; flex-direction: column; gap: 24px;
+    scroll-behavior: smooth;
+  }
+  #messages::-webkit-scrollbar { width: 3px; }
+  #messages::-webkit-scrollbar-track { background: transparent; }
+  #messages::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 2px; }
+
+  /* WELCOME */
+  #welcome {
+    text-align: center; padding: 70px 20px 50px;
+    display: flex; flex-direction: column; align-items: center; gap: 18px;
+  }
+
+  /* ORB RESPIRATOR — prezenta LEA */
+  #welcome-orb {
+    position: relative;
+    width: 80px; height: 80px;
+    margin-bottom: 12px;
+  }
+  #welcome-orb-core {
+    width: 80px; height: 80px; border-radius: 50%;
+    background: radial-gradient(circle at 38% 36%,
+      rgba(200,150,62,0.35) 0%,
+      rgba(139,92,246,0.18) 55%,
+      transparent 80%);
+    border: 1px solid rgba(200,150,62,0.18);
+    animation: orbBreathe 6s ease-in-out infinite;
+    position: relative; z-index: 2;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0;
+  }
+  #welcome-orb-glow {
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%,-50%);
+    width: 140px; height: 140px; border-radius: 50%;
+    background: radial-gradient(circle,
+      rgba(200,150,62,0.07) 0%,
+      rgba(139,92,246,0.04) 50%,
+      transparent 70%);
+    animation: orbBreathe 6s ease-in-out infinite 1.2s;
+    z-index: 1;
+  }
+  @keyframes orbBreathe {
+    0%,100% { transform: scale(1);    opacity: 0.55; }
+    50%      { transform: scale(1.07); opacity: 0.88; }
+  }
+  #welcome-orb-glow { animation-name: orbGlowBreathe; }
+  @keyframes orbGlowBreathe {
+    0%,100% { transform: translate(-50%,-50%) scale(1);    opacity: 0.38; }
+    50%      { transform: translate(-50%,-50%) scale(1.10); opacity: 0.75; }
+  }
+
+  #welcome h2 {
+    font-size: 24px; color: rgba(255,248,235,0.78);
+    font-weight: 300; letter-spacing: 4px;
+    margin-top: 0;
+  }
+
+  #welcome p {
+    font-size: 13px; color: var(--text-dim);
+    max-width: 340px; line-height: 1.85; letter-spacing: 0.2px;
+  }
+
+  .welcome-chips {
+    display: flex; flex-wrap: wrap; gap: 7px;
+    justify-content: center; margin-top: 8px;
+  }
+
+  .welcome-chip {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,248,235,0.055);
+    color: rgba(255,248,235,0.32); padding: 6px 18px;
+    border-radius: 20px; font-size: 12px; cursor: pointer;
+    transition: all 0.5s ease; font-family: inherit; letter-spacing: 0.2px;
+  }
+  .welcome-chip:hover {
+    border-color: rgba(200,150,62,0.18); color: rgba(255,248,235,0.65);
+    background: rgba(200,150,62,0.04);
+  }
+
+  /* LEA STATE GLOW — orb-urile se schimba cu starea emotionala */
+  body.state-close   #orb1 { background: radial-gradient(circle, rgba(50,24,90,0.7) 0%, transparent 65%); }
+  body.state-close   #orb2 { background: radial-gradient(circle, rgba(100,54,18,0.38) 0%, transparent 65%); }
+  body.state-deep    #orb1 { background: radial-gradient(circle, rgba(20,10,50,0.8) 0%, transparent 65%); }
+  body.state-deep    #orb2 { background: radial-gradient(circle, rgba(40,20,80,0.35) 0%, transparent 65%); }
+  body.state-warm    #orb1 { background: radial-gradient(circle, rgba(40,20,10,0.6) 0%, transparent 65%); }
+  body.state-warm    #orb2 { background: radial-gradient(circle, rgba(120,60,10,0.35) 0%, transparent 65%); }
+
+  /* MESAJE */
+  @keyframes msgAppear {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .msg-row {
+    display: flex; gap: 10px; max-width: 680px;
+    animation: msgAppear 0.7s cubic-bezier(0.22,1,0.36,1) both;
+  }
+  .msg-row.user { align-self: flex-end; flex-direction: row-reverse; }
+  .msg-row.lea  { align-self: flex-start; }
+
+  .msg-avatar {
+    width: 26px; height: 26px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px; font-weight: 600; flex-shrink: 0; margin-top: 3px;
+  }
+  .msg-row.lea .msg-avatar {
+    background: var(--glass); border: 1px solid var(--glass-b2);
+    color: rgba(255,255,255,0.65);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.07);
+  }
+  .msg-row.user .msg-avatar {
+    background: var(--accent-dim);
+    border: 1px solid rgba(200,150,62,0.22);
+    color: var(--accent);
+  }
+
+  .msg-body { display: flex; flex-direction: column; gap: 4px; max-width: 580px; }
+
+  .msg-bubble {
+    padding: 11px 16px; border-radius: 14px;
+    font-size: 14px; line-height: 1.65;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+  }
+
+  .msg-row.lea .msg-bubble {
+    background: rgba(255,248,235,0.022);
+    border: 1px solid rgba(255,248,235,0.038);
+    color: var(--text); border-top-left-radius: 3px;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.22);
+    font-size: 14.5px; line-height: 1.88;
+    letter-spacing: 0.015em;
+  }
+
+  .msg-row.user .msg-bubble {
+    background: rgba(200,150,62,0.065);
+    border: 1px solid rgba(200,150,62,0.11);
+    color: rgba(255,248,235,0.82); border-top-right-radius: 3px;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.2);
+    font-size: 14.5px; line-height: 1.88;
+  }
+
+  /* META ascuns, vizibil la hover */
+  .msg-meta {
+    display: flex; align-items: center; gap: 5px;
+    flex-wrap: wrap; padding: 0 2px;
+    max-height: 0; overflow: hidden; opacity: 0;
+    transition: opacity 0.5s ease, max-height 0.4s ease;
+  }
+  .msg-body:hover .msg-meta { max-height: 28px; opacity: 1; margin-top: 2px; }
+
+  .meta-type, .meta-tone, .meta-concept {
+    font-size: 8px; letter-spacing: 0.8px;
+    padding: 1px 7px; border-radius: 10px;
+    background: var(--glass); border: 1px solid var(--glass-b);
+    color: var(--text-dim); text-transform: uppercase;
+  }
+  .meta-tone, .meta-concept { font-size: 9px; text-transform: none; }
+
+  /* Feedback */
+  .msg-feedback { display: flex; gap: 5px; margin-top: 1px; }
 
   .fb-btn {
     background: transparent;
-    border: 1px solid var(--border);
+    border: 1px solid rgba(255,255,255,0.06);
     color: var(--text-dim);
-    width: 26px; height: 26px;
-    border-radius: 6px;
-    font-size: 13px;
-    cursor: pointer;
+    width: 24px; height: 24px; border-radius: 6px;
+    font-size: 11px; cursor: pointer;
     transition: all 0.15s;
     display: flex; align-items: center; justify-content: center;
+    font-family: inherit;
   }
+  .fb-btn:hover { border-color: rgba(255,255,255,0.14); }
+  .fb-btn.active-pos { border-color: rgba(48,209,88,0.45); color: var(--green); background: rgba(48,209,88,0.07); }
+  .fb-btn.active-neg { border-color: rgba(255,69,58,0.45); color: var(--red); background: rgba(255,69,58,0.07); }
 
-  .fb-btn:hover { border-color: var(--gold-dim); }
-  .fb-btn.active-pos { border-color: #40e878; color: #40e878; background: #0a1a0a; }
-  .fb-btn.active-neg { border-color: #e84040; color: #e84040; background: #1a0a0a; }
-
-  /* TYPING INDICATOR */
-  #typing {
-    display: none;
-    align-items: center;
-    gap: 4px;
-    padding: 8px 0;
-    color: var(--text-dim);
-    font-size: 12px;
+  /* TYPING */
+  #typing { display:none; align-items:center; gap:6px; padding:6px 0; color:var(--text-dim); font-size:12px; }
+  #typing.show { display: flex; animation: typingFadeIn 0.7s ease forwards; }
+  @keyframes typingFadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to   { opacity: 1; transform: translateY(0); }
   }
-
-  #typing.show { display: flex; }
 
   .typing-dot {
-    width: 5px; height: 5px;
-    border-radius: 50%;
-    background: var(--gold);
-    animation: tdot 1.2s infinite;
+    width: 4px; height: 4px; border-radius: 50%;
+    background: rgba(255,248,235,0.28);
+    animation: tdot 2.4s ease-in-out infinite;
   }
-
-  .typing-dot:nth-child(2) { animation-delay: 0.2s; }
-  .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+  .typing-dot:nth-child(2) { animation-delay: 0.5s; }
+  .typing-dot:nth-child(3) { animation-delay: 1.0s; }
 
   @keyframes tdot {
-    0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
-    40% { transform: scale(1); opacity: 1; }
+    0%,100% { transform: scale(0.45); opacity: 0.12; }
+    42%     { transform: scale(1.15); opacity: 0.65; }
   }
 
-  /* INPUT AREA */
+  /* CREIERUL VIZIBIL — ascuns complet, userul nu vede mecanica */
+  #brain-bar { display: none; }
+
+  .bb-tag {
+    padding: 2px 8px; border-radius: 10px;
+    font-size: 9px; letter-spacing: 0.5px;
+    background: var(--glass); border: 1px solid var(--glass-b);
+    color: var(--text-dim); transition: all 0.2s;
+  }
+  .bb-tag.t-scena     { color: rgba(10,132,255,0.75);  border-color: rgba(10,132,255,0.18); }
+  .bb-tag.t-emotie    { color: rgba(191,90,242,0.75);  border-color: rgba(191,90,242,0.18); }
+  .bb-tag.t-creativ   { color: rgba(255,159,10,0.75);  border-color: rgba(255,159,10,0.18); }
+  .bb-tag.t-comanda   { color: rgba(48,209,88,0.75);   border-color: rgba(48,209,88,0.18);  }
+  .bb-tag.t-intrebare { color: rgba(255,255,255,0.5);  }
+  .bb-tag.t-salut     { color: rgba(48,209,88,0.5);    }
+  .bb-tag.e-trist     { color: rgba(100,150,255,0.75); border-color: rgba(100,150,255,0.18); }
+  .bb-tag.e-bucuros   { color: rgba(48,209,88,0.75);   border-color: rgba(48,209,88,0.18);  }
+  .bb-tag.e-furios    { color: rgba(255,100,80,0.75);  border-color: rgba(255,100,80,0.18); }
+  .bb-tag.e-speriat   { color: rgba(191,90,242,0.75);  border-color: rgba(191,90,242,0.18); }
+  .bb-tag.e-linistit  { color: rgba(48,209,88,0.55);   }
+  .bb-tag.e-obosit    { color: rgba(150,150,150,0.75); }
+  .bb-tag.e-nostalgic { color: rgba(210,160,80,0.75);  border-color: rgba(210,160,80,0.18); }
+
+  /* SIDEBAR TABS */
+  #sidebar-tabs {
+    display: flex; gap: 4px; padding: 10px 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    flex-shrink: 0;
+  }
+  .stab {
+    flex: 1; background: transparent;
+    border: 1px solid transparent;
+    color: var(--text-dim); padding: 5px 4px;
+    border-radius: 8px; font-size: 11px;
+    cursor: pointer; font-family: inherit;
+    transition: all 0.2s; letter-spacing: 0.3px;
+  }
+  .stab:hover { color: var(--text-mid); }
+  .stab.activ {
+    background: var(--glass-2);
+    border-color: var(--glass-b);
+    color: rgba(255,255,255,0.85);
+  }
+
+  /* CONVERSAȚII */
+  #conv-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 16px 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    flex-shrink: 0;
+  }
+  #new-conv-btn {
+    background: var(--glass); border: 1px solid var(--glass-b);
+    color: var(--text-dim); width: 22px; height: 22px;
+    border-radius: 6px; font-size: 15px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s; font-family: inherit; line-height: 1;
+  }
+  #new-conv-btn:hover { color: var(--text); border-color: rgba(255,255,255,0.2); }
+
+  .conv-item {
+    padding: 10px 16px; cursor: pointer;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    transition: background 0.15s;
+  }
+  .conv-item:hover { background: rgba(255,255,255,0.03); }
+  .conv-item.activa { background: rgba(255,255,255,0.05); }
+  .conv-title {
+    font-size: 11px; color: rgba(255,255,255,0.65);
+    line-height: 1.4; white-space: nowrap;
+    overflow: hidden; text-overflow: ellipsis;
+  }
+  .conv-date {
+    font-size: 9px; color: var(--text-dim);
+    margin-top: 3px; letter-spacing: 0.3px;
+  }
+  #conv-empty {
+    padding: 16px; font-size: 10px; color: var(--text-dim); text-align: center;
+  }
+
+  /* GENOMUL TĂU */
+  #genom-text {
+    font-size: 11px; color: rgba(255,255,255,0.5);
+    line-height: 1.65; font-style: italic;
+  }
+
+  /* STATISTICI */
+  .stat-row {
+    display: flex; align-items: center; gap: 8px; margin-bottom: 5px;
+  }
+  .stat-label {
+    font-size: 9px; color: var(--text-dim);
+    width: 60px; flex-shrink: 0; letter-spacing: 0.3px;
+  }
+  .stat-bar-wrap {
+    flex: 1; height: 3px; background: rgba(255,255,255,0.06);
+    border-radius: 2px; overflow: hidden;
+  }
+  .stat-bar { height: 100%; border-radius: 2px; transition: width 0.4s; }
+  .stat-count { font-size: 9px; color: var(--text-dim); width: 16px; text-align: right; flex-shrink: 0; }
+
+  /* NOTIȚE */
+  .nota-item {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    font-size: 10px; color: rgba(255,255,255,0.55);
+    padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.04); gap: 6px;
+    line-height: 1.4;
+  }
+  .nota-item span { flex: 1; }
+  .nota-del {
+    background: none; border: none; color: rgba(255,255,255,0.18);
+    cursor: pointer; font-size: 11px; padding: 0 2px;
+    transition: color 0.15s; flex-shrink: 0; margin-top: 1px;
+  }
+  .nota-del:hover { color: rgba(255,80,80,0.65); }
+
+  /* PROFILE BUTTON */
+  #profile-btn {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--glass-2); border: 1px solid var(--glass-b2);
+    color: rgba(255,255,255,0.8); font-size: 11px; font-weight: 600;
+    cursor: pointer; font-family: inherit;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1);
+    flex-shrink: 0;
+  }
+  #profile-btn:hover {
+    border-color: rgba(255,255,255,0.25); background: rgba(255,255,255,0.1);
+  }
+
+  /* VV ME — POPUP PREMIUM */
+  #vvme-overlay {
+    position: fixed; inset: 0; z-index: 100;
+    background: rgba(0,0,0,0.22);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.3s;
+  }
+  #vvme-overlay.visible { opacity: 1; pointer-events: all; }
+
+  #vvme-popup {
+    position: fixed;
+    top: 0; right: -390px; bottom: 0;
+    width: 365px; z-index: 101;
+    background: rgba(5,5,13,0.93);
+    backdrop-filter: blur(32px) saturate(1.3);
+    -webkit-backdrop-filter: blur(32px) saturate(1.3);
+    border-left: 1px solid rgba(255,255,255,0.055);
+    box-shadow: -40px 0 100px rgba(0,0,0,0.65), inset 1px 0 0 rgba(255,255,255,0.025);
+    transition: right 0.44s cubic-bezier(0.34, 1.04, 0.64, 1);
+    display: flex; flex-direction: column; overflow: hidden;
+  }
+  #vvme-popup.visible { right: 0; }
+
+  #vvme-header {
+    display: flex; align-items: center; gap: 13px;
+    padding: 22px 20px 17px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    flex-shrink: 0;
+  }
+
+  #vvme-lea-wrap { position: relative; flex-shrink: 0; }
+
+  #vvme-lea-avatar {
+    width: 42px; height: 42px; border-radius: 50%;
+    background: rgba(255,255,255,0.045);
+    border: 1px solid rgba(255,255,255,0.09);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 500; color: rgba(255,255,255,0.78);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.07);
+  }
+
+  #vvme-lea-pulse {
+    position: absolute; bottom: 1px; right: 1px;
+    width: 9px; height: 9px; border-radius: 50%;
+    background: var(--green); box-shadow: 0 0 5px var(--green);
+    border: 2px solid rgba(5,5,13,0.93);
+    animation: pulse 2.5s infinite;
+  }
+
+  #vvme-header-info { flex: 1; min-width: 0; }
+  #vvme-header-name {
+    font-size: 15px; font-weight: 500;
+    color: rgba(255,255,255,0.84); letter-spacing: 0.2px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  #vvme-header-sub {
+    font-size: 10px; color: var(--text-dim);
+    margin-top: 3px; letter-spacing: 0.3px;
+  }
+
+  #vvme-close {
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07);
+    color: var(--text-dim); width: 28px; height: 28px;
+    border-radius: 50%; font-size: 16px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s; font-family: inherit; flex-shrink: 0; line-height: 1;
+  }
+  #vvme-close:hover { border-color: rgba(255,255,255,0.18); color: var(--text); }
+
+  #vvme-body {
+    flex: 1; overflow-y: auto; scrollbar-width: none;
+    padding: 0 20px 24px;
+  }
+  #vvme-body::-webkit-scrollbar { display: none; }
+
+  .vvme-section {
+    padding: 18px 0 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+  }
+  .vvme-section:last-child { border-bottom: none; }
+
+  .vvme-label {
+    font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase;
+    color: rgba(255,255,255,0.18); margin-bottom: 11px; font-weight: 500;
+  }
+
+  #vvme-evo-text {
+    font-size: 12px; color: rgba(255,255,255,0.38);
+    line-height: 1.7; font-style: italic;
+  }
+
+  .vvme-frag {
+    font-size: 13px; line-height: 1.75; margin-bottom: 5px;
+    animation: vvmeFadeUp 0.45s ease forwards; opacity: 0;
+  }
+  @keyframes vvmeFadeUp {
+    from { opacity: 0; transform: translateY(7px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .vvme-frag.observed {
+    font-style: italic;
+    padding-left: 10px;
+    border-left: 1px solid rgba(255,255,255,0.07);
+  }
+
+  .vvme-empty {
+    font-size: 11px; color: rgba(255,255,255,0.16);
+    font-style: italic; line-height: 1.6;
+  }
+
+  .vvme-nota-item {
+    display: flex; gap: 8px; align-items: flex-start;
+    font-size: 11px; color: rgba(255,255,255,0.45);
+    margin-bottom: 6px; line-height: 1.5;
+  }
+  .vvme-nota-item::before {
+    content: '—'; color: rgba(255,255,255,0.18); flex-shrink: 0;
+  }
+
+  /* RAFTURI */
+  .raft-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+    margin-top: 4px;
+  }
+  .raft-card {
+    background: rgba(255,255,255,0.025);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 10px; padding: 10px 11px;
+    transition: border-color 0.2s;
+  }
+  .raft-card:hover { border-color: rgba(255,255,255,0.11); }
+  .raft-card.raft-plin { border-color: rgba(255,255,255,0.09); }
+  .raft-card-icon {
+    font-size: 14px; margin-bottom: 5px; opacity: 0.7;
+  }
+  .raft-card-label {
+    font-size: 8.5px; letter-spacing: 1.2px; text-transform: uppercase;
+    color: rgba(255,255,255,0.28); margin-bottom: 6px; font-weight: 500;
+  }
+  .raft-linie {
+    font-size: 10.5px; color: rgba(255,255,255,0.55);
+    margin-bottom: 3px; line-height: 1.45;
+  }
+  .raft-linie.dim { color: rgba(255,255,255,0.22); font-style: italic; }
+  .raft-chip {
+    display: inline-block; font-size: 9.5px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 20px; padding: 2px 8px;
+    color: rgba(255,255,255,0.5); margin: 2px 2px 0 0;
+  }
+
+  #vvme-footer {
+    padding: 13px 20px;
+    border-top: 1px solid rgba(255,255,255,0.03);
+    flex-shrink: 0;
+  }
+  #vvme-reset-btn {
+    width: 100%; background: transparent;
+    border: 1px solid rgba(255,50,50,0.12);
+    color: rgba(255,90,90,0.35); padding: 8px;
+    border-radius: 10px; font-size: 10px; cursor: pointer;
+    letter-spacing: 0.5px; transition: all 0.2s; font-family: inherit;
+  }
+  #vvme-reset-btn:hover {
+    border-color: rgba(255,50,50,0.3); color: rgba(255,90,90,0.65);
+  }
+
+  /* INPUT */
   #input-area {
-    padding: 16px 32px 20px;
-    background: var(--bg2);
-    border-top: 1px solid var(--border);
+    padding: 12px 60px 22px;
+    background: rgba(7,7,13,0.6);
+    backdrop-filter: blur(28px);
+    -webkit-backdrop-filter: blur(28px);
+    border-top: 1px solid rgba(255,248,235,0.038);
     flex-shrink: 0;
   }
 
   #input-wrap {
-    display: flex;
-    gap: 10px;
-    align-items: flex-end;
-    background: var(--bg3);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 10px 14px;
-    transition: border-color 0.2s;
+    display: flex; gap: 10px; align-items: flex-end;
+    background: rgba(255,248,235,0.028);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,248,235,0.05);
+    border-radius: 14px; padding: 11px 12px 11px 18px;
+    transition: border-color 0.5s ease, box-shadow 0.5s ease;
+    box-shadow: 0 4px 28px rgba(0,0,0,0.4);
   }
-
   #input-wrap:focus-within {
-    border-color: var(--gold-dim);
+    border-color: rgba(200,150,62,0.22);
+    box-shadow: 0 4px 28px rgba(0,0,0,0.5), 0 0 0 1px rgba(200,150,62,0.06);
   }
 
   #msg-input {
-    flex: 1;
-    background: transparent;
-    border: none;
-    outline: none;
-    color: var(--text);
-    font-size: 14px;
-    font-family: inherit;
-    resize: none;
-    max-height: 120px;
-    line-height: 1.5;
+    flex: 1; background: transparent; border: none; outline: none;
+    color: var(--text); font-size: 14px; font-family: inherit;
+    resize: none; max-height: 120px; line-height: 1.5;
   }
-
   #msg-input::placeholder { color: var(--text-dim); }
 
   #send-btn {
-    background: var(--gold);
-    border: none;
-    color: #000;
-    width: 34px; height: 34px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 16px;
+    background: rgba(200,150,62,0.85);
+    border: none; color: #07070d;
+    width: 32px; height: 32px; border-radius: 10px;
+    cursor: pointer; font-size: 15px; font-weight: 700;
     display: flex; align-items: center; justify-content: center;
-    transition: all 0.15s;
-    flex-shrink: 0;
+    transition: all 0.15s; flex-shrink: 0;
+    box-shadow: 0 2px 12px rgba(200,150,62,0.25); font-family: inherit;
   }
-
-  #send-btn:hover { background: #e0b850; }
-  #send-btn:active { transform: scale(0.95); }
+  #send-btn:hover  { background: rgba(200,150,62,1); box-shadow: 0 4px 18px rgba(200,150,62,0.35); }
+  #send-btn:active { transform: scale(0.92); }
 
   #input-hint {
-    font-size: 10px;
-    color: var(--text-dim);
-    margin-top: 8px;
-    text-align: center;
-    letter-spacing: 0.5px;
+    font-size: 10px; color: rgba(255,255,255,0.13);
+    margin-top: 8px; text-align: center; letter-spacing: 0.3px;
   }
 
-  /* TONE COLORS */
-  .tone-trist    { color: #6090ff; }
-  .tone-furios   { color: #ff6050; }
-  .tone-bucuros  { color: #60d860; }
-  .tone-speriat  { color: #a060ff; }
-  .tone-linistit { color: #60d8c0; }
-  .tone-obosit   { color: #909090; }
-  .tone-nostalgic{ color: #d0a060; }
-  .tone-neutru   { color: var(--text-dim); }
+  /* Tone colors — folosite în sidebar */
+  .tone-trist     { color: #6090ff !important; }
+  .tone-furios    { color: #ff6050 !important; }
+  .tone-bucuros   { color: #60d860 !important; }
+  .tone-speriat   { color: #a060ff !important; }
+  .tone-linistit  { color: #60d8c0 !important; }
+  .tone-obosit    { color: #909090 !important; }
+  .tone-nostalgic { color: #d0a060 !important; }
+
+  /* ══════════════════════════════════════════════════════════
+     SHELVES PANEL — camere vii, dreapta
+  ══════════════════════════════════════════════════════════ */
+  #shelves-panel {
+    width: 195px;
+    background: rgba(0,0,0,0.16);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    border-left: 1px solid rgba(255,248,235,0.022);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    overflow-y: auto;
+    scrollbar-width: none;
+    padding: 36px 0 24px;
+  }
+  #shelves-panel::-webkit-scrollbar { display: none; }
+
+  /* Separator vizual subtil deasupra observatiei */
+  #shelf-observatie {
+    margin-top: auto;
+    padding: 20px 20px 0;
+    border-top: 1px solid rgba(255,248,235,0.02);
+  }
+  #shelf-observatie-text {
+    font-size: 11px;
+    color: rgba(255,248,235,0.2);
+    line-height: 1.75;
+    font-style: italic;
+    min-height: 16px;
+    transition: color 1.2s ease;
+  }
+  #shelf-observatie-text.vizibil {
+    color: rgba(255,248,235,0.38);
+  }
+
+  /* Shelf individual */
+  .shelf {
+    padding: 0 20px 30px;
+    position: relative;
+    transition: opacity 1s ease;
+  }
+
+  .shelf-label {
+    font-size: 7.5px;
+    letter-spacing: 2.2px;
+    text-transform: uppercase;
+    color: rgba(255,248,235,0.14);
+    margin-bottom: 9px;
+    font-weight: 500;
+  }
+
+  /* Linia pulsantă — bătaia de inimă a raftului */
+  .shelf-line {
+    height: 1px;
+    margin-bottom: 13px;
+    border-radius: 2px;
+    transform-origin: left center;
+  }
+  #shelf-stare   .shelf-line { background: linear-gradient(to right, rgba(139,92,246,0.5), transparent); animation: shelfBreath 9s  ease-in-out infinite 0s;   }
+  #shelf-job     .shelf-line { background: linear-gradient(to right, rgba(200,150,62,0.45),transparent); animation: shelfBreath 11s ease-in-out infinite 2.5s; }
+  #shelf-familie .shelf-line { background: linear-gradient(to right, rgba(255,130,100,0.38),transparent);animation: shelfBreath 8s  ease-in-out infinite 1s;   }
+  #shelf-placeri .shelf-line { background: linear-gradient(to right, rgba(80,200,140,0.38), transparent); animation: shelfBreath 13s ease-in-out infinite 4s;  }
+
+  @keyframes shelfBreath {
+    0%,100% { opacity: 0.28; transform: scaleX(0.65); }
+    50%      { opacity: 0.8;  transform: scaleX(1);    }
+  }
+
+  /* Textul principal al raftului */
+  .shelf-text {
+    font-size: 13px;
+    color: rgba(255,248,235,0.68);
+    line-height: 1.72;
+    letter-spacing: 0.01em;
+    min-height: 19px;
+    transition: color 1.2s ease, opacity 1s ease;
+  }
+  /* Gol = aproape invizibil. Se descoperă, nu se prezintă. */
+  .shelf-text.gol { color: rgba(255,248,235,0.07); font-style: italic; }
+
+  /* Linia secundară — memo, observație adițională */
+  .shelf-memo {
+    font-size: 10px;
+    color: rgba(255,248,235,0.24);
+    margin-top: 5px;
+    line-height: 1.6;
+    font-style: italic;
+    transition: opacity 0.8s ease;
+  }
+
+  /* Starea speciale — colorare subtilă a textului stare */
+  body.state-close #shelf-stare .shelf-text  { color: rgba(180,150,255,0.75); }
+  body.state-deep  #shelf-stare .shelf-text  { color: rgba(140,120,220,0.65); }
+  body.state-warm  #shelf-stare .shelf-text  { color: rgba(255,200,120,0.65); }
+
+  /* Shelf clickabil */
+  .shelf { cursor: default; }
+  .shelf.are-date { cursor: pointer; }
+  .shelf.are-date:hover .shelf-label { color: rgba(255,248,235,0.32); }
+
+  /* Shelf detail — camera interioara, se deschide la click */
+  .shelf-detail {
+    display: none;
+    margin-top: 10px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255,248,235,0.04);
+    animation: shelfDetailOpen 0.35s ease-out forwards;
+  }
+  .shelf.open .shelf-detail { display: block; }
+  @keyframes shelfDetailOpen {
+    from { opacity: 0; transform: translateY(-4px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .shelf-detail-linie {
+    font-size: 11px; color: rgba(255,248,235,0.42);
+    line-height: 1.7; margin-bottom: 4px;
+  }
+  .shelf-detail-linie.obs {
+    font-style: italic; color: rgba(255,248,235,0.26);
+    font-size: 10.5px; margin-top: 6px;
+  }
+  .shelf-detail-close {
+    display: inline-block; margin-top: 8px;
+    font-size: 9px; color: rgba(255,248,235,0.18);
+    letter-spacing: 1px; cursor: pointer;
+  }
+  .shelf-detail-close:hover { color: rgba(255,248,235,0.4); }
+
+  /* Shelf update pulse — apare organic cand memoria creste */
+  @keyframes shelfUpdate {
+    0%   { opacity: 0.3; transform: translateY(3px); }
+    100% { opacity: 1;   transform: translateY(0); }
+  }
+  .shelf-text.just-updated {
+    animation: shelfUpdate 0.9s ease-out forwards;
+  }
+
+  @media (max-width: 900px) {
+    #shelves-panel { display: none; }
+    #sidebar { display: none; }
+    #messages { padding: 32px 24px; }
+  }
+  @media (max-width: 1100px) {
+    #shelves-panel { width: 160px; }
+    #shelves-panel .shelf-text { font-size: 12px; }
+  }
 </style>
 </head>
 <body>
+
+<!-- Orbs pentru efect glass -->
+<div class="orb" id="orb1"></div>
+<div class="orb" id="orb2"></div>
+<div class="orb" id="orb3"></div>
 
 <!-- HEADER -->
 <div id="header">
@@ -562,99 +1000,994 @@
     <div id="lea-logo">L</div>
     <div id="header-title">
       <span>LEA</span>
-      <span>VV Hybrid Universe — Acasă</span>
+      <span>VV Hybrid Universe</span>
     </div>
     <div id="status-dot"></div>
+    <div id="lea-stare" class="asteptare">
+      <div id="lea-stare-dot"></div>
+      <span id="lea-stare-text">în așteptare</span>
+    </div>
   </div>
   <div id="header-right">
-    <button class="hbtn" onclick="showMemory()">Memorie</button>
-    <button class="hbtn" onclick="clearAll()">Resetează</button>
+    <div id="moduri">
+      <button class="mod-btn activ" onclick="switchMod('creativ')"   id="mod-creativ">Creativ</button>
+      <button class="mod-btn"       onclick="switchMod('direct')"    id="mod-direct">Direct</button>
+      <button class="mod-btn"       onclick="switchMod('profund')"   id="mod-profund">Profund</button>
+      <button class="mod-btn"       onclick="switchMod('studio')"    id="mod-studio">Studio</button>
+    </div>
+    <button class="hbtn" onclick="window.open('vv-studio.html','_blank')"
+      style="font-size:10px;letter-spacing:.5px;"
+      id="studio-btn" title="VV Studio">Studio →</button>
+    <button id="profile-btn" onclick="showProfile()" title="Profilul tău">
+      <span id="profile-initials">·</span>
+    </button>
   </div>
 </div>
 
 <!-- MAIN -->
 <div id="main">
 
-  <!-- SIDEBAR — starea Lea -->
+  <!-- SIDEBAR — Istoric -->
   <div id="sidebar">
-    <div class="sidebar-section">
-      <div class="sidebar-label">Scena curentă</div>
-      <div id="mem-emotie">neutru</div>
-      <div id="mem-vreme" style="display:none"></div>
-      <div id="mem-subiecte"></div>
+    <div id="conv-header">
+      <span class="sidebar-label" style="margin:0">Conversații</span>
+      <button id="new-conv-btn" onclick="startNewConv()" title="Conversație nouă">+</button>
     </div>
-
-    <div class="sidebar-section">
-      <div class="sidebar-label">Folosești des</div>
-      <div id="preferinte-list"><span style="font-size:10px;color:var(--text-dim)">— nimic încă —</span></div>
-    </div>
-
-    <div class="sidebar-section">
-      <div class="sidebar-label">Motoare active</div>
-      <div style="display:flex;flex-direction:column;gap:5px;margin-top:4px;">
-        <div style="font-size:9px;color:#50c878;letter-spacing:1px;">✓ HiT — Tranzit</div>
-        <div style="font-size:9px;color:#50c878;letter-spacing:1px;">✓ HiN — Nexus</div>
-        <div style="font-size:9px;color:#50c878;letter-spacing:1px;">✓ HiM — Memorie</div>
-        <div style="font-size:9px;color:#50c878;letter-spacing:1px;">✓ HiE — Emotio</div>
-        <div style="font-size:9px;color:#50c878;letter-spacing:1px;">✓ HiD — Dopamina</div>
-      </div>
-    </div>
-
-    <div class="sidebar-section">
-      <div class="sidebar-label">Știu despre tine</div>
-      <div id="kb-list"><span style="font-size:10px;color:var(--text-dim)">— nimic încă —</span></div>
-    </div>
-
-    <div id="sidebar-footer">
-      <button id="clear-mem-btn" onclick="clearMemory()">Șterge memoria</button>
-    </div>
+    <div id="conv-list"><div id="conv-empty">— nimic salvat —</div></div>
   </div>
 
   <!-- CHAT -->
   <div id="chat-area">
     <div id="messages">
 
-      <!-- WELCOME -->
       <div id="welcome">
-        <div id="welcome-logo">L</div>
-        <h2>Bună ziua</h2>
-        <p>Sunt Lea. Spune-mi ce gândești — o scenă, o emoție, o întrebare. Înțeleg românește cum vorbești.</p>
+        <div id="welcome-orb">
+          <div id="welcome-orb-core"></div>
+          <div id="welcome-orb-glow"></div>
+        </div>
+        <h2 id="welcome-greeting">Bună seara.</h2>
+        <p>Sunt Lea. Spune-mi orice.</p>
         <div class="welcome-chips">
-          <div class="welcome-chip" onclick="sendQuick('om trist la apus lângă mare')">om trist la apus</div>
-          <div class="welcome-chip" onclick="sendQuick('copil bucuros în pădure vara')">copil în pădure</div>
-          <div class="welcome-chip" onclick="sendQuick('bătrân singur ninge noaptea')">bătrân în ninsoare</div>
           <div class="welcome-chip" onclick="sendQuick('sunt obosit azi')">sunt obosit azi</div>
-          <div class="welcome-chip" onclick="sendQuick('furtună și casă caldă cu foc')">furtună și casă caldă</div>
+          <div class="welcome-chip" onclick="sendQuick('om trist la apus lângă mare')">om trist la apus</div>
+          <div class="welcome-chip" onclick="sendQuick('nu știu ce simt')">nu știu ce simt</div>
+          <div class="welcome-chip" onclick="sendQuick('sunt bine azi')">sunt bine azi</div>
         </div>
       </div>
 
     </div>
 
-    <!-- TYPING -->
-    <div id="typing" style="padding: 0 32px 8px;">
+    <div id="typing" style="padding: 0 60px 10px;">
       <div class="typing-dot"></div>
       <div class="typing-dot"></div>
       <div class="typing-dot"></div>
-      <span style="font-size:11px;color:var(--text-dim);margin-left:4px;">Lea gândește</span>
     </div>
 
-    <!-- INPUT -->
     <div id="input-area">
+      <div id="brain-bar"></div>
       <div id="input-wrap">
-        <textarea id="msg-input" rows="1" placeholder="Spune-i ceva Lea..." onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
-        <button id="send-btn" onclick="sendMessage()">→</button>
+        <textarea id="msg-input" rows="1" placeholder="Spune-i ceva Lea..." onkeydown="handleKey(event)" oninput="autoResize(this); scanBrain(this.value)" spellcheck="true" lang="ro"></textarea>
+        <button id="send-btn" onclick="sendMessage()">↑</button>
       </div>
-      <div id="input-hint">Enter pentru a trimite &nbsp;·&nbsp; Shift+Enter pentru linie nouă</div>
+      <div id="input-hint">Enter · Shift+Enter linie nouă</div>
     </div>
+  </div>
+
+  <!-- SHELVES — camere vii -->
+  <div id="shelves-panel">
+
+    <div class="shelf" id="shelf-stare" onclick="_shelfOpen('stare')">
+      <div class="shelf-label">stare</div>
+      <div class="shelf-line"></div>
+      <div class="shelf-text gol" id="shelf-stare-text">…</div>
+      <div class="shelf-detail" id="shelf-stare-detail"></div>
+    </div>
+
+    <div class="shelf" id="shelf-job" onclick="_shelfOpen('job')">
+      <div class="shelf-label">job</div>
+      <div class="shelf-line"></div>
+      <div class="shelf-text gol" id="shelf-job-text">nu știe încă</div>
+      <div class="shelf-memo" id="shelf-job-memo" style="display:none"></div>
+      <div class="shelf-detail" id="shelf-job-detail"></div>
+    </div>
+
+    <div class="shelf" id="shelf-familie" onclick="_shelfOpen('familie')">
+      <div class="shelf-label">familie</div>
+      <div class="shelf-line"></div>
+      <div class="shelf-text gol" id="shelf-familie-text">nu știe încă</div>
+      <div class="shelf-detail" id="shelf-familie-detail"></div>
+    </div>
+
+    <div class="shelf" id="shelf-placeri" onclick="_shelfOpen('placeri')">
+      <div class="shelf-label">plăceri</div>
+      <div class="shelf-line"></div>
+      <div class="shelf-text gol" id="shelf-placeri-text">nu știe încă</div>
+      <div class="shelf-detail" id="shelf-placeri-detail"></div>
+    </div>
+
+    <div id="shelf-observatie">
+      <div class="shelf-label" style="margin-bottom:8px">lea a observat</div>
+      <div id="shelf-observatie-text">—</div>
+    </div>
+
   </div>
 
 </div>
 
-<!-- VV ANIMUS — Creierul -->
+<!-- VV ME POPUP -->
+<div id="vvme-overlay" onclick="closeProfile()"></div>
+<div id="vvme-popup">
+
+  <div id="vvme-header">
+    <div id="vvme-lea-wrap">
+      <div id="vvme-lea-avatar">L</div>
+      <div id="vvme-lea-pulse"></div>
+    </div>
+    <div id="vvme-header-info">
+      <div id="vvme-header-name">VV ME</div>
+      <div id="vvme-header-sub">— spune ceva Lea</div>
+    </div>
+    <button id="vvme-close" onclick="closeProfile()">×</button>
+  </div>
+
+  <div id="vvme-body">
+
+    <div class="vvme-section">
+      <div id="vvme-evo-text">Abia ne-am cunoscut. Spune-mi ceva.</div>
+    </div>
+
+    <div class="vvme-section">
+      <div class="vvme-label">Cine ești</div>
+      <div id="vvme-explicit-content">
+        <div class="vvme-empty">Spune-i ceva despre tine.</div>
+      </div>
+    </div>
+
+    <div class="vvme-section">
+      <div class="vvme-label">Lea a observat</div>
+      <div id="vvme-observed-content">
+        <div class="vvme-empty">Se construiește cu fiecare conversație.</div>
+      </div>
+    </div>
+
+    <div class="vvme-section">
+      <div class="vvme-label">Rafturi — viața ta</div>
+      <div id="vvme-rafturi-content">
+        <div class="raft-grid">
+          <div class="raft-card" id="raft-familie">
+            <div class="raft-card-icon">👨‍👩‍👧</div>
+            <div class="raft-card-label">Familie</div>
+            <div id="raft-familie-body"><div class="raft-linie dim">— necunoscut —</div></div>
+          </div>
+          <div class="raft-card" id="raft-job">
+            <div class="raft-card-icon">💼</div>
+            <div class="raft-card-label">Job</div>
+            <div id="raft-job-body"><div class="raft-linie dim">— necunoscut —</div></div>
+          </div>
+          <div class="raft-card" id="raft-placeri">
+            <div class="raft-card-icon">✨</div>
+            <div class="raft-card-label">Plăceri</div>
+            <div id="raft-placeri-body"><div class="raft-linie dim">— necunoscut —</div></div>
+          </div>
+          <div class="raft-card" id="raft-mancare">
+            <div class="raft-card-icon">🍽</div>
+            <div class="raft-card-label">Mâncare</div>
+            <div id="raft-mancare-body"><div class="raft-linie dim">— necunoscut —</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="vvme-section">
+      <div class="vvme-label">Notițe</div>
+      <div id="vvme-note-content">
+        <div class="vvme-empty">spune „notează: X"</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div id="vvme-footer">
+    <button id="vvme-reset-btn" onclick="clearAll(); closeProfile()">Uită tot ce știe Lea</button>
+  </div>
+
+</div>
+
+<!-- păstrat pentru updateSidebar (sidebar stânga) -->
+<div id="mem-emotie" style="display:none">neutru</div>
+<div id="mem-vreme"  style="display:none"></div>
+<div id="mem-subiecte" style="display:none"></div>
+
 <script src="engine/00-vv-animus.js"></script>
+<script src="alexandria-data-v2.js"></script>
+<script src="lea-dictionary.js"></script>
+<script src="lea-speech.js"></script>
+<script src="lea-state.js"></script>
+<script src="lea-intention.js"></script>
+<script src="lea-shelves.js"></script>
+<script src="lea-diacritice.js"></script>
+<script src="lea-correct.js"></script>
+<script src="lea-motor.js"></script>
+<script src="lea-vvme.js"></script>
+<script src="lea-profile.js"></script>
 
 <script>
   var _msgCount = 0;
+
+  var STARE_LABELS = {
+    asteptare:  'în așteptare',
+    curiozitate:'curioasă',
+    energie:    'energică',
+    atentie:    'atentă',
+    oboseala:   'obosită'
+  };
+
+  function updateLeaState() {
+    if (!window.Lea) return;
+    var s = Lea.getLeaState();
+    var el   = document.getElementById('lea-stare');
+    var txt  = document.getElementById('lea-stare-text');
+    if (!el || !txt) return;
+    el.className  = s.stare || 'asteptare';
+    txt.textContent = STARE_LABELS[s.stare] || s.stare;
+
+    // Orb background schimba culoarea cu starea emotionala
+    var st = typeof leaStateGet === 'function' ? leaStateGet() : {};
+    var body = document.body;
+    body.classList.remove('state-close','state-deep','state-warm');
+    if (st.closeness > 0.55)      body.classList.add('state-close');
+    else if (st.tension > 0.5)    body.classList.add('state-deep');
+    else if (st.warmth > 0.65)    body.classList.add('state-warm');
+
+    updateShelvesPanel();
+  }
+
+  // ══════════════════════════════════════════════════════════
+  // SHELVES PANEL — camere vii
+  // ══════════════════════════════════════════════════════════
+
+  function updateShelvesPanel() {
+    var st = typeof leaStateGet === 'function' ? leaStateGet() : {};
+    var sh = typeof shelfGet   === 'function' ? shelfGet()    : {};
+    var pr = window.VVProfile  ? VVProfile.getAll() : null;
+
+    // — STARE —
+    _shelfSet('stare', _shelfStareText(st, sh));
+
+    // — JOB —
+    var jobMain = '', jobMemo = '';
+    if (pr && pr.job) {
+      var j = pr.job;
+      if (j.titlu || j.domeniu) {
+        jobMain = 'Lucrezi'
+          + (j.titlu  ? ' ca ' + j.titlu.toLowerCase()  : '')
+          + (j.domeniu ? ' în ' + j.domeniu.toLowerCase() : '') + '.';
+        if (j.nemultumiri && j.nemultumiri.length) jobMemo = 'Ai zis că e greu uneori.';
+      }
+    }
+    _shelfSet('job', jobMain);
+    _shelfMemo('job', jobMemo);
+
+    // — FAMILIE —
+    var fam = '';
+    if (pr && pr.familie) {
+      var f = pr.familie;
+      if (f.partener && f.partener.rol) {
+        var genFem = /soție|prietenă|iubita/.test(f.partener.rol);
+        fam = f.partener.nume
+          ? 'Ai menționat' + (genFem ? '-o' : '-l') + ' pe ' + f.partener.nume + '.'
+          : 'Vorbești despre ' + f.partener.rol + '.';
+      } else if (f.copii && f.copii.length > 0) {
+        var c = f.copii[0];
+        fam = c.nume ? c.nume + ' e important pentru tine.' : 'Ai copii. Contează.';
+      } else if (f.parinti && f.parinti.mama) {
+        fam = 'Ai vorbit despre mama.';
+      }
+    }
+    _shelfSet('familie', fam);
+
+    // — PLĂCERI —
+    var pl = '';
+    if (pr) {
+      var p = pr.placeri, m = pr.mancare;
+      if (p.sport === 'alergat') pl = 'Alergi.';
+      else if (p.sport)          pl = p.sport + '.';
+      else if (p.hobby && p.hobby.length)   pl = p.hobby[0] + '.';
+      else if (p.muzica)         pl = 'Muzica e prezentă.';
+      else if (m.favorite && m.favorite.length) pl = m.favorite[0] + '.';
+    }
+    _shelfSet('placeri', pl);
+
+    // — LEA A OBSERVAT —
+    _shelfObservatie(st, sh);
+  }
+
+  function _shelfStareText(st, sh) {
+    if (st.closeness > 0.62) return 'Ești aproape.';
+    if (st.tension   > 0.52) return 'Ceva apasă.';
+    if (st.fragility > 0.52) return 'E ceva fragil acum.';
+    if (st.warmth    > 0.72) return 'Ești deschis.';
+    if (sh && sh.emotii && sh.emotii.dominanta) {
+      var dom = sh.emotii.dominanta;
+      if (dom === 'tristete_profunda' || dom === 'tristete') return 'Azi e mai greu.';
+      if (dom === 'bucurie' || dom === 'entuziasm')          return 'Ești bine azi.';
+      if (dom === 'oboseala')                                return 'Ești obosit.';
+      if (dom === 'anxietate')                               return 'Ceva te neliniștește.';
+      if (dom === 'furie' || dom === 'frustrare')            return 'Ceva te supără.';
+      if (dom === 'liniste' || dom === 'speranta')           return 'Ești liniștit.';
+    }
+    return '…';
+  }
+
+  function _shelfObservatie(st, sh) {
+    var obs = '';
+    if (sh && sh.obiceiuri) {
+      var ore = sh.obiceiuri.ore || {};
+      var oraMax = null, maxCt = 0;
+      Object.keys(ore).forEach(function(h) {
+        if (ore[h] > maxCt) { maxCt = ore[h]; oraMax = parseInt(h, 10); }
+      });
+      if (maxCt >= 3) {
+        if (oraMax >= 22 || oraMax <= 4)  obs = 'Revii la conversație noaptea.';
+        else if (oraMax >= 6 && oraMax <= 9) obs = 'Ziua ta începe cu LEA.';
+      }
+    }
+    if (!obs && sh && sh.emotii && sh.emotii.dominanta) {
+      if (sh.obiceiuri && sh.obiceiuri.total > 6) {
+        var dom = sh.emotii.dominanta;
+        if (dom === 'tristete_profunda') obs = 'Revii des la lucruri grele.';
+        if (dom === 'oboseala')          obs = 'Pari obosit mai des decât înainte.';
+      }
+    }
+    var el = document.getElementById('shelf-observatie-text');
+    if (!el) return;
+    if (obs) {
+      el.textContent = obs;
+      el.classList.add('vizibil');
+    } else {
+      el.textContent = '—';
+      el.classList.remove('vizibil');
+    }
+  }
+
+  // ══════════════════════════════════════════════════════════
+  // SHELF CLICK — camera interioara
+  // ══════════════════════════════════════════════════════════
+
+  var _openShelf = null;
+
+  function _shelfOpen(id) {
+    var el = document.getElementById('shelf-' + id);
+    if (!el) return;
+    if (!el.classList.contains('are-date')) return; // gol = nu se deschide
+
+    if (_openShelf && _openShelf !== id) {
+      var prev = document.getElementById('shelf-' + _openShelf);
+      if (prev) prev.classList.remove('open');
+    }
+
+    if (el.classList.contains('open')) {
+      el.classList.remove('open');
+      _openShelf = null;
+      return;
+    }
+
+    // Populare detaliu
+    var detail = document.getElementById('shelf-' + id + '-detail');
+    if (detail) detail.innerHTML = _buildShelfDetail(id);
+
+    el.classList.add('open');
+    _openShelf = id;
+  }
+
+  function _buildShelfDetail(id) {
+    var pr = window.VVProfile ? VVProfile.getAll() : null;
+    var sh = typeof shelfGet === 'function' ? shelfGet() : {};
+    var lines = [];
+
+    if (id === 'stare') {
+      // Ultimele emotii din sesiune
+      if (sh.emotii && sh.emotii.tipare && sh.emotii.tipare.length > 0) {
+        var recente = sh.emotii.tipare.slice(-3).reverse();
+        recente.forEach(function(t) {
+          if (t.emotie) lines.push(t.emotie.replace(/_/g, ' '));
+        });
+      }
+      if (sh.emotii && sh.emotii.dominanta) {
+        lines.push('pattern dominant: ' + sh.emotii.dominanta.replace(/_/g, ' '));
+      }
+      var st = typeof leaStateGet === 'function' ? leaStateGet() : {};
+      if (st.closeness > 0.3) lines.push('conversație apropiată');
+      if (st.tension > 0.3)   lines.push('tensiune prezentă');
+
+    } else if (id === 'job') {
+      var j = pr && pr.job;
+      if (j) {
+        if (j.titlu)    lines.push(j.titlu);
+        if (j.domeniu && j.domeniu !== j.titlu) lines.push(j.domeniu);
+        if (j.angajator) lines.push(j.angajator);
+        if (j.nemultumiri && j.nemultumiri.length) lines.push('momente grele menționate');
+        if (j.placeri && j.placeri.length) lines.push('îți place: ' + j.placeri[0]);
+      }
+      // Declansatori din shelves
+      if (sh.emotii && sh.emotii.declansatori && sh.emotii.declansatori['job']) {
+        lines.push('legat de: ' + sh.emotii.declansatori['job']);
+      }
+
+    } else if (id === 'familie') {
+      var f = pr && pr.familie;
+      if (f) {
+        if (f.partener && f.partener.rol) {
+          lines.push(f.partener.nume
+            ? f.partener.rol + ': ' + f.partener.nume
+            : f.partener.rol);
+        }
+        if (f.copii && f.copii.length) {
+          f.copii.forEach(function(c) {
+            lines.push(c.nume ? (c.varsta ? c.nume + ' · ' + c.varsta + ' ani' : c.nume) : 'copil');
+          });
+        }
+        if (f.parinti && f.parinti.mama) lines.push('mama menționată');
+        if (f.parinti && f.parinti.tata) lines.push('tata menționat');
+      }
+      // Persoane din relatii
+      if (sh.relatii && sh.relatii.persoane && sh.relatii.persoane.length > 0) {
+        var top = sh.relatii.persoane.sort(function(a,b){return b.count-a.count;})[0];
+        if (top && top.nume) lines.push('vorbit des despre: ' + top.nume);
+      }
+
+    } else if (id === 'placeri') {
+      var p = pr && pr.placeri;
+      var m = pr && pr.mancare;
+      if (p) {
+        if (p.sport)   lines.push(p.sport);
+        if (p.hobby && p.hobby.length) p.hobby.forEach(function(h){ lines.push(h); });
+        if (p.muzica)  lines.push('muzică: ' + p.muzica);
+        if (p.calatorii && p.calatorii.length) lines.push('călătorit');
+      }
+      if (m && m.favorite && m.favorite.length) {
+        lines.push('mâncare: ' + m.favorite.slice(0,2).join(', '));
+      }
+    }
+
+    if (!lines.length) return '';
+
+    // Observatie LEA din obiceiuri
+    var obs = '';
+    if (sh.obiceiuri) {
+      var ore = sh.obiceiuri.ore || {};
+      var oraMax = null, maxCt = 0;
+      Object.keys(ore).forEach(function(h) {
+        if (ore[h] > maxCt) { maxCt = ore[h]; oraMax = parseInt(h, 10); }
+      });
+      if (maxCt >= 3) {
+        if (oraMax >= 22 || oraMax <= 4) obs = 'revii noaptea la conversație.';
+        else if (oraMax >= 6 && oraMax <= 9) obs = 'dimineața ești cel mai activ.';
+        else if (oraMax >= 20) obs = 'serile sunt ale tale.';
+      }
+    }
+
+    var html = lines.map(function(l) {
+      return '<div class="shelf-detail-linie">' + _escShelf(l) + '</div>';
+    }).join('');
+    if (obs) html += '<div class="shelf-detail-linie obs">' + _escShelf(obs) + '</div>';
+    html += '<span class="shelf-detail-close" onclick="event.stopPropagation();_shelfOpen(\'' + id + '\')">închide</span>';
+    return html;
+  }
+
+  function _escShelf(s) {
+    return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function _shelfSet(id, text) {
+    var el = document.getElementById('shelf-' + id + '-text');
+    if (!el) return;
+    var prev = el.textContent;
+    var shelfEl = document.getElementById('shelf-' + id);
+    if (text) {
+      el.textContent = text;
+      el.classList.remove('gol');
+      if (shelfEl) shelfEl.classList.add('are-date');
+    } else {
+      el.textContent = 'nu știe încă';
+      el.classList.add('gol');
+      if (shelfEl) shelfEl.classList.remove('are-date');
+    }
+    // Animatie doar daca textul s-a schimbat cu ceva real
+    if (text && text !== prev && prev === 'nu știe încă') {
+      el.classList.remove('just-updated');
+      void el.offsetWidth; // reflow pentru restart animatie
+      el.classList.add('just-updated');
+      setTimeout(function() { el.classList.remove('just-updated'); }, 950);
+    }
+  }
+
+  function _shelfMemo(id, text) {
+    var el = document.getElementById('shelf-' + id + '-memo');
+    if (!el) return;
+    el.textContent  = text || '';
+    el.style.display = text ? '' : 'none';
+  }
+
+  function switchMod(mod) {
+    if (!window.Lea) return;
+    Lea.setMod(mod);
+    document.querySelectorAll('.mod-btn').forEach(function(b){ b.classList.remove('activ'); });
+    var btn = document.getElementById('mod-' + mod);
+    if (btn) btn.classList.add('activ');
+  }
+
+
+  // SIDEBAR TABS
+  function switchSidebarTab(tab) {
+    document.getElementById('sidebar-scena').style.display   = tab === 'scena'   ? 'block' : 'none';
+    document.getElementById('sidebar-istoric').style.display = tab === 'istoric' ? 'block' : 'none';
+    document.getElementById('stab-scena').className   = 'stab' + (tab === 'scena'   ? ' activ' : '');
+    document.getElementById('stab-istoric').className = 'stab' + (tab === 'istoric' ? ' activ' : '');
+    if (tab === 'istoric') updateHistoryList();
+  }
+
+  // ISTORICUL CONVERSAȚIILOR
+  var _convId    = 'conv_' + Date.now();
+  var _convMsgs  = [];
+  var _convTitle = null;
+
+  function relativeDate(ts) {
+    var diff = Date.now() - ts;
+    var days = Math.floor(diff / 86400000);
+    if (days === 0) return 'azi';
+    if (days === 1) return 'ieri';
+    if (days < 7)   return 'acum ' + days + ' zile';
+    var d = new Date(ts);
+    return d.getDate() + '.' + (d.getMonth()+1) + '.' + d.getFullYear();
+  }
+
+  function getHistory() {
+    try { return JSON.parse(localStorage.getItem('vv_lea_history') || '[]'); } catch(e) { return []; }
+  }
+
+  function saveCurrentConv() {
+    if (_convMsgs.length === 0) return;
+    var hist = getHistory();
+    var idx  = hist.findIndex(function(c){ return c.id === _convId; });
+    var conv = { id: _convId, title: _convTitle || 'Conversație nouă', date: Date.now(), messages: _convMsgs };
+    if (idx >= 0) hist[idx] = conv; else hist.unshift(conv);
+    if (hist.length > 30) hist = hist.slice(0, 30);
+    try { localStorage.setItem('vv_lea_history', JSON.stringify(hist)); } catch(e) {}
+  }
+
+  function historySave(role, text) {
+    _convMsgs.push({ role: role, text: text, t: Date.now() });
+    if (!_convTitle && role === 'user') {
+      _convTitle = text.trim().slice(0, 34) + (text.trim().length > 34 ? '…' : '');
+    }
+    saveCurrentConv();
+  }
+
+  function updateHistoryList() {
+    var hist = getHistory();
+    var el   = document.getElementById('conv-list');
+    if (!el) return;
+    if (hist.length === 0) {
+      el.innerHTML = '<div id="conv-empty">— nimic salvat —</div>';
+      return;
+    }
+    el.innerHTML = '';
+    hist.forEach(function(conv) {
+      var item = document.createElement('div');
+      item.className = 'conv-item' + (conv.id === _convId ? ' activa' : '');
+      item.innerHTML =
+        '<div class="conv-title">' + escHtml(conv.title) + '</div>' +
+        '<div class="conv-date">'  + relativeDate(conv.date) + ' · ' + conv.messages.length + ' mesaje</div>';
+      item.onclick = function(){ loadConversation(conv.id); };
+      el.appendChild(item);
+    });
+  }
+
+  function loadConversation(convId) {
+    var hist = getHistory();
+    var conv = hist.find(function(c){ return c.id === convId; });
+    if (!conv) return;
+
+    _convId    = conv.id;
+    _convMsgs  = conv.messages.slice();
+    _convTitle = conv.title;
+
+    var msgs = document.getElementById('messages');
+    msgs.innerHTML = '';
+    conv.messages.forEach(function(m) {
+      if (m.role === 'user') addUserMsg(m.text);
+      else addLeaMsg(m.text, null);
+    });
+
+    scrollBottom();
+  }
+
+  // ── ONBOARDING — prima deschidere ────────────────────────────
+
+  function leaHasName() {
+    // Daca onboarding-ul a fost facut vreodata — skip
+    if (localStorage.getItem('vv_onboarding_done') === '1') return true;
+    // Daca are conversatii salvate — user vechi, skip
+    try {
+      var hist = localStorage.getItem('vv_conv_history');
+      if (hist && JSON.parse(hist).length > 0) {
+        localStorage.setItem('vv_onboarding_done', '1');
+        return true;
+      }
+    } catch(e) {}
+    // Daca are nume in KB
+    try {
+      var kb = JSON.parse(localStorage.getItem('vv_animus_kb') || '{}');
+      if (kb['nume'] && kb['nume'].val) {
+        localStorage.setItem('vv_onboarding_done', '1');
+        return true;
+      }
+    } catch(e) {}
+    return false;
+  }
+
+  function leaGetName() {
+    try {
+      var kb = JSON.parse(localStorage.getItem('vv_animus_kb') || '{}');
+      return kb['nume'] ? kb['nume'].val : '';
+    } catch(e) { return ''; }
+  }
+
+  function leaCompleteOnboarding(name, stare) {
+    // Marcheaza onboarding ca facut
+    localStorage.setItem('vv_onboarding_done', '1');
+    // Salveaza numele prin ANIMUS
+    if (name && window.Lea) {
+      Lea.think('ma cheama ' + name);
+    }
+    // Salveaza starea initiala in Shelves
+    if (stare && window.shelfLearn) {
+      var hic = window.leaTimeContext ? leaTimeContext() : { ora: new Date().getHours() };
+      shelfLearn(stare, stare, [], hic.ora, new Date().getDay());
+    }
+    // Porneste conversatia normala cu mesaj personalizat
+    startNewConvWelcome(name, stare);
+  }
+
+  function startNewConvWelcome(name, stare) {
+    _convId    = 'conv_' + Date.now();
+    _convMsgs  = [];
+    _convTitle = null;
+
+    var msgs = document.getElementById('messages');
+    msgs.innerHTML = '';
+    var w = document.createElement('div');
+    w.id = 'welcome';
+
+    var numeCurat = name ? name.charAt(0).toUpperCase() + name.slice(1).toLowerCase() : '';
+    var salut = numeCurat ? 'Bună, ' + numeCurat + '.' : 'Bună.';
+    var sub   = stare && stare !== 'nu stiu'
+      ? 'Am reținut că ești ' + stare + ' acum. Spune-mi mai mult dacă vrei.'
+      : 'Sunt Lea. Spune-mi ce simți — orice.';
+
+    w.innerHTML =
+      '<div id="welcome-logo">L</div>' +
+      '<h2>' + salut + '</h2>' +
+      '<p>' + sub + '</p>' +
+      '<div class="welcome-chips">' +
+        '<div class="welcome-chip" onclick="sendQuick(\'sunt obosit azi\')">sunt obosit azi</div>' +
+        '<div class="welcome-chip" onclick="sendQuick(\'om trist la apus lângă mare\')">om trist la apus</div>' +
+        '<div class="welcome-chip" onclick="sendQuick(\'sunt bine azi\')">sunt bine azi</div>' +
+        '<div class="welcome-chip" onclick="sendQuick(\'nu știu ce simt\')">nu știu ce simt</div>' +
+      '</div>';
+    msgs.appendChild(w);
+    _msgCount = 0;
+    updateHistoryList();
+  }
+
+  function leaShowOnboarding() {
+    var msgs = document.getElementById('messages');
+    msgs.innerHTML = '';
+    var w = document.createElement('div');
+    w.id = 'welcome';
+    w.innerHTML =
+      '<div id="welcome-logo">L</div>' +
+      '<h2>Prima dată aici.</h2>' +
+      '<p>Cum te cheamă?</p>' +
+      '<input id="onb-name" type="text" placeholder="numele tău" autocomplete="off" style="' +
+        'width:100%;max-width:280px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);' +
+        'border-radius:12px;padding:12px 16px;color:#fff;font-size:15px;outline:none;margin:8px 0 16px;text-align:center;' +
+        'font-family:inherit;letter-spacing:0.3px;" />' +
+      '<p style="margin-bottom:12px;opacity:0.6;font-size:13px;">Cum ești acum?</p>' +
+      '<div class="welcome-chips" id="onb-stare">' +
+        '<div class="welcome-chip onb-sel" onclick="leaOnbStare(this,\'bine\')">bine</div>' +
+        '<div class="welcome-chip onb-sel" onclick="leaOnbStare(this,\'obosit\')">obosit</div>' +
+        '<div class="welcome-chip onb-sel" onclick="leaOnbStare(this,\'stresat\')">stresat</div>' +
+        '<div class="welcome-chip onb-sel" onclick="leaOnbStare(this,\'nu stiu\')">nu știu</div>' +
+      '</div>' +
+      '<div style="margin-top:20px;">' +
+        '<button onclick="leaOnbDone()" style="' +
+          'background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);' +
+          'border-radius:12px;color:#fff;padding:12px 32px;font-size:14px;cursor:pointer;' +
+          'font-family:inherit;transition:all 0.2s;" ' +
+          'onmouseover="this.style.background=\'rgba(255,255,255,0.14)\'" ' +
+          'onmouseout="this.style.background=\'rgba(255,255,255,0.08)\'">Continuă</button>' +
+        '<div style="margin-top:10px;">' +
+          '<span onclick="leaOnbSkip()" style="font-size:11px;opacity:0.3;cursor:pointer;letter-spacing:0.5px;">sari peste</span>' +
+        '</div>' +
+      '</div>';
+    msgs.appendChild(w);
+
+    // Focus pe input
+    setTimeout(function() {
+      var inp = document.getElementById('onb-name');
+      if (inp) {
+        inp.focus();
+        inp.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter') leaOnbDone();
+        });
+      }
+    }, 100);
+  }
+
+  var _onbStare = 'nu stiu';
+  function leaOnbStare(el, val) {
+    _onbStare = val;
+    document.querySelectorAll('.onb-sel').forEach(function(b) {
+      b.style.background = '';
+      b.style.borderColor = '';
+      b.style.color = '';
+    });
+    el.style.background = 'rgba(255,255,255,0.12)';
+    el.style.borderColor = 'rgba(255,255,255,0.3)';
+  }
+
+  function leaOnbDone() {
+    var inp = document.getElementById('onb-name');
+    var name = inp ? inp.value.trim() : '';
+    leaCompleteOnboarding(name || '', _onbStare);
+  }
+
+  function leaOnbSkip() {
+    leaCompleteOnboarding('', 'nu stiu');
+  }
+
+  // ── START CONVERSATIE — cu sau fara onboarding ────────────
+
+  function startNewConv() {
+    _convId    = 'conv_' + Date.now();
+    _convMsgs  = [];
+    _convTitle = null;
+    _onbStare  = 'nu stiu';
+
+    if (!leaHasName()) {
+      leaShowOnboarding();
+      _msgCount = 0;
+      updateHistoryList();
+      return;
+    }
+
+    // Are deja nume — welcome personalizat
+    var name = leaGetName();
+    startNewConvWelcome(name, null);
+    _msgCount = 0;
+    updateHistoryList();
+  }
+
+  // VV ME POPUP
+  function renderVVME() {
+    if (!window.VVME) return;
+
+    var convCount = VVME.getConvCount();
+
+    var subEl = document.getElementById('vvme-header-sub');
+    if (subEl) {
+      if (convCount === 0) subEl.textContent = '— prima conversație';
+      else if (convCount === 1) subEl.textContent = 'de la prima conversație';
+      else subEl.textContent = 'de ' + convCount + ' conversații';
+    }
+
+    var evoEl = document.getElementById('vvme-evo-text');
+    if (evoEl) {
+      if (convCount === 0)      evoEl.textContent = 'Abia ne-am cunoscut. Spune-mi ceva.';
+      else if (convCount < 3)   evoEl.textContent = 'Abia am început. Cu cât vorbești, cu atât te știu.';
+      else if (convCount < 8)   evoEl.textContent = 'Azi știu mai mult decât în prima zi. Se construiește.';
+      else if (convCount < 20)  evoEl.textContent = 'Ne cunoaștem deja. Nu mai răspund ca la început.';
+      else                      evoEl.textContent = 'De ' + convCount + ' conversații suntem împreună. Se vede în cum răspund.';
+    }
+
+    var nameEl = document.getElementById('vvme-header-name');
+    if (nameEl && window.Lea) {
+      var kb = Lea.getKB();
+      if (kb.nume && kb.nume.val) {
+        nameEl.textContent = kb.nume.val.charAt(0).toUpperCase() + kb.nume.val.slice(1).toLowerCase();
+      } else {
+        nameEl.textContent = 'VV ME';
+      }
+    }
+
+    if (window.VVME && window.Lea) VVME.learnFromKB(Lea.getKB());
+    var profile = VVME.generateProfile();
+
+    var explEl = document.getElementById('vvme-explicit-content');
+    if (explEl) {
+      if (profile.explicit.length === 0) {
+        explEl.innerHTML = '<div class="vvme-empty">Spune-i ceva despre tine.</div>';
+      } else {
+        explEl.innerHTML = '';
+        profile.explicit.forEach(function(f, i) {
+          var op = Math.min(0.9, 0.38 + f.intensity * 0.52);
+          var d = document.createElement('div');
+          d.className = 'vvme-frag';
+          d.style.color = 'rgba(255,255,255,' + op.toFixed(2) + ')';
+          d.style.animationDelay = (i * 55) + 'ms';
+          d.textContent = f.text;
+          explEl.appendChild(d);
+        });
+      }
+    }
+
+    var obsEl = document.getElementById('vvme-observed-content');
+    if (obsEl) {
+      if (profile.observed.length === 0) {
+        obsEl.innerHTML = '<div class="vvme-empty">Se construiește cu fiecare conversație.</div>';
+      } else {
+        obsEl.innerHTML = '';
+        profile.observed.forEach(function(f, i) {
+          var op = Math.min(0.75, 0.25 + f.intensity * 0.5);
+          var d = document.createElement('div');
+          d.className = 'vvme-frag observed';
+          d.style.color = 'rgba(255,255,255,' + op.toFixed(2) + ')';
+          d.style.animationDelay = (i * 70 + 120) + 'ms';
+          d.textContent = f.text;
+          obsEl.appendChild(d);
+        });
+      }
+    }
+
+    // ── RAFTURI ────────────────────────────────────────────
+    if (window.VVProfile) {
+      var pd = VVProfile.getAll();
+
+      function _raftLine(text, dim) {
+        return '<div class="raft-linie' + (dim ? ' dim' : '') + '">' + escHtml(text) + '</div>';
+      }
+      function _raftChip(text) {
+        return '<span class="raft-chip">' + escHtml(text) + '</span>';
+      }
+      function _setRaft(id, html, hasCeva) {
+        var el = document.getElementById(id + '-body');
+        if (!el) return;
+        el.innerHTML = html || '<div class="raft-linie dim">— necunoscut —</div>';
+        var card = document.getElementById(id);
+        if (card) card.classList.toggle('raft-plin', !!hasCeva);
+      }
+
+      // Familie
+      var fHtml = ''; var fOk = false;
+      if (pd.familie.partener) {
+        var p = pd.familie.partener;
+        fHtml += _raftLine((p.nume ? p.nume + ' — ' : '') + (p.rol || 'partener'));
+        fOk = true;
+      }
+      if (pd.familie.copii.length > 0) {
+        var numite = pd.familie.copii.filter(function(c){return c.nume;}).map(function(c){return c.nume + (c.varsta?' ('+c.varsta+')':'');});
+        fHtml += _raftLine(numite.length ? numite.join(', ') : pd.familie.copii.length + ' cop' + (pd.familie.copii.length===1?'il':'ii'));
+        fOk = true;
+      }
+      _setRaft('raft-familie', fHtml, fOk);
+
+      // Job
+      var jHtml = ''; var jOk = false;
+      if (pd.job.titlu || pd.job.angajator) {
+        jHtml += _raftLine((pd.job.titlu || '') + (pd.job.angajator ? (pd.job.titlu ? ' @ ' : '') + pd.job.angajator : ''));
+        jOk = true;
+      } else if (pd.job.domeniu) {
+        jHtml += _raftLine(pd.job.domeniu);
+        jOk = true;
+      }
+      if (pd.job.secundar) { jHtml += _raftLine('+ job secundar'); jOk = true; }
+      _setRaft('raft-job', jHtml, jOk);
+
+      // Plăceri
+      var plHtml = ''; var plOk = false;
+      if (pd.placeri.sport)  { plHtml += _raftChip(pd.placeri.sport); plOk = true; }
+      if (pd.placeri.muzica) { plHtml += _raftChip(pd.placeri.muzica); plOk = true; }
+      pd.placeri.hobby.slice(0,3).forEach(function(h){ plHtml += _raftChip(h); plOk = true; });
+      pd.placeri.calatorii.slice(0,1).forEach(function(c){ plHtml += _raftChip(c); plOk = true; });
+      _setRaft('raft-placeri', plHtml, plOk);
+
+      // Mâncare
+      var mHtml = ''; var mOk = false;
+      pd.mancare.favorite.slice(0,3).forEach(function(f){ mHtml += _raftChip(f); mOk = true; });
+      pd.mancare.evita.slice(0,2).forEach(function(e){ mHtml += '<span class="raft-chip" style="opacity:0.5;text-decoration:line-through">' + escHtml(e) + '</span>'; mOk = true; });
+      _setRaft('raft-mancare', mHtml, mOk);
+    }
+
+    var noteEl = document.getElementById('vvme-note-content');
+    if (noteEl && window.Lea) {
+      var kb2 = Lea.getKB();
+      var noteKeys = Object.keys(kb2).filter(function(k){ return k.indexOf('nota_') === 0; });
+      if (noteKeys.length === 0) {
+        noteEl.innerHTML = '<div class="vvme-empty">spune „notează: X"</div>';
+      } else {
+        noteEl.innerHTML = '';
+        noteKeys.slice(-6).forEach(function(k) {
+          var d = document.createElement('div');
+          d.className = 'vvme-nota-item';
+          d.textContent = kb2[k].val;
+          noteEl.appendChild(d);
+        });
+      }
+    }
+  }
+
+  function showProfile() {
+    renderVVME();
+    document.getElementById('vvme-overlay').classList.add('visible');
+    document.getElementById('vvme-popup').classList.add('visible');
+  }
+
+  function closeProfile() {
+    document.getElementById('vvme-overlay').classList.remove('visible');
+    document.getElementById('vvme-popup').classList.remove('visible');
+  }
+
+  function updateInitials() {
+    if (!window.Lea) return;
+    var kb  = Lea.getKB();
+    var n   = kb['nume'] ? kb['nume'].val : null;
+    var ini = n ? n.charAt(0).toUpperCase() : '·';
+    var btn = document.getElementById('profile-initials');
+    if (btn) btn.textContent = ini;
+  }
+
+  // CREIERUL VIZIBIL
+  var _brainTimer = null;
+  var TYPE_LABELS = { scena:'scenă', emotie:'emoție', creativ:'creativ', comanda:'comandă', intrebare:'întrebare', salut:'salut', expresie:'expresie', identitate:'identitate' };
+
+  function scanBrain(text) {
+    var bar = document.getElementById('brain-bar');
+    if (!window.Lea || !text || text.length < 3) {
+      bar.classList.remove('visible');
+      return;
+    }
+    clearTimeout(_brainTimer);
+    _brainTimer = setTimeout(function() {
+      var hit      = Lea._hit(text);
+      var hie      = Lea._hie(text);
+      var entities = Lea._extract(text);
+
+      bar.innerHTML = '';
+
+      var t1 = document.createElement('span');
+      t1.className = 'bb-tag t-' + hit.type;
+      t1.textContent = 'HiT · ' + (TYPE_LABELS[hit.type] || hit.type);
+      bar.appendChild(t1);
+
+      if (hie.tone !== 'neutru') {
+        var t2 = document.createElement('span');
+        t2.className = 'bb-tag e-' + hie.tone;
+        t2.textContent = 'HiE · ' + hie.tone;
+        bar.appendChild(t2);
+      }
+
+      if (entities.length > 0) {
+        var t3 = document.createElement('span');
+        t3.className = 'bb-tag';
+        t3.textContent = 'HiN · ' + entities.length + ' ' + (entities.length === 1 ? 'entitate' : 'entități');
+        bar.appendChild(t3);
+      }
+
+      bar.classList.add('visible');
+    }, 120);
+  }
+
+  // placeholder — date muta in VV ME
+  function updateGenom() {}
+  function updateStats() {}
+
+  function hideBrain() {
+    clearTimeout(_brainTimer);
+    var bar = document.getElementById('brain-bar');
+    if (bar) bar.classList.remove('visible');
+  }
 
   function autoResize(el) {
     el.style.height = 'auto';
@@ -675,42 +2008,210 @@
 
   function sendMessage() {
     var input = document.getElementById('msg-input');
+    // Corecție inteligentă română înainte de trimitere
+    if (window.leaCorrectInput) leaCorrectInput(input);
     var text = input.value.trim();
     if (!text) return;
 
-    // Ascunde welcome
     var welcome = document.getElementById('welcome');
     if (welcome) welcome.style.display = 'none';
 
     input.value = '';
     input.style.height = 'auto';
+    hideBrain();
 
     addUserMsg(text);
+    historySave('user', text);
     showTyping(true);
+    _typingStart = Date.now();
 
     setTimeout(function() {
       processWithLea(text);
     }, 400);
   }
 
-  function processWithLea(text) {
+  var _typingStart = 0;
+
+  // Delay dinamic: micro-reactii apar repede, raspunsuri lungi/profunde iau mai mult
+  function finishWithLea(fn, respLen) {
+    var minDelay;
+    if (!respLen || respLen < 12)  minDelay = 320;   // "hm.", "da." — aproape instant
+    else if (respLen < 45)         minDelay = 680;   // scurt
+    else if (respLen < 110)        minDelay = 1050;  // mediu
+    else                           minDelay = 1450;  // lung / profund
+    var elapsed = Date.now() - _typingStart;
+    var wait = Math.max(0, minDelay - elapsed);
+    setTimeout(fn, wait);
+  }
+
+  async function processWithLea(text) {
     if (!window.Lea) {
-      showTyping(false);
-      addLeaMsg('Creierul nu s-a încărcat. Reîncarcă pagina.', null);
+      finishWithLea(function() {
+        showTyping(false);
+        addLeaMsg('Creierul nu s-a încărcat. Reîncarcă pagina.', null);
+      });
       return;
     }
 
-    var result = Lea.think(text);
-    showTyping(false);
+    // ── DISCOVERY — user raspunde la intrebarea LEA ───────────
+    // Daca LEA asteapta confirmare (waitPerm), trateaza orice raspuns pozitiv
+    if (window._leaDsc && _leaDsc.waitPerm) {
+      _leaDsc.waitPerm = false;
+      var tLow = text.toLowerCase().trim();
+      var isNo = /^(nu|nop|nah|pas|skip|las|nu vreau)/.test(tLow);
+      if (!isNo) {
+        // User accepta — incepe discovery cu prima intrebare
+        _leaDsc.step = 'name';
+        var firstQ = window._LEA_DSC_STEPS['name'].q;
+        finishWithLea(function() {
+          showTyping(false);
+          addLeaMsg(firstQ, null, null);
+          historySave('lea', firstQ);
+          updateHistoryList(); updateKB(); updateInitials(); updateLeaState();
+        });
+        return;
+      }
+      // User a refuzat — continua normal
+    }
+
+    // Daca LEA asteapta raspuns la o intrebare de profil (discovery step activ)
+    // → wrapeaza textul inainte sa il trimitem la ANIMUS
+    var textForAnimus = text;
+    if (window.leaDscNeedsWrap && leaDscNeedsWrap()) {
+      var wrapped = leaDscWrap(text);
+      if (wrapped) textForAnimus = wrapped;
+    }
+
+    var result = Lea.think(textForAnimus);
 
     if (!result) {
-      addLeaMsg('Nu am înțeles. Încearcă din nou.', null);
+      finishWithLea(function() {
+        showTyping(false);
+        addLeaMsg('Nu am înțeles. Încearcă din nou.', null);
+      });
       return;
     }
 
-    addLeaMsg(result.response, result);
-    updateSidebar(result);
-    updateKB();
+    // HiK — ANIMUS a prins info personală (nume, vârstă, job, loc)
+    if (result.type === 'memorie') {
+      if (window.VVProfile) VVProfile.learnFromText(textForAnimus);
+      // Înlocuiește răspunsul ANIMUS generic cu ceva uman
+      result.response = _leaWarmProfileResp(textForAnimus, result.response);
+      finishWithLea(function() {
+        showTyping(false);
+        addLeaMsg(result.response, result, null);
+        historySave('lea', result.response);
+        updateHistoryList(); updateKB(); updateGenom(); updateStats(); updateInitials(); updateLeaState();
+        // Discovery activ — avanseaza la urmatoarea intrebare
+        if (window.leaDscNeedsWrap && window._leaDsc && _leaDsc.step) {
+          var nextQ = leaDscAdvance();
+          if (nextQ) {
+            setTimeout(function() {
+              addLeaMsg(nextQ, null, null);
+              historySave('lea', nextQ);
+              updateHistoryList(); updateKB(); updateInitials(); updateLeaState();
+            }, 900);
+          }
+        }
+      });
+      return;
+    }
+
+    // Motor Alexandria + VV Speech — conectat la ANIMUS
+    var alexResult = null;
+    if (window.leaRespond) {
+      alexResult = leaRespond(text, null, result); // trimite contextul ANIMUS (HiT, HiM, HiK)
+      if (alexResult && alexResult.raspuns) {
+        if (alexResult.pattern) leaApplyColor(alexResult.pattern.his);
+        result.response = alexResult.raspuns;
+      }
+    }
+
+    if (window.VVProfile) VVProfile.learnFromText(textForAnimus);
+    if (window.VVME && alexResult && alexResult.comportament && alexResult.pattern) {
+      var now = new Date();
+      VVME.learnFromEmotion(alexResult.comportament, alexResult.pattern.hiq, now.getHours(), now.getDay());
+    }
+
+    var _respLen = result.response ? result.response.length : 50;
+    finishWithLea(function() {
+      showTyping(false);
+      addLeaMsg(result.response, result, alexResult);
+      historySave('lea', result.response);
+      updateHistoryList();
+      updateSidebar(result);
+      updateKB();
+      updateGenom();
+      updateStats();
+      updateInitials();
+      updateLeaState();
+    }, _respLen);
+  }
+
+  // ── CULORI ADAPTIVE — interfata simte tiparul ──
+  var _colorTimer = null;
+  function leaApplyColor(his) {
+    var orb1 = document.getElementById('orb1');
+    var orb2 = document.getElementById('orb2');
+    var orb3 = document.getElementById('orb3');
+    if (!orb1) return;
+
+    var c1, c2, c3;
+
+    if (his.includes('heavy') && his.includes('dark')) {
+      // tristete, disperare — albastru adanc, discret
+      c1 = 'rgba(8,18,70,0.52)';
+      c2 = 'rgba(22,8,60,0.38)';
+      c3 = 'rgba(4,8,35,0.28)';
+    } else if (his.includes('hot') && his.includes('fast')) {
+      // furie — rosu foarte subtil
+      c1 = 'rgba(90,8,8,0.44)';
+      c2 = 'rgba(60,14,8,0.34)';
+      c3 = 'rgba(45,4,4,0.24)';
+    } else if (his.includes('light') && his.includes('warm')) {
+      // bucurie — auriu cald, abia vizibil
+      c1 = 'rgba(90,60,0,0.38)';
+      c2 = 'rgba(60,38,6,0.28)';
+      c3 = 'rgba(75,52,0,0.22)';
+    } else if (his.includes('tense') && his.includes('cold')) {
+      // anxietate — albastru rece, tensionat
+      c1 = 'rgba(8,30,70,0.46)';
+      c2 = 'rgba(14,14,52,0.34)';
+      c3 = 'rgba(4,22,40,0.26)';
+    } else if (his.includes('still') && his.includes('soft')) {
+      // liniste — verde-albastru, calm
+      c1 = 'rgba(8,40,50,0.36)';
+      c2 = 'rgba(14,30,56,0.26)';
+      c3 = 'rgba(0,32,42,0.22)';
+    } else if (his.includes('warm') && his.includes('golden')) {
+      // dragoste — auriu-portocaliu cald
+      c1 = 'rgba(80,46,8,0.42)';
+      c2 = 'rgba(55,22,38,0.32)';
+      c3 = 'rgba(62,38,0,0.26)';
+    } else {
+      // default — brand VV, nemodificat
+      c1 = 'rgba(20,50,140,0.55)';
+      c2 = 'rgba(70,20,110,0.45)';
+      c3 = 'rgba(0,70,90,0.35)';
+    }
+
+    orb1.style.transition = 'background 3s ease';
+    orb2.style.transition = 'background 3s ease';
+    orb3.style.transition = 'background 3s ease';
+    orb1.style.background = 'radial-gradient(circle, '+c1+' 0%, transparent 65%)';
+    orb2.style.background = 'radial-gradient(circle, '+c2+' 0%, transparent 65%)';
+    orb3.style.background = 'radial-gradient(circle, '+c3+' 0%, transparent 65%)';
+
+    // revine la default dupa 8 secunde
+    if (_colorTimer) clearTimeout(_colorTimer);
+    _colorTimer = setTimeout(function() {
+      orb1.style.transition = 'background 4s ease';
+      orb2.style.transition = 'background 4s ease';
+      orb3.style.transition = 'background 4s ease';
+      orb1.style.background = 'radial-gradient(circle, rgba(20,50,140,0.55) 0%, transparent 65%)';
+      orb2.style.background = 'radial-gradient(circle, rgba(70,20,110,0.45) 0%, transparent 65%)';
+      orb3.style.background = 'radial-gradient(circle, rgba(0,70,90,0.35) 0%, transparent 65%)';
+    }, 12000);
   }
 
   function addUserMsg(text) {
@@ -726,7 +2227,7 @@
     scrollBottom();
   }
 
-  function addLeaMsg(text, result) {
+  function addLeaMsg(text, result, alexResult) {
     var msgs = document.getElementById('messages');
     var id = 'msg-' + (++_msgCount);
     var row = document.createElement('div');
@@ -736,16 +2237,13 @@
     var fbHtml = '';
 
     if (result) {
-      // Type chip
-      var typeLabel = { scena:'Scenă', emotie:'Emoție', comanda:'Comandă', intrebare:'Întrebare', creativ:'Creativ', feedback:'Feedback' };
-      metaHtml += '<span class="meta-type ' + result.type + '">' + (typeLabel[result.type] || result.type) + '</span>';
+      var typeLabel = { scena:'Scenă', emotie:'Emoție', comanda:'Comandă', intrebare:'Întrebare', creativ:'Creativ', feedback:'Feedback', salut:'Salut', expresie:'Expresie', identitate:'Identitate', laramun:'—' };
+      metaHtml += '<span class="meta-type">' + (typeLabel[result.type] || result.type) + '</span>';
 
-      // Tone
       if (result.tone && result.tone !== 'neutru') {
-        metaHtml += '<span class="meta-tone tone-' + result.tone + '">· ' + result.tone + '</span>';
+        metaHtml += '<span class="meta-tone">· ' + result.tone + '</span>';
       }
 
-      // Top 2 concepte inferred
       var concepts = Object.keys(result.inferred.concepts || {}).sort(function(a,b){
         return result.inferred.concepts[b] - result.inferred.concepts[a];
       }).slice(0, 2);
@@ -753,7 +2251,6 @@
         metaHtml += '<span class="meta-concept">' + c.replace(/_/g,' ') + '</span>';
       });
 
-      // Feedback buttons
       fbHtml =
         '<div class="msg-feedback">' +
           '<button class="fb-btn" id="pos-' + id + '" onclick="doFeedback(\'' + id + '\', true)" title="Îmi place">👍</button>' +
@@ -777,35 +2274,59 @@
     if (!window.Lea) return;
     var resp = Lea.feedback(isPositive);
 
-    // Update buttons
     var posBtn = document.getElementById('pos-' + id);
     var negBtn = document.getElementById('neg-' + id);
     if (posBtn) posBtn.className = 'fb-btn' + (isPositive ? ' active-pos' : '');
     if (negBtn) negBtn.className = 'fb-btn' + (!isPositive ? ' active-neg' : '');
 
-    // Arată răspuns Lea
     addLeaMsg(resp, null);
   }
 
   function updateKB() {
     if (!window.Lea) return;
-    var kb = Lea.getKB();
-    var el = document.getElementById('kb-list');
+    if (window.VVME) VVME.learnFromKB(Lea.getKB());
+    var kb   = Lea.getKB();
     var keys = Object.keys(kb);
-    if (keys.length === 0) {
-      el.innerHTML = '<span style="font-size:10px;color:var(--text-dim)">— nimic încă —</span>';
-      return;
+
+    var noteKeys = keys.filter(function(k){ return k.indexOf('nota_') === 0; });
+    var profKeys = keys.filter(function(k){ return k.indexOf('nota_') !== 0; });
+
+    // Notițe
+    var noteEl = document.getElementById('note-list');
+    if (noteEl) {
+      if (noteKeys.length === 0) {
+        noteEl.innerHTML = '<span style="font-size:10px;color:var(--text-dim)">— spune „notează: X" —</span>';
+      } else {
+        noteEl.innerHTML = '';
+        noteKeys.slice(-6).forEach(function(k) {
+          var item = document.createElement('div');
+          item.className = 'nota-item';
+          item.innerHTML =
+            '<span>' + escHtml(kb[k].val) + '</span>' +
+            '<button class="nota-del" onclick="deleteKB(\'' + k + '\')" title="Șterge">✕</button>';
+          noteEl.appendChild(item);
+        });
+      }
     }
-    el.innerHTML = '';
-    keys.slice(-8).forEach(function(k) {
-      var item = document.createElement('div');
-      item.className = 'kb-item';
-      var label = k.replace(/_\d+$/, '').replace(/_/g,' ');
-      item.innerHTML =
-        '<span title="' + k + '">' + label + ': ' + escHtml(kb[k].val) + '</span>' +
-        '<button class="kb-del" onclick="deleteKB(\'' + k + '\')" title="Uită">✕</button>';
-      el.appendChild(item);
-    });
+
+    // Profil KB
+    var kbEl = document.getElementById('kb-list');
+    if (kbEl) {
+      if (profKeys.length === 0) {
+        kbEl.innerHTML = '<span style="font-size:10px;color:var(--text-dim)">— nimic încă —</span>';
+      } else {
+        kbEl.innerHTML = '';
+        profKeys.slice(-8).forEach(function(k) {
+          var item = document.createElement('div');
+          item.className = 'kb-item';
+          var label = k.replace(/_\d+$/, '').replace(/_/g,' ');
+          item.innerHTML =
+            '<span title="' + k + '">' + label + ': ' + escHtml(kb[k].val) + '</span>' +
+            '<button class="kb-del" onclick="deleteKB(\'' + k + '\')" title="Uită">✕</button>';
+          kbEl.appendChild(item);
+        });
+      }
+    }
   }
 
   function deleteKB(key) {
@@ -816,21 +2337,18 @@
     if (!window.Lea) return;
     var mem = Lea.getMemory();
 
-    // Emoție scenă
     var emotieEl = document.getElementById('mem-emotie');
-    var toneColors = { trist:'#6090ff', furios:'#ff6050', bucuros:'#60d860', speriat:'#a060ff', linistit:'#60d8c0', obosit:'#909090', nostalgic:'#d0a060', neutru:'#5a5a7a' };
+    var toneColors = { trist:'#6090ff', furios:'#ff6050', bucuros:'#60d860', speriat:'#a060ff', linistit:'#60d8c0', obosit:'#909090', nostalgic:'#d0a060', neutru:'rgba(255,255,255,0.4)' };
     var tone = mem.scena ? (mem.scena.emotie || 'neutru') : 'neutru';
     emotieEl.textContent = tone;
-    emotieEl.style.color = toneColors[tone] || '#5a5a7a';
+    emotieEl.style.color = toneColors[tone] || 'rgba(255,255,255,0.4)';
 
-    // Vreme
     var vremeEl = document.getElementById('mem-vreme');
     if (mem.scena && mem.scena.vreme) {
-      vremeEl.textContent = '☁ ' + mem.scena.vreme;
+      vremeEl.textContent = mem.scena.vreme;
       vremeEl.style.display = 'block';
     }
 
-    // Subiecte
     var subjEl = document.getElementById('mem-subiecte');
     subjEl.innerHTML = '';
     var subs = (mem.scena && mem.scena.subiecte) ? mem.scena.subiecte.slice(-8) : [];
@@ -841,20 +2359,46 @@
       subjEl.appendChild(chip);
     });
 
-    // Preferințe
-    var prefEl = document.getElementById('preferinte-list');
-    prefEl.innerHTML = '';
-    var prefs = mem.preferinte || [];
-    if (prefs.length === 0) {
-      prefEl.innerHTML = '<span style="font-size:10px;color:var(--text-dim)">— nimic încă —</span>';
-    } else {
-      prefs.forEach(function(p) {
-        var d = document.createElement('div');
-        d.className = 'pref-item';
-        d.textContent = p;
-        prefEl.appendChild(d);
-      });
+    // preferinte-list eliminat din sidebar — skip
+  }
+
+  // Răspuns cald când LEA înțelege ceva personal — în loc de "Interesant." generic
+  function _leaWarmProfileResp(text, original) {
+    var t = text.toLowerCase();
+    // Partener / familie
+    if (/soți[ae]|soț|iubit[ăa]|iubit|partener[ăa]?|prietenă|prieten/.test(t)) {
+      var r = ['hm… pari să ții la ea.', 'mă bucur că ai pe cineva.', 'frumos să ai pe cineva lângă.', 'spune-mi mai mult.'];
+      return r[Math.floor(Math.random()*r.length)];
     }
+    // Job / muncă
+    if (/lucrez|muncesc|job|serviciu|angajat|freelance/.test(t)) {
+      var r2 = ['și cum e?', 'îți place ce faci?', 'spune-mi mai mult.', 'asta te consumă sau te împlinește?'];
+      return r2[Math.floor(Math.random()*r2.length)];
+    }
+    // Nume
+    if (/mă cheamă|cheamă|numele meu/.test(t)) {
+      var kb = window.Lea && Lea.getKB ? Lea.getKB() : {};
+      var n = kb && kb.nume && kb.nume.val ? kb.nume.val : '';
+      var r3 = n ? ['bine, ' + n + '.', 'am reținut, ' + n + '.', n + '. bine.'] : ['am reținut.', 'bine.'];
+      return r3[Math.floor(Math.random()*r3.length)];
+    }
+    // Vârstă
+    if (/am\s+\d+\s+ani|\d+\s+ani/.test(t)) {
+      var r4 = ['notat.', 'am reținut.', 'bine.'];
+      return r4[Math.floor(Math.random()*r4.length)];
+    }
+    // Hobby / sport
+    if (/alerg|sală|fitness|hobby|îmi place|ador|pasionat/.test(t)) {
+      var r5 = ['bine asta.', 'de mult?', 'ce simți după?', 'important să ai asta.'];
+      return r5[Math.floor(Math.random()*r5.length)];
+    }
+    // Locație
+    if (/locuiesc|stau în|din\s+\w+|trăiesc în/.test(t)) {
+      var r6 = ['notat.', 'știu acum.', 'bine.'];
+      return r6[Math.floor(Math.random()*r6.length)];
+    }
+    // Fallback — dacă ANIMUS a prins ceva dar nu știm ce
+    return original || 'am reținut.';
   }
 
   function showTyping(show) {
@@ -869,14 +2413,13 @@
   function showMemory() {
     if (!window.Lea) return;
     var mem = Lea.getMemory();
-    var text = 'MEMORIA LEA:\n\n';
-    text += 'Scenă curentă:\n';
-    text += '  Emoție: ' + (mem.scena.emotie || 'neutru') + '\n';
-    text += '  Vreme: ' + (mem.scena.vreme || '—') + '\n';
-    text += '  Moment: ' + (mem.scena.moment || '—') + '\n';
-    text += '  Subiecte: ' + (mem.scena.subiecte || []).join(', ') + '\n\n';
-    text += 'Preferințele tale: ' + (mem.preferinte || []).join(', ') + '\n\n';
-    text += 'Ultimele schimburi:\n';
+    var text = 'MEMORIA LEA\n\n';
+    text += 'Scenă: ' + (mem.scena.emotie || 'neutru') + '\n';
+    text += 'Vreme: ' + (mem.scena.vreme || '—') + '\n';
+    text += 'Moment: ' + (mem.scena.moment || '—') + '\n';
+    text += 'Subiecte: ' + (mem.scena.subiecte || []).join(', ') + '\n\n';
+    text += 'Preferințe: ' + (mem.preferinte || []).join(', ') + '\n\n';
+    text += 'Schimburi recente:\n';
     (mem.ultimele || []).forEach(function(u) {
       text += '  [' + u.type + '/' + u.tone + '] ' + u.text + '\n';
     });
@@ -890,42 +2433,76 @@
     document.getElementById('mem-emotie').style.color = '';
     document.getElementById('mem-vreme').style.display = 'none';
     document.getElementById('mem-subiecte').innerHTML = '';
-    document.getElementById('preferinte-list').innerHTML = '<span style="font-size:10px;color:var(--text-dim)">— nimic încă —</span>';
   }
 
   function clearAll() {
     clearMemory();
-    if (window.Lea) Lea.resetWeights();
-    var msgs = document.getElementById('messages');
-    msgs.innerHTML = '';
-    // Readaugă welcome
-    var w = document.createElement('div');
-    w.id = 'welcome';
-    w.innerHTML =
-      '<div id="welcome-logo">L</div>' +
-      '<h2>Bună ziua</h2>' +
-      '<p>Sunt Lea. Spune-mi ce gândești — o scenă, o emoție, o întrebare. Înțeleg românește cum vorbești.</p>' +
-      '<div class="welcome-chips">' +
-        '<div class="welcome-chip" onclick="sendQuick(\'om trist la apus lângă mare\')">om trist la apus</div>' +
-        '<div class="welcome-chip" onclick="sendQuick(\'copil bucuros în pădure vara\')">copil în pădure</div>' +
-        '<div class="welcome-chip" onclick="sendQuick(\'bătrân singur ninge noaptea\')">bătrân în ninsoare</div>' +
-        '<div class="welcome-chip" onclick="sendQuick(\'sunt obosit azi\')">sunt obosit azi</div>' +
-        '<div class="welcome-chip" onclick="sendQuick(\'furtună și casă caldă cu foc\')">furtună și casă caldă</div>' +
-      '</div>';
-    msgs.appendChild(w);
-    _msgCount = 0;
+    if (window.Lea) { Lea.resetWeights(); if (Lea.kbClear) Lea.kbClear(); }
+    if (window.VVME) VVME.clear();
+    if (window._leaDsc) { _leaDsc.waitPerm = false; _leaDsc.step = null; }
+    if (window._leaInima) { _leaInima.emotii = []; _leaInima.msgCount = 0; }
+    if (typeof _leaUltimaCuriozitate !== 'undefined') _leaUltimaCuriozitate = null;
+    if (typeof _leaUltimTopic      !== 'undefined') _leaUltimTopic = null;
+    if (typeof _sessionCtx !== 'undefined') { _sessionCtx.emotie = null; _sessionCtx.subiect = null; _sessionCtx.msgCount = 0; }
+    if (window.VVProfile) VVProfile.clear();
+    if (typeof leaStateReset === 'function') leaStateReset();
+    startNewConv();
   }
 
   function escHtml(s) {
     return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
   }
 
-  // Init check
   window.addEventListener('load', function() {
     if (!window.Lea) {
       console.error('[LEA HOME] VV ANIMUS nu s-a încărcat!');
     } else {
       console.log('[LEA HOME] VV ANIMUS conectat. Lea e activă.');
+      updateKB();
+      updateGenom();
+      updateStats();
+      updateInitials();
+      updateHistoryList();
+      saveCurrentConv();
+
+      // Porneste motorul Alexandria
+      if (window.leaMotorInit) {
+        leaMotorInit();
+      }
+
+      // Salut time-aware
+      (function() {
+        var h = new Date().getHours();
+        var salut = h < 5 ? 'E noaptea.' : h < 12 ? 'Bună dimineața.' : h < 18 ? 'Bună ziua.' : h < 22 ? 'Bună seara.' : 'E târziu.';
+        var g = document.getElementById('welcome-greeting');
+        if (g) g.textContent = salut;
+      })();
+
+      // Prima deschidere → onboarding; utilizator cunoscut → welcome personalizat
+      if (!leaHasName()) {
+        leaShowOnboarding();
+        _msgCount = 0;
+      } else {
+        var n = leaGetName();
+        if (n) {
+          var g2 = document.getElementById('welcome-greeting');
+          var p  = document.querySelector('#welcome p');
+          var h  = new Date().getHours();
+          var salutPers = h < 5 ? 'E noaptea, ' : h < 12 ? 'Bună dimineața, ' : h < 18 ? 'Bună ziua, ' : h < 22 ? 'Bună seara, ' : 'E târziu, ';
+          if (g2) g2.textContent = salutPers + n.charAt(0).toUpperCase() + n.slice(1).toLowerCase() + '.';
+
+          // LEA proactivă — dacă există proiect activ în Studio
+          var _studioActive = null;
+          try { _studioActive = JSON.parse(localStorage.getItem('vv_active_project')); } catch(e){}
+          if (_studioActive && _studioActive.name) {
+            var studioSub = 'lucrezi la "' + _studioActive.name + '". vrei să continuăm?';
+            if (_studioActive.lastIdea) studioSub = 'ultima idee la "' + _studioActive.name + '": "' + _studioActive.lastIdea.slice(0,55) + '". continuăm?';
+            if (p) p.textContent = studioSub;
+          } else {
+            if (p) p.textContent = 'Bine ai revenit. Spune-mi ce simți.';
+          }
+        }
+      }
     }
   });
 </script>
