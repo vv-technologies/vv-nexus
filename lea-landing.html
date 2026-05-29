@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LEA — Continue your work naturally.</title>
+<meta name="description" content="An AI workspace that remembers where you left off. Organize projects, ideas, and unfinished work — without losing context between sessions.">
+<meta property="og:title" content="LEA — Continue your work naturally.">
+<meta property="og:description" content="An AI workspace that remembers where you left off. Local-first. No cloud. Built for indie builders.">
+<meta property="og:type" content="website">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg:        #07070d;
+  --bg2:       #0d0d16;
+  --text:      rgba(255,248,235,0.84);
+  --text-dim:  rgba(255,248,235,0.34);
+  --text-mid:  rgba(255,248,235,0.54);
+  --accent:    #c8963e;
+  --accent-lo: rgba(200,150,62,0.12);
+  --accent-glow: rgba(200,150,62,0.18);
+  --violet:    #8b5cf6;
+  --violet-lo: rgba(139,92,246,0.08);
+  --glass:     rgba(255,255,255,0.028);
+  --glass-b:   rgba(255,255,255,0.055);
+  --border:    rgba(255,255,255,0.06);
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, 'SF Pro Text', 'Segoe UI', system-ui, sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── ORBS ─────────────────────────────────────────── */
+.orb {
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+}
+#orb1 {
+  width: 900px; height: 900px;
+  background: radial-gradient(circle, rgba(28,16,58,0.55) 0%, transparent 65%);
+  top: -350px; left: -300px;
+  animation: breathe 13s ease-in-out infinite;
+}
+#orb2 {
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(80,44,14,0.28) 0%, transparent 65%);
+  bottom: -200px; right: -150px;
+  animation: breathe 17s ease-in-out infinite 3s;
+}
+#orb3 {
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(139,92,246,0.10) 0%, transparent 65%);
+  top: 40%; left: 60%;
+  animation: breathe 21s ease-in-out infinite 7s;
+}
+@keyframes breathe {
+  0%,100% { opacity: 0.6; transform: scale(1); }
+  50%      { opacity: 0.9; transform: scale(1.05); }
+}
+
+/* ── NAV ──────────────────────────────────────────── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0;
+  z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 40px;
+  height: 56px;
+  background: rgba(7,7,13,0.72);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+}
+.nav-logo {
+  display: flex; align-items: center; gap: 10px;
+  text-decoration: none;
+}
+.nav-logo-mark {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: linear-gradient(135deg, rgba(200,150,62,0.2), rgba(139,92,246,0.15));
+  border: 1px solid rgba(200,150,62,0.3);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; color: rgba(255,248,235,0.85); font-weight: 600;
+  letter-spacing: 0.5px;
+  box-shadow: 0 0 16px rgba(200,150,62,0.12);
+}
+.nav-logo-text {
+  font-size: 13px; font-weight: 400;
+  color: rgba(255,248,235,0.82); letter-spacing: 3px;
+}
+.nav-badge {
+  font-size: 9px; letter-spacing: 1.5px;
+  color: var(--accent); border: 1px solid rgba(200,150,62,0.3);
+  padding: 3px 8px; border-radius: 20px;
+  background: var(--accent-lo);
+}
+.nav-cta {
+  display: flex; align-items: center; gap: 16px;
+}
+.nav-link {
+  font-size: 12px; color: var(--text-dim); text-decoration: none;
+  letter-spacing: 0.3px;
+  transition: color 0.2s;
+}
+.nav-link:hover { color: var(--text-mid); }
+.btn-ghost {
+  font-size: 12px; color: var(--text-mid);
+  border: 1px solid var(--border);
+  background: var(--glass);
+  padding: 7px 16px; border-radius: 20px;
+  cursor: pointer; text-decoration: none;
+  transition: all 0.2s;
+  letter-spacing: 0.3px;
+}
+.btn-ghost:hover {
+  background: var(--glass-b);
+  border-color: rgba(255,255,255,0.1);
+  color: var(--text);
+}
+
+/* ── HERO ─────────────────────────────────────────── */
+.hero {
+  position: relative; z-index: 1;
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center;
+  padding: 100px 24px 80px;
+}
+.hero-eyebrow {
+  font-size: 10px; letter-spacing: 3px;
+  color: var(--accent); text-transform: uppercase;
+  margin-bottom: 28px;
+  opacity: 0; animation: fadeUp 0.7s ease forwards 0.2s;
+}
+.hero-title {
+  font-size: clamp(42px, 7vw, 88px);
+  font-weight: 300; line-height: 1.08;
+  letter-spacing: -1.5px;
+  color: rgba(255,248,235,0.92);
+  max-width: 860px;
+  margin-bottom: 28px;
+  opacity: 0; animation: fadeUp 0.8s ease forwards 0.35s;
+}
+.hero-title em {
+  font-style: normal;
+  background: linear-gradient(135deg, #c8963e 0%, #e8b86d 50%, #8b5cf6 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero-sub {
+  font-size: clamp(15px, 2vw, 18px);
+  color: var(--text-mid); font-weight: 300;
+  max-width: 480px; line-height: 1.7;
+  margin-bottom: 48px;
+  opacity: 0; animation: fadeUp 0.8s ease forwards 0.5s;
+}
+.hero-actions {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap; justify-content: center;
+  opacity: 0; animation: fadeUp 0.8s ease forwards 0.65s;
+}
+.btn-primary {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: linear-gradient(135deg, #c8963e, #b07a2e);
+  color: rgba(7,7,13,0.95); font-weight: 600;
+  font-size: 13px; letter-spacing: 0.5px;
+  padding: 13px 28px; border-radius: 24px;
+  text-decoration: none; border: none; cursor: pointer;
+  transition: all 0.25s;
+  box-shadow: 0 4px 24px rgba(200,150,62,0.25);
+}
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 32px rgba(200,150,62,0.35);
+}
+.btn-secondary {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--glass);
+  color: var(--text-mid); font-size: 13px;
+  padding: 13px 24px; border-radius: 24px;
+  text-decoration: none; border: 1px solid var(--border);
+  cursor: pointer; transition: all 0.25s; letter-spacing: 0.3px;
+}
+.btn-secondary:hover {
+  background: var(--glass-b);
+  color: var(--text);
+  border-color: rgba(255,255,255,0.1);
+}
+.hero-note {
+  margin-top: 20px; font-size: 11px; color: var(--text-dim);
+  letter-spacing: 0.3px;
+  opacity: 0; animation: fadeUp 0.8s ease forwards 0.8s;
+}
+
+/* ── DEMO / APP PREVIEW ───────────────────────────── */
+.hero-preview {
+  position: relative; z-index: 1;
+  display: flex; justify-content: center;
+  padding: 0 24px 100px;
+}
+.preview-frame {
+  width: 100%; max-width: 780px;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  background: rgba(10,10,18,0.8);
+  backdrop-filter: blur(20px);
+  overflow: hidden;
+  box-shadow: 0 40px 100px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04);
+  opacity: 0; animation: fadeUp 1s ease forwards 0.9s;
+}
+.preview-bar {
+  display: flex; align-items: center; gap: 8px;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(255,255,255,0.018);
+}
+.preview-dot { width: 10px; height: 10px; border-radius: 50%; }
+.preview-dot:nth-child(1) { background: rgba(255,95,87,0.5); }
+.preview-dot:nth-child(2) { background: rgba(255,189,46,0.5); }
+.preview-dot:nth-child(3) { background: rgba(40,200,64,0.5); }
+.preview-url {
+  flex: 1; text-align: center;
+  font-size: 11px; color: var(--text-dim); letter-spacing: 0.3px;
+}
+.preview-body {
+  display: grid; grid-template-columns: 200px 1fr;
+  min-height: 340px;
+}
+.preview-sidebar {
+  border-right: 1px solid var(--border);
+  padding: 20px 16px;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.preview-sidebar-title {
+  font-size: 9px; letter-spacing: 2px; color: var(--text-dim);
+  text-transform: uppercase; margin-bottom: 8px; margin-top: 4px;
+}
+.sidebar-item {
+  font-size: 12px; color: var(--text-mid);
+  padding: 7px 10px; border-radius: 8px;
+  cursor: pointer; transition: all 0.15s;
+  display: flex; align-items: center; gap: 8px;
+}
+.sidebar-item.active {
+  background: var(--accent-lo);
+  color: var(--accent);
+  border: 1px solid rgba(200,150,62,0.15);
+}
+.sidebar-item .dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: currentColor; opacity: 0.5; flex-shrink: 0;
+}
+.preview-main {
+  padding: 24px 28px;
+  display: flex; flex-direction: column; gap: 16px;
+}
+.preview-session-tag {
+  font-size: 9px; letter-spacing: 1.5px; color: var(--accent);
+  text-transform: uppercase;
+}
+.preview-message {
+  background: var(--glass);
+  border: 1px solid var(--border);
+  border-radius: 12px; padding: 16px 18px;
+}
+.preview-message.lea {
+  background: var(--accent-lo);
+  border-color: rgba(200,150,62,0.12);
+}
+.preview-message-label {
+  font-size: 9px; letter-spacing: 1.5px; color: var(--text-dim);
+  text-transform: uppercase; margin-bottom: 8px;
+}
+.preview-message.lea .preview-message-label { color: rgba(200,150,62,0.6); }
+.preview-message-text {
+  font-size: 13px; color: var(--text-mid); line-height: 1.6;
+}
+.preview-message.lea .preview-message-text { color: rgba(255,248,235,0.78); }
+.preview-continue {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 11px; color: var(--accent); opacity: 0.8;
+  padding: 6px 12px;
+  background: var(--accent-lo);
+  border: 1px solid rgba(200,150,62,0.15);
+  border-radius: 20px; cursor: pointer; margin-top: 4px;
+  transition: opacity 0.2s;
+}
+.preview-continue:hover { opacity: 1; }
+.preview-arrow { font-size: 10px; }
+
+/* ── SECTION WRAPPER ──────────────────────────────── */
+section {
+  position: relative; z-index: 1;
+}
+.section-inner {
+  max-width: 960px; margin: 0 auto; padding: 0 24px;
+}
+
+/* ── DIVIDER LINE ─────────────────────────────────── */
+.divider {
+  width: 100%; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border) 30%, var(--border) 70%, transparent);
+  margin: 0;
+}
+
+/* ── STATEMENT SECTION ────────────────────────────── */
+.section-statement {
+  padding: 100px 24px;
+}
+.statement-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 80px;
+  align-items: center; max-width: 900px; margin: 0 auto;
+}
+.statement-label {
+  font-size: 9px; letter-spacing: 2.5px; text-transform: uppercase;
+  color: var(--text-dim); margin-bottom: 20px;
+}
+.statement-text {
+  font-size: clamp(22px, 3vw, 30px);
+  font-weight: 300; line-height: 1.5;
+  color: rgba(255,248,235,0.88);
+  letter-spacing: -0.3px;
+}
+.statement-text strong {
+  font-weight: 400;
+  color: rgba(255,248,235,0.95);
+}
+.statement-items {
+  display: flex; flex-direction: column; gap: 20px;
+}
+.statement-item {
+  display: flex; gap: 16px; align-items: flex-start;
+}
+.statement-item-icon {
+  width: 32px; height: 32px; border-radius: 8px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+  background: var(--glass); border: 1px solid var(--border);
+  margin-top: 2px;
+}
+.statement-item-text h4 {
+  font-size: 13px; font-weight: 500; color: rgba(255,248,235,0.85);
+  margin-bottom: 4px;
+}
+.statement-item-text p {
+  font-size: 12px; color: var(--text-dim); line-height: 1.6;
+}
+
+/* ── FEATURES ─────────────────────────────────────── */
+.section-features {
+  padding: 80px 24px 100px;
+}
+.features-header {
+  text-align: center; margin-bottom: 60px;
+}
+.section-eyebrow {
+  font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+  color: var(--accent); margin-bottom: 16px;
+}
+.section-title {
+  font-size: clamp(28px, 4vw, 42px);
+  font-weight: 300; letter-spacing: -0.8px;
+  color: rgba(255,248,235,0.9); line-height: 1.2;
+}
+.section-title em {
+  font-style: normal; color: var(--accent);
+}
+.features-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+  max-width: 900px; margin: 0 auto;
+}
+.feature-card {
+  background: var(--glass);
+  border: 1px solid var(--border);
+  border-radius: 16px; padding: 28px 24px;
+  transition: all 0.3s;
+  position: relative; overflow: hidden;
+}
+.feature-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
+}
+.feature-card:hover {
+  background: rgba(255,255,255,0.038);
+  border-color: rgba(255,255,255,0.09);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+}
+.feature-num {
+  font-size: 9px; letter-spacing: 2px; color: var(--text-dim);
+  margin-bottom: 20px;
+}
+.feature-title {
+  font-size: 16px; font-weight: 400;
+  color: rgba(255,248,235,0.88);
+  margin-bottom: 12px; letter-spacing: -0.2px;
+}
+.feature-desc {
+  font-size: 13px; color: var(--text-dim); line-height: 1.7;
+}
+.feature-pills {
+  display: flex; flex-wrap: wrap; gap: 6px; margin-top: 18px;
+}
+.feature-pill {
+  font-size: 10px; color: var(--text-dim);
+  border: 1px solid var(--border);
+  padding: 3px 8px; border-radius: 10px;
+  background: var(--glass);
+}
+
+/* ── WHO IS THIS FOR ──────────────────────────────── */
+.section-for {
+  padding: 80px 24px 100px;
+  background: linear-gradient(180deg, transparent, rgba(28,16,58,0.15), transparent);
+}
+.for-inner { max-width: 760px; margin: 0 auto; text-align: center; }
+.for-title {
+  font-size: clamp(26px, 4vw, 38px);
+  font-weight: 300; letter-spacing: -0.8px;
+  color: rgba(255,248,235,0.88); line-height: 1.35;
+  margin-bottom: 48px;
+}
+.for-title span { color: var(--accent); }
+.for-tags {
+  display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;
+  margin-bottom: 56px;
+}
+.for-tag {
+  font-size: 13px; color: var(--text-mid);
+  border: 1px solid var(--border);
+  padding: 10px 20px; border-radius: 24px;
+  background: var(--glass);
+  transition: all 0.2s;
+}
+.for-tag:hover {
+  background: var(--glass-b);
+  color: rgba(255,248,235,0.75);
+  border-color: rgba(255,255,255,0.1);
+}
+.for-quote {
+  font-size: clamp(18px, 2.5vw, 24px);
+  font-weight: 300; font-style: italic;
+  color: var(--text-mid); line-height: 1.6;
+  max-width: 600px; margin: 0 auto;
+  border-left: 2px solid rgba(200,150,62,0.3);
+  padding-left: 24px; text-align: left;
+}
+.for-quote-src {
+  font-size: 11px; color: var(--text-dim); margin-top: 12px;
+  font-style: normal; letter-spacing: 0.5px; padding-left: 24px;
+  text-align: left;
+}
+
+/* ── DIFF TABLE ───────────────────────────────────── */
+.section-diff {
+  padding: 80px 24px 100px;
+}
+.diff-header { text-align: center; margin-bottom: 48px; }
+.diff-table {
+  max-width: 720px; margin: 0 auto;
+  border: 1px solid var(--border); border-radius: 16px; overflow: hidden;
+}
+.diff-row {
+  display: grid; grid-template-columns: 1fr 1fr 1fr;
+  border-bottom: 1px solid var(--border);
+}
+.diff-row:last-child { border-bottom: none; }
+.diff-row.header {
+  background: rgba(255,255,255,0.02);
+}
+.diff-cell {
+  padding: 14px 18px;
+  font-size: 12px; color: var(--text-dim);
+  border-right: 1px solid var(--border);
+  line-height: 1.5;
+}
+.diff-cell:last-child { border-right: none; }
+.diff-row.header .diff-cell {
+  font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase;
+  color: var(--text-dim);
+}
+.diff-cell.them { color: rgba(255,255,255,0.3); }
+.diff-cell.lea  { color: rgba(255,248,235,0.75); }
+.diff-cell.lea strong { color: var(--accent); font-weight: 500; }
+.diff-cell.topic { color: var(--text-mid); font-weight: 400; font-size: 12px; }
+
+/* ── EARLY ACCESS CTA ─────────────────────────────── */
+.section-cta {
+  padding: 80px 24px 120px;
+}
+.cta-box {
+  max-width: 640px; margin: 0 auto;
+  background: var(--glass);
+  border: 1px solid var(--border);
+  border-radius: 24px; padding: 56px 48px;
+  text-align: center; position: relative; overflow: hidden;
+  box-shadow: 0 40px 80px rgba(0,0,0,0.4);
+}
+.cta-box::before {
+  content: '';
+  position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+  width: 200px; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent-glow), transparent);
+}
+.cta-box::after {
+  content: '';
+  position: absolute; top: -200px; left: 50%; transform: translateX(-50%);
+  width: 400px; height: 400px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(200,150,62,0.05) 0%, transparent 65%);
+  pointer-events: none;
+}
+.cta-badge {
+  display: inline-block;
+  font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--accent); border: 1px solid rgba(200,150,62,0.3);
+  background: var(--accent-lo); padding: 5px 14px; border-radius: 20px;
+  margin-bottom: 28px;
+}
+.cta-title {
+  font-size: clamp(26px, 4vw, 36px);
+  font-weight: 300; letter-spacing: -0.8px;
+  color: rgba(255,248,235,0.92); line-height: 1.25;
+  margin-bottom: 16px;
+}
+.cta-sub {
+  font-size: 14px; color: var(--text-dim); line-height: 1.7;
+  margin-bottom: 36px;
+}
+.cta-form {
+  display: flex; gap: 10px; max-width: 420px; margin: 0 auto 24px;
+}
+.cta-input {
+  flex: 1;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  border-radius: 20px; padding: 12px 18px;
+  font-size: 13px; color: var(--text);
+  outline: none; transition: border-color 0.2s;
+  font-family: inherit;
+}
+.cta-input::placeholder { color: var(--text-dim); }
+.cta-input:focus { border-color: rgba(200,150,62,0.35); }
+.cta-submit {
+  background: linear-gradient(135deg, #c8963e, #b07a2e);
+  color: rgba(7,7,13,0.95); font-weight: 600;
+  font-size: 13px; padding: 12px 22px; border-radius: 20px;
+  border: none; cursor: pointer; white-space: nowrap;
+  transition: all 0.2s; font-family: inherit;
+}
+.cta-submit:hover {
+  box-shadow: 0 4px 20px rgba(200,150,62,0.3);
+  transform: translateY(-1px);
+}
+.cta-features {
+  display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;
+}
+.cta-feature {
+  font-size: 11px; color: var(--text-dim);
+  display: flex; align-items: center; gap: 5px;
+}
+.cta-feature::before { content: '✓'; color: var(--accent); font-size: 10px; }
+.cta-price-note {
+  margin-top: 20px; font-size: 12px; color: var(--text-dim); letter-spacing: 0.3px;
+}
+.cta-price-note strong { color: rgba(255,248,235,0.65); }
+
+/* ── FOOTER ───────────────────────────────────────── */
+footer {
+  position: relative; z-index: 1;
+  padding: 32px 40px;
+  border-top: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 16px;
+}
+.footer-left { display: flex; align-items: center; gap: 12px; }
+.footer-logo-mark {
+  width: 22px; height: 22px; border-radius: 50%;
+  background: linear-gradient(135deg, rgba(200,150,62,0.15), rgba(139,92,246,0.12));
+  border: 1px solid rgba(200,150,62,0.2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px; color: rgba(255,248,235,0.7); font-weight: 600;
+  letter-spacing: 0.5px;
+}
+.footer-brand { font-size: 11px; color: var(--text-dim); letter-spacing: 0.5px; }
+.footer-right {
+  display: flex; align-items: center; gap: 24px;
+}
+.footer-link {
+  font-size: 11px; color: var(--text-dim); text-decoration: none;
+  transition: color 0.2s; letter-spacing: 0.3px;
+}
+.footer-link:hover { color: var(--text-mid); }
+.footer-copy {
+  font-size: 11px; color: var(--text-dim); letter-spacing: 0.3px;
+}
+
+/* ── ANIMATIONS ───────────────────────────────────── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── RESPONSIVE ───────────────────────────────────── */
+@media (max-width: 768px) {
+  nav { padding: 0 20px; }
+  .nav-cta { gap: 8px; }
+  .features-grid { grid-template-columns: 1fr; max-width: 440px; }
+  .statement-grid { grid-template-columns: 1fr; gap: 40px; }
+  .diff-table { overflow-x: auto; }
+  .cta-box { padding: 40px 24px; }
+  .cta-form { flex-direction: column; }
+  footer { flex-direction: column; align-items: flex-start; }
+  .preview-body { grid-template-columns: 1fr; }
+  .preview-sidebar { display: none; }
+}
+@media (max-width: 480px) {
+  .hero-title { letter-spacing: -0.8px; }
+  .nav-link { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- Orbs -->
+<div class="orb" id="orb1"></div>
+<div class="orb" id="orb2"></div>
+<div class="orb" id="orb3"></div>
+
+<!-- Nav -->
+<nav>
+  <a class="nav-logo" href="#">
+    <div class="nav-logo-mark">L</div>
+    <span class="nav-logo-text">LEA</span>
+    <span class="nav-badge">EARLY ACCESS</span>
+  </a>
+  <div class="nav-cta">
+    <a href="#features" class="nav-link">Features</a>
+    <a href="#for-who" class="nav-link">Who it's for</a>
+    <a href="#access" class="btn-ghost">Get access</a>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-eyebrow">Personal AI Workspace</div>
+  <h1 class="hero-title">
+    Continue your work<br><em>naturally.</em>
+  </h1>
+  <p class="hero-sub">
+    LEA remembers where you left off. Organize projects, ideas, and unfinished work — without losing context between sessions.
+  </p>
+  <div class="hero-actions">
+    <a href="#access" class="btn-primary">
+      Request early access
+      <span>→</span>
+    </a>
+    <a href="#features" class="btn-secondary">See how it works</a>
+  </div>
+  <p class="hero-note">Local-first · No cloud · Your data stays on your device</p>
+</section>
+
+<!-- App Preview -->
+<div class="hero-preview">
+  <div class="preview-frame">
+    <div class="preview-bar">
+      <div class="preview-dot"></div>
+      <div class="preview-dot"></div>
+      <div class="preview-dot"></div>
+      <span class="preview-url">LEA · Personal Workspace</span>
+    </div>
+    <div class="preview-body">
+      <div class="preview-sidebar">
+        <div class="preview-sidebar-title">Projects</div>
+        <div class="sidebar-item active"><span class="dot"></span> Current</div>
+        <div class="sidebar-item"><span class="dot"></span> Ideas</div>
+        <div class="sidebar-item"><span class="dot"></span> Notes</div>
+        <div style="height:1px; background:var(--border); margin: 8px 0;"></div>
+        <div class="preview-sidebar-title">Memory</div>
+        <div class="sidebar-item"><span class="dot"></span> Last session</div>
+        <div class="sidebar-item"><span class="dot"></span> Context</div>
+      </div>
+      <div class="preview-main">
+        <div class="preview-session-tag">Continuing from yesterday</div>
+        <div class="preview-message lea">
+          <div class="preview-message-label">LEA</div>
+          <div class="preview-message-text">
+            Last time you were working on your landing page. You stopped after writing the hero copy — you weren't sure about the CTA. You also had three ideas you didn't finish: pricing model, who to contact first, and the demo flow.
+          </div>
+          <div class="preview-continue">Continue where you left off <span class="preview-arrow">→</span></div>
+        </div>
+        <div class="preview-message">
+          <div class="preview-message-label">You</div>
+          <div class="preview-message-text">Start with the pricing model.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Divider -->
+<div class="divider"></div>
+
+<!-- Statement -->
+<section class="section-statement">
+  <div class="statement-grid">
+    <div>
+      <div class="statement-label">The problem</div>
+      <div class="statement-text">
+        You lose <strong>hours every week</strong> re-reading old notes, re-discovering where you left off, re-building context you already built before.
+      </div>
+    </div>
+    <div class="statement-items">
+      <div class="statement-item">
+        <div class="statement-item-icon">⟳</div>
+        <div class="statement-item-text">
+          <h4>No more cold restarts</h4>
+          <p>LEA resumes sessions with full context — what you were building, what stopped you, what's next.</p>
+        </div>
+      </div>
+      <div class="statement-item">
+        <div class="statement-item-icon">◈</div>
+        <div class="statement-item-text">
+          <h4>Organized without effort</h4>
+          <p>Drop notes, ideas, or raw text. LEA groups them, finds the project, keeps the thread.</p>
+        </div>
+      </div>
+      <div class="statement-item">
+        <div class="statement-item-icon">◎</div>
+        <div class="statement-item-text">
+          <h4>Stays private, stays local</h4>
+          <p>No cloud sync. No accounts. Everything lives on your device.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Divider -->
+<div class="divider"></div>
+
+<!-- Features -->
+<section class="section-features" id="features">
+  <div class="features-header">
+    <div class="section-eyebrow">What LEA does</div>
+    <h2 class="section-title">Three flows that <em>actually matter</em></h2>
+  </div>
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-num">01</div>
+      <div class="feature-title">Continue Work</div>
+      <p class="feature-desc">Open LEA and get an instant recap — active projects, last ideas, what blocked you, what's next. Pick up in seconds, not minutes.</p>
+      <div class="feature-pills">
+        <span class="feature-pill">session restore</span>
+        <span class="feature-pill">context recap</span>
+        <span class="feature-pill">next steps</span>
+      </div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-num">02</div>
+      <div class="feature-title">Project Breakdown</div>
+      <p class="feature-desc">Tell LEA what you want to build. It breaks it into steps, creates structure, keeps it organized — so large goals don't stay large.</p>
+      <div class="feature-pills">
+        <span class="feature-pill">goal → steps</span>
+        <span class="feature-pill">structure</span>
+        <span class="feature-pill">clarity</span>
+      </div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-num">03</div>
+      <div class="feature-title">Organize Chaos</div>
+      <p class="feature-desc">Throw in notes, ideas, screenshots, raw text. LEA groups them, detects projects, and builds structure from your mess — automatically.</p>
+      <div class="feature-pills">
+        <span class="feature-pill">inbox</span>
+        <span class="feature-pill">grouping</span>
+        <span class="feature-pill">project detect</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Divider -->
+<div class="divider"></div>
+
+<!-- Who it's for -->
+<section class="section-for" id="for-who">
+  <div class="for-inner">
+    <h2 class="for-title">
+      Built for people who work on<br>
+      <span>too many things at once</span>
+    </h2>
+    <div class="for-tags">
+      <span class="for-tag">indie builders</span>
+      <span class="for-tag">solo creators</span>
+      <span class="for-tag">ADHD builders</span>
+      <span class="for-tag">writers with 30 open tabs</span>
+      <span class="for-tag">people with long-term projects</span>
+      <span class="for-tag">anyone who loses context daily</span>
+    </div>
+    <blockquote class="for-quote">
+      ChatGPT knows everything about the world, nothing about you.<br>
+      LEA doesn't know everything about the world — but your work is its world.
+    </blockquote>
+    <p class="for-quote-src">— VV Hybrid Universe</p>
+  </div>
+</section>
+
+<!-- Divider -->
+<div class="divider"></div>
+
+<!-- Comparison -->
+<section class="section-diff">
+  <div class="diff-header">
+    <div class="section-eyebrow">Why LEA is different</div>
+    <h2 class="section-title">Not another AI chatbot</h2>
+  </div>
+  <div class="diff-table">
+    <div class="diff-row header">
+      <div class="diff-cell"></div>
+      <div class="diff-cell">ChatGPT / others</div>
+      <div class="diff-cell">LEA</div>
+    </div>
+    <div class="diff-row">
+      <div class="diff-cell topic">Remembers your work</div>
+      <div class="diff-cell them">Starts fresh each time</div>
+      <div class="diff-cell lea"><strong>Full session continuity</strong></div>
+    </div>
+    <div class="diff-row">
+      <div class="diff-cell topic">Your data</div>
+      <div class="diff-cell them">Stored on their servers</div>
+      <div class="diff-cell lea"><strong>Stays on your device</strong></div>
+    </div>
+    <div class="diff-row">
+      <div class="diff-cell topic">Project organization</div>
+      <div class="diff-cell them">You organize, it answers</div>
+      <div class="diff-cell lea"><strong>LEA organizes for you</strong></div>
+    </div>
+    <div class="diff-row">
+      <div class="diff-cell topic">Works offline</div>
+      <div class="diff-cell them">Requires internet</div>
+      <div class="diff-cell lea"><strong>Local-first, offline-ready</strong></div>
+    </div>
+    <div class="diff-row">
+      <div class="diff-cell topic">Knows who you are</div>
+      <div class="diff-cell them">Treats everyone the same</div>
+      <div class="diff-cell lea"><strong>Learns you over time</strong></div>
+    </div>
+  </div>
+</section>
+
+<!-- Divider -->
+<div class="divider"></div>
+
+<!-- CTA -->
+<section class="section-cta" id="access">
+  <div class="cta-box">
+    <span class="cta-badge">Early Access</span>
+    <h2 class="cta-title">Small release.<br>Real product.</h2>
+    <p class="cta-sub">
+      Join the first users. Get access while it's early — and help shape what LEA becomes.
+    </p>
+    <form class="cta-form" onsubmit="handleSubmit(event)">
+      <input type="email" class="cta-input" placeholder="your@email.com" required>
+      <button type="submit" class="cta-submit">Get access</button>
+    </form>
+    <div class="cta-features">
+      <span class="cta-feature">Persistent memory</span>
+      <span class="cta-feature">Project organization</span>
+      <span class="cta-feature">Session continuity</span>
+      <span class="cta-feature">Local-first</span>
+      <span class="cta-feature">Works offline</span>
+    </div>
+    <p class="cta-price-note">Free during early access · <strong>€9/mo</strong> when PRO launches · No commitment</p>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <div class="footer-left">
+    <div class="footer-logo-mark">L</div>
+    <span class="footer-brand">LEA by VV Hybrid Universe · Cosmin Toma</span>
+  </div>
+  <div class="footer-right">
+    <a href="mailto:vv.ep.team@gmail.com" class="footer-link">Contact</a>
+    <span class="footer-copy">© 2026</span>
+  </div>
+</footer>
+
+<script>
+function handleSubmit(e) {
+  e.preventDefault();
+  const input = e.target.querySelector('input');
+  const btn   = e.target.querySelector('button');
+  const email = input.value;
+
+  btn.textContent = '...';
+  btn.disabled = true;
+
+  // Trimite la Formspree — înlocuiește YOUR_FORM_ID cu cel real
+  fetch('https://formspree.io/f/YOUR_FORM_ID', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+    body: JSON.stringify({ email, source: 'lea-landing' })
+  })
+  .then(r => r.json())
+  .then(data => {
+    input.style.display = 'none';
+    btn.style.display = 'none';
+    const msg = document.createElement('div');
+    msg.style.cssText = 'font-size:14px;color:rgba(200,150,62,0.9);padding:8px 0;';
+    msg.textContent = 'You\'re on the list. We\'ll reach out soon.';
+    e.target.appendChild(msg);
+  })
+  .catch(() => {
+    btn.textContent = 'Get access';
+    btn.disabled = false;
+    alert('Something went wrong. Email us directly: vv.ep.team@gmail.com');
+  });
+}
+
+// Smooth reveal on scroll
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.style.opacity = '1';
+      entry.target.style.transform = 'translateY(0)';
+    }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.feature-card, .statement-item, .for-tag, .diff-row:not(.header)').forEach(el => {
+  el.style.cssText += 'opacity:0;transform:translateY(14px);transition:opacity 0.5s ease,transform 0.5s ease;';
+  observer.observe(el);
+});
+</script>
+
+</body>
+</html>
