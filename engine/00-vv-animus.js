@@ -1,7 +1,7 @@
 // ============================================================
 // VV ANIMUS — Creierul Central LEA
 // Hibrid Inteligent: HiT + HiN + HiM + HiE + HiD
-// Cosmin Toma / VV Technologies — Mai 2026
+// Cosmin Toma / VV Hybrid Universe — Mai 2026
 // Toate drepturile rezervate.
 //
 // API public: window.Lea.think(text) → rezultat complet
@@ -186,7 +186,8 @@ var VVAnimus = (function () {
   var _him = {
     scena_curenta: { subiecte: [], emotie: 'neutru', vreme: null, moment: null },
     conversatie:   [],
-    profil:        { frecventa: {}, evita: [] }
+    profil:        { frecventa: {}, evita: [] },
+    stats:         { tone: {}, total: 0 }
   };
 
   try {
@@ -215,6 +216,11 @@ var VVAnimus = (function () {
       });
       if (result.tone && result.tone !== 'neutru') _him.scena_curenta.emotie = result.tone;
     }
+    // Statistici tonuri
+    if (!_him.stats) _him.stats = { tone: {}, total: 0 };
+    var t = result.tone || 'neutru';
+    _him.stats.tone[t] = (_him.stats.tone[t] || 0) + 1;
+    _him.stats.total   = (_him.stats.total  || 0) + 1;
     himSave();
   }
 
@@ -222,9 +228,12 @@ var VVAnimus = (function () {
     return {
       scena:      _him.scena_curenta,
       ultimele:   _him.conversatie.slice(-3),
-      preferinte: Object.keys(_him.profil.frecventa).sort(function(a, b) {
+      preferinte: Object.keys(_him.profil.frecventa).filter(function(k) {
+        return _him.profil.frecventa[k] >= 2;
+      }).sort(function(a, b) {
         return (_him.profil.frecventa[b] || 0) - (_him.profil.frecventa[a] || 0);
-      }).slice(0, 5)
+      }).slice(0, 5),
+      stats: _him.stats || { tone: {}, total: 0 }
     };
   }
 
@@ -279,14 +288,99 @@ var VVAnimus = (function () {
     try { localStorage.setItem('vv_animus_kb', JSON.stringify(_kb)); } catch(e) {}
   }
 
+  function kbClear() {
+    _kb = {};
+    try { localStorage.removeItem('vv_animus_kb'); } catch(e) {}
+  }
+
+  // ════════════════════════════════════════════════════════
+  // HiS — Starea Lea + Moduri
+  // Lea are propria stare emoțională și mod de răspuns
+  // ════════════════════════════════════════════════════════
+
+  var _mod = 'creativ'; // creativ | direct | profund | studio
+
+  var _leaState = {
+    stare:        'asteptare', // asteptare | curiozitate | energie | atentie | oboseala
+    exchanges:    0,
+    energieTicks: 0,
+    atentieTicks: 0
+  };
+
+  function leaStateUpdate(result) {
+    _leaState.exchanges++;
+
+    if (result.tone === 'bucuros') {
+      _leaState.stare = 'energie'; _leaState.energieTicks = 3; return;
+    }
+    if (result.tone === 'trist' || result.tone === 'speriat' || result.type === 'emotie') {
+      _leaState.stare = 'atentie'; _leaState.atentieTicks = 2; return;
+    }
+    if (_leaState.exchanges > 14) { _leaState.stare = 'oboseala'; return; }
+
+    if (_leaState.energieTicks > 0) {
+      _leaState.energieTicks--;
+      if (_leaState.energieTicks > 0) { _leaState.stare = 'energie'; return; }
+    }
+    if (_leaState.atentieTicks > 0) {
+      _leaState.atentieTicks--;
+      if (_leaState.atentieTicks > 0) { _leaState.stare = 'atentie'; return; }
+    }
+    if (result.type === 'scena' || result.type === 'creativ' || result.type === 'intrebare') {
+      _leaState.stare = 'curiozitate'; return;
+    }
+    _leaState.stare = 'asteptare';
+  }
+
+  var MOD_PROFUND_Q = [
+    'Ce te-a adus la asta azi?',
+    'De unde vine imaginea asta?',
+    'E ceva din tine în scenă?',
+    'Ce simți față de asta?',
+    'Unde se duce asta în mintea ta?',
+    'Ce rămâne după?'
+  ];
+
+  var MOD_STUDIO_D = [
+    'Plan larg. Lumina din spate.',
+    'Prim-plan. Umbră pe jumătate de față.',
+    'Plan de ansamblu. Sunet de fond dominant.',
+    'Mișcare lentă. Culori desaturate.',
+    'Lumina laterală dură. Niciun sunet.',
+    'Teleobiectiv. Subiect izolat.'
+  ];
+
+  function applyMod(response) {
+    if (_mod === 'direct') {
+      var first = response.split(/[.!\n]/)[0].trim();
+      return first ? first + '.' : response;
+    }
+    if (_mod === 'profund') {
+      var q = MOD_PROFUND_Q[Math.floor(Math.random() * MOD_PROFUND_Q.length)];
+      return response + '\n\n' + q;
+    }
+    if (_mod === 'studio') {
+      var d = MOD_STUDIO_D[Math.floor(Math.random() * MOD_STUDIO_D.length)];
+      return response + '\n\n— ' + d;
+    }
+    return response;
+  }
+
+  function setMod(mod) {
+    if (['creativ','direct','profund','studio'].indexOf(mod) !== -1) _mod = mod;
+  }
+
+  function getMod()       { return _mod; }
+  function getLeaState()  { return { stare: _leaState.stare, mod: _mod, exchanges: _leaState.exchanges }; }
+
   // Tipare de detectat ce trebuie reținut
   var HIK_PATTERNS = [
     { rx: /ma cheama\s+(\w+)/i,              key: 'nume',        fmt: function(m){ return m[1]; } },
     { rx: /am\s+(\d+)\s+ani/i,               key: 'varsta',      fmt: function(m){ return m[1] + ' ani'; } },
-    { rx: /lucrez\s+(?:la|ca|in)\s+(.+)/i,   key: 'job',         fmt: function(m){ return m[1].trim(); } },
-    { rx: /locuiesc\s+(?:in|la)\s+(.+)/i,    key: 'oras',        fmt: function(m){ return m[1].trim(); } },
-    { rx: /imi place\s+(.+)/i,               key: null,          fmt: function(m){ return m[1].trim(); }, category: 'place' },
-    { rx: /nu imi place\s+(.+)/i,            key: null,          fmt: function(m){ return m[1].trim(); }, category: 'nu_place' },
+    { rx: /lucrez\s+(?:la|ca|in)\s+([^,!?;\.]+?)(?:\s*[,!?;]|\s+stii|\s+ok|\s+da\b|$)/i, key: 'job', fmt: function(m){ return m[1].trim(); } },
+    { rx: /locuiesc\s+(?:in|la)\s+([^,!?;\.]+?)(?:\s*[,!?;]|$)/i, key: 'oras', fmt: function(m){ return m[1].trim(); } },
+    { rx: /imi place\s+([^,!?;\.]+)/i,       key: null,          fmt: function(m){ return m[1].trim(); }, category: 'place' },
+    { rx: /nu imi place\s+([^,!?;\.]+)/i,    key: null,          fmt: function(m){ return m[1].trim(); }, category: 'nu_place' },
     { rx: /retine\s+(?:ca\s+)?(.+)/i,        key: null,          fmt: function(m){ return m[1].trim(); }, category: 'nota' },
     { rx: /tine minte\s+(?:ca\s+)?(.+)/i,    key: null,          fmt: function(m){ return m[1].trim(); }, category: 'nota' },
     { rx: /sa stii\s+(?:ca\s+)?(.+)/i,       key: null,          fmt: function(m){ return m[1].trim(); }, category: 'nota' },
@@ -298,8 +392,12 @@ var VVAnimus = (function () {
       .replace(/ă/g,'a').replace(/â/g,'a').replace(/î/g,'i')
       .replace(/ș/g,'s').replace(/ş/g,'s').replace(/ț/g,'t').replace(/ţ/g,'t');
 
+    // Nu invata preferinte din intrebari
+    var isQuestion = /^(ce|cum|cand|cat|cati|cine|unde|care|de ce)\b/.test(n.trim()) || n.trim().endsWith('?');
+
     for (var i = 0; i < HIK_PATTERNS.length; i++) {
       var p = HIK_PATTERNS[i];
+      if (isQuestion && (p.category === 'place' || p.category === 'nu_place')) continue;
       var m = n.match(p.rx);
       if (m) {
         var val = p.fmt(m);
@@ -315,10 +413,12 @@ var VVAnimus = (function () {
 
   function hikResponse(detected) {
     var cat = detected.category || detected.key;
-    if (cat === 'nume')     return 'Am reținut. Te cheamă ' + detected.val + '.';
+    var capJob = function(s) { return s ? (s.length <= 4 ? s.toUpperCase() : s.charAt(0).toUpperCase() + s.slice(1).toLowerCase()) : s; };
+    var capName = function(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1).toLowerCase() : s; };
+    if (cat === 'nume')     return 'Am reținut. Te cheamă ' + capName(detected.val) + '.';
     if (cat === 'varsta')   return 'Notat. ' + detected.val + '.';
-    if (cat === 'job')      return 'Reținut — ' + detected.val + '.';
-    if (cat === 'oras')     return 'Știu acum. ' + detected.val + '.';
+    if (cat === 'job')      return 'Reținut — ' + capJob(detected.val) + '.';
+    if (cat === 'oras')     return 'Știu acum. ' + capName(detected.val) + '.';
     if (cat === 'place')    return 'Am notat că îți place ' + detected.val + '.';
     if (cat === 'nu_place') return 'Am notat. Evit ' + detected.val + '.';
     return 'Am reținut: ' + detected.val + '.';
@@ -448,6 +548,10 @@ var VVAnimus = (function () {
     'serios': ['Da, serios.', 'Absolut.'],
     'nimic': ['OK. Sunt aici.', 'Bine.'],
     'laramun': ['OK.', 'Bine.', 'Înțeles.'],
+    'bine': ['Bine.', 'E bine.', 'Să fie.'],
+    'super': ['Bine de tot.', 'Îmi place asta.', 'E bine.'],
+    'multumesc': ['Cu plăcere.', 'Oricând.'],
+    'mersi': ['Cu plăcere.', 'Oricând.'],
   };
 
   function getExpresieResponse(text) {
@@ -580,10 +684,12 @@ var VVAnimus = (function () {
       _rawText:   text
     };
 
-    result.response = generateResponse(result);
+    var _baseResp = generateResponse(result);
+    result.response = applyMod(_baseResp);
 
-    // 7. HiM — actualizează memoria
+    // 7. HiM + HiS — actualizează memoria și starea Lea
     himUpdate(text, result);
+    leaStateUpdate(result);
 
     return result;
   }
@@ -593,6 +699,7 @@ var VVAnimus = (function () {
   // ════════════════════════════════════════════════════════
 
   function feedback(isPositive) {
+    if (isPositive) { _leaState.stare = 'energie'; _leaState.energieTicks = 3; }
     return hidApply(isPositive);
   }
 
@@ -629,6 +736,11 @@ var VVAnimus = (function () {
     // KB Personal
     getKB:        kbGet,
     kbForget:     kbForget,
+    kbClear:      kbClear,
+    // Moduri și starea Lea
+    setMod:       setMod,
+    getMod:       getMod,
+    getLeaState:  getLeaState,
     // Acces direct la module (pentru debugging și extensii)
     _hit: hitClassify,
     _hin: hinInfer,
@@ -643,4 +755,5 @@ var VVAnimus = (function () {
 window.Lea    = VVAnimus;
 window.VVAnimus = VVAnimus;
 
-console.log('[VV ANIMUS] Creierul Lea activ — HiT + HiN + HiM + HiE + HiD');
+console.log('[VV ANIMUS] Creierul Lea activ — HiT + HiN + HiM + HiE + HiD + HiK + HiS');
+
