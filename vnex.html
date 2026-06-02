@@ -239,6 +239,30 @@ header{position:relative;z-index:10;max-width:1140px;margin:0 auto;padding:24px 
 </div>
 
 <div class="page-wrap" id="feed-anchor">
+  <!-- BARA CE POTI FACE ACUM -->
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px">
+    <a href="#" onclick="setTabByName('Need testers');return false" style="background:var(--s1);border:1px solid rgba(34,197,94,.2);border-radius:12px;padding:14px 16px;text-decoration:none;transition:all .2s;display:block" onmouseover="this.style.borderColor='rgba(34,197,94,.5)'" onmouseout="this.style.borderColor='rgba(34,197,94,.2)'">
+      <div style="font-size:18px;margin-bottom:5px">🧪</div>
+      <div style="font-size:18px;font-weight:900;color:#4ade80;letter-spacing:-1px">3</div>
+      <div style="font-size:11px;color:var(--muted2);margin-top:2px">apps need testers</div>
+    </a>
+    <a href="#" onclick="setTabByName('Need help');return false" style="background:var(--s1);border:1px solid rgba(239,68,68,.2);border-radius:12px;padding:14px 16px;text-decoration:none;transition:all .2s;display:block" onmouseover="this.style.borderColor='rgba(239,68,68,.5)'" onmouseout="this.style.borderColor='rgba(239,68,68,.2)'">
+      <div style="font-size:18px;margin-bottom:5px">🆘</div>
+      <div style="font-size:18px;font-weight:900;color:#f87171;letter-spacing:-1px">2</div>
+      <div style="font-size:11px;color:var(--muted2);margin-top:2px">builders stuck</div>
+    </a>
+    <a href="#" onclick="setTabByName('Need ideas');return false" style="background:var(--s1);border:1px solid rgba(168,85,247,.2);border-radius:12px;padding:14px 16px;text-decoration:none;transition:all .2s;display:block" onmouseover="this.style.borderColor='rgba(168,85,247,.5)'" onmouseout="this.style.borderColor='rgba(168,85,247,.2)'">
+      <div style="font-size:18px;margin-bottom:5px">💡</div>
+      <div style="font-size:18px;font-weight:900;color:#c084fc;letter-spacing:-1px">12</div>
+      <div style="font-size:11px;color:var(--muted2);margin-top:2px">votes active</div>
+    </a>
+    <a href="#" onclick="setTabByName('Launched');return false" style="background:var(--s1);border:1px solid rgba(99,102,241,.2);border-radius:12px;padding:14px 16px;text-decoration:none;transition:all .2s;display:block" onmouseover="this.style.borderColor='rgba(99,102,241,.5)'" onmouseout="this.style.borderColor='rgba(99,102,241,.2)'">
+      <div style="font-size:18px;margin-bottom:5px">🚀</div>
+      <div style="font-size:18px;font-weight:900;color:var(--accent2);letter-spacing:-1px">5</div>
+      <div style="font-size:11px;color:var(--muted2);margin-top:2px">launched recently</div>
+    </a>
+  </div>
+
   <div class="filter-row">
     <div class="tabs">
       <button class="tab active" onclick="setTab(this)">🔥 Trending</button>
@@ -300,7 +324,10 @@ header{position:relative;z-index:10;max-width:1140px;margin:0 auto;padding:24px 
             </div>
           </div>
           <div class="feedback-board">
-            <div class="fb-label">Give feedback</div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+              <div class="fb-label" style="margin-bottom:0">Give feedback</div>
+              <a href="https://hilea.eu/solvo.html" target="_blank" style="display:inline-flex;align-items:center;gap:5px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);border-radius:8px;padding:5px 12px;font-size:11px;font-weight:700;color:#4ade80;text-decoration:none;transition:all .2s" onmouseover="this.style.background='rgba(34,197,94,.18)'" onmouseout="this.style.background='rgba(34,197,94,.1)'">▶ Try now</a>
+            </div>
             <div class="fb-actions">
               <button class="fb-btn suggest" onclick="openFeedback('Solvo','suggest')">💡 Suggest</button>
               <button class="fb-btn bug" onclick="openFeedback('Solvo','bug')">🐛 Bug</button>
@@ -349,7 +376,10 @@ header{position:relative;z-index:10;max-width:1140px;margin:0 auto;padding:24px 
             </div>
           </div>
           <div class="feedback-board">
-            <div class="fb-label">Give feedback</div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+              <div class="fb-label" style="margin-bottom:0">Give feedback</div>
+              <a href="https://hilea.eu/lea-home.html" target="_blank" style="display:inline-flex;align-items:center;gap:5px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);border-radius:8px;padding:5px 12px;font-size:11px;font-weight:700;color:#4ade80;text-decoration:none;transition:all .2s" onmouseover="this.style.background='rgba(34,197,94,.18)'" onmouseout="this.style.background='rgba(34,197,94,.1)'">▶ Try now</a>
+            </div>
             <div class="fb-actions">
               <button class="fb-btn suggest" onclick="openFeedback('LEA','suggest')">💡 Suggest</button>
               <button class="fb-btn bug" onclick="openFeedback('LEA','bug')">🐛 Bug</button>
@@ -651,6 +681,11 @@ function scrollFeed(){ document.getElementById('feed-anchor').scrollIntoView({be
 function setTab(el){
   document.querySelectorAll('.tab').forEach(function(t){ t.classList.remove('active'); });
   el.classList.add('active');
+}
+function setTabByName(name){
+  document.querySelectorAll('.tab').forEach(function(t){
+    if (t.textContent.indexOf(name) !== -1) { t.click(); t.scrollIntoView({behavior:'smooth',block:'center'}); }
+  });
 }
 
 function openModal(id){ document.getElementById(id).style.display='flex'; }
