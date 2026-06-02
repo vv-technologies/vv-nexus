@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VNEX — Follow projects, not people.</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#080810;--s1:#0f0f1a;--s2:#13131f;
+  --border:rgba(255,255,255,.06);--border2:rgba(255,255,255,.1);
+  --text:#eeeeff;--muted:#6b6884;--muted2:#9b99b4;
+  --green:#22c55e;--yellow:#eab308;--red:#ef4444;--blue:#3b82f6;--white:#94a3b8;
+  --accent:#6366f1;--accent2:#818cf8;
+}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,-apple-system,sans-serif;min-height:100vh;overflow-x:hidden}
+
+body::before{content:'';position:fixed;inset:0;
+  background:radial-gradient(ellipse 70% 40% at 50% 0%,rgba(99,102,241,.1) 0%,transparent 60%),
+             radial-gradient(ellipse 40% 30% at 80% 80%,rgba(34,197,94,.05) 0%,transparent 60%);
+  pointer-events:none;z-index:0}
+
+/* ── HEADER ── */
+header{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:28px 24px 0;display:flex;align-items:center;justify-content:space-between}
+.logo{font-size:22px;font-weight:900;letter-spacing:-1px;color:var(--text)}
+.logo span{color:var(--accent)}
+.header-right{display:flex;align-items:center;gap:12px}
+.btn-header{background:var(--accent);color:#fff;border:none;border-radius:9px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s}
+.btn-header:hover{background:var(--accent2);box-shadow:0 4px 16px rgba(99,102,241,.4)}
+.btn-header-ghost{background:none;border:1px solid var(--border2);border-radius:9px;padding:9px 18px;font-size:13px;color:var(--muted2);cursor:pointer;transition:all .2s}
+.btn-header-ghost:hover{border-color:var(--accent);color:var(--accent2)}
+
+/* ── HERO ── */
+.hero{position:relative;z-index:1;text-align:center;padding:70px 24px 56px;max-width:700px;margin:0 auto}
+.hero-tag{display:inline-flex;align-items:center;gap:7px;background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.25);border-radius:100px;padding:5px 14px;font-size:12px;color:var(--accent2);margin-bottom:24px}
+.live-dot{width:6px;height:6px;background:var(--green);border-radius:50%;box-shadow:0 0 6px var(--green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.hero h1{font-size:clamp(36px,6vw,60px);font-weight:900;letter-spacing:-2px;line-height:1.05;margin-bottom:18px}
+.hero h1 span{color:var(--accent)}
+.hero p{font-size:16px;color:var(--muted2);line-height:1.6;margin-bottom:36px;max-width:500px;margin-left:auto;margin-right:auto}
+.hero-cta{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap}
+.btn-big{background:var(--accent);color:#fff;border:none;border-radius:12px;padding:15px 32px;font-size:15px;font-weight:700;cursor:pointer;transition:all .2s;box-shadow:0 4px 24px rgba(99,102,241,.35)}
+.btn-big:hover{background:var(--accent2);box-shadow:0 6px 30px rgba(99,102,241,.5);transform:translateY(-1px)}
+.btn-outline{background:none;border:1.5px solid var(--border2);border-radius:12px;padding:15px 28px;font-size:15px;color:var(--muted2);cursor:pointer;transition:all .2s}
+.btn-outline:hover{border-color:var(--accent);color:var(--accent2)}
+.hero-stats{display:flex;align-items:center;justify-content:center;gap:32px;margin-top:40px;flex-wrap:wrap}
+.hero-stat-val{font-size:24px;font-weight:800;color:var(--text)}
+.hero-stat-label{font-size:11px;color:var(--muted);margin-top:2px}
+
+/* ── TABS ── */
+.tabs-wrap{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:0 24px;margin-bottom:24px}
+.tabs{display:flex;gap:4px;background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:4px;width:fit-content}
+.tab{padding:8px 18px;border-radius:9px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;transition:all .2s;border:none;background:none}
+.tab.active{background:var(--accent);color:#fff}
+.tab:hover:not(.active){color:var(--text)}
+
+/* ── FEED ── */
+.feed-wrap{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:0 24px 80px;display:grid;grid-template-columns:1fr 320px;gap:24px}
+.feed{display:flex;flex-direction:column;gap:14px}
+.sidebar{display:flex;flex-direction:column;gap:16px}
+
+/* ── PROJECT CARD ── */
+.pcard{background:var(--s1);border:1px solid var(--border);border-radius:16px;padding:22px;transition:all .2s;cursor:pointer;position:relative;overflow:hidden}
+.pcard::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:2px 2px 0 0;opacity:0;transition:opacity .2s}
+.pcard.green::before{background:var(--green);opacity:1}
+.pcard.yellow::before{background:var(--yellow);opacity:1}
+.pcard.red::before{background:var(--red);opacity:1}
+.pcard.blue::before{background:var(--blue);opacity:1}
+.pcard:hover{border-color:var(--border2);transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,0,0,.3)}
+.pcard-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;gap:12px}
+.pcard-left{display:flex;align-items:center;gap:12px}
+.pcard-emoji{font-size:28px;flex-shrink:0}
+.pcard-name{font-size:16px;font-weight:700;color:var(--text)}
+.pcard-by{font-size:11px;color:var(--muted);margin-top:2px}
+.pcard-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0}
+.status-badge{display:inline-flex;align-items:center;gap:5px;border-radius:100px;padding:4px 10px;font-size:11px;font-weight:700;white-space:nowrap}
+.status-badge.launched{background:rgba(34,197,94,.12);color:var(--green);border:1px solid rgba(34,197,94,.2)}
+.status-badge.building{background:rgba(234,179,8,.12);color:var(--yellow);border:1px solid rgba(234,179,8,.2)}
+.status-badge.stuck{background:rgba(239,68,68,.12);color:var(--red);border:1px solid rgba(239,68,68,.2)}
+.status-badge.idea{background:rgba(148,163,184,.1);color:var(--muted2);border:1px solid rgba(148,163,184,.15)}
+.day-count{font-size:11px;color:var(--muted);text-align:right}
+.pcard-desc{font-size:13px;color:var(--muted2);line-height:1.5;margin-bottom:14px}
+.pcard-update{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px;padding:10px 14px;font-size:12px;color:var(--muted2);line-height:1.5;margin-bottom:14px}
+.pcard-update-label{font-size:10px;color:var(--accent2);font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-bottom:4px}
+.pcard-footer{display:flex;align-items:center;justify-content:space-between}
+.pcard-tags{display:flex;gap:6px;flex-wrap:wrap}
+.tag{background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:6px;padding:3px 8px;font-size:10px;color:var(--muted2)}
+.pcard-actions{display:flex;gap:8px}
+.btn-follow{background:none;border:1px solid var(--border2);border-radius:8px;padding:6px 14px;font-size:12px;color:var(--muted2);cursor:pointer;transition:all .2s;font-weight:600}
+.btn-follow:hover{border-color:var(--accent);color:var(--accent2)}
+.btn-test{background:rgba(99,102,241,.12);border:1px solid rgba(99,102,241,.25);border-radius:8px;padding:6px 14px;font-size:12px;color:var(--accent2);cursor:pointer;transition:all .2s;font-weight:600}
+.btn-test:hover{background:rgba(99,102,241,.2);border-color:var(--accent)}
+.btn-help{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);border-radius:8px;padding:6px 14px;font-size:12px;color:#f87171;cursor:pointer;transition:all .2s;font-weight:600}
+.btn-help:hover{background:rgba(239,68,68,.18)}
+
+/* ── STUCK BANNER ── */
+.stuck-banner{background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.2);border-radius:10px;padding:12px 14px;margin-bottom:14px}
+.stuck-banner-title{font-size:12px;font-weight:700;color:#f87171;margin-bottom:4px}
+.stuck-banner-text{font-size:12px;color:var(--muted2);line-height:1.5}
+
+/* ── SIDEBAR CARDS ── */
+.scard{background:var(--s1);border:1px solid var(--border);border-radius:14px;padding:20px}
+.scard-title{font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:14px}
+.need-testers-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)}
+.need-testers-item:last-child{border-bottom:none}
+.nti-emoji{font-size:18px;flex-shrink:0}
+.nti-name{font-size:13px;font-weight:600;flex:1}
+.nti-btn{background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.2);border-radius:7px;padding:4px 10px;font-size:11px;color:var(--accent2);cursor:pointer;transition:all .2s;white-space:nowrap}
+.nti-btn:hover{background:rgba(99,102,241,.2)}
+.leaderboard-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)}
+.leaderboard-item:last-child{border-bottom:none}
+.lb-rank{font-size:13px;font-weight:800;color:var(--muted);width:20px;flex-shrink:0}
+.lb-rank.gold{color:#f59e0b}
+.lb-rank.silver{color:#94a3b8}
+.lb-rank.bronze{color:#92400e}
+.lb-name{flex:1;font-size:13px}
+.lb-score{font-size:12px;color:var(--accent2);font-weight:700}
+.join-box{background:linear-gradient(135deg,rgba(99,102,241,.12),rgba(129,140,248,.06));border:1px solid rgba(99,102,241,.2);border-radius:14px;padding:20px;text-align:center}
+.join-box h3{font-size:15px;font-weight:700;margin-bottom:6px}
+.join-box p{font-size:12px;color:var(--muted2);margin-bottom:16px;line-height:1.5}
+.join-input{width:100%;background:rgba(255,255,255,.05);border:1.5px solid var(--border2);border-radius:9px;color:var(--text);font-size:13px;padding:10px 14px;outline:none;margin-bottom:10px;font-family:inherit}
+.join-input:focus{border-color:var(--accent)}
+.join-input::placeholder{color:var(--muted)}
+.btn-join{width:100%;background:var(--accent);color:#fff;border:none;border-radius:9px;padding:11px;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s}
+.btn-join:hover{background:var(--accent2);box-shadow:0 4px 16px rgba(99,102,241,.35)}
+.join-note{font-size:10px;color:var(--muted);margin-top:6px}
+
+/* ── MODAL ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px}
+.modal{background:#0f0f1a;border:1px solid var(--border2);border-radius:20px;padding:32px;width:100%;max-width:460px;position:relative}
+.modal-close{position:absolute;top:14px;right:16px;background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer}
+.modal h2{font-size:20px;font-weight:800;margin-bottom:6px}
+.modal p{font-size:13px;color:var(--muted2);margin-bottom:20px;line-height:1.5}
+.modal input,.modal textarea{width:100%;background:rgba(255,255,255,.04);border:1.5px solid var(--border2);border-radius:10px;color:var(--text);font-size:14px;padding:12px 14px;outline:none;font-family:inherit;margin-bottom:12px}
+.modal input:focus,.modal textarea:focus{border-color:var(--accent)}
+.modal textarea{height:80px;resize:none}
+.modal-btn{width:100%;background:var(--accent);color:#fff;border:none;border-radius:11px;padding:14px;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s}
+.modal-btn:hover{background:var(--accent2)}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(12px);background:#22c55e;color:#0a0a12;padding:10px 22px;border-radius:100px;font-weight:700;font-size:13px;opacity:0;transition:all .3s;pointer-events:none;z-index:999}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+@media(max-width:800px){
+  .feed-wrap{grid-template-columns:1fr}
+  .sidebar{display:none}
+  .hero h1{font-size:36px}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">V<span>NEX</span></div>
+  <div class="header-right">
+    <button class="btn-header-ghost" onclick="openPostModal()">+ Post project</button>
+    <button class="btn-header" onclick="openJoinModal()">Join waitlist</button>
+  </div>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-tag"><div class="live-dot"></div> Early access — building in public</div>
+  <h1>Follow <span>projects</span>,<br>not people.</h1>
+  <p>VNEX is where builders post real progress, testers give feedback, and followers discover what's being built right now.</p>
+  <div class="hero-cta">
+    <button class="btn-big" onclick="openJoinModal()">Join the waitlist</button>
+    <button class="btn-outline" onclick="scrollToFeed()">Explore projects ↓</button>
+  </div>
+  <div class="hero-stats">
+    <div><div class="hero-stat-val">12</div><div class="hero-stat-label">Projects live</div></div>
+    <div style="width:1px;height:32px;background:var(--border)"></div>
+    <div><div class="hero-stat-val">47</div><div class="hero-stat-label">Builders</div></div>
+    <div style="width:1px;height:32px;background:var(--border)"></div>
+    <div><div class="hero-stat-val">203</div><div class="hero-stat-label">Tests done</div></div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs-wrap" id="feed-top">
+  <div class="tabs">
+    <button class="tab active">🔥 Trending</button>
+    <button class="tab">🚀 Launched</button>
+    <button class="tab">🔴 Need help</button>
+    <button class="tab">🧪 Need testers</button>
+  </div>
+</div>
+
+<!-- FEED + SIDEBAR -->
+<div class="feed-wrap">
+  <div class="feed">
+
+    <!-- CARD 1 — Solvo -->
+    <div class="pcard green">
+      <div class="pcard-top">
+        <div class="pcard-left">
+          <span class="pcard-emoji">📄</span>
+          <div>
+            <div class="pcard-name">Solvo</div>
+            <div class="pcard-by">by Cosmin Toma · VV Team</div>
+          </div>
+        </div>
+        <div class="pcard-right">
+          <span class="status-badge launched">🚀 Launched</span>
+          <div class="day-count">Day 1</div>
+        </div>
+      </div>
+      <div class="pcard-desc">Document builder for tradespeople and small businesses. Generate offers, contracts, and invoices in 60 seconds. Works offline, no account needed.</div>
+      <div class="pcard-update">
+        <div class="pcard-update-label">Latest update</div>
+        Added full document chain — offer → contract → process verbal → proforma. WhatsApp share + client view page. Live now.
+      </div>
+      <div class="pcard-footer">
+        <div class="pcard-tags">
+          <span class="tag">tools</span><span class="tag">offline</span><span class="tag">romania</span>
+        </div>
+        <div class="pcard-actions">
+          <button class="btn-test" onclick="openTestModal('Solvo')">🧪 Test it</button>
+          <button class="btn-follow" onclick="followProject('Solvo')">Follow</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CARD 2 — LEA -->
+    <div class="pcard yellow">
+      <div class="pcard-top">
+        <div class="pcard-left">
+          <span class="pcard-emoji">🧠</span>
+          <div>
+            <div class="pcard-name">LEA</div>
+            <div class="pcard-by">by Cosmin Toma · VV Hybrid Universe</div>
+          </div>
+        </div>
+        <div class="pcard-right">
+          <span class="status-badge building">🟡 Building</span>
+          <div class="day-count">Day 180+</div>
+        </div>
+      </div>
+      <div class="pcard-desc">Personal AI companion that lives on your device. Knows you, remembers everything, works fully offline. No server, no cloud, no data leaving your device.</div>
+      <div class="pcard-update">
+        <div class="pcard-update-label">Latest update</div>
+        Alexandria 2.0 integrated — 3026 Romanian patterns, O(1) lookup. Presence Architecture complete. Living Shelves Panel live.
+      </div>
+      <div class="pcard-footer">
+        <div class="pcard-tags">
+          <span class="tag">AI</span><span class="tag">offline</span><span class="tag">personal</span>
+        </div>
+        <div class="pcard-actions">
+          <button class="btn-test" onclick="openTestModal('LEA')">🧪 Test it</button>
+          <button class="btn-follow" onclick="followProject('LEA')">Follow</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CARD 3 — STUCK -->
+    <div class="pcard red">
+      <div class="pcard-top">
+        <div class="pcard-left">
+          <span class="pcard-emoji">⚡</span>
+          <div>
+            <div class="pcard-name">QuickInvoice</div>
+            <div class="pcard-by">by alex_m · builder</div>
+          </div>
+        </div>
+        <div class="pcard-right">
+          <span class="status-badge stuck">🔴 Stuck</span>
+          <div class="day-count">Day 34</div>
+        </div>
+      </div>
+      <div class="stuck-banner">
+        <div class="stuck-banner-title">🔴 Builder is stuck</div>
+        <div class="stuck-banner-text">Can't figure out how to handle EU VAT for digital products without a registered business. Romania specifically. Anyone done this?</div>
+      </div>
+      <div class="pcard-desc">Fast invoice generator for freelancers. Built for speed — from zero to PDF in under 30 seconds.</div>
+      <div class="pcard-footer">
+        <div class="pcard-tags"><span class="tag">invoicing</span><span class="tag">freelance</span></div>
+        <div class="pcard-actions">
+          <button class="btn-help" onclick="openHelpModal('QuickInvoice')">💬 Help out</button>
+          <button class="btn-follow" onclick="followProject('QuickInvoice')">Follow</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CARD 4 — Indie game -->
+    <div class="pcard yellow">
+      <div class="pcard-top">
+        <div class="pcard-left">
+          <span class="pcard-emoji">🎮</span>
+          <div>
+            <div class="pcard-name">Pixel Realm</div>
+            <div class="pcard-by">by mihai_dev · indie</div>
+          </div>
+        </div>
+        <div class="pcard-right">
+          <span class="status-badge building">🟡 Building</span>
+          <div class="day-count">Day 118</div>
+        </div>
+      </div>
+      <div class="pcard-desc">2D pixel RPG with procedurally generated dungeons. Solo dev project. No publisher, no funding — just building.</div>
+      <div class="pcard-update">
+        <div class="pcard-update-label">Latest update</div>
+        First public trailer posted. Combat system rewritten from scratch. 847 views in 48h.
+      </div>
+      <div class="pcard-footer">
+        <div class="pcard-tags"><span class="tag">game</span><span class="tag">pixel</span><span class="tag">indie</span></div>
+        <div class="pcard-actions">
+          <button class="btn-test" onclick="openTestModal('Pixel Realm')">🧪 Test it</button>
+          <button class="btn-follow" onclick="followProject('Pixel Realm')">Follow</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CARD 5 — VNEX itself -->
+    <div class="pcard blue">
+      <div class="pcard-top">
+        <div class="pcard-left">
+          <span class="pcard-emoji">🌐</span>
+          <div>
+            <div class="pcard-name">VNEX</div>
+            <div class="pcard-by">by Cosmin Toma · building in public</div>
+          </div>
+        </div>
+        <div class="pcard-right">
+          <span class="status-badge building">🟡 Building</span>
+          <div class="day-count">Day 1</div>
+        </div>
+      </div>
+      <div class="pcard-desc">The platform you're looking at right now. Follow projects, not people. Builders post progress, testers give feedback, followers discover what's being built.</div>
+      <div class="pcard-update">
+        <div class="pcard-update-label">Latest update</div>
+        First version live. Static feed, 5 projects, waitlist. Backend and accounts coming after validation.
+      </div>
+      <div class="pcard-footer">
+        <div class="pcard-tags"><span class="tag">platform</span><span class="tag">builders</span><span class="tag">meta</span></div>
+        <div class="pcard-actions">
+          <button class="btn-follow" onclick="followProject('VNEX')">Follow</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+
+    <!-- JOIN BOX -->
+    <div class="join-box">
+      <h3>Join the waitlist</h3>
+      <p>Be first when accounts launch. Get early builder status and tester XP.</p>
+      <form onsubmit="submitWaitlist(event)">
+        <input class="join-input" type="email" id="waitlist-email" placeholder="your@email.com" required>
+        <button class="btn-join" type="submit">Get early access →</button>
+      </form>
+      <div class="join-note">No spam. Just project updates.</div>
+    </div>
+
+    <!-- NEED TESTERS -->
+    <div class="scard">
+      <div class="scard-title">🧪 Need testers</div>
+      <div class="need-testers-item">
+        <span class="nti-emoji">📄</span>
+        <div class="nti-name">Solvo</div>
+        <button class="nti-btn" onclick="openTestModal('Solvo')">Test</button>
+      </div>
+      <div class="need-testers-item">
+        <span class="nti-emoji">🧠</span>
+        <div class="nti-name">LEA</div>
+        <button class="nti-btn" onclick="openTestModal('LEA')">Test</button>
+      </div>
+      <div class="need-testers-item">
+        <span class="nti-emoji">🎮</span>
+        <div class="nti-name">Pixel Realm</div>
+        <button class="nti-btn" onclick="openTestModal('Pixel Realm')">Test</button>
+      </div>
+    </div>
+
+    <!-- TESTER LEADERBOARD -->
+    <div class="scard">
+      <div class="scard-title">⚡ Top testers</div>
+      <div class="leaderboard-item">
+        <div class="lb-rank gold">1</div>
+        <div class="lb-name">ana_builds</div>
+        <div class="lb-score">2.840 XP</div>
+      </div>
+      <div class="leaderboard-item">
+        <div class="lb-rank silver">2</div>
+        <div class="lb-name">radu_dev</div>
+        <div class="lb-score">1.920 XP</div>
+      </div>
+      <div class="leaderboard-item">
+        <div class="lb-rank bronze">3</div>
+        <div class="lb-name">ioana_m</div>
+        <div class="lb-score">1.540 XP</div>
+      </div>
+      <div class="leaderboard-item">
+        <div class="lb-rank">4</div>
+        <div class="lb-name">alex_m</div>
+        <div class="lb-score">980 XP</div>
+      </div>
+      <div class="leaderboard-item">
+        <div class="lb-rank">5</div>
+        <div class="lb-name">mihai_dev</div>
+        <div class="lb-score">740 XP</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MODALS -->
+<div class="modal-overlay" id="join-modal" style="display:none" onclick="if(event.target===this)closeModal('join-modal')">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('join-modal')">×</button>
+    <h2>Join VNEX waitlist</h2>
+    <p>Get early access when builder accounts launch. First 100 get permanent "Early Builder" badge.</p>
+    <form onsubmit="submitWaitlist(event)">
+      <input type="text" placeholder="Your name" required>
+      <input type="email" id="modal-email" placeholder="your@email.com" required>
+      <textarea placeholder="What are you building? (optional)"></textarea>
+      <button class="modal-btn" type="submit">Join waitlist →</button>
+    </form>
+  </div>
+</div>
+
+<div class="modal-overlay" id="test-modal" style="display:none" onclick="if(event.target===this)closeModal('test-modal')">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('test-modal')">×</button>
+    <h2>🧪 Test <span id="test-project-name"></span></h2>
+    <p>Leave your email and we'll send you access. You'll earn XP for every bug reported and suggestion accepted.</p>
+    <form onsubmit="submitTest(event)">
+      <input type="email" placeholder="your@email.com" required>
+      <textarea placeholder="What would you like to test or what are you looking for?"></textarea>
+      <button class="modal-btn" type="submit">Send me access →</button>
+    </form>
+  </div>
+</div>
+
+<div class="modal-overlay" id="post-modal" style="display:none" onclick="if(event.target===this)closeModal('post-modal')">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('post-modal')">×</button>
+    <h2>Post your project</h2>
+    <p>VNEX is in early access. Leave your email and project details — we'll add it manually for now.</p>
+    <form onsubmit="submitPost(event)">
+      <input type="text" placeholder="Project name" required>
+      <input type="email" placeholder="your@email.com" required>
+      <textarea placeholder="What are you building? One paragraph."></textarea>
+      <button class="modal-btn" type="submit">Submit project →</button>
+    </form>
+  </div>
+</div>
+
+<div class="modal-overlay" id="help-modal" style="display:none" onclick="if(event.target===this)closeModal('help-modal')">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('help-modal')">×</button>
+    <h2>💬 Help out</h2>
+    <p>The builder is stuck. If you have experience with this, leave your suggestion below.</p>
+    <form onsubmit="submitHelp(event)">
+      <input type="email" placeholder="your@email.com" required>
+      <textarea placeholder="Your suggestion or solution..." style="height:120px"></textarea>
+      <button class="modal-btn" type="submit">Send help →</button>
+    </form>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+var FORMSPREE = 'https://formspree.io/f/meepavqj';
+
+function scrollToFeed(){ document.getElementById('feed-top').scrollIntoView({behavior:'smooth'}); }
+function openJoinModal(){ document.getElementById('join-modal').style.display='flex'; }
+function openPostModal(){ document.getElementById('post-modal').style.display='flex'; }
+function openTestModal(name){ document.getElementById('test-project-name').textContent=name; document.getElementById('test-modal').style.display='flex'; }
+function openHelpModal(name){ document.getElementById('help-modal').style.display='flex'; }
+function closeModal(id){ document.getElementById(id).style.display='none'; }
+
+function toast(msg){
+  var el=document.getElementById('toast'); el.textContent=msg; el.classList.add('show');
+  setTimeout(function(){ el.classList.remove('show'); },2800);
+}
+
+function followProject(name){
+  toast('Following '+name+' — you\'ll be notified of updates.');
+}
+
+function submitWaitlist(e){
+  e.preventDefault();
+  var email = document.getElementById('waitlist-email') || document.getElementById('modal-email');
+  fetch(FORMSPREE, {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ email: email ? email.value : '', type:'vnex-waitlist', source:'vnex' })
+  });
+  closeModal('join-modal');
+  toast('✓ You\'re on the waitlist!');
+  e.target.reset();
+}
+
+function submitTest(e){
+  e.preventDefault();
+  var name = document.getElementById('test-project-name').textContent;
+  fetch(FORMSPREE, {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ project: name, type:'tester-request' })
+  });
+  closeModal('test-modal');
+  toast('✓ Request sent! +50 XP incoming.');
+  e.target.reset();
+}
+
+function submitPost(e){
+  e.preventDefault();
+  fetch(FORMSPREE, {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ type:'project-submission' })
+  });
+  closeModal('post-modal');
+  toast('✓ Project submitted! We\'ll review it soon.');
+  e.target.reset();
+}
+
+function submitHelp(e){
+  e.preventDefault();
+  fetch(FORMSPREE, {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ type:'help-suggestion' })
+  });
+  closeModal('help-modal');
+  toast('✓ Help sent! +100 XP earned.');
+  e.target.reset();
+}
+
+// Tab switching
+document.querySelectorAll('.tab').forEach(function(tab){
+  tab.addEventListener('click', function(){
+    document.querySelectorAll('.tab').forEach(function(t){ t.classList.remove('active'); });
+    tab.classList.add('active');
+  });
+});
+</script>
+</body>
+</html>
