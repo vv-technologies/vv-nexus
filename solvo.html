@@ -1200,7 +1200,7 @@ function resetAll() {
 // ═══════════════════════════════
 // PREMIUM DOWNLOAD SYSTEM
 // ═══════════════════════════════
-var PREM_CODES = ['SOLVO-A7K2','SOLVO-X9M4','SOLVO-B3P8','SOLVO-Q2W9','SOLVO-L5N1','SOLVO-R8T3','SOLVO-M4J6','SOLVO-D1F7','SOLVO-H6G0','SOLVO-K3C5','SOLVO-V9Y2','SOLVO-U8E4','SOLVO-Z2P1','SOLVO-N7S3','SOLVO-W5I8','SOLVO-O4A6','SOLVO-TEST1','SOLVO-TEST2'];
+var GUMROAD_PRODUCT = 'gehoap';
 var USED_KEY = 'solvo_used_codes';
 
 function getUsedCodes() {
@@ -1220,14 +1220,35 @@ function closePremium() {
 function usePremiumCode() {
   var code = document.getElementById('prem-code-input').value.trim().toUpperCase();
   if (!code) { toast('Introdu codul Premium.'); return; }
-  if (PREM_CODES.indexOf(code) === -1) { toast('Cod invalid. Verifică și încearcă din nou.'); return; }
+
   var used = getUsedCodes();
   if (used.indexOf(code) !== -1) { toast('Cod deja folosit.'); return; }
-  used.push(code);
-  localStorage.setItem(USED_KEY, JSON.stringify(used));
-  closePremium();
-  genPDF(true); // true = premium, fara footer
-  toast('✦ Document Premium generat!');
+
+  var btn = document.querySelector('.btn-prem-unlock');
+  if (btn) { btn.textContent = 'Se verifică...'; btn.disabled = true; }
+
+  fetch('https://api.gumroad.com/v2/licenses/verify', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: 'product_permalink=' + GUMROAD_PRODUCT + '&license_key=' + encodeURIComponent(code) + '&increment_uses_count=true'
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(data) {
+    if (btn) { btn.textContent = 'Generează'; btn.disabled = false; }
+    if (data.success) {
+      used.push(code);
+      localStorage.setItem(USED_KEY, JSON.stringify(used));
+      closePremium();
+      genPDF(true);
+      toast('✦ Document Premium generat!');
+    } else {
+      toast('Cod invalid sau expirat.');
+    }
+  })
+  .catch(function() {
+    if (btn) { btn.textContent = 'Generează'; btn.disabled = false; }
+    toast('Eroare conexiune. Încearcă din nou.');
+  });
 }
 
 // ═══════════════════════════════
