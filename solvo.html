@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Solvo — Documente profesionale</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0a12;--s1:#11111c;--border:rgba(255,255,255,.07);--border2:rgba(124,92,252,.35);
+  --accent:#7c5cfc;--accent2:#a78bfa;--text:#f0eeff;--muted:#6b6880;--muted2:#9391a8;
+  --success:#34d399;--wa:#25d366;--card:rgba(17,17,28,.9);
+}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,-apple-system,sans-serif;min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 60% 50% at 20% 10%,rgba(124,92,252,.12) 0%,transparent 70%),radial-gradient(ellipse 50% 40% at 80% 80%,rgba(56,189,248,.07) 0%,transparent 70%);pointer-events:none;z-index:0}
+
+/* LAYOUT */
+.page{position:relative;z-index:1;display:grid;grid-template-columns:1fr 300px;min-height:100vh;max-width:1020px;margin:0 auto;padding:0 20px;gap:0 32px}
+.header{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;padding:26px 0 0}
+.logo{display:flex;align-items:baseline;gap:2px}
+.logo-text{font-size:20px;font-weight:800;letter-spacing:-.5px}
+.logo-dot{width:7px;height:7px;background:var(--accent);border-radius:50%;margin-left:1px;margin-bottom:2px;box-shadow:0 0 8px var(--accent)}
+.header-right{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)}
+.sdot{width:6px;height:6px;background:var(--success);border-radius:50%;box-shadow:0 0 6px var(--success)}
+
+/* PROGRESS */
+.prog{grid-column:1/-1;display:flex;align-items:center;margin:28px 0 0;padding-bottom:2px}
+.pd{width:26px;height:26px;border-radius:50%;border:1.5px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--muted);background:var(--s1);transition:all .3s;flex-shrink:0;position:relative}
+.pd.active{border-color:var(--accent);color:var(--accent);box-shadow:0 0 0 4px rgba(124,92,252,.15)}
+.pd.done{border-color:var(--success);background:var(--success);color:#0a0a12;font-size:12px}
+.pd .pl{position:absolute;top:32px;left:50%;transform:translateX(-50%);font-size:9px;color:var(--muted);white-space:nowrap}
+.pd.active .pl{color:var(--accent2)}.pd.done .pl{color:var(--success)}
+.pln{flex:1;height:1.5px;background:rgba(255,255,255,.07);transition:background .3s}
+.pln.done{background:var(--success)}
+
+/* MAIN + LIVE */
+.main{grid-column:1;padding:44px 0 60px}
+.live-p{grid-column:2;padding:44px 0 60px;position:sticky;top:0;height:fit-content}
+
+/* CARD */
+.card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:32px;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);box-shadow:0 8px 40px rgba(0,0,0,.4),0 0 0 1px rgba(124,92,252,.04)}
+.step-title{font-size:24px;font-weight:700;letter-spacing:-.5px;margin-bottom:5px}
+.step-sub{font-size:13px;color:var(--muted2);margin-bottom:24px}
+
+/* DOC SELECTOR */
+.doc-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:14px}
+.doc-card{background:rgba(255,255,255,.03);border:1.5px solid rgba(255,255,255,.07);border-radius:13px;padding:16px 14px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:12px}
+.doc-card:hover{border-color:var(--accent);background:rgba(124,92,252,.08);transform:translateY(-1px)}
+.doc-card.sel{border-color:var(--accent);background:rgba(124,92,252,.12);box-shadow:0 0 0 3px rgba(124,92,252,.13)}
+.doc-icon{font-size:22px;flex-shrink:0}
+.doc-info{text-align:left}
+.doc-name{font-size:13px;font-weight:600;color:var(--text)}
+.doc-desc{font-size:11px;color:var(--muted);margin-top:2px}
+
+/* FIRMA BANNER */
+.firma-saved{background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.25);border-radius:12px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.firma-saved-name{font-size:14px;font-weight:600}
+.firma-saved-sub{font-size:11px;color:var(--muted2);margin-top:2px}
+.btn-edit-small{background:none;border:1px solid rgba(255,255,255,.12);border-radius:8px;color:var(--muted);font-size:12px;padding:6px 12px;cursor:pointer;transition:all .2s}
+.btn-edit-small:hover{border-color:var(--accent);color:var(--accent2)}
+
+/* INPUTS */
+.field{margin-bottom:13px}
+.field label{display:block;font-size:10px;color:var(--muted);letter-spacing:.7px;text-transform:uppercase;margin-bottom:6px}
+input,select,textarea{width:100%;background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.08);border-radius:10px;color:var(--text);font-size:14px;padding:12px 14px;outline:none;transition:border-color .2s,box-shadow .2s,background .2s;font-family:inherit}
+input:focus,select:focus,textarea:focus{border-color:var(--accent);background:rgba(124,92,252,.06);box-shadow:0 0 0 3px rgba(124,92,252,.12)}
+input::placeholder,textarea::placeholder{color:var(--muted)}
+select option{background:#16162a}
+.row-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+
+/* SERVICII */
+.srv-item{background:rgba(255,255,255,.03);border:1.5px solid rgba(255,255,255,.07);border-radius:11px;padding:14px;margin-bottom:9px;position:relative}
+.srv-item:focus-within{border-color:rgba(124,92,252,.4)}
+.srv-top{display:grid;grid-template-columns:1fr 120px;gap:9px;align-items:end}
+.btn-rm{position:absolute;top:9px;right:11px;background:none;border:none;color:rgba(255,255,255,.15);font-size:17px;cursor:pointer;transition:color .2s}
+.btn-rm:hover{color:#f87171}
+.btn-add-srv{width:100%;background:none;border:1.5px dashed rgba(255,255,255,.1);border-radius:10px;color:var(--muted);font-size:13px;padding:13px;cursor:pointer;transition:all .2s;margin-top:3px}
+.btn-add-srv:hover{border-color:var(--accent);color:var(--accent2);background:rgba(124,92,252,.05)}
+
+/* TEMPLATE GALLERY */
+.tpl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
+.tpl-card{background:rgba(255,255,255,.03);border:1.5px solid rgba(255,255,255,.07);border-radius:11px;padding:14px 10px;text-align:center;cursor:pointer;transition:all .2s}
+.tpl-card:hover{border-color:var(--accent);background:rgba(124,92,252,.08);transform:translateY(-2px)}
+.tpl-card.sel{border-color:var(--accent);background:rgba(124,92,252,.12)}
+.tpl-icon{font-size:24px;margin-bottom:6px;display:block}
+.tpl-name{font-size:11px;color:var(--muted2);font-weight:500}
+.btn-skip{background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;text-decoration:underline;padding:4px}
+.btn-skip:hover{color:var(--text)}
+
+/* FIRMA TOGGLE */
+.ftog{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;background:rgba(255,255,255,.03);border:1.5px solid rgba(255,255,255,.07);border-radius:11px;cursor:pointer;margin-bottom:12px;transition:border-color .2s}
+.ftog:hover{border-color:rgba(124,92,252,.4)}
+.ftog-info{display:flex;flex-direction:column;gap:2px}
+.ftog-info span{font-size:10px;color:var(--muted);letter-spacing:.5px;text-transform:uppercase}
+.ftog-info strong{font-size:13px;color:var(--text)}
+.arr{color:var(--muted);font-size:11px;transition:transform .2s}
+.ftog.open .arr{transform:rotate(180deg)}
+.fbody{display:none;background:rgba(124,92,252,.05);border:1.5px solid var(--border2);border-radius:11px;padding:18px;margin-bottom:12px}
+.fbody.open{display:block}
+
+/* LIVE CARD */
+.live-card{background:var(--card);border:1px solid var(--border);border-radius:15px;padding:20px;backdrop-filter:blur(20px)}
+.live-title{font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:16px}
+.live-row{display:flex;justify-content:space-between;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--border);gap:8px}
+.live-row:last-of-type{border-bottom:none}
+.live-row-name{font-size:12px;color:var(--text);flex:1;min-width:0;word-break:break-word}
+.live-row-price{font-size:12px;font-weight:600;color:var(--accent2);white-space:nowrap}
+.live-empty{font-size:12px;color:var(--muted);text-align:center;padding:12px 0;font-style:italic}
+.live-total{margin-top:13px;padding-top:13px;border-top:1px solid var(--border2);display:flex;justify-content:space-between;align-items:center}
+.live-total span:first-child{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px}
+.live-total-val{font-size:20px;font-weight:800;color:var(--accent2)}
+
+/* DASHBOARD */
+.dash{margin-top:16px;padding-top:16px;border-top:1px solid var(--border)}
+.dash-title{font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+.dash-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0}
+.dash-row-label{font-size:11px;color:var(--muted2)}
+.dash-row-val{font-size:12px;font-weight:700;color:var(--text)}
+.dash-total-row{display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding-top:10px;border-top:1px solid var(--border)}
+.dash-total-row span:first-child{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px}
+.dash-total-val{font-size:14px;font-weight:800;color:var(--success)}
+
+/* KO-FI */
+.btn-kofi{display:inline-flex;align-items:center;gap:6px;background:rgba(255,94,91,.12);border:1px solid rgba(255,94,91,.25);border-radius:100px;padding:6px 14px;font-size:11px;color:#ff8a87;cursor:pointer;text-decoration:none;transition:all .2s}
+.btn-kofi:hover{background:rgba(255,94,91,.2);border-color:rgba(255,94,91,.4)}
+
+/* DOC TYPE BADGE */
+.doc-badge{display:inline-flex;align-items:center;gap:7px;background:rgba(124,92,252,.12);border:1px solid var(--border2);border-radius:100px;padding:5px 14px;font-size:11px;color:var(--accent2);margin-bottom:20px}
+
+/* PREVIEW */
+.pdf-preview{background:#fff;border-radius:12px;overflow:hidden;margin-bottom:18px;box-shadow:0 4px 30px rgba(0,0,0,.5)}
+.ppv-header{background:linear-gradient(135deg,#7c5cfc,#a78bfa);padding:14px 18px;display:flex;justify-content:space-between;align-items:center}
+.ppv-logo{font-size:16px;font-weight:800;color:#fff}
+.ppv-title{text-align:right}
+.ppv-title h3{font-size:11px;color:rgba(255,255,255,.85);letter-spacing:1.5px}
+.ppv-title p{font-size:10px;color:rgba(255,255,255,.7);margin-top:1px}
+.ppv-body{padding:14px 18px}
+.ppv-parties{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid #f0f0f8}
+.ppv-party h4{font-size:8px;color:#7c5cfc;letter-spacing:1px;text-transform:uppercase;margin-bottom:3px}
+.ppv-party strong{font-size:11px;color:#1a1a2e;display:block;margin-bottom:2px}
+.ppv-party span{font-size:9px;color:#888;display:block;line-height:1.4}
+.ppv-tbl{width:100%;border-collapse:collapse;font-size:9px;margin-bottom:10px}
+.ppv-tbl th{background:#f5f3ff;color:#7c5cfc;padding:5px 7px;text-align:left;font-size:8px}
+.ppv-tbl td{padding:5px 7px;border-bottom:1px solid #f5f5ff;color:#333}
+.ppv-tbl td:last-child{text-align:right;font-weight:700;color:#7c5cfc}
+.ppv-total{text-align:right;font-size:10px;color:#888}
+.ppv-total .grand{font-size:16px;font-weight:800;color:#7c5cfc;margin-top:3px}
+
+/* CHAIN BUTTONS */
+.chain-box{background:rgba(52,211,153,.07);border:1px solid rgba(52,211,153,.2);border-radius:12px;padding:16px;margin-bottom:12px}
+.chain-title{font-size:11px;color:var(--success);font-weight:600;letter-spacing:.5px;margin-bottom:10px}
+.chain-btns{display:flex;flex-direction:column;gap:8px}
+.btn-chain{background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.1);border-radius:10px;color:var(--text);font-size:13px;padding:12px 16px;cursor:pointer;text-align:left;transition:all .2s;display:flex;align-items:center;gap:10px}
+.btn-chain:hover{border-color:var(--accent);background:rgba(124,92,252,.08)}
+.btn-chain .ch-icon{font-size:18px;flex-shrink:0}
+
+/* BUTOANE */
+.nav{display:flex;gap:9px;margin-top:22px}
+.btn-p{flex:1;background:var(--accent);color:#fff;border:none;border-radius:11px;padding:15px;font-size:14px;font-weight:700;cursor:pointer;transition:background .2s,box-shadow .2s}
+.btn-p:hover{background:var(--accent2);box-shadow:0 4px 20px rgba(124,92,252,.4)}
+.btn-g{background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.08);border-radius:11px;color:var(--muted);padding:15px 18px;font-size:13px;cursor:pointer;transition:all .2s}
+.btn-g:hover{border-color:rgba(255,255,255,.2);color:var(--text)}
+.btn-dl{width:100%;background:linear-gradient(135deg,var(--accent),#6d44f5);color:#fff;border:none;border-radius:11px;padding:15px;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 4px 20px rgba(124,92,252,.35);margin-bottom:9px;transition:opacity .2s}
+.btn-dl:hover{opacity:.9}
+.btn-wa{width:100%;background:var(--wa);color:#fff;border:none;border-radius:11px;padding:15px;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px;margin-bottom:9px;box-shadow:0 4px 16px rgba(37,211,102,.3);transition:opacity .2s}
+.btn-wa:hover{opacity:.9}
+.btn-wa svg{width:18px;height:18px;fill:#fff;flex-shrink:0}
+
+/* TOAST */
+.toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(12px);background:var(--success);color:#0a0a12;padding:10px 20px;border-radius:100px;font-weight:700;font-size:12px;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap;z-index:999}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* CLIENT VIEW */
+#cv{display:none;position:relative;z-index:1}
+.cv-wrap{max-width:600px;margin:0 auto;padding:36px 18px 80px}
+.cv-card{background:var(--card);border:1px solid var(--border);border-radius:18px;overflow:hidden;backdrop-filter:blur(20px);box-shadow:0 8px 40px rgba(0,0,0,.5)}
+.cv-hdr{background:linear-gradient(135deg,#7c5cfc 0%,#6d44f5 100%);padding:22px 26px;display:flex;justify-content:space-between;align-items:center}
+.cv-logo{font-size:18px;font-weight:800;color:#fff}
+.cv-nr h3{font-size:11px;color:rgba(255,255,255,.8);letter-spacing:1.5px;text-align:right}
+.cv-nr p{font-size:10px;color:rgba(255,255,255,.65);margin-top:2px;text-align:right}
+.cv-body{padding:24px}
+.cv-parties{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+.cv-party h4{font-size:9px;color:var(--accent2);letter-spacing:1px;text-transform:uppercase;margin-bottom:5px}
+.cv-party strong{font-size:14px;display:block;margin-bottom:3px}
+.cv-party span{font-size:11px;color:var(--muted2);display:block;line-height:1.5}
+.cv-srv-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);gap:14px}
+.cv-srv-row:last-child{border-bottom:none}
+.cv-srv-name{font-size:13px}
+.cv-srv-price{font-size:13px;font-weight:700;color:var(--accent2);white-space:nowrap}
+.cv-total-bloc{background:rgba(124,92,252,.08);border:1px solid var(--border2);border-radius:12px;padding:16px 20px;margin:16px 0 24px}
+.cv-total-sub{display:flex;justify-content:space-between;font-size:12px;color:var(--muted2);margin-bottom:5px}
+.cv-total-grand{display:flex;justify-content:space-between;align-items:center;margin-top:9px;padding-top:9px;border-top:1px solid var(--border2)}
+.cv-total-grand span:first-child{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px}
+.cv-grand-val{font-size:26px;font-weight:800;color:var(--accent2)}
+.btn-accept{width:100%;background:var(--success);color:#0a0a12;border:none;border-radius:13px;padding:17px;font-size:16px;font-weight:800;cursor:pointer;box-shadow:0 4px 20px rgba(52,211,153,.35);margin-bottom:10px;transition:opacity .2s}
+.btn-accept:hover{opacity:.92}
+.cv-accepted{text-align:center;padding:18px;background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.3);border-radius:13px;margin-bottom:10px}
+.cv-accepted h3{font-size:18px;font-weight:800;color:var(--success);margin-bottom:5px}
+.cv-accepted p{font-size:13px;color:var(--muted2)}
+.cv-footer{text-align:center;font-size:11px;color:var(--muted);margin-top:24px}
+.cv-footer a{color:var(--accent2);text-decoration:none}
+
+@media(max-width:760px){
+  .page{grid-template-columns:1fr}
+  .live-p{display:none}
+  .doc-grid{grid-template-columns:1fr}
+  .cv-parties{grid-template-columns:1fr}
+}
+@media(max-width:420px){.tpl-grid{grid-template-columns:1fr 1fr}.card{padding:22px 16px}}
+</style>
+</head>
+<body>
+
+<!-- CLIENT VIEW -->
+<div id="cv"></div>
+
+<!-- FORM MODE -->
+<div class="page" id="fm">
+
+  <div class="header">
+    <div class="logo"><span class="logo-text">Solvo</span><div class="logo-dot"></div></div>
+    <div class="header-right">
+      <div class="sdot"></div><span style="margin-right:8px">Offline</span>
+      <a href="https://ko-fi.com/vvteam" target="_blank" class="btn-kofi">☕ Susține</a>
+    </div>
+  </div>
+
+  <div class="prog" id="prog">
+    <div class="pd active" id="pd0">1<span class="pl">Document</span></div>
+    <div class="pln" id="pl0"></div>
+    <div class="pd" id="pd1">2<span class="pl">Servicii</span></div>
+    <div class="pln" id="pl1"></div>
+    <div class="pd" id="pd2">3<span class="pl">Client</span></div>
+    <div class="pln" id="pl2"></div>
+    <div class="pd" id="pd3">4<span class="pl">Generează</span></div>
+  </div>
+
+  <div class="main">
+
+    <!-- PAS 0 — DOC TYPE -->
+    <div id="s0">
+      <div class="card">
+        <div class="step-title">Ce generezi?</div>
+        <div class="step-sub">Alege documentul. Datele se completează o singură dată.</div>
+        <div class="doc-grid">
+          <div class="doc-card" onclick="selectDoc('oferta')" id="d-oferta">
+            <span class="doc-icon">📄</span>
+            <div class="doc-info"><div class="doc-name">Ofertă Comercială</div><div class="doc-desc">Preț + servicii pentru client</div></div>
+          </div>
+          <div class="doc-card" onclick="selectDoc('contract')" id="d-contract">
+            <span class="doc-icon">📑</span>
+            <div class="doc-info"><div class="doc-name">Contract Prestări</div><div class="doc-desc">Contract servicii cu clauze legale</div></div>
+          </div>
+          <div class="doc-card" onclick="selectDoc('deviz')" id="d-deviz">
+            <span class="doc-icon">📋</span>
+            <div class="doc-info"><div class="doc-name">Deviz Lucrare</div><div class="doc-desc">Detaliere costuri manoperă + materiale</div></div>
+          </div>
+          <div class="doc-card" onclick="selectDoc('pv')" id="d-pv">
+            <span class="doc-icon">✅</span>
+            <div class="doc-info"><div class="doc-name">Proces Verbal</div><div class="doc-desc">Recepție lucrare finalizată</div></div>
+          </div>
+          <div class="doc-card" onclick="selectDoc('proforma')" id="d-proforma">
+            <span class="doc-icon">🧾</span>
+            <div class="doc-info"><div class="doc-name">Factură Proformă</div><div class="doc-desc">Document plată în avans</div></div>
+          </div>
+        </div>
+        <div class="nav"><button class="btn-p" onclick="if(SEL_DOC)goTo(1);else toast('Alege tipul documentului.')">Continuă →</button></div>
+      </div>
+    </div>
+
+    <!-- PAS 1 — TEMPLATE + SERVICII -->
+    <div id="s1" style="display:none">
+      <div class="card">
+        <div id="doc-badge-1" class="doc-badge"></div>
+        <div class="step-title">Ce lucrezi?</div>
+        <div class="step-sub">Alege domeniul sau adaugă servicii direct.</div>
+        <div class="tpl-grid" id="tpl-grid"></div>
+        <div style="text-align:center;margin-bottom:16px">
+          <button class="btn-skip" onclick="clearSrv();addSrv()">Completez eu →</button>
+        </div>
+        <div id="srv-list"></div>
+        <button class="btn-add-srv" onclick="addSrv()">+ Adaugă</button>
+        <div id="extra-fields-1"></div>
+        <div class="nav">
+          <button class="btn-g" onclick="goTo(0)">← Înapoi</button>
+          <button class="btn-p" onclick="goTo(2)">Continuă →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAS 2 — CLIENT + FIRMA -->
+    <div id="s2" style="display:none">
+      <div class="card">
+        <div id="doc-badge-2" class="doc-badge"></div>
+        <div class="step-title">Client și firma ta</div>
+        <div class="step-sub">Firma ta e salvată automat după prima completare.</div>
+
+        <!-- FIRMA SALVATA sau FORM -->
+        <div id="firma-saved-box" style="display:none">
+          <div class="firma-saved">
+            <div><div class="firma-saved-name" id="fsb-name"></div><div class="firma-saved-sub" id="fsb-sub"></div></div>
+            <button class="btn-edit-small" onclick="editFirma()">Editează</button>
+          </div>
+        </div>
+        <div id="firma-form-box">
+          <div class="ftog" id="ftog" onclick="toggleFirma()">
+            <div class="ftog-info"><span>Firma ta</span><strong id="f_prev">Click să completezi</strong></div>
+            <span class="arr">▾</span>
+          </div>
+          <div class="fbody" id="fbody">
+            <div class="row-2">
+              <div class="field"><label>Nume firmă *</label><input id="f_n" type="text" placeholder="SC Firma Mea SRL" oninput="upFirmaP()"></div>
+              <div class="field"><label>CUI / CIF</label><input id="f_cui" placeholder="RO12345678"></div>
+            </div>
+            <div class="row-2">
+              <div class="field"><label>Email</label><input id="f_e" placeholder="contact@firma.ro"></div>
+              <div class="field"><label>Telefon</label><input id="f_t" placeholder="0740 000 000"></div>
+            </div>
+            <div class="field"><label>Adresă</label><input id="f_a" placeholder="Str. Exemplu 1, București"></div>
+          </div>
+        </div>
+
+        <!-- CLIENT -->
+        <div class="field"><label>Client *</label><input id="c_n" placeholder="SC Client SRL sau Ion Popescu" oninput="upLive()"></div>
+        <div class="row-2">
+          <div class="field"><label>Persoană contact</label><input id="c_c" placeholder="Ion Popescu"></div>
+          <div class="field"><label>Email client</label><input id="c_e" placeholder="client@email.ro"></div>
+        </div>
+        <div class="field"><label>Telefon client (WhatsApp)</label><input id="c_tel" type="tel" placeholder="0740 000 000"></div>
+        <div class="row-2">
+          <div class="field" style="margin:0"><label>Monedă</label><select id="moneda" onchange="upLive()"><option value="RON">RON</option><option value="EUR">EUR</option><option value="USD">USD</option></select></div>
+          <div class="field" style="margin:0"><label>TVA</label><select id="tva" onchange="upLive()"><option value="0">Fără TVA</option><option value="19" selected>TVA 19%</option><option value="9">TVA 9%</option><option value="5">TVA 5%</option></select></div>
+        </div>
+        <div class="field" style="margin-top:12px"><label>Număr document</label><input id="o_nr" type="text"></div>
+        <div id="extra-fields-2"></div>
+        <div class="nav">
+          <button class="btn-g" onclick="goTo(1)">← Înapoi</button>
+          <button class="btn-p" onclick="goTo(3)">Previzualizează →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAS 3 — GENEREAZA -->
+    <div id="s3" style="display:none">
+      <div class="card">
+        <div id="doc-badge-3" class="doc-badge"></div>
+        <div class="step-title">Gata de generat</div>
+        <div class="step-sub">Verifică și descarcă sau trimite pe WhatsApp.</div>
+        <div class="pdf-preview" id="pdf-prev"></div>
+        <button class="btn-wa" onclick="shareWA()">
+          <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          Trimite pe WhatsApp
+        </button>
+        <button class="btn-dl" onclick="genPDF()">⬇ Descarcă PDF</button>
+
+        <!-- CHAIN -->
+        <div class="chain-box" id="chain-box" style="display:none">
+          <div class="chain-title">↓ Pasul următor</div>
+          <div class="chain-btns" id="chain-btns"></div>
+        </div>
+
+        <div class="nav">
+          <button class="btn-g" onclick="goTo(2)">← Modifică</button>
+          <button class="btn-g" onclick="resetAll()">+ Document nou</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- LIVE PANEL -->
+  <div class="live-p">
+    <div class="live-card">
+      <div class="live-title" id="live-doc-title">Document</div>
+      <div id="live-rows"><div class="live-empty">Alege documentul...</div></div>
+      <div class="live-total"><span>Total</span><span class="live-total-val" id="live-total">0 RON</span></div>
+      <div class="dash">
+        <div class="dash-title">Activitate</div>
+        <div id="dash-rows"><div style="font-size:11px;color:var(--muted);font-style:italic">Niciun document încă</div></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════
+// TEMPLATES
+// ═══════════════════════════════
+var TPLS = {
+  electric:[{d:'Instalație electrică cameră',p:800},{d:'Tablou electric (înlocuire)',p:1200},{d:'Prize și întrerupătoare (set 10)',p:400},{d:'Iluminat LED cameră',p:350}],
+  instalator:[{d:'Instalație sanitară baie completă',p:2500},{d:'Montaj chiuvetă + baterie',p:350},{d:'Montaj vas WC',p:400},{d:'Instalație termică calorifer',p:800}],
+  constructor:[{d:'Gresie și faianță (per mp)',p:120},{d:'Rigips perete (per mp)',p:80},{d:'Tencuială interioară (per mp)',p:45},{d:'Șapă autonivelantă (per mp)',p:55}],
+  zugrav:[{d:'Zugrăvit cameră vopsea lavabilă',p:700},{d:'Gletuire pereți cameră',p:500},{d:'Tavan vopsit',p:350},{d:'Grunduire suprafețe',p:200}],
+  termopane:[{d:'Geam termopan (per mp)',p:350},{d:'Ușă exterior PVC',p:2200},{d:'Jaluzele interioare (set)',p:180},{d:'Montaj și etanșare',p:150}],
+  ac:[{d:'Montaj aer condiționat split 12000 BTU',p:1800},{d:'Instalație freon și conducte',p:600},{d:'Suport și fixare unitate externă',p:200},{d:'Revizie sistem existent',p:350}],
+  mobila:[{d:'Corp bucătărie blaturi (per ml)',p:800},{d:'Ușă mobilier personalizat',p:450},{d:'Montaj complet mobilier',p:600},{d:'Transport și livrare',p:200}],
+  web:[{d:'Website prezentare (5 pagini)',p:2500},{d:'Magazin online',p:5000},{d:'Design logo',p:800},{d:'Mentenanță lunară',p:300}]
+};
+
+var TPL_LIST = [
+  {k:'electric',i:'🔌',n:'Electrician'},
+  {k:'instalator',i:'🔧',n:'Instalator'},
+  {k:'constructor',i:'🏗',n:'Constructor'},
+  {k:'zugrav',i:'🎨',n:'Zugrav'},
+  {k:'termopane',i:'🪟',n:'Termopane'},
+  {k:'ac',i:'❄️',n:'Aer Condiționat'},
+  {k:'mobila',i:'🪵',n:'Mobilă'},
+  {k:'web',i:'💻',n:'Web / IT'}
+];
+
+var DOC_INFO = {
+  oferta:   {name:'Ofertă Comercială',  icon:'📄', short:'OFERTĂ',   prefix:'OF'},
+  contract: {name:'Contract Prestări',  icon:'📑', short:'CONTRACT', prefix:'CT'},
+  deviz:    {name:'Deviz Lucrare',       icon:'📋', short:'DEVIZ',    prefix:'DV'},
+  pv:       {name:'Proces Verbal',       icon:'✅', short:'PV',       prefix:'PV'},
+  proforma: {name:'Factură Proformă',    icon:'🧾', short:'PROFORMĂ', prefix:'PF'}
+};
+
+var CHAIN = {
+  oferta:   [{doc:'contract',label:'Generează Contract Prestări',hint:'Clientul a acceptat oferta?'},
+             {doc:'deviz',   label:'Generează Deviz Lucrare',    hint:'Vrei detalii mai exacte?'}],
+  contract: [{doc:'pv',      label:'Generează Proces Verbal',    hint:'Lucrarea e finalizată?'}],
+  deviz:    [{doc:'contract',label:'Generează Contract',         hint:'Transformă devizul în contract?'},
+             {doc:'pv',      label:'Generează Proces Verbal',    hint:'Lucrarea e finalizată?'}],
+  pv:       [{doc:'proforma',label:'Generează Factură Proformă', hint:'Solicită plata?'}],
+  proforma: []
+};
+
+// ═══════════════════════════════
+// STATE
+// ═══════════════════════════════
+var SEL_DOC = null;
+var services = [];
+var sid = 0;
+
+// ═══════════════════════════════
+// FIRMA PERSISTENTA
+// ═══════════════════════════════
+function loadFirma() {
+  try {
+    var f = JSON.parse(localStorage.getItem('solvo_firma') || 'null');
+    if (f && f.n) {
+      document.getElementById('f_n').value   = f.n  || '';
+      document.getElementById('f_cui').value = f.cui|| '';
+      document.getElementById('f_e').value   = f.e  || '';
+      document.getElementById('f_t').value   = f.t  || '';
+      document.getElementById('f_a').value   = f.a  || '';
+      showFirmaSaved(f);
+      upFirmaP();
+    }
+  } catch(e) {}
+}
+
+function saveFirma() {
+  var f = { n:v('f_n'), cui:v('f_cui'), e:v('f_e'), t:v('f_t'), a:v('f_a') };
+  if (f.n) localStorage.setItem('solvo_firma', JSON.stringify(f));
+}
+
+function showFirmaSaved(f) {
+  if (!f || !f.n) return;
+  document.getElementById('fsb-name').textContent = f.n;
+  document.getElementById('fsb-sub').textContent  = [f.cui, f.e, f.t].filter(Boolean).join(' · ');
+  document.getElementById('firma-saved-box').style.display = 'block';
+  document.getElementById('firma-form-box').style.display  = 'none';
+}
+
+function editFirma() {
+  document.getElementById('firma-saved-box').style.display = 'none';
+  document.getElementById('firma-form-box').style.display  = 'block';
+  document.getElementById('fbody').classList.add('open');
+  document.getElementById('ftog').classList.add('open');
+}
+
+// ═══════════════════════════════
+// DOC SELECT
+// ═══════════════════════════════
+function selectDoc(key) {
+  SEL_DOC = key;
+  document.querySelectorAll('.doc-card').forEach(function(c){ c.classList.remove('sel'); });
+  document.getElementById('d-' + key).classList.add('sel');
+  setTimeout(function(){ goTo(1); }, 160);
+}
+
+function setBadges(step) {
+  if (!SEL_DOC) return;
+  var info = DOC_INFO[SEL_DOC];
+  var html = info.icon + ' ' + info.name;
+  ['doc-badge-1','doc-badge-2','doc-badge-3'].forEach(function(id){
+    var el = document.getElementById(id);
+    if (el) el.textContent = html;
+  });
+  var liveEl = document.getElementById('live-doc-title');
+  if (liveEl) liveEl.textContent = info.name;
+}
+
+// ═══════════════════════════════
+// TEMPLATES RENDER
+// ═══════════════════════════════
+function renderTpls() {
+  var g = document.getElementById('tpl-grid');
+  g.innerHTML = '';
+  TPL_LIST.forEach(function(t){
+    var d = document.createElement('div');
+    d.className = 'tpl-card'; d.id = 'tc-' + t.k;
+    d.innerHTML = '<span class="tpl-icon">' + t.i + '</span><div class="tpl-name">' + t.n + '</div>';
+    d.onclick = function(){ loadTpl(t.k); };
+    g.appendChild(d);
+  });
+}
+
+function loadTpl(key) {
+  document.querySelectorAll('.tpl-card').forEach(function(c){ c.classList.remove('sel'); });
+  var el = document.getElementById('tc-' + key);
+  if (el) el.classList.add('sel');
+  clearSrv();
+  (TPLS[key] || []).forEach(function(t){ addSrv(t.d, t.p); });
+  if (services.length === 0) addSrv();
+  upLive();
+}
+
+// ═══════════════════════════════
+// SERVICII
+// ═══════════════════════════════
+function clearSrv() {
+  document.getElementById('srv-list').innerHTML = '';
+  services = []; sid = 0;
+}
+
+function addSrv(desc, price) {
+  sid++;
+  var id = sid;
+  services.push(id);
+  var wrap = document.createElement('div');
+  wrap.className = 'srv-item'; wrap.id = 'srv' + id;
+  wrap.innerHTML =
+    '<button class="btn-rm" onclick="rmSrv(' + id + ')" tabindex="-1">×</button>' +
+    '<div class="srv-top">' +
+    '<div class="field" style="margin:0"><label>Serviciu / Produs</label>' +
+    '<input type="text" id="sd' + id + '" placeholder="Descriere" value="' + (desc||'') + '" oninput="upLive()"></div>' +
+    '<div><div style="font-size:10px;color:var(--muted);letter-spacing:.7px;text-transform:uppercase;margin-bottom:6px">Preț (RON)</div>' +
+    '<input type="number" id="sp' + id + '" placeholder="0" min="0" step="any" value="' + (price||'') + '" oninput="upLive()"></div>' +
+    '</div>';
+  document.getElementById('srv-list').appendChild(wrap);
+  if (!desc) setTimeout(function(){ var el=document.getElementById('sd'+id); if(el) el.focus(); }, 40);
+  upLive();
+}
+
+function rmSrv(id) {
+  services = services.filter(function(s){ return s !== id; });
+  var el = document.getElementById('srv' + id);
+  if (el) el.remove();
+  upLive();
+}
+
+// ═══════════════════════════════
+// LIVE UPDATE
+// ═══════════════════════════════
+function upLive() {
+  var moneda = v('moneda') || 'RON';
+  var tvaPct = parseFloat(v('tva')) || 0;
+  var sub = 0; var html = '';
+  services.forEach(function(id){
+    var desc  = v('sd'+id) || 'Serviciu';
+    var price = parseFloat(v('sp'+id)) || 0;
+    sub += price;
+    html += '<div class="live-row"><span class="live-row-name">'+desc+'</span><span class="live-row-price">'+fmt(price)+' '+moneda+'</span></div>';
+  });
+  if (!html) html = '<div class="live-empty">Adaugă servicii...</div>';
+  document.getElementById('live-rows').innerHTML = html;
+  document.getElementById('live-total').textContent = fmt(sub + sub * tvaPct / 100) + ' ' + moneda;
+}
+
+// ═══════════════════════════════
+// FIRMA TOGGLE
+// ═══════════════════════════════
+function toggleFirma() {
+  document.getElementById('ftog').classList.toggle('open');
+  document.getElementById('fbody').classList.toggle('open');
+}
+function upFirmaP() {
+  var val = v('f_n') || '';
+  document.getElementById('f_prev').textContent = val || 'Click să completezi';
+}
+
+// ═══════════════════════════════
+// NAVIGARE
+// ═══════════════════════════════
+function goTo(step) {
+  if (step === 1 && !SEL_DOC) { toast('Alege tipul documentului.'); return; }
+  if (step === 2 && services.length === 0) { toast('Adaugă cel puțin un serviciu.'); return; }
+  if (step === 3) {
+    if (!v('c_n').trim()) { toast('Completează numele clientului.'); return; }
+    saveFirma();
+    var saved = JSON.parse(localStorage.getItem('solvo_firma') || 'null');
+    if (saved && saved.n) showFirmaSaved(saved);
+    buildPreview();
+    buildChain();
+  }
+  [0,1,2,3].forEach(function(i){
+    var s = document.getElementById('s'+i);
+    if (s) s.style.display = i === step ? 'block' : 'none';
+  });
+  [0,1,2,3].forEach(function(i){
+    var d = document.getElementById('pd'+i);
+    if (d) d.className = 'pd' + (i < step ? ' done' : i === step ? ' active' : '');
+  });
+  ['pl0','pl1','pl2'].forEach(function(id, i){
+    var el = document.getElementById(id);
+    if (el) el.className = 'pln' + (step > i ? ' done' : '');
+  });
+  setBadges(step);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ═══════════════════════════════
+// CHAIN
+// ═══════════════════════════════
+function buildChain() {
+  var ch = CHAIN[SEL_DOC] || [];
+  var box = document.getElementById('chain-box');
+  var btns = document.getElementById('chain-btns');
+  if (!ch.length) { box.style.display = 'none'; return; }
+  box.style.display = 'block';
+  btns.innerHTML = '';
+  ch.forEach(function(c){
+    var info = DOC_INFO[c.doc];
+    var b = document.createElement('button');
+    b.className = 'btn-chain';
+    b.innerHTML = '<span class="ch-icon">' + info.icon + '</span><div><div style="font-size:13px;font-weight:600">' + c.label + '</div><div style="font-size:11px;color:var(--muted);margin-top:2px">' + c.hint + '</div></div>';
+    b.onclick = function(){
+      SEL_DOC = c.doc;
+      document.querySelectorAll('.doc-card').forEach(function(dc){ dc.classList.remove('sel'); });
+      var dEl = document.getElementById('d-' + c.doc);
+      if (dEl) dEl.classList.add('sel');
+      setBadges(3);
+      buildPreview();
+      buildChain();
+      toast(info.name + ' generat!');
+    };
+    btns.appendChild(b);
+  });
+}
+
+// ═══════════════════════════════
+// ENCODE/DECODE
+// ═══════════════════════════════
+function getJobData() {
+  var moneda = v('moneda') || 'RON';
+  var tvaPct = parseFloat(v('tva')) || 0;
+  var srvs = [];
+  services.forEach(function(id){
+    var d = v('sd'+id); var p = parseFloat(v('sp'+id)) || 0;
+    if (d || p) srvs.push({ d: d, p: p });
+  });
+  return {
+    doc: SEL_DOC,
+    fN:  v('f_n'), fCui:v('f_cui'), fE:v('f_e'), fT:v('f_t'), fA:v('f_a'),
+    cN:  v('c_n'), cC:v('c_c'), cE:v('c_e'), cTel:v('c_tel'),
+    nr:  v('o_nr'), m: moneda, t: tvaPct, s: srvs,
+    dt:  new Date().toLocaleDateString('ro-RO'),
+    extra: getExtra()
+  };
+}
+
+function getExtra() {
+  var ex = {};
+  var termen = document.getElementById('ex_termen');
+  if (termen) ex.termen = termen.value;
+  return ex;
+}
+
+function encodeOffer() {
+  return btoa(unescape(encodeURIComponent(JSON.stringify(getJobData()))));
+}
+
+function decodeOffer(b64) {
+  try { return JSON.parse(decodeURIComponent(escape(atob(b64)))); } catch(e) { return null; }
+}
+
+// ═══════════════════════════════
+// WHATSAPP
+// ═══════════════════════════════
+function shareWA() {
+  var encoded = encodeOffer();
+  var base    = window.location.href.split('?')[0];
+  var link    = base + '?d=' + encoded;
+  var data    = getJobData();
+  var sub     = 0;
+  data.s.forEach(function(s){ sub += s.p || 0; });
+  var grand   = sub + sub * data.t / 100;
+  var info    = DOC_INFO[SEL_DOC] || {};
+  var msg = 'Bună ziua,\n\nVă trimit ' + (info.name || 'documentul') + ' nr. ' + data.nr + '.\nTotal: *' + fmt(grand) + ' ' + data.m + '*\n\nVedeți detaliile:\n' + link;
+  var cTel = data.cTel.replace(/\s/g,'');
+  var wa = cTel
+    ? 'https://wa.me/40' + cTel.replace(/^0/,'') + '?text=' + encodeURIComponent(msg)
+    : 'https://wa.me/?text=' + encodeURIComponent(msg);
+  window.open(wa, '_blank');
+}
+
+// ═══════════════════════════════
+// PREVIEW HTML
+// ═══════════════════════════════
+function buildPreview() {
+  var data  = getJobData();
+  var info  = DOC_INFO[data.doc] || DOC_INFO.oferta;
+  var sub   = 0; var rowsH = '';
+  data.s.forEach(function(s, i){
+    sub += s.p || 0;
+    rowsH += '<tr><td>'+(i+1)+'</td><td>'+s.d+'</td><td>'+fmt(s.p)+' '+data.m+'</td></tr>';
+  });
+  var tvaVal = sub * data.t / 100;
+  var grand  = sub + tvaVal;
+  var tvaLine = data.t > 0
+    ? '<div style="font-size:9px;color:#888;margin-bottom:2px">Subtotal: '+fmt(sub)+' '+data.m+'</div>' +
+      '<div style="font-size:9px;color:#888;margin-bottom:5px">TVA '+data.t+'%: '+fmt(tvaVal)+' '+data.m+'</div>' : '';
+  document.getElementById('pdf-prev').innerHTML =
+    '<div class="ppv-header"><div class="ppv-logo">Solvo.</div><div class="ppv-title"><h3>'+info.short+'</h3><p>Nr. '+data.nr+' · '+data.dt+'</p></div></div>' +
+    '<div class="ppv-body">' +
+    '<div class="ppv-parties">' +
+    '<div class="ppv-party"><h4>De la</h4><strong>'+(data.fN||'Firma ta')+'</strong>'+(data.fCui?'<span>'+data.fCui+'</span>':'')+(data.fA?'<span>'+data.fA+'</span>':'')+(data.fE?'<span>'+data.fE+'</span>':'')+'</div>' +
+    '<div class="ppv-party"><h4>Către</h4><strong>'+data.cN+'</strong>'+(data.cC?'<span>Att: '+data.cC+'</span>':'')+(data.cE?'<span>'+data.cE+'</span>':'')+'</div>' +
+    '</div>' +
+    '<table class="ppv-tbl"><thead><tr><th>#</th><th>Descriere</th><th style="text-align:right">Total</th></tr></thead><tbody>'+rowsH+'</tbody></table>' +
+    '<div class="ppv-total">'+tvaLine+'<div class="grand">'+fmt(grand)+' '+data.m+'</div></div>' +
+    '</div>';
+}
+
+// ═══════════════════════════════
+// PDF GENERATION
+// ═══════════════════════════════
+function genPDF() {
+  var data = getJobData();
+  var info = DOC_INFO[data.doc] || DOC_INFO.oferta;
+  if (data.doc === 'contract') { genContractPDF(data, info); return; }
+  if (data.doc === 'pv')       { genPvPDF(data, info); return; }
+  genStandardPDF(data, info);
+}
+
+function pdfBase(doc, W, M, data, info) {
+  doc.setFillColor(124,92,252); doc.rect(0,0,W,32,'F');
+  doc.setFillColor(109,68,245); doc.rect(W/2,0,W/2,32,'F');
+  doc.setFont('helvetica','bold'); doc.setFontSize(18); doc.setTextColor(255,255,255);
+  doc.text('Solvo.', M, 20);
+  doc.setFontSize(9); doc.setFont('helvetica','normal'); doc.setTextColor(220,210,255);
+  doc.text(info.short, W-M, 13, {align:'right'});
+  doc.setFontSize(11); doc.setTextColor(255,255,255);
+  doc.text((data.nr||'—') + ' · ' + (data.dt||''), W-M, 21, {align:'right'});
+  var y = 42;
+  doc.setFontSize(7); doc.setFont('helvetica','bold'); doc.setTextColor(124,92,252);
+  doc.text('PRESTATOR', M, y);
+  doc.setFontSize(10); doc.setFont('helvetica','bold'); doc.setTextColor(20,20,35);
+  doc.text(data.fN||'Firma', M, y+5);
+  doc.setFontSize(8); doc.setFont('helvetica','normal'); doc.setTextColor(90,90,110);
+  var yL=y+10;
+  if(data.fCui){doc.text('CUI: '+data.fCui,M,yL);yL+=4;}
+  if(data.fA){doc.text(data.fA,M,yL);yL+=4;}
+  if(data.fE){doc.text(data.fE,M,yL);yL+=4;}
+  if(data.fT){doc.text(data.fT,M,yL);}
+  var xR=W/2+8;
+  doc.setFontSize(7); doc.setFont('helvetica','bold'); doc.setTextColor(124,92,252);
+  doc.text('BENEFICIAR', xR, y);
+  doc.setFontSize(10); doc.setFont('helvetica','bold'); doc.setTextColor(20,20,35);
+  doc.text(data.cN||'Client', xR, y+5);
+  doc.setFontSize(8); doc.setFont('helvetica','normal'); doc.setTextColor(90,90,110);
+  var yR=y+10;
+  if(data.cC){doc.text('Att: '+data.cC,xR,yR);yR+=4;}
+  if(data.cE){doc.text(data.cE,xR,yR);}
+  return Math.max(yL,yR) + 10;
+}
+
+function pdfTotal(doc, W, M, yA, sub, tvaVal, grand, moneda, tvaPct) {
+  var xT = W-M;
+  if(tvaPct>0){
+    doc.setFontSize(8); doc.setFont('helvetica','normal'); doc.setTextColor(100,100,120);
+    doc.text('Subtotal:',xT-40,yA,{align:'right'}); doc.text(fmt(sub)+' '+moneda,xT,yA,{align:'right'}); yA+=4.5;
+    doc.text('TVA '+tvaPct+'%:',xT-40,yA,{align:'right'}); doc.text(fmt(tvaVal)+' '+moneda,xT,yA,{align:'right'}); yA+=7;
+  }
+  doc.setDrawColor(124,92,252); doc.line(xT-60,yA-2,xT,yA-2);
+  doc.setFont('helvetica','bold');doc.setFontSize(13);doc.setTextColor(124,92,252);
+  doc.text('TOTAL: '+fmt(grand)+' '+moneda,xT,yA+5,{align:'right'});
+  return yA + 8;
+}
+
+function pdfFooter(doc, W) {
+  doc.setFillColor(10,10,18); doc.rect(0,284,W,13,'F');
+  doc.setFontSize(7.5);doc.setFont('helvetica','normal');doc.setTextColor(80,80,110);
+  doc.text('Generat cu Solvo · solvo.ro',W/2,291,{align:'center'});
+}
+
+function genStandardPDF(data, info) {
+  var {jsPDF}=window.jspdf; var doc=new jsPDF({unit:'mm',format:'a4'}); var W=210,M=18;
+  var yT = pdfBase(doc,W,M,data,info);
+  var rows=[]; var sub=0;
+  data.s.forEach(function(s,i){ sub+=s.p||0; rows.push([i+1,s.d,fmt(s.p)+' '+data.m]); });
+  doc.autoTable({startY:yT,margin:{left:M,right:M},
+    head:[['#','Descriere','Total']],body:rows,
+    headStyles:{fillColor:[124,92,252],textColor:255,fontSize:8,fontStyle:'bold'},
+    bodyStyles:{fontSize:9,textColor:[40,40,60]},
+    alternateRowStyles:{fillColor:[248,246,255]},
+    columnStyles:{0:{halign:'center',cellWidth:12},2:{halign:'right',cellWidth:36}},theme:'grid'});
+  var yA=doc.lastAutoTable.finalY+8;
+  var tvaVal=sub*data.t/100, grand=sub+tvaVal;
+  pdfTotal(doc,W,M,yA,sub,tvaVal,grand,data.m,data.t);
+  pdfFooter(doc,W);
+  doc.save(info.prefix+'-'+data.nr+'-'+(data.cN||'doc').replace(/\s+/g,'_')+'.pdf');
+  addStat(data.doc, grand);
+  toast('✓ PDF descărcat!');
+}
+
+function genContractPDF(data, info) {
+  var {jsPDF}=window.jspdf; var doc=new jsPDF({unit:'mm',format:'a4'}); var W=210,M=18;
+  var sub=0; data.s.forEach(function(s){ sub+=s.p||0; });
+  var tvaVal=sub*data.t/100, grand=sub+tvaVal;
+  var termen=data.extra.termen||'30';
+
+  doc.setFillColor(124,92,252); doc.rect(0,0,W,32,'F');
+  doc.setFont('helvetica','bold'); doc.setFontSize(18); doc.setTextColor(255,255,255);
+  doc.text('Solvo.',M,20);
+  doc.setFontSize(9); doc.setFont('helvetica','normal'); doc.setTextColor(220,210,255);
+  doc.text('CONTRACT DE PRESTĂRI SERVICII',W-M,13,{align:'right'});
+  doc.setFontSize(11); doc.setTextColor(255,255,255);
+  doc.text('Nr. '+(data.nr||'—')+' / '+(data.dt||''),W-M,21,{align:'right'});
+
+  var y=40;
+  var cls = function(sz,bold,r,g,b){ doc.setFontSize(sz);doc.setFont('helvetica',bold?'bold':'normal');doc.setTextColor(r||20,g||20,b||35); };
+  var line = function(txt){ var lines=doc.splitTextToSize(txt,W-M*2); doc.text(lines,M,y); y+=lines.length*5+2; };
+
+  cls(10,true,124,92,252); doc.text('1. PĂRȚILE CONTRACTANTE',M,y); y+=6;
+  cls(9,false);
+  line('Prestator: '+(data.fN||'Firma')+' '+(data.fCui?', CUI '+data.fCui:'')+', '+( data.fA||'')+', '+(data.fE||''));
+  line('Beneficiar: '+(data.cN||'Client')+(data.cC?', att. '+data.cC:'')+', '+(data.cE||''));
+  y+=2;
+  cls(10,true,124,92,252); doc.text('2. OBIECTUL CONTRACTULUI',M,y); y+=6;
+  cls(9,false);
+  line('Prestatorul se obligă să execute următoarele servicii pentru Beneficiar:');
+  data.s.forEach(function(s,i){ line('   '+(i+1)+'. '+s.d+' — '+fmt(s.p)+' '+data.m); });
+  y+=2;
+  cls(10,true,124,92,252); doc.text('3. VALOAREA CONTRACTULUI',M,y); y+=6;
+  cls(9,false);
+  line('Valoarea totală a contractului este: '+fmt(grand)+' '+data.m+(data.t>0?' (inclusiv TVA '+data.t+'%)':''));
+  line('Plata se va efectua în termen de 30 de zile de la finalizarea lucrărilor.');
+  y+=2;
+  cls(10,true,124,92,252); doc.text('4. DURATA',M,y); y+=6;
+  cls(9,false);
+  line('Lucrările vor fi executate în termen de '+termen+' zile lucrătoare de la semnarea contractului.');
+  y+=2;
+  cls(10,true,124,92,252); doc.text('5. OBLIGAȚIILE PRESTATORULUI',M,y); y+=6;
+  cls(9,false);
+  line('a) Să execute lucrările conform specificațiilor agreate și în termenul stabilit.');
+  line('b) Să utilizeze materiale de calitate corespunzătoare.');
+  line('c) Să informeze Beneficiarul asupra oricăror situații neprevăzute.');
+  y+=2;
+  cls(10,true,124,92,252); doc.text('6. OBLIGAȚIILE BENEFICIARULUI',M,y); y+=6;
+  cls(9,false);
+  line('a) Să asigure accesul Prestatorului la locul de muncă.');
+  line('b) Să efectueze plata în termenul convenit.');
+  line('c) Să recepționeze lucrările prin semnarea Procesului Verbal de Recepție.');
+  y+=2;
+  cls(10,true,124,92,252); doc.text('7. FORȚA MAJORĂ',M,y); y+=6;
+  cls(9,false);
+  line('Niciuna din părți nu va fi răspunzătoare pentru neexecutarea obligațiilor contractuale cauzată de forță majoră.');
+  y+=2;
+  cls(10,true,124,92,252); doc.text('8. LITIGII',M,y); y+=6;
+  cls(9,false);
+  line('Litigiile se vor soluționa pe cale amiabilă. În caz contrar, competența revine instanțelor judecătorești.');
+  y+=8;
+  doc.setDrawColor(200,200,220); doc.line(M,y,W/2-10,y); doc.line(W/2+10,y,W-M,y);
+  cls(8,false,100,100,120);
+  doc.text('Prestator',M,y+6); doc.text('Beneficiar',W-M,y+6,{align:'right'});
+  doc.text(data.fN||'',M,y+11); doc.text(data.cN||'',W-M,y+11,{align:'right'});
+  pdfFooter(doc,W);
+  doc.save(info.prefix+'-'+data.nr+'-'+(data.cN||'contract').replace(/\s+/g,'_')+'.pdf');
+  addStat('contract', grand);
+  toast('✓ Contract descărcat!');
+}
+
+function genPvPDF(data, info) {
+  var {jsPDF}=window.jspdf; var doc=new jsPDF({unit:'mm',format:'a4'}); var W=210,M=18;
+  var sub=0; data.s.forEach(function(s){ sub+=s.p||0; });
+  var tvaVal=sub*data.t/100, grand=sub+tvaVal;
+
+  doc.setFillColor(124,92,252); doc.rect(0,0,W,32,'F');
+  doc.setFont('helvetica','bold'); doc.setFontSize(18); doc.setTextColor(255,255,255);
+  doc.text('Solvo.',M,20);
+  doc.setFontSize(9); doc.setFont('helvetica','normal'); doc.setTextColor(220,210,255);
+  doc.text('PROCES VERBAL DE RECEPȚIE',W-M,13,{align:'right'});
+  doc.setFontSize(11); doc.setTextColor(255,255,255);
+  doc.text('Nr. '+(data.nr||'—')+' / '+(data.dt||''),W-M,21,{align:'right'});
+
+  var y=42;
+  doc.setFontSize(9); doc.setFont('helvetica','normal'); doc.setTextColor(60,60,80);
+  var lines = doc.splitTextToSize(
+    'Încheiat astăzi, '+data.dt+', între '+( data.fN||'Prestator')+' în calitate de Prestator și '+(data.cN||'Beneficiar')+' în calitate de Beneficiar, cu privire la recepția lucrărilor executate.',
+    W-M*2
+  );
+  doc.text(lines,M,y); y+=lines.length*5+8;
+
+  doc.setFontSize(10); doc.setFont('helvetica','bold'); doc.setTextColor(124,92,252);
+  doc.text('LUCRĂRI EXECUTATE',M,y); y+=6;
+
+  var rows = []; data.s.forEach(function(s,i){ rows.push([i+1,s.d,fmt(s.p)+' '+data.m]); });
+  doc.autoTable({startY:y,margin:{left:M,right:M},
+    head:[['#','Lucrare executată','Valoare']],body:rows,
+    headStyles:{fillColor:[124,92,252],textColor:255,fontSize:8,fontStyle:'bold'},
+    bodyStyles:{fontSize:9,textColor:[40,40,60]},
+    alternateRowStyles:{fillColor:[248,246,255]},
+    columnStyles:{0:{halign:'center',cellWidth:12},2:{halign:'right',cellWidth:36}},theme:'grid'});
+
+  y=doc.lastAutoTable.finalY+8;
+  y=pdfTotal(doc,W,M,y,sub,tvaVal,grand,data.m,data.t);
+  y+=6;
+
+  doc.setFontSize(9); doc.setFont('helvetica','normal'); doc.setTextColor(60,60,80);
+  var conclLines = doc.splitTextToSize(
+    'Lucrările de mai sus au fost verificate, testate și recepționate fără obiecțiuni. Beneficiarul confirmă că lucrările au fost executate conform contractului și este de acord cu plata valorii totale.',
+    W-M*2
+  );
+  doc.text(conclLines,M,y); y+=conclLines.length*5+10;
+
+  doc.setDrawColor(200,200,220);
+  doc.line(M,y,W/2-10,y); doc.line(W/2+10,y,W-M,y);
+  doc.setFontSize(8); doc.setTextColor(100,100,120);
+  doc.text('Prestator',M,y+6); doc.text('Beneficiar',W-M,y+6,{align:'right'});
+  doc.text(data.fN||'',M,y+11); doc.text(data.cN||'',W-M,y+11,{align:'right'});
+  pdfFooter(doc,W);
+  doc.save(info.prefix+'-'+data.nr+'-'+(data.cN||'pv').replace(/\s+/g,'_')+'.pdf');
+  addStat('pv', grand);
+  toast('✓ Proces Verbal descărcat!');
+}
+
+// ═══════════════════════════════
+// CLIENT VIEW
+// ═══════════════════════════════
+function renderCV(data) {
+  document.getElementById('fm').style.display='none';
+  var cv=document.getElementById('cv'); cv.style.display='block';
+  var info=DOC_INFO[data.doc]||DOC_INFO.oferta;
+  document.title='Solvo — '+info.name+' '+data.nr;
+  var sub=0; var srvH='';
+  (data.s||[]).forEach(function(s){ sub+=s.p||0; srvH+='<div class="cv-srv-row"><span class="cv-srv-name">'+s.d+'</span><span class="cv-srv-price">'+fmt(s.p)+' '+data.m+'</span></div>'; });
+  var tvaVal=sub*(data.t||0)/100, grand=sub+tvaVal;
+  var tvaLine=data.t>0?'<div class="cv-total-sub"><span>Subtotal</span><span>'+fmt(sub)+' '+data.m+'</span></div><div class="cv-total-sub"><span>TVA '+data.t+'%</span><span>'+fmt(tvaVal)+' '+data.m+'</span></div>':'';
+  var acceptMsg=encodeURIComponent('Am văzut '+info.name+' nr. '+(data.nr||'')+'. Vă contactez pentru confirmare.');
+  var acceptUrl=data.fT?'https://wa.me/40'+data.fT.replace(/\s/g,'').replace(/^0/,'')+'?text='+acceptMsg:'mailto:'+(data.fE||'')+'?subject=Confirmare '+info.name+' '+(data.nr||'');
+  cv.innerHTML='<div style="background:var(--bg);min-height:100vh"><div style="position:fixed;inset:0;background:radial-gradient(ellipse 60% 50% at 20% 10%,rgba(124,92,252,.12) 0%,transparent 70%);pointer-events:none;z-index:0"></div>'+
+    '<div class="cv-wrap" style="position:relative;z-index:1">'+
+    '<div style="display:flex;align-items:center;gap:10px;margin-bottom:24px"><div class="logo"><span class="logo-text">Solvo</span><div class="logo-dot"></div></div><span style="font-size:11px;color:var(--muted)">— '+info.name+'</span></div>'+
+    '<div class="cv-card">'+
+    '<div class="cv-hdr"><div class="cv-logo">Solvo.</div><div class="cv-nr"><h3>'+info.short+'</h3><p>Nr. '+(data.nr||'—')+' · '+(data.dt||'')+'</p></div></div>'+
+    '<div class="cv-body">'+
+    '<div class="cv-parties">'+
+    '<div class="cv-party"><h4>De la</h4><strong>'+(data.fN||'—')+'</strong>'+(data.fCui?'<span>'+data.fCui+'</span>':'')+(data.fA?'<span>'+data.fA+'</span>':'')+(data.fE?'<span>'+data.fE+'</span>':'')+'</div>'+
+    '<div class="cv-party"><h4>Către</h4><strong>'+(data.cN||'—')+'</strong>'+(data.cC?'<span>Att: '+data.cC+'</span>':'')+(data.cE?'<span>'+data.cE+'</span>':'')+'</div>'+
+    '</div>'+
+    '<div class="cv-services">'+srvH+'</div>'+
+    '<div class="cv-total-bloc">'+tvaLine+'<div class="cv-total-grand"><span>Total</span><span class="cv-grand-val">'+fmt(grand)+' '+data.m+'</span></div></div>'+
+    '<div id="cv-accept-area"><button class="btn-accept" onclick="cvAccept(\''+acceptUrl.replace(/'/g,"\\'")+'\')" >✓ Accept / Confirm</button></div>'+
+    '<div class="cv-footer">Generat cu <a href="'+window.location.href.split('?')[0]+'">Solvo.</a></div>'+
+    '</div></div></div></div>';
+}
+
+function cvAccept(url) {
+  document.getElementById('cv-accept-area').innerHTML='<div class="cv-accepted"><h3>✓ Confirmat!</h3><p>Se deschide WhatsApp pentru a confirma cu furnizorul.</p></div>';
+  setTimeout(function(){ window.open(url,'_blank'); }, 400);
+}
+
+// ═══════════════════════════════
+// RESET
+// ═══════════════════════════════
+function resetAll() {
+  if (!confirm('Document nou? Datele curente se pierd.')) return;
+  clearSrv(); SEL_DOC=null;
+  document.querySelectorAll('.doc-card').forEach(function(c){ c.classList.remove('sel'); });
+  ['c_n','c_c','c_e','c_tel'].forEach(function(id){ var el=document.getElementById(id); if(el) el.value=''; });
+  goTo(0);
+}
+
+// ═══════════════════════════════
+// HELPERS
+// ═══════════════════════════════
+// ═══════════════════════════════
+// STATS / DASHBOARD
+// ═══════════════════════════════
+var STATS_KEY = 'solvo_stats';
+
+function loadStats() {
+  try { return JSON.parse(localStorage.getItem(STATS_KEY) || 'null') || { oferta:0, contract:0, deviz:0, pv:0, proforma:0, valoare:0 }; }
+  catch(e) { return { oferta:0, contract:0, deviz:0, pv:0, proforma:0, valoare:0 }; }
+}
+
+function addStat(docType, valoare) {
+  var s = loadStats();
+  s[docType] = (s[docType] || 0) + 1;
+  s.valoare  = (s.valoare  || 0) + (valoare || 0);
+  localStorage.setItem(STATS_KEY, JSON.stringify(s));
+  renderDash();
+}
+
+function renderDash() {
+  var s = loadStats();
+  var total = s.oferta + s.contract + s.deviz + s.pv + s.proforma;
+  if (!total) return;
+  var labels = { oferta:'Oferte', contract:'Contracte', deviz:'Devize', pv:'Procese verbale', proforma:'Proformate' };
+  var html = '';
+  ['oferta','contract','deviz','pv','proforma'].forEach(function(k){
+    if (s[k]) html += '<div class="dash-row"><span class="dash-row-label">'+ labels[k] +'</span><span class="dash-row-val">'+ s[k] +'</span></div>';
+  });
+  if (s.valoare > 0) {
+    html += '<div class="dash-total-row"><span>Valoare totală</span><span class="dash-total-val">'+ fmt(s.valoare) +' RON</span></div>';
+  }
+  var el = document.getElementById('dash-rows');
+  if (el) el.innerHTML = html;
+}
+
+function v(id){ var el=document.getElementById(id); return el ? el.value.trim() : ''; }
+function fmt(n){ return Number(n).toLocaleString('ro-RO',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function toast(msg){ var el=document.getElementById('toast'); el.textContent=msg; el.classList.add('show'); setTimeout(function(){ el.classList.remove('show'); },2600); }
+
+// ═══════════════════════════════
+// INIT
+// ═══════════════════════════════
+(function(){
+  var params=new URLSearchParams(window.location.search);
+  var d=params.get('d');
+  if(d){ var data=decodeOffer(d); if(data){ renderCV(data); return; } }
+  renderTpls();
+  loadFirma();
+  renderDash();
+  document.getElementById('o_nr').value = 'DOC-'+(Math.floor(Math.random()*900)+100);
+})();
+</script>
+</body>
+</html>
