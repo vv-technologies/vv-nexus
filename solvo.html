@@ -929,7 +929,7 @@ function pdfBase(doc, W, M, data, info) {
       doc.setTextColor(bc[0],bc[1],bc[2]); doc.text('Solvo.',M,20);
     }
     doc.setFontSize(9); doc.setFont('helvetica','normal'); doc.setTextColor(120,120,130);
-    doc.text(info.short, W-M, 13, {align:'right'});
+    doc.text(diac(info.short), W-M, 13, {align:'right'});
     doc.setFontSize(11); doc.setTextColor(60,60,70);
     doc.text((data.nr||'—') + ' · ' + (data.dt||''), W-M, 22, {align:'right'});
   } else if (isDark) {
@@ -945,7 +945,7 @@ function pdfBase(doc, W, M, data, info) {
       doc.setTextColor(bc[0],bc[1],bc[2]); doc.text('Solvo.',M,20);
     }
     doc.setFontSize(9); doc.setFont('helvetica','normal'); doc.setTextColor(180,170,200);
-    doc.text(info.short, W-M, 13, {align:'right'});
+    doc.text(diac(info.short), W-M, 13, {align:'right'});
     doc.setFontSize(11); doc.setTextColor(255,255,255);
     doc.text((data.nr||'—') + ' · ' + (data.dt||''), W-M, 22, {align:'right'});
   } else {
@@ -961,7 +961,7 @@ function pdfBase(doc, W, M, data, info) {
       doc.text('Solvo.',M,20);
     }
     doc.setFontSize(9); doc.setFont('helvetica','normal'); doc.setTextColor(220,210,255);
-    doc.text(info.short, W-M, 13, {align:'right'});
+    doc.text(diac(info.short), W-M, 13, {align:'right'});
     doc.setFontSize(11); doc.setTextColor(255,255,255);
     doc.text((data.nr||'—') + ' · ' + (data.dt||''), W-M, 21, {align:'right'});
   }
@@ -970,21 +970,21 @@ function pdfBase(doc, W, M, data, info) {
   doc.setFontSize(7); doc.setFont('helvetica','bold'); doc.setTextColor(124,92,252);
   doc.text('PRESTATOR', M, y);
   doc.setFontSize(10); doc.setFont('helvetica','bold'); doc.setTextColor(20,20,35);
-  doc.text(data.fN||'Firma', M, y+5);
+  doc.text(diac(data.fN||'Firma'), M, y+5);
   doc.setFontSize(8); doc.setFont('helvetica','normal'); doc.setTextColor(90,90,110);
   var yL=y+10;
   if(data.fCui){doc.text('CUI: '+data.fCui,M,yL);yL+=4;}
-  if(data.fA){doc.text(data.fA,M,yL);yL+=4;}
+  if(data.fA){doc.text(diac(data.fA),M,yL);yL+=4;}
   if(data.fE){doc.text(data.fE,M,yL);yL+=4;}
   if(data.fT){doc.text(data.fT,M,yL);}
   var xR=W/2+8;
   doc.setFontSize(7); doc.setFont('helvetica','bold'); doc.setTextColor(124,92,252);
   doc.text('BENEFICIAR', xR, y);
   doc.setFontSize(10); doc.setFont('helvetica','bold'); doc.setTextColor(20,20,35);
-  doc.text(data.cN||'Client', xR, y+5);
+  doc.text(diac(data.cN||'Client'), xR, y+5);
   doc.setFontSize(8); doc.setFont('helvetica','normal'); doc.setTextColor(90,90,110);
   var yR=y+10;
-  if(data.cC){doc.text('Att: '+data.cC,xR,yR);yR+=4;}
+  if(data.cC){doc.text(diac('Att: '+data.cC),xR,yR);yR+=4;}
   if(data.cE){doc.text(data.cE,xR,yR);}
   return Math.max(yL,yR) + 10;
 }
@@ -1013,7 +1013,7 @@ function genStandardPDF(data, info) {
   var {jsPDF}=window.jspdf; var doc=new jsPDF({unit:'mm',format:'a4'}); var W=210,M=18;
   var yT = pdfBase(doc,W,M,data,info);
   var rows=[]; var sub=0;
-  data.s.forEach(function(s,i){ sub+=s.p||0; rows.push([i+1,s.d,fmt(s.p)+' '+data.m]); });
+  data.s.forEach(function(s,i){ sub+=s.p||0; rows.push([i+1,diac(s.d),fmt(s.p)+' '+data.m]); });
   doc.autoTable({startY:yT,margin:{left:M,right:M},
     head:[['#','Descriere','Total']],body:rows,
     headStyles:{fillColor:[124,92,252],textColor:255,fontSize:8,fontStyle:'bold'},
@@ -1418,6 +1418,15 @@ function renderDash() {
 function v(id){ var el=document.getElementById(id); return el ? el.value.trim() : ''; }
 function fmt(n){ return Number(n).toLocaleString('ro-RO',{minimumFractionDigits:2,maximumFractionDigits:2}); }
 function toast(msg){ var el=document.getElementById('toast'); el.textContent=msg; el.classList.add('show'); setTimeout(function(){ el.classList.remove('show'); },2600); }
+function diac(s){ if(!s) return '';
+  return s.replace(/ă/g,'a').replace(/Ă/g,'A')
+          .replace(/â/g,'a').replace(/Â/g,'A')
+          .replace(/î/g,'i').replace(/Î/g,'I')
+          .replace(/ș/g,'s').replace(/Ș/g,'S')
+          .replace(/ț/g,'t').replace(/Ț/g,'T')
+          .replace(/ş/g,'s').replace(/Ş/g,'S')
+          .replace(/ţ/g,'t').replace(/Ţ/g,'T');
+}
 
 // ═══════════════════════════════
 // INIT
