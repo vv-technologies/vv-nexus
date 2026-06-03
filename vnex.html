@@ -11,6 +11,7 @@
 <header>
   <div class="logo">V<span>NEX</span><div class="logo-badge">ALPHA</div></div>
   <div class="nav-links">
+    <div class="builder-badge" id="builder-badge" style="display:none;cursor:pointer" onclick="openMyWorkspace()" title="My Space"><span id="builder-badge-name"></span><span class="builder-rank" id="builder-badge-rank"></span></div>
     <button class="btn-nav" onclick="openSettings()" title="Settings">⚙️</button>
     <button class="btn-nav" onclick="openShareProject()">+ Share project</button>
     <button class="btn-nav-accent" onclick="openModal('waitlist-modal')">Get early access</button>
@@ -25,10 +26,10 @@
     <button class="btn-explore" onclick="scrollFeed()">See who's building ↓</button>
     <button class="btn-post" onclick="openShareProject()">Share what you're building →</button>
   </div>
-  <div class="stats-bar">
-    <div class="stat-item"><div class="stat-val">1</div><div class="stat-label">Builder</div></div>
-    <div class="stat-item"><div class="stat-val">4</div><div class="stat-label">Projects</div></div>
-    <div class="stat-item"><div class="stat-val">0</div><div class="stat-label">Tests done</div></div>
+  <div class="stats-bar" id="hero-stats-bar">
+    <div class="stat-item"><div class="stat-val" id="hs-builders">0</div><div class="stat-label">Builders</div></div>
+    <div class="stat-item"><div class="stat-val" id="hs-projects">0</div><div class="stat-label">Projects</div></div>
+    <div class="stat-item"><div class="stat-val" id="hs-logs">0</div><div class="stat-label">Log entries</div></div>
     <div class="stat-item"><div class="stat-val">Day 1</div><div class="stat-label">VNEX is live</div></div>
   </div>
 </div>
@@ -57,34 +58,31 @@
   <div class="grid">
     <div class="feed" id="builders-feed">
 
-      <!-- COSMIN -->
-      <div class="bcard">
+<!-- MY CARD — dinamic din localStorage -->
+      <div class="bcard" id="my-builder-card" style="display:none;border-color:rgba(99,102,241,.25)">
         <div class="bcard-top">
-          <div class="bcard-avatar" style="background:linear-gradient(135deg,#6366f1,#818cf8)">C</div>
+          <div class="bcard-avatar" id="my-card-avatar" style="background:linear-gradient(135deg,#6366f1,#818cf8)">?</div>
           <div>
-            <div class="bcard-name">Cosmin</div>
-            <div class="bcard-rank">VV Hybrid Universe · 4 projects active</div>
+            <div class="bcard-name" id="my-card-name">–</div>
+            <div class="bcard-rank" id="my-card-rank">Visitor · 0 projects</div>
           </div>
         </div>
-        <div class="bcard-projects">
-          <span class="bcard-proj">🧠 LEA</span>
-          <span class="bcard-proj">🌐 VNEX</span>
-          <span class="bcard-proj">📄 Solvo</span>
-          <span class="bcard-proj">◈ SIGNAL</span>
+        <div class="bcard-projects" id="my-card-projects">
+          <span style="font-size:11px;color:var(--muted)">No projects yet</span>
         </div>
-        <div class="bcard-update">Working on VNEX Builder Space — replacing project feed with builder cards. First real architecture change.</div>
+        <div class="bcard-update" id="my-card-update">Your space. Add your first project.</div>
         <div class="bcard-footer">
-          <span class="bcard-need">🧪 Needs testers for LEA + SIGNAL</span>
-          <button class="bcard-btn" onclick="openWorkspace('cosmin')">Enter Workspace →</button>
+          <span class="bcard-need" id="my-card-need"></span>
+          <button class="bcard-btn" onclick="openMyWorkspace()">My Space →</button>
         </div>
       </div>
 
       <!-- EMPTY STATE -->
-      <div style="background:rgba(255,255,255,.02);border:1px dashed var(--border);border-radius:18px;padding:32px 24px;text-align:center">
+      <div style="background:rgba(255,255,255,.02);border:1px dashed var(--border);border-radius:18px;padding:32px 24px;text-align:center" id="empty-state-card">
         <div style="font-size:28px;margin-bottom:12px">🏗</div>
         <div style="font-size:14px;font-weight:700;color:var(--muted2);margin-bottom:6px">Be the next builder here.</div>
-        <div style="font-size:12px;color:var(--muted);margin-bottom:18px;line-height:1.6">Share what you're building. Real progress, real feedback, real community.</div>
-        <button class="bcard-btn" onclick="openShareProject()">Share your project →</button>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:18px;line-height:1.6">Enter VNEX, create your space, add your projects.</div>
+        <button class="bcard-btn" onclick="openOrSetupProfile()">Create your space →</button>
       </div>
 
     </div>
@@ -104,16 +102,7 @@
 
       <div class="scard">
         <div class="scard-title">🧪 Need testers now</div>
-        <div class="nti-item">
-          <span class="nti-emoji">🧠</span>
-          <div><div class="nti-name">LEA</div><div class="nti-status">Romanian offline AI</div></div>
-          <button class="btn-nti" onclick="openFeedback('LEA','test')">Test</button>
-        </div>
-        <div class="nti-item">
-          <span class="nti-emoji">◈</span>
-          <div><div class="nti-name">SIGNAL</div><div class="nti-status">Raycaster game</div></div>
-          <button class="btn-nti" onclick="openFeedback('SIGNAL','test')">Test</button>
-        </div>
+        <div style="font-size:12px;color:var(--muted);padding:8px 0 4px;line-height:1.6">No projects need testers yet.<br><span style="color:var(--accent2);font-weight:600;cursor:pointer" onclick="openOrSetupProfile()">Add your project →</span></div>
       </div>
 
       <div class="scard">
@@ -202,6 +191,13 @@
       </div>
       <input class="wl-input" id="builder-name-input" placeholder="Or type your own..." maxlength="20" style="margin-bottom:14px" oninput="clearNameSug()">
       <button class="welcome-cta" onclick="setBuilderName()">Enter VNEX →</button>
+      <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
+        <div style="font-size:12px;color:var(--muted);margin-bottom:10px">Already have a code?</div>
+        <div style="display:flex;gap:8px">
+          <input id="restore-code-input" class="wl-input" placeholder="VNEX-XXXX-XXXX-XXXX" style="margin-bottom:0;font-family:'Courier New',monospace;letter-spacing:1px;font-size:12px">
+          <button onclick="restoreWithCode()" style="background:rgba(99,102,241,.15);border:1px solid rgba(99,102,241,.3);border-radius:9px;padding:10px 16px;font-size:12px;font-weight:700;color:var(--accent2);cursor:pointer;font-family:inherit;white-space:nowrap">Connect →</button>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -234,6 +230,16 @@
           </div>
         </div>
         <button class="settings-save" onclick="saveSettings()">Save changes</button>
+        <div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--border)">
+          <div class="settings-section-title">Your VNEX Code</div>
+          <div id="settings-code-display" style="font-family:'Courier New',monospace;font-size:14px;color:var(--accent2);letter-spacing:2px;font-weight:700;padding:12px;background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.2);border-radius:10px;margin-bottom:8px">–</div>
+          <div style="display:flex;gap:8px;margin-bottom:20px">
+            <button onclick="copyCodeFromSettings()" style="background:none;border:1px solid var(--border2);border-radius:8px;padding:7px 14px;font-size:11px;font-weight:600;color:var(--muted2);cursor:pointer;font-family:inherit">📋 Copy</button>
+            <button id="btn-generate-code" onclick="generateCodeForExisting()" style="display:none;background:rgba(99,102,241,.12);border:1px solid rgba(99,102,241,.25);border-radius:8px;padding:7px 14px;font-size:11px;font-weight:600;color:var(--accent2);cursor:pointer;font-family:inherit">⚡ Generate my code</button>
+          </div>
+          <div class="settings-section-title" style="color:#f87171">Danger Zone</div>
+          <button onclick="deleteAccount()" style="width:100%;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:10px;padding:11px;font-size:13px;font-weight:700;color:#f87171;cursor:pointer;font-family:inherit">Delete my account & all data</button>
+        </div>
       </div>
       <div id="stab-appearance" class="settings-section" style="display:none">
         <div class="settings-section-title">Theme</div>
@@ -330,6 +336,7 @@
         <div class="share-need" onclick="spToggleNeed(this,'testers')"><div class="share-need-icon">🧪</div><div class="share-need-label">Testers</div></div>
         <div class="share-need" onclick="spToggleNeed(this,'ideas')"><div class="share-need-icon">💡</div><div class="share-need-label">Ideas</div></div>
         <div class="share-need" onclick="spToggleNeed(this,'feedback')"><div class="share-need-icon">💬</div><div class="share-need-label">Feedback</div></div>
+        <div class="share-need" onclick="spToggleNeed(this,'bugs')"><div class="share-need-icon">🐛</div><div class="share-need-label">Bug reports</div></div>
         <div class="share-need" onclick="spToggleNeed(this,'help')"><div class="share-need-icon">🆘</div><div class="share-need-label">Help</div></div>
       </div>
       <div class="share-nav">
@@ -346,7 +353,12 @@
       <textarea class="mc-textarea" id="sp-desc" placeholder="What does it do? 1-2 sentences." style="min-height:70px;margin-bottom:10px"></textarea>
       <input class="mc-input" id="sp-link" placeholder="🌐 Website / Demo (optional)" style="margin-bottom:8px">
       <input class="mc-input" id="sp-github" placeholder="🐙 GitHub (optional)" style="margin-bottom:8px">
-      <input class="mc-input" id="sp-video" placeholder="▶ Video link (optional)" style="margin-bottom:16px">
+      <input class="mc-input" id="sp-video" placeholder="▶ Video link (optional)" style="margin-bottom:12px">
+      <div id="sp-days-toggle" onclick="spToggleDays()" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:1.5px solid var(--border);border-radius:10px;cursor:pointer;transition:all .2s;margin-bottom:4px">
+        <div id="sp-days-dot" style="width:18px;height:18px;border-radius:5px;border:2px solid var(--muted);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .2s;font-size:12px"></div>
+        <span style="font-size:13px;color:var(--muted2)">📅 Show day counter <span style="color:var(--muted);font-size:11px">— Day 1, Day 45... counts from today</span></span>
+      </div>
+      <input type="checkbox" id="sp-days" style="display:none">
       <div class="share-nav">
         <button class="share-back" onclick="spNext(3)">← Back</button>
         <button class="share-next" onclick="spPublish()">Publish →</button>
