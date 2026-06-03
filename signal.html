@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SIGNAL</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#000; overflow:hidden; }
+canvas { display:block; image-rendering:pixelated; }
+
+#ui {
+  position:fixed; inset:0; pointer-events:none;
+  font-family:'Courier New',monospace; color:rgba(255,255,255,0.18);
+}
+#top {
+  position:absolute; top:22px; width:100%; text-align:center;
+  font-size:9px; letter-spacing:5px;
+  animation: pulse 4s ease-in-out infinite;
+}
+#bottom {
+  position:absolute; bottom:22px; width:100%; text-align:center;
+  font-size:8px; letter-spacing:3px;
+}
+#cross {
+  position:absolute; top:50%; left:50%;
+  transform:translate(-50%,-50%);
+  width:4px; height:4px; border-radius:50%;
+  background:rgba(80,120,255,0.4);
+}
+#msg {
+  position:absolute; top:50%; left:50%;
+  transform:translate(-50%,-50%);
+  font-size:11px; letter-spacing:4px;
+  color:rgba(100,140,255,0.8);
+  text-align:center; line-height:2.2;
+  opacity:0; transition:opacity 0.8s;
+  pointer-events:none;
+}
+#overlay {
+  position:fixed; inset:0; background:#000;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  cursor:pointer; z-index:100;
+  transition:opacity 1.5s;
+}
+#overlay.fade { opacity:0; pointer-events:none; }
+.ol-title { font-family:'Courier New',monospace; font-size:13px; letter-spacing:8px; color:rgba(255,255,255,0.85); margin-bottom:32px; }
+.ol-sub   { font-family:'Courier New',monospace; font-size:9px;  letter-spacing:3px; color:rgba(255,255,255,0.2);  }
+
+@keyframes pulse { 0%,100%{opacity:.18} 50%{opacity:.4} }
+</style>
+</head>
+<body>
+
+<canvas id="c"></canvas>
+
+<div id="ui">
+  <div id="top">S I G N A L · D E T E C T E D</div>
+  <div id="cross"></div>
+  <div id="msg"></div>
+  <div id="bottom" id="roomlabel">ROOM · 01 · SECTOR · A</div>
+</div>
+
+<div id="overlay">
+  <div class="ol-title">S I G N A L</div>
+  <div class="ol-sub">CLICK TO ENTER</div>
+</div>
+
+<script>
+// ── MAP ───────────────────────────────────────────────────────
+// 0 = empty, 1 = plain wall, 2-9 = symbol walls
+const MAP = [
+  [1,1,1,1,1,1,1,1,1,1,1,1],
+  [1,0,0,0,0,0,0,0,0,0,0,1],
+  [1,0,0,0,0,0,0,0,0,0,0,1],
+  [1,0,0,2,0,0,0,0,3,0,0,1],
+  [1,0,0,0,0,0,0,0,0,0,0,1],
+  [1,0,0,0,0,0,0,0,0,0,0,1],
+  [1,0,0,0,0,0,0,0,0,0,0,1],
+  [1,0,0,4,0,0,0,0,0,0,0,1],
+  [1,0,0,0,0,0,0,0,0,0,0,1],
+  [1,0,0,0,0,0,0,0,2,0,0,1],
+  [1,0,0,0,0,0,0,0,0,0,0,1],
+  [1,1,1,1,1,0,0,1,1,1,1,1],  // door gap at col 4-5
+  [0,0,0,0,0,0,0,0,0,0,0,0],  // next room
+  [0,0,0,0,0,0,0,0,0,0,0,0],
+  [0,5,0,0,0,0,0,0,0,0,5,0],
+  [0,0,0,0,0,0,0,0,0,0,0,0],
+  [1,1,1,1,1,1,1,1,1,1,1,1],
+];
+
+const SYMBOLS = {
+  2: 'A1', 3: '07', 4: 'B3', 5: 'A1'
+};
+
+const MAP_W = MAP[0].length;
+const MAP_H = MAP.length;
+
+// ── CANVAS SETUP ──────────────────────────────────────────────
+const canvas = document.getElementById('c');
+const ctx    = canvas.getContext('2d');
+
+// Render at half resolution for performance
+const SCALE  = 0.5;
+let W, H;
+
+function resize() {
+  W = Math.floor(window.innerWidth  * SCALE);
+  H = Math.floor(window.innerHeight * SCALE);
+  canvas.width  = W;
+  canvas.height = H;
+  canvas.style.width  = window.innerWidth  + 'px';
+  canvas.style.height = window.innerHeight + 'px';
+}
+resize();
+window.addEventListener('resize', resize);
+
+// ── PLAYER ───────────────────────────────────────────────────
+const player = {
+  x: 5.5, y: 9.5,
+  angle: -Math.PI/2,  // facing up
+  speed: 0, rotSpeed: 0,
+  room: 1
+};
+
+// ── INPUT ─────────────────────────────────────────────────────
+const keys = {};
+document.addEventListener('keydown', e => { keys[e.code] = true; e.preventDefault(); });
+document.addEventListener('keyup',   e => { keys[e.code] = false; });
+
+// Mouse look
+let mouseActive = false;
+document.addEventListener('pointerlockchange', () => {
+  mouseActive = document.pointerLockElement === canvas;
+});
+document.addEventListener('mousemove', e => {
+  if (!mouseActive) return;
+  player.angle += e.movementX * 0.0025;
+});
+
+// ── COLLISION ─────────────────────────────────────────────────
+function solid(x, y) {
+  const mx = Math.floor(x), my = Math.floor(y);
+  if (mx < 0 || my < 0 || mx >= MAP_W || my >= MAP_H) return true;
+  return MAP[my][mx] !== 0;
+}
+
+// ── UPDATE ────────────────────────────────────────────────────
+let lastTime = performance.now();
+
+function update(now) {
+  const dt = Math.min((now - lastTime) / 1000, 0.05);
+  lastTime = now;
+
+  const spd = 2.8;
+  const rot = 2.0;
+
+  if (keys['KeyA'] || keys['ArrowLeft'])  player.angle -= rot * dt;
+  if (keys['KeyD'] || keys['ArrowRight']) player.angle += rot * dt;
+
+  let dx = 0, dy = 0;
+  if (keys['KeyW'] || keys['ArrowUp'])   { dx =  Math.cos(player.angle) * spd * dt; dy =  Math.sin(player.angle) * spd * dt; }
+  if (keys['KeyS'] || keys['ArrowDown']) { dx = -Math.cos(player.angle) * spd * dt; dy = -Math.sin(player.angle) * spd * dt; }
+
+  const nx = player.x + dx;
+  const ny = player.y + dy;
+
+  if (!solid(nx, player.y)) player.x = nx;
+  if (!solid(player.x, ny)) player.y = ny;
+
+  // Check door proximity (row 11, cols 4-5)
+  if (player.y > 10.5 && player.y < 11.5 && player.x > 4 && player.x < 6) {
+    if (player.room === 1) {
+      player.room = 2;
+      showMsg('SIGNAL · A1 · CONFIRMED\nROOM · 02 · SECTOR · B', 3000);
+      document.getElementById('bottom').textContent = 'ROOM · 02 · SECTOR · B';
+    }
+  }
+}
+
+// ── WALL COLORS ───────────────────────────────────────────────
+function wallColor(type, dist, side) {
+  const bright = Math.max(0, 1 - dist / 14);
+  const b = side ? 0.55 : 1.0;
+  if (type === 0) return null;
+
+  // Symbol walls glow slightly
+  const isSymbol = type >= 2;
+  const r = isSymbol ? Math.floor(20  * bright * b) : Math.floor(10 * bright * b);
+  const g = isSymbol ? Math.floor(30  * bright * b) : Math.floor(12 * bright * b);
+  const bl= isSymbol ? Math.floor(120 * bright * b) : Math.floor(55 * bright * b);
+
+  return `rgb(${r},${g},${bl})`;
+}
+
+// ── RAYCASTER ─────────────────────────────────────────────────
+function cast(px, py, angle) {
+  const cos = Math.cos(angle);
+  const sin = Math.sin(angle);
+
+  let mapX = Math.floor(px);
+  let mapY = Math.floor(py);
+
+  const dDX = Math.abs(1 / (cos || 1e-10));
+  const dDY = Math.abs(1 / (sin || 1e-10));
+
+  let stepX, stepY, sideDistX, sideDistY;
+
+  if (cos < 0) { stepX = -1; sideDistX = (px - mapX) * dDX; }
+  else         { stepX =  1; sideDistX = (mapX + 1 - px) * dDX; }
+  if (sin < 0) { stepY = -1; sideDistY = (py - mapY) * dDY; }
+  else         { stepY =  1; sideDistY = (mapY + 1 - py) * dDY; }
+
+  let hit = false, side = 0, wall = 0;
+
+  for (let i = 0; i < 24 && !hit; i++) {
+    if (sideDistX < sideDistY) { sideDistX += dDX; mapX += stepX; side = 0; }
+    else                        { sideDistY += dDY; mapY += stepY; side = 1; }
+    if (mapX < 0 || mapY < 0 || mapX >= MAP_W || mapY >= MAP_H) { hit = true; wall = 1; }
+    else if (MAP[mapY][mapX] !== 0) { hit = true; wall = MAP[mapY][mapX]; }
+  }
+
+  const dist = side === 0
+    ? (mapX - px + (1 - stepX) / 2) / cos
+    : (mapY - py + (1 - stepY) / 2) / sin;
+
+  return { dist: Math.abs(dist), wall, side };
+}
+
+// ── RENDER ────────────────────────────────────────────────────
+function render() {
+  ctx.fillStyle = '#000';
+  ctx.fillRect(0, 0, W, H);
+
+  // Ceiling gradient
+  const ceil = ctx.createLinearGradient(0, 0, 0, H/2);
+  ceil.addColorStop(0, '#000000');
+  ceil.addColorStop(1, '#01010a');
+  ctx.fillStyle = ceil;
+  ctx.fillRect(0, 0, W, H/2);
+
+  // Floor gradient
+  const floor = ctx.createLinearGradient(0, H/2, 0, H);
+  floor.addColorStop(0, '#01010c');
+  floor.addColorStop(1, '#000000');
+  ctx.fillStyle = floor;
+  ctx.fillRect(0, H/2, W, H/2);
+
+  const FOV = Math.PI / 2.8;
+
+  for (let col = 0; col < W; col++) {
+    const rayAngle = player.angle - FOV/2 + (col / W) * FOV;
+    const { dist, wall, side } = cast(player.x, player.y, rayAngle);
+
+    const wallH = Math.min(H, Math.floor(H / (dist * Math.cos(rayAngle - player.angle))));
+    const top   = Math.floor((H - wallH) / 2);
+    const color = wallColor(wall, dist, side);
+
+    if (color) {
+      ctx.fillStyle = color;
+      ctx.fillRect(col, top, 1, wallH);
+    }
+  }
+}
+
+// ── SYMBOL OVERLAY (edge glow effect) ────────────────────────
+// Every 60 frames draw subtle scan line
+let frame = 0;
+function scanline() {
+  if (frame % 4 !== 0) return;
+  const y = Math.floor((frame / 4) % H);
+  ctx.fillStyle = 'rgba(20,30,100,0.03)';
+  ctx.fillRect(0, y, W, 1);
+}
+
+// ── MESSAGE ──────────────────────────────────────────────────
+const msgEl = document.getElementById('msg');
+let msgTimer = null;
+
+function showMsg(text, duration) {
+  msgEl.innerHTML = text.replace('\n','<br>');
+  msgEl.style.opacity = '1';
+  clearTimeout(msgTimer);
+  msgTimer = setTimeout(() => { msgEl.style.opacity = '0'; }, duration || 3000);
+}
+
+// ── AMBIENT SOUND ─────────────────────────────────────────────
+let audioCtx;
+function startAudio() {
+  try {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const gain = audioCtx.createGain();
+    gain.gain.setValueAtTime(0, audioCtx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.03, audioCtx.currentTime + 4);
+    gain.connect(audioCtx.destination);
+
+    [55, 82].forEach((freq, i) => {
+      const osc = audioCtx.createOscillator();
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      const g = audioCtx.createGain();
+      g.gain.value = i === 0 ? 1 : 0.4;
+      osc.connect(g); g.connect(gain);
+      osc.start();
+    });
+
+    // Signal pulse every 6s
+    setInterval(() => {
+      if (!audioCtx) return;
+      const p = audioCtx.createOscillator();
+      p.type = 'sine';
+      p.frequency.setValueAtTime(440, audioCtx.currentTime);
+      p.frequency.exponentialRampToValueAtTime(110, audioCtx.currentTime + 2);
+      const pg = audioCtx.createGain();
+      pg.gain.setValueAtTime(0.015, audioCtx.currentTime);
+      pg.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 2);
+      p.connect(pg); pg.connect(audioCtx.destination);
+      p.start(); p.stop(audioCtx.currentTime + 2);
+    }, 6000);
+  } catch(e) {}
+}
+
+// ── MAIN LOOP ─────────────────────────────────────────────────
+let running = false;
+
+function loop(now) {
+  if (!running) return;
+  frame++;
+  update(now);
+  render();
+  scanline();
+  requestAnimationFrame(loop);
+}
+
+// ── OVERLAY ───────────────────────────────────────────────────
+document.getElementById('overlay').addEventListener('click', function() {
+  this.classList.add('fade');
+  setTimeout(() => { this.style.display = 'none'; }, 1600);
+  canvas.requestPointerLock();
+  startAudio();
+  running = true;
+  requestAnimationFrame(loop);
+  setTimeout(() => showMsg('SIGNAL · DETECTED', 3000), 800);
+});
+</script>
+</body>
+</html>
