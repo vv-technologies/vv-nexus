@@ -3,282 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>VNEX — Follow projects, not people.</title>
-<style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --bg:#07070f;--s1:#0d0d18;--s2:#12121e;
-  --border:rgba(255,255,255,.06);--border2:rgba(255,255,255,.1);
-  --text:#eeeeff;--muted:#5a587a;--muted2:#9896b8;
-  --green:#22c55e;--yellow:#eab308;--red:#ef4444;--blue:#3b82f6;--purple:#a855f7;
-  --accent:#6366f1;--accent2:#818cf8;
-  --card:rgba(13,13,24,.9);
-}
-body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,-apple-system,sans-serif;min-height:100vh;overflow-x:hidden}
-body::before{content:'';position:fixed;inset:0;
-  background:radial-gradient(ellipse 80% 40% at 50% -5%,rgba(99,102,241,.13) 0%,transparent 60%),
-             radial-gradient(ellipse 40% 30% at 90% 90%,rgba(34,197,94,.06) 0%,transparent 60%),
-             radial-gradient(ellipse 30% 20% at 10% 60%,rgba(168,85,247,.05) 0%,transparent 60%);
-  pointer-events:none;z-index:0}
-
-/* ── HEADER ── */
-header{position:relative;z-index:10;max-width:1140px;margin:0 auto;padding:24px 24px 0;display:flex;align-items:center;justify-content:space-between}
-.logo{font-size:21px;font-weight:900;letter-spacing:-1px;color:var(--text);display:flex;align-items:center;gap:8px}
-.logo-badge{background:rgba(99,102,241,.15);border:1px solid rgba(99,102,241,.3);border-radius:6px;padding:2px 8px;font-size:10px;color:var(--accent2);font-weight:700;letter-spacing:.5px}
-.logo span{color:var(--accent)}
-.nav-links{display:flex;align-items:center;gap:6px}
-.btn-nav{background:none;border:1px solid var(--border2);border-radius:9px;padding:8px 16px;font-size:12px;font-weight:600;color:var(--muted2);cursor:pointer;transition:all .2s}
-.btn-nav:hover{border-color:var(--accent);color:var(--accent2)}
-.btn-nav-accent{background:var(--accent);color:#fff;border:none;border-radius:9px;padding:8px 18px;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s}
-.btn-nav-accent:hover{background:var(--accent2);box-shadow:0 4px 14px rgba(99,102,241,.4)}
-
-/* ── HERO ── */
-.hero{position:relative;z-index:1;text-align:center;padding:72px 24px 60px;max-width:760px;margin:0 auto}
-.hero-tag{display:inline-flex;align-items:center;gap:7px;background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.2);border-radius:100px;padding:5px 16px;font-size:12px;color:var(--accent2);margin-bottom:26px;cursor:default}
-.live-dot{width:6px;height:6px;background:var(--green);border-radius:50%;box-shadow:0 0 6px var(--green);animation:blink 2s infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
-.hero h1{font-size:clamp(38px,6.5vw,66px);font-weight:900;letter-spacing:-2.5px;line-height:1.03;margin-bottom:20px;background:linear-gradient(135deg,#eeeeff 0%,#a5b4fc 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.hero p{font-size:17px;color:var(--muted2);line-height:1.65;margin-bottom:38px;max-width:520px;margin-left:auto;margin-right:auto}
-.hero-cta{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;margin-bottom:48px}
-.btn-explore{background:var(--accent);color:#fff;border:none;border-radius:12px;padding:15px 34px;font-size:15px;font-weight:700;cursor:pointer;transition:all .2s;box-shadow:0 4px 24px rgba(99,102,241,.35)}
-.btn-explore:hover{background:var(--accent2);box-shadow:0 6px 32px rgba(99,102,241,.5);transform:translateY(-1px)}
-.btn-post{background:none;border:1.5px solid var(--border2);border-radius:12px;padding:15px 28px;font-size:15px;color:var(--muted2);cursor:pointer;transition:all .2s;font-weight:600}
-.btn-post:hover{border-color:var(--accent);color:var(--accent2)}
-.stats-bar{display:flex;align-items:center;justify-content:center;gap:0;flex-wrap:wrap;background:var(--s1);border:1px solid var(--border);border-radius:16px;padding:16px 32px;max-width:520px;margin:0 auto}
-.stat-item{text-align:center;padding:0 24px}
-.stat-item+.stat-item{border-left:1px solid var(--border)}
-.stat-val{font-size:26px;font-weight:900;color:var(--text);letter-spacing:-1px}
-.stat-label{font-size:11px;color:var(--muted);margin-top:2px;letter-spacing:.3px}
-
-/* ── TABS ── */
-.page-wrap{position:relative;z-index:1;max-width:1140px;margin:0 auto;padding:0 24px 100px}
-.filter-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px}
-.tabs{display:flex;gap:4px;background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:4px}
-.tab{padding:8px 16px;border-radius:9px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;transition:all .2s;border:none;background:none;white-space:nowrap}
-.tab.active{background:var(--accent);color:#fff;box-shadow:0 2px 8px rgba(99,102,241,.35)}
-.tab:hover:not(.active){color:var(--text)}
-.filter-right{display:flex;gap:8px}
-.sort-btn{background:var(--s1);border:1px solid var(--border);border-radius:9px;padding:8px 14px;font-size:12px;color:var(--muted2);cursor:pointer;transition:all .2s}
-.sort-btn:hover{border-color:var(--border2);color:var(--text)}
-
-/* ── GRID ── */
-.grid{display:grid;grid-template-columns:1fr 340px;gap:20px}
-.feed{display:flex;flex-direction:column;gap:16px}
-.sidebar{display:flex;flex-direction:column;gap:16px}
-
-/* ── PROJECT CARD ── */
-.pcard{background:var(--card);border:1px solid var(--border);border-radius:18px;overflow:hidden;transition:all .25s;position:relative}
-.pcard:hover{border-color:rgba(99,102,241,.3);box-shadow:0 8px 40px rgba(0,0,0,.4),0 0 0 1px rgba(99,102,241,.08)}
-.pcard-img{height:140px;background:linear-gradient(135deg,#1a1a2e,#16213e);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;flex-shrink:0}
-.pcard-img-emoji{font-size:52px;filter:drop-shadow(0 4px 12px rgba(0,0,0,.4))}
-.pcard-img-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,transparent 50%,var(--card) 100%)}
-.pcard-status-pin{position:absolute;top:12px;left:12px}
-.pcard-body{padding:18px 20px 16px}
-.pcard-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:8px}
-.pcard-name{font-size:17px;font-weight:800;letter-spacing:-.3px}
-.pcard-by{font-size:11px;color:var(--muted);margin-top:2px}
-.pcard-meta{display:flex;align-items:center;gap:12px;margin-bottom:10px;flex-wrap:wrap}
-.pcard-stat{font-size:11px;color:var(--muted2);display:flex;align-items:center;gap:4px}
-.pcard-desc{font-size:13px;color:var(--muted2);line-height:1.55;margin-bottom:12px}
-
-/* STATUS BADGES */
-.status-badge{display:inline-flex;align-items:center;gap:5px;border-radius:100px;padding:4px 11px;font-size:11px;font-weight:700;white-space:nowrap}
-.s-launched{background:rgba(34,197,94,.12);color:#4ade80;border:1px solid rgba(34,197,94,.22)}
-.s-building{background:rgba(234,179,8,.12);color:#fbbf24;border:1px solid rgba(234,179,8,.2)}
-.s-stuck{background:rgba(239,68,68,.12);color:#f87171;border:1px solid rgba(239,68,68,.2)}
-.s-idea{background:rgba(148,163,184,.08);color:#94a3b8;border:1px solid rgba(148,163,184,.15)}
-.s-needs-ideas{background:rgba(168,85,247,.12);color:#c084fc;border:1px solid rgba(168,85,247,.2)}
-
-/* STUCK BLOCK */
-.stuck-block{background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.18);border-radius:10px;padding:12px 14px;margin-bottom:12px}
-.stuck-block-title{font-size:11px;font-weight:700;color:#f87171;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
-.stuck-block-text{font-size:12px;color:var(--muted2);line-height:1.5}
-
-/* LAST UPDATE */
-.last-update{background:rgba(99,102,241,.06);border:1px solid rgba(99,102,241,.15);border-radius:10px;padding:10px 13px;margin-bottom:12px}
-.lu-label{font-size:10px;color:var(--accent2);font-weight:700;letter-spacing:.6px;text-transform:uppercase;margin-bottom:4px}
-.lu-text{font-size:12px;color:var(--muted2);line-height:1.5}
-
-/* COMMUNITY VOTE */
-.vote-block{background:rgba(168,85,247,.06);border:1px solid rgba(168,85,247,.18);border-radius:10px;padding:12px 14px;margin-bottom:12px}
-.vote-question{font-size:12px;font-weight:600;color:#c084fc;margin-bottom:10px}
-.vote-options{display:flex;flex-direction:column;gap:6px}
-.vote-opt{display:flex;align-items:center;gap:8px;cursor:pointer}
-.vote-opt-text{font-size:12px;color:var(--muted2);flex:1}
-.vote-bar{height:6px;background:rgba(255,255,255,.06);border-radius:3px;flex:2;overflow:hidden}
-.vote-bar-fill{height:100%;border-radius:3px;transition:width .6s ease}
-.vote-pct{font-size:11px;color:var(--muted);width:28px;text-align:right}
-
-/* PREDICTION */
-.pred-block{background:rgba(234,179,8,.06);border:1px solid rgba(234,179,8,.18);border-radius:10px;padding:12px 14px;margin-bottom:12px}
-.pred-label{font-size:10px;color:#fbbf24;font-weight:700;letter-spacing:.6px;text-transform:uppercase;margin-bottom:6px}
-.pred-text{font-size:12px;color:var(--muted2);margin-bottom:10px;line-height:1.4}
-.pred-btns{display:flex;gap:8px}
-.pred-btn{flex:1;padding:7px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;border:none;transition:all .2s;text-align:center}
-.pred-yes{background:rgba(34,197,94,.12);color:#4ade80;border:1px solid rgba(34,197,94,.2)}
-.pred-yes:hover{background:rgba(34,197,94,.22)}
-.pred-no{background:rgba(239,68,68,.1);color:#f87171;border:1px solid rgba(239,68,68,.2)}
-.pred-no:hover{background:rgba(239,68,68,.2)}
-
-/* WALL OF PROGRESS */
-.wop{margin-bottom:12px}
-.wop-label{font-size:10px;color:var(--muted);font-weight:600;letter-spacing:.6px;text-transform:uppercase;margin-bottom:7px}
-.wop-dots{display:flex;gap:4px;align-items:flex-end;height:24px}
-.wop-dot{width:8px;border-radius:2px;background:rgba(99,102,241,.25);transition:background .2s;cursor:default;flex-shrink:0}
-.wop-dot.active{background:var(--accent)}
-.wop-dot.launched{background:var(--green)}
-.wop-dot.stuck{background:var(--red)}
-
-/* FEEDBACK BOARD */
-.feedback-board{border-top:1px solid var(--border);padding-top:12px}
-.fb-label{font-size:10px;color:var(--muted);font-weight:600;letter-spacing:.6px;text-transform:uppercase;margin-bottom:8px}
-.fb-actions{display:flex;gap:7px;flex-wrap:wrap}
-.fb-btn{display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:8px;padding:6px 12px;font-size:11px;font-weight:600;color:var(--muted2);cursor:pointer;transition:all .2s;white-space:nowrap}
-.fb-btn:hover{border-color:var(--border2);color:var(--text);background:rgba(255,255,255,.07)}
-.fb-btn.suggest:hover{border-color:rgba(99,102,241,.4);color:var(--accent2);background:rgba(99,102,241,.08)}
-.fb-btn.bug:hover{border-color:rgba(239,68,68,.3);color:#f87171;background:rgba(239,68,68,.07)}
-.fb-btn.test:hover{border-color:rgba(34,197,94,.3);color:#4ade80;background:rgba(34,197,94,.07)}
-.fb-btn.help:hover{border-color:rgba(234,179,8,.3);color:#fbbf24;background:rgba(234,179,8,.06)}
-.fb-btn.vote:hover{border-color:rgba(168,85,247,.3);color:#c084fc;background:rgba(168,85,247,.07)}
-
-/* ── SIDEBAR ── */
-.scard{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px}
-.scard-title{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:14px}
-
-.waitlist-box{background:linear-gradient(135deg,rgba(99,102,241,.12),rgba(129,140,248,.05));border:1px solid rgba(99,102,241,.2);border-radius:16px;padding:20px}
-.wl-title{font-size:15px;font-weight:800;margin-bottom:4px}
-.wl-sub{font-size:12px;color:var(--muted2);margin-bottom:16px;line-height:1.5}
-.wl-input{width:100%;background:rgba(255,255,255,.05);border:1.5px solid var(--border2);border-radius:9px;color:var(--text);font-size:13px;padding:10px 14px;outline:none;margin-bottom:10px;font-family:inherit}
-.wl-input:focus{border-color:var(--accent);background:rgba(99,102,241,.06)}
-.wl-input::placeholder{color:var(--muted)}
-.btn-wl{width:100%;background:var(--accent);color:#fff;border:none;border-radius:9px;padding:11px;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s}
-.btn-wl:hover{background:var(--accent2);box-shadow:0 4px 14px rgba(99,102,241,.4)}
-.wl-note{font-size:10px;color:var(--muted);margin-top:7px;text-align:center}
-
-.nti-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border)}
-.nti-item:last-child{border-bottom:none}
-.nti-emoji{font-size:18px;flex-shrink:0}
-.nti-name{font-size:13px;font-weight:600;flex:1}
-.nti-status{font-size:10px;color:var(--muted);display:block;margin-top:1px}
-.btn-nti{background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.2);border-radius:7px;padding:5px 11px;font-size:11px;color:var(--accent2);cursor:pointer;transition:all .2s;font-weight:600;white-space:nowrap}
-.btn-nti:hover{background:rgba(99,102,241,.2);border-color:var(--accent)}
-
-.lb-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)}
-.lb-item:last-child{border-bottom:none}
-.lb-rank{font-size:12px;font-weight:900;width:18px;flex-shrink:0;color:var(--muted)}
-.lb-rank.r1{color:#f59e0b}.lb-rank.r2{color:#94a3b8}.lb-rank.r3{color:#b45309}
-.lb-avatar{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
-.lb-info{flex:1}
-.lb-name{font-size:12px;font-weight:600}
-.lb-badges{font-size:10px;color:var(--muted);margin-top:1px}
-.lb-xp{font-size:12px;color:var(--accent2);font-weight:700;white-space:nowrap}
-
-.hot-tag{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:7px;padding:5px 10px;font-size:11px;color:var(--muted2);cursor:pointer;transition:all .2s;margin:3px}
-.hot-tag:hover{border-color:var(--accent);color:var(--accent2)}
-
-/* ── MODALS ── */
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(10px);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px}
-.modal{background:#0d0d1a;border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:30px;width:100%;max-width:460px;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.6)}
-.modal-close{position:absolute;top:14px;right:16px;background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer;line-height:1;transition:color .2s}
-.modal-close:hover{color:var(--text)}
-.modal h2{font-size:19px;font-weight:800;margin-bottom:5px;letter-spacing:-.3px}
-.modal-sub{font-size:13px;color:var(--muted2);margin-bottom:20px;line-height:1.5}
-.modal input,.modal textarea,.modal select{width:100%;background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.09);border-radius:10px;color:var(--text);font-size:13px;padding:11px 14px;outline:none;font-family:inherit;margin-bottom:10px;transition:border-color .2s}
-.modal input:focus,.modal textarea:focus,.modal select:focus{border-color:var(--accent);background:rgba(99,102,241,.05)}
-.modal textarea{height:80px;resize:none}
-.modal select option{background:#0d0d1a}
-.modal-btn{width:100%;background:var(--accent);color:#fff;border:none;border-radius:11px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s}
-.modal-btn:hover{background:var(--accent2);box-shadow:0 4px 16px rgba(99,102,241,.4)}
-.feedback-types{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
-.ft-option{background:rgba(255,255,255,.03);border:1.5px solid rgba(255,255,255,.07);border-radius:10px;padding:10px 12px;cursor:pointer;transition:all .2s;text-align:center}
-.ft-option:hover,.ft-option.sel{border-color:var(--accent);background:rgba(99,102,241,.08)}
-.ft-option .ft-icon{font-size:20px;margin-bottom:4px}
-.ft-option .ft-name{font-size:11px;color:var(--muted2);font-weight:600}
-
-/* ── TOAST ── */
-.toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(14px);background:#22c55e;color:#07070f;padding:10px 24px;border-radius:100px;font-weight:700;font-size:13px;opacity:0;transition:all .3s;pointer-events:none;z-index:999;white-space:nowrap}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-
-@media(max-width:860px){
-  .grid{grid-template-columns:1fr}
-  .sidebar{display:none}
-  .hero h1{font-size:38px;letter-spacing:-1.5px}
-  .stats-bar{padding:14px 20px}
-  .stat-item{padding:0 16px}
-}
-@media(max-width:480px){
-  .tabs{overflow-x:auto;flex-wrap:nowrap}.tab{padding:7px 12px;font-size:11px}
-  .fb-actions{gap:5px}.fb-btn{padding:5px 9px;font-size:10px}
-}
-
-/* ── SETTINGS ── */
-.settings-wrap{background:var(--s1);border:1px solid var(--border2);border-radius:22px;width:100%;max-width:560px;position:relative;max-height:90vh;overflow-y:auto;display:flex;flex-direction:column}
-.settings-tabs{display:flex;border-bottom:1px solid var(--border);padding:0 24px}
-.settings-tab{padding:14px 16px;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap}
-.settings-tab.active{color:var(--accent2);border-bottom-color:var(--accent)}
-.settings-body{padding:24px;overflow-y:auto}
-.settings-section{margin-bottom:28px}
-.settings-section-title{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:14px}
-.settings-field{margin-bottom:14px}
-.settings-label{font-size:12px;color:var(--muted2);margin-bottom:6px;display:block}
-.settings-input{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--border2);border-radius:10px;padding:10px 13px;color:var(--text);font-size:13px;font-family:inherit;outline:none;transition:border .2s}
-.settings-input:focus{border-color:var(--accent)}
-.theme-opts,.lang-opts{display:flex;gap:8px;flex-wrap:wrap}
-.theme-opt{display:flex;align-items:center;gap:7px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px;padding:9px 14px;cursor:pointer;transition:all .2s;font-size:12px;font-weight:600;color:var(--muted2)}
-.theme-opt.sel,.lang-opt.sel{border-color:var(--accent);color:var(--accent2);background:rgba(99,102,241,.09)}
-.lang-opt{display:flex;align-items:center;gap:7px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px;padding:9px 14px;cursor:pointer;transition:all .2s;font-size:12px;font-weight:600;color:var(--muted2)}
-.notif-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)}
-.notif-row:last-child{border-bottom:none}
-.notif-label{font-size:13px;color:var(--text)}
-.toggle{width:36px;height:20px;background:rgba(255,255,255,.1);border-radius:100px;cursor:pointer;position:relative;transition:background .2s;flex-shrink:0}
-.toggle.on{background:var(--accent)}
-.toggle::after{content:'';position:absolute;width:14px;height:14px;background:#fff;border-radius:50%;top:3px;left:3px;transition:transform .2s}
-.toggle.on::after{transform:translateX(16px)}
-.settings-save{width:100%;background:var(--accent);color:#fff;border:none;border-radius:11px;padding:12px;font-size:13px;font-weight:700;cursor:pointer;margin-top:4px;font-family:inherit;transition:all .2s}
-.settings-save:hover{background:var(--accent2)}
-
-/* ── WELCOME / LEGAL ── */
-.welcome-wrap{background:var(--s1);border:1px solid rgba(99,102,241,.3);border-radius:22px;padding:40px 36px;width:100%;max-width:440px;text-align:center}
-.welcome-logo{font-size:32px;font-weight:900;letter-spacing:-1px;margin-bottom:6px}
-.welcome-logo span{color:var(--accent)}
-.welcome-tag{font-size:13px;color:var(--muted2);margin-bottom:28px}
-.welcome-rules{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:14px;padding:16px 20px;text-align:left;margin-bottom:24px}
-.welcome-rule{display:flex;align-items:center;gap:10px;padding:6px 0;font-size:13px;color:var(--muted2)}
-.welcome-rule-icon{font-size:15px;flex-shrink:0}
-.welcome-disclaimer{font-size:11px;color:var(--muted);margin-bottom:20px;line-height:1.6}
-.welcome-cta{width:100%;background:var(--accent);color:#fff;border:none;border-radius:12px;padding:14px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s}
-.welcome-cta:hover{background:var(--accent2);box-shadow:0 4px 18px rgba(99,102,241,.4)}
-
-/* ── MISSION CONTROL ── */
-.mc-wrap{background:var(--s1);border:1px solid var(--border2);border-radius:22px;padding:32px;width:100%;max-width:680px;position:relative;max-height:90vh;overflow-y:auto}
-.mc-head{font-size:22px;font-weight:900;letter-spacing:-.5px;margin-bottom:6px}
-.mc-sub{font-size:13px;color:var(--muted2);margin-bottom:24px}
-.mc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:8px}
-.mc-type{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:14px;padding:16px 12px;cursor:pointer;transition:all .2s;text-align:center;display:flex;flex-direction:column;align-items:center;gap:8px}
-.mc-type:hover{border-color:var(--accent);background:rgba(99,102,241,.07);transform:translateY(-2px)}
-.mc-type.sel{border-color:var(--accent);background:rgba(99,102,241,.12);box-shadow:0 0 0 1px rgba(99,102,241,.3)}
-.mc-type-icon{font-size:26px;line-height:1}
-.mc-type-name{font-size:11px;font-weight:700;color:var(--text);letter-spacing:.2px}
-.mc-type-desc{font-size:10px;color:var(--muted);line-height:1.3}
-.mc-form{margin-top:20px}
-.mc-back{background:none;border:none;color:var(--muted2);font-size:12px;cursor:pointer;display:flex;align-items:center;gap:5px;margin-bottom:18px;padding:0;font-family:inherit}
-.mc-back:hover{color:var(--text)}
-.mc-form-title{font-size:16px;font-weight:800;margin-bottom:4px;display:flex;align-items:center;gap:8px}
-.mc-form-sub{font-size:12px;color:var(--muted2);margin-bottom:18px}
-.mc-field{margin-bottom:14px}
-.mc-label{font-size:11px;font-weight:700;color:var(--muted2);letter-spacing:.4px;text-transform:uppercase;margin-bottom:6px;display:block}
-.mc-input,.mc-textarea,.mc-select{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--border2);border-radius:10px;padding:11px 14px;color:var(--text);font-size:13px;font-family:inherit;outline:none;transition:border .2s;resize:none}
-.mc-input:focus,.mc-textarea:focus,.mc-select:focus{border-color:var(--accent)}
-.mc-textarea{min-height:90px}
-.mc-row{display:flex;gap:10px}
-.mc-row .mc-field{flex:1}
-.mc-time-opts,.mc-reward-opts{display:flex;gap:8px;flex-wrap:wrap}
-.mc-opt{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:8px;padding:7px 14px;font-size:12px;font-weight:600;color:var(--muted2);cursor:pointer;transition:all .2s}
-.mc-opt:hover,.mc-opt.sel{border-color:var(--accent);color:var(--accent2);background:rgba(99,102,241,.08)}
-.mc-submit{width:100%;background:var(--accent);color:#fff;border:none;border-radius:12px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;margin-top:6px;font-family:inherit}
-.mc-submit:hover{background:var(--accent2);box-shadow:0 4px 18px rgba(99,102,241,.4)}
-@media(max-width:580px){.mc-grid{grid-template-columns:repeat(2,1fr)}.mc-wrap{padding:22px 18px}}
-</style>
+<title>VNEX — Follow builders through their projects.</title>
+<link rel="stylesheet" href="vnex.css">
 </head>
 <body>
 
@@ -292,53 +18,36 @@ header{position:relative;z-index:10;max-width:1140px;margin:0 auto;padding:24px 
 </header>
 
 <div class="hero">
-  <div class="hero-tag"><div class="live-dot"></div>&nbsp;12 projects building right now</div>
-  <h1>Follow projects,<br>not people.</h1>
-  <p>Where builders share real progress, testers shape the product, and the community validates what gets built next.</p>
+  <div class="hero-tag"><div class="live-dot"></div>&nbsp;Day 1 — building in public</div>
+  <h1>Follow builders<br>through their projects.</h1>
+  <p>Not a feed of projects. A window into the people building them — what they're making, where they're stuck, what they need.</p>
   <div class="hero-cta">
-    <button class="btn-explore" onclick="scrollFeed()">Explore live projects ↓</button>
+    <button class="btn-explore" onclick="scrollFeed()">See who's building ↓</button>
     <button class="btn-post" onclick="openShareProject()">Share what you're building →</button>
   </div>
   <div class="stats-bar">
-    <div class="stat-item"><div class="stat-val">12</div><div class="stat-label">Live projects</div></div>
-    <div class="stat-item"><div class="stat-val">47</div><div class="stat-label">Builders</div></div>
-    <div class="stat-item"><div class="stat-val">203</div><div class="stat-label">Tests done</div></div>
-    <div class="stat-item"><div class="stat-val">840</div><div class="stat-label">XP earned</div></div>
+    <div class="stat-item"><div class="stat-val">1</div><div class="stat-label">Builder</div></div>
+    <div class="stat-item"><div class="stat-val">4</div><div class="stat-label">Projects</div></div>
+    <div class="stat-item"><div class="stat-val">0</div><div class="stat-label">Tests done</div></div>
+    <div class="stat-item"><div class="stat-val">Day 1</div><div class="stat-label">VNEX is live</div></div>
   </div>
 </div>
 
 <div class="page-wrap" id="feed-anchor">
-  <!-- BARA CE POTI FACE ACUM -->
-  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px">
-    <a href="#" onclick="setTabByName('Need testers');return false" style="background:var(--s1);border:1px solid rgba(34,197,94,.2);border-radius:12px;padding:14px 16px;text-decoration:none;transition:all .2s;display:block" onmouseover="this.style.borderColor='rgba(34,197,94,.5)'" onmouseout="this.style.borderColor='rgba(34,197,94,.2)'">
-      <div style="font-size:18px;margin-bottom:5px">🧪</div>
-      <div style="font-size:18px;font-weight:900;color:#4ade80;letter-spacing:-1px">3</div>
-      <div style="font-size:11px;color:var(--muted2);margin-top:2px">apps need testers</div>
-    </a>
-    <a href="#" onclick="setTabByName('Need help');return false" style="background:var(--s1);border:1px solid rgba(239,68,68,.2);border-radius:12px;padding:14px 16px;text-decoration:none;transition:all .2s;display:block" onmouseover="this.style.borderColor='rgba(239,68,68,.5)'" onmouseout="this.style.borderColor='rgba(239,68,68,.2)'">
-      <div style="font-size:18px;margin-bottom:5px">🆘</div>
-      <div style="font-size:18px;font-weight:900;color:#f87171;letter-spacing:-1px">2</div>
-      <div style="font-size:11px;color:var(--muted2);margin-top:2px">builders stuck</div>
-    </a>
-    <a href="#" onclick="setTabByName('Need ideas');return false" style="background:var(--s1);border:1px solid rgba(168,85,247,.2);border-radius:12px;padding:14px 16px;text-decoration:none;transition:all .2s;display:block" onmouseover="this.style.borderColor='rgba(168,85,247,.5)'" onmouseout="this.style.borderColor='rgba(168,85,247,.2)'">
-      <div style="font-size:18px;margin-bottom:5px">💡</div>
-      <div style="font-size:18px;font-weight:900;color:#c084fc;letter-spacing:-1px">12</div>
-      <div style="font-size:11px;color:var(--muted2);margin-top:2px">votes active</div>
-    </a>
-    <a href="#" onclick="setTabByName('Launched');return false" style="background:var(--s1);border:1px solid rgba(99,102,241,.2);border-radius:12px;padding:14px 16px;text-decoration:none;transition:all .2s;display:block" onmouseover="this.style.borderColor='rgba(99,102,241,.5)'" onmouseout="this.style.borderColor='rgba(99,102,241,.2)'">
-      <div style="font-size:18px;margin-bottom:5px">🚀</div>
-      <div style="font-size:18px;font-weight:900;color:var(--accent2);letter-spacing:-1px">5</div>
-      <div style="font-size:11px;color:var(--muted2);margin-top:2px">launched recently</div>
-    </a>
+
+  <div style="background:var(--s1);border:1px solid rgba(34,197,94,.2);border-radius:12px;padding:14px 18px;margin-bottom:20px;display:flex;align-items:center;gap:10px">
+    <span style="font-size:16px">🧪</span>
+    <span style="font-size:13px;color:var(--muted2)"><strong style="color:#4ade80">LEA</strong> and <strong style="color:#4ade80">SIGNAL</strong> need real testers. Be the first.</span>
+    <button class="bcard-btn" style="margin-left:auto" onclick="openFeedback('LEA','test')">Test LEA →</button>
   </div>
 
   <div class="filter-row">
     <div class="tabs">
-      <button class="tab active" onclick="setTab(this)">🔥 Trending</button>
-      <button class="tab" onclick="setTab(this)">🚀 Launched</button>
-      <button class="tab" onclick="setTab(this)">🔴 Need help</button>
+      <button class="tab active" onclick="setTab(this)">👥 All builders</button>
       <button class="tab" onclick="setTab(this)">🧪 Need testers</button>
+      <button class="tab" onclick="setTab(this)">🆘 Need help</button>
       <button class="tab" onclick="setTab(this)">💡 Need ideas</button>
+      <button class="tab" onclick="setTab(this)">🚀 Just launched</button>
     </div>
     <div class="filter-right">
       <button class="sort-btn">Sort: Latest</button>
@@ -346,289 +55,36 @@ header{position:relative;z-index:10;max-width:1140px;margin:0 auto;padding:24px 
   </div>
 
   <div class="grid">
-    <div class="feed">
+    <div class="feed" id="builders-feed">
 
-      <!-- SOLVO -->
-      <div class="pcard">
-        <div class="pcard-img" style="background:linear-gradient(135deg,#1a1040,#2d1b69)">
-          <div class="pcard-img-emoji">📄</div>
-          <div class="pcard-img-overlay"></div>
-          <div class="pcard-status-pin"><span class="status-badge s-launched">🚀 Launched</span></div>
+      <!-- COSMIN -->
+      <div class="bcard">
+        <div class="bcard-top">
+          <div class="bcard-avatar" style="background:linear-gradient(135deg,#6366f1,#818cf8)">C</div>
+          <div>
+            <div class="bcard-name">Cosmin</div>
+            <div class="bcard-rank">VV Hybrid Universe · 4 projects active</div>
+          </div>
         </div>
-        <div class="pcard-body">
-          <div class="pcard-head">
-            <div>
-              <div class="pcard-name">Solvo</div>
-              <div class="pcard-by">by Cosmin Toma · VV Team</div>
-            </div>
-            <div style="text-align:right;font-size:11px;color:var(--muted)">Day 1<br><span style="color:#4ade80">Live ↗</span></div>
-          </div>
-          <div class="pcard-meta">
-            <span class="pcard-stat">👥 34 followers</span>
-            <span class="pcard-stat">📝 18 updates</span>
-            <span class="pcard-stat">🧪 12 testers</span>
-          </div>
-          <div class="pcard-desc">Document builder for tradespeople. Offers, contracts, invoices in 60 seconds. Works offline, zero account needed.</div>
-          <div class="last-update">
-            <div class="lu-label">Latest update · today</div>
-            <div class="lu-text">Full document chain live — offer → contract → process verbal → proforma. WhatsApp share + client view page.</div>
-          </div>
-          <div class="wop">
-            <div class="wop-label">Progress · 18 updates</div>
-            <div class="wop-dots" id="wop-solvo"></div>
-          </div>
-          <div class="vote-block">
-            <div class="vote-question">💬 What should we build next?</div>
-            <div class="vote-options">
-              <div class="vote-opt" onclick="vote(this,'solvo',0)">
-                <span class="vote-opt-text">Saved clients library</span>
-                <div class="vote-bar"><div class="vote-bar-fill" style="width:64%;background:var(--accent)"></div></div>
-                <span class="vote-pct">64%</span>
-              </div>
-              <div class="vote-opt" onclick="vote(this,'solvo',1)">
-                <span class="vote-opt-text">Invoice generator</span>
-                <div class="vote-bar"><div class="vote-bar-fill" style="width:36%;background:var(--muted)"></div></div>
-                <span class="vote-pct">36%</span>
-              </div>
-            </div>
-          </div>
-          <div class="feedback-board">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-              <div class="fb-label" style="margin-bottom:0">Give feedback</div>
-              <a href="https://hilea.eu/solvo.html" target="_blank" style="display:inline-flex;align-items:center;gap:5px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);border-radius:8px;padding:5px 12px;font-size:11px;font-weight:700;color:#4ade80;text-decoration:none;transition:all .2s" onmouseover="this.style.background='rgba(34,197,94,.18)'" onmouseout="this.style.background='rgba(34,197,94,.1)'">▶ Try now</a>
-            </div>
-            <div class="fb-actions">
-              <button class="fb-btn suggest" onclick="openFeedback('Solvo','suggest')">💡 Suggest</button>
-              <button class="fb-btn bug" onclick="openFeedback('Solvo','bug')">🐛 Bug</button>
-              <button class="fb-btn test" onclick="openFeedback('Solvo','test')">🧪 Test it</button>
-              <button class="fb-btn vote" onclick="openFeedback('Solvo','vote')">🗳 Vote</button>
-            </div>
-          </div>
+        <div class="bcard-projects">
+          <span class="bcard-proj">🧠 LEA</span>
+          <span class="bcard-proj">🌐 VNEX</span>
+          <span class="bcard-proj">📄 Solvo</span>
+          <span class="bcard-proj">◈ SIGNAL</span>
+        </div>
+        <div class="bcard-update">Working on VNEX Builder Space — replacing project feed with builder cards. First real architecture change.</div>
+        <div class="bcard-footer">
+          <span class="bcard-need">🧪 Needs testers for LEA + SIGNAL</span>
+          <button class="bcard-btn" onclick="openWorkspace('cosmin')">Enter Workspace →</button>
         </div>
       </div>
 
-      <!-- LEA -->
-      <div class="pcard">
-        <div class="pcard-img" style="background:linear-gradient(135deg,#0a1628,#1e3a5f)">
-          <div class="pcard-img-emoji">🧠</div>
-          <div class="pcard-img-overlay"></div>
-          <div class="pcard-status-pin"><span class="status-badge s-building">🟡 Building</span></div>
-        </div>
-        <div class="pcard-body">
-          <div class="pcard-head">
-            <div>
-              <div class="pcard-name">LEA</div>
-              <div class="pcard-by">by Cosmin Toma · VV Hybrid Universe</div>
-            </div>
-            <div style="text-align:right;font-size:11px;color:var(--muted)">Day 180+</div>
-          </div>
-          <div class="pcard-meta">
-            <span class="pcard-stat">👥 89 followers</span>
-            <span class="pcard-stat">📝 54 updates</span>
-            <span class="pcard-stat">🧪 8 testers</span>
-          </div>
-          <div class="pcard-desc">Personal AI companion that lives on your device. Knows you, remembers everything, works fully offline. Zero cloud, zero tracking.</div>
-          <div class="last-update">
-            <div class="lu-label">Latest update · 2 days ago</div>
-            <div class="lu-text">Alexandria 2.0 integrated — 3026 Romanian patterns, O(1) lookup. Presence Architecture + Living Shelves complete.</div>
-          </div>
-          <div class="wop">
-            <div class="wop-label">Progress · 54 updates</div>
-            <div class="wop-dots" id="wop-lea"></div>
-          </div>
-          <div class="pred-block">
-            <div class="pred-label">🔮 Prediction — vote now</div>
-            <div class="pred-text">Builder plans to add WebLLM (local AI model in browser) in October. Will it ship on time?</div>
-            <div class="pred-btns">
-              <button class="pred-btn pred-yes" onclick="predict(this,'yes')">✓ Will ship · 71%</button>
-              <button class="pred-btn pred-no" onclick="predict(this,'no')">✗ Won't ship · 29%</button>
-            </div>
-          </div>
-          <div class="feedback-board">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-              <div class="fb-label" style="margin-bottom:0">Give feedback</div>
-              <a href="https://hilea.eu/lea-home.html" target="_blank" style="display:inline-flex;align-items:center;gap:5px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);border-radius:8px;padding:5px 12px;font-size:11px;font-weight:700;color:#4ade80;text-decoration:none;transition:all .2s" onmouseover="this.style.background='rgba(34,197,94,.18)'" onmouseout="this.style.background='rgba(34,197,94,.1)'">▶ Try now</a>
-            </div>
-            <div class="fb-actions">
-              <button class="fb-btn suggest" onclick="openFeedback('LEA','suggest')">💡 Suggest</button>
-              <button class="fb-btn bug" onclick="openFeedback('LEA','bug')">🐛 Bug</button>
-              <button class="fb-btn test" onclick="openFeedback('LEA','test')">🧪 Test it</button>
-              <button class="fb-btn help" onclick="openFeedback('LEA','help')">🆘 Help</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- QUICKINVOICE — STUCK -->
-      <div class="pcard">
-        <div class="pcard-img" style="background:linear-gradient(135deg,#1f0a0a,#4c1313)">
-          <div class="pcard-img-emoji">⚡</div>
-          <div class="pcard-img-overlay"></div>
-          <div class="pcard-status-pin"><span class="status-badge s-stuck">🔴 Stuck</span></div>
-        </div>
-        <div class="pcard-body">
-          <div class="pcard-head">
-            <div>
-              <div class="pcard-name">QuickInvoice</div>
-              <div class="pcard-by">by alex_m · builder</div>
-            </div>
-            <div style="text-align:right;font-size:11px;color:var(--muted)">Day 34</div>
-          </div>
-          <div class="pcard-meta">
-            <span class="pcard-stat">👥 21 followers</span>
-            <span class="pcard-stat">📝 9 updates</span>
-            <span class="pcard-stat">🧪 4 testers</span>
-          </div>
-          <div class="pcard-desc">Fast invoice generator for freelancers. From zero to PDF in under 30 seconds.</div>
-          <div class="stuck-block">
-            <div class="stuck-block-title">🔴 Builder is stuck — can you help?</div>
-            <div class="stuck-block-text">Can't figure out how to handle EU VAT for digital products without a registered business. Romania specifically. Anyone solved this without a PFA?</div>
-          </div>
-          <div class="feedback-board">
-            <div class="fb-label">Give feedback</div>
-            <div class="fb-actions">
-              <button class="fb-btn help" onclick="openFeedback('QuickInvoice','help')">🆘 Help out</button>
-              <button class="fb-btn suggest" onclick="openFeedback('QuickInvoice','suggest')">💡 Suggest</button>
-              <button class="fb-btn test" onclick="openFeedback('QuickInvoice','test')">🧪 Test it</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- PIXEL REALM -->
-      <div class="pcard">
-        <div class="pcard-img" style="background:linear-gradient(135deg,#0a1a0a,#1a3a1a)">
-          <div class="pcard-img-emoji">🎮</div>
-          <div class="pcard-img-overlay"></div>
-          <div class="pcard-status-pin"><span class="status-badge s-needs-ideas">💡 Need ideas</span></div>
-        </div>
-        <div class="pcard-body">
-          <div class="pcard-head">
-            <div>
-              <div class="pcard-name">Pixel Realm</div>
-              <div class="pcard-by">by mihai_dev · indie</div>
-            </div>
-            <div style="text-align:right;font-size:11px;color:var(--muted)">Day 118</div>
-          </div>
-          <div class="pcard-meta">
-            <span class="pcard-stat">👥 156 followers</span>
-            <span class="pcard-stat">📝 43 updates</span>
-            <span class="pcard-stat">🧪 27 testers</span>
-          </div>
-          <div class="pcard-desc">2D pixel RPG with procedurally generated dungeons. Solo dev, no publisher, no funding. Just building.</div>
-          <div class="vote-block">
-            <div class="vote-question">💡 What boss should come next?</div>
-            <div class="vote-options">
-              <div class="vote-opt" onclick="vote(this,'pixel',0)">
-                <span class="vote-opt-text">Ice Dragon</span>
-                <div class="vote-bar"><div class="vote-bar-fill" style="width:52%;background:#818cf8"></div></div>
-                <span class="vote-pct">52%</span>
-              </div>
-              <div class="vote-opt" onclick="vote(this,'pixel',1)">
-                <span class="vote-opt-text">Shadow Witch</span>
-                <div class="vote-bar"><div class="vote-bar-fill" style="width:31%;background:#818cf8"></div></div>
-                <span class="vote-pct">31%</span>
-              </div>
-              <div class="vote-opt" onclick="vote(this,'pixel',2)">
-                <span class="vote-opt-text">Lava Golem</span>
-                <div class="vote-bar"><div class="vote-bar-fill" style="width:17%;background:#818cf8"></div></div>
-                <span class="vote-pct">17%</span>
-              </div>
-            </div>
-          </div>
-          <div class="feedback-board">
-            <div class="fb-label">Give feedback</div>
-            <div class="fb-actions">
-              <button class="fb-btn suggest" onclick="openFeedback('Pixel Realm','suggest')">💡 Suggest</button>
-              <button class="fb-btn test" onclick="openFeedback('Pixel Realm','test')">🧪 Test it</button>
-              <button class="fb-btn vote" onclick="openFeedback('Pixel Realm','vote')">🗳 Vote</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- SIGNAL GAME -->
-      <div class="pcard">
-        <div class="pcard-img" style="background:linear-gradient(135deg,#000005,#010118)">
-          <div class="pcard-img-emoji" style="font-size:42px;letter-spacing:6px;font-family:'Courier New',monospace;color:rgba(60,90,255,0.7)">◈</div>
-          <div class="pcard-img-overlay"></div>
-          <div class="pcard-status-pin"><span class="status-badge s-launched">🧪 Need testers</span></div>
-        </div>
-        <div class="pcard-body">
-          <div class="pcard-head">
-            <div>
-              <div class="pcard-name">SIGNAL</div>
-              <div class="pcard-by">by Cosmin Toma · VV Hybrid Universe</div>
-            </div>
-            <div style="text-align:right;font-size:11px;color:var(--muted)">Day 1<br><span style="color:rgba(60,90,255,0.8)">New</span></div>
-          </div>
-          <div class="pcard-meta">
-            <span class="pcard-stat">🎮 Raycaster</span>
-            <span class="pcard-stat">🔇 Ambient audio</span>
-            <span class="pcard-stat">⌨️ WASD / arrows</span>
-          </div>
-          <div class="pcard-desc">Atmospheric raycaster game. Navigate dark rooms, detect signals, uncover symbols. Built in a single HTML file — no dependencies, no install.</div>
-          <div class="last-update">
-            <div class="lu-label">Latest update · today</div>
-            <div class="lu-text">First build. Raycaster engine, ambient audio, 2-room map, pointer lock mouse look. Click to enter.</div>
-          </div>
-          <div class="feedback-board">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-              <div class="fb-label" style="margin-bottom:0">Give feedback</div>
-              <a href="signal.html" target="_blank" style="display:inline-flex;align-items:center;gap:5px;background:rgba(60,80,255,.1);border:1px solid rgba(60,80,255,.3);border-radius:8px;padding:5px 12px;font-size:11px;font-weight:700;color:rgba(100,130,255,0.9);text-decoration:none;transition:all .2s" onmouseover="this.style.background='rgba(60,80,255,.2)'" onmouseout="this.style.background='rgba(60,80,255,.1)'">▶ Play now</a>
-            </div>
-            <div class="fb-actions">
-              <button class="fb-btn suggest" onclick="openFeedback('SIGNAL','suggest')">💡 Suggest</button>
-              <button class="fb-btn bug" onclick="openFeedback('SIGNAL','bug')">🐛 Bug</button>
-              <button class="fb-btn test" onclick="openFeedback('SIGNAL','test')">🧪 Test it</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- VNEX ITSELF -->
-      <div class="pcard">
-        <div class="pcard-img" style="background:linear-gradient(135deg,#0f0f2a,#1a1a4a)">
-          <div class="pcard-img-emoji">🌐</div>
-          <div class="pcard-img-overlay"></div>
-          <div class="pcard-status-pin"><span class="status-badge s-building">🟡 Building</span></div>
-        </div>
-        <div class="pcard-body">
-          <div class="pcard-head">
-            <div>
-              <div class="pcard-name">VNEX</div>
-              <div class="pcard-by">by Cosmin Toma · meta project</div>
-            </div>
-            <div style="text-align:right;font-size:11px;color:var(--muted)">Day 1</div>
-          </div>
-          <div class="pcard-meta">
-            <span class="pcard-stat">👥 12 followers</span>
-            <span class="pcard-stat">📝 1 update</span>
-            <span class="pcard-stat">🧪 0 testers</span>
-          </div>
-          <div class="pcard-desc">The platform you're looking at. Follow projects, not people. Builders post progress, community votes, testers give feedback.</div>
-          <div class="last-update">
-            <div class="lu-label">Latest update · today</div>
-            <div class="lu-text">First version live. Feed, 5 projects, waitlist. Accounts and backend coming after validation from real users.</div>
-          </div>
-          <div class="pred-block">
-            <div class="pred-label">🔮 Prediction</div>
-            <div class="pred-text">Will VNEX have 100 waitlist signups before accounts launch?</div>
-            <div class="pred-btns">
-              <button class="pred-btn pred-yes" onclick="predict(this,'yes')">✓ Yes · 84%</button>
-              <button class="pred-btn pred-no" onclick="predict(this,'no')">✗ No · 16%</button>
-            </div>
-          </div>
-          <div class="feedback-board">
-            <div class="fb-label">Give feedback</div>
-            <div class="fb-actions">
-              <button class="fb-btn suggest" onclick="openFeedback('VNEX','suggest')">💡 Suggest</button>
-              <button class="fb-btn bug" onclick="openFeedback('VNEX','bug')">🐛 Bug</button>
-              <button class="fb-btn test" onclick="openFeedback('VNEX','test')">🧪 Test it</button>
-              <button class="fb-btn vote" onclick="openFeedback('VNEX','vote')">🗳 Vote</button>
-            </div>
-          </div>
-        </div>
+      <!-- EMPTY STATE -->
+      <div style="background:rgba(255,255,255,.02);border:1px dashed var(--border);border-radius:18px;padding:32px 24px;text-align:center">
+        <div style="font-size:28px;margin-bottom:12px">🏗</div>
+        <div style="font-size:14px;font-weight:700;color:var(--muted2);margin-bottom:6px">Be the next builder here.</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:18px;line-height:1.6">Share what you're building. Real progress, real feedback, real community.</div>
+        <button class="bcard-btn" onclick="openShareProject()">Share your project →</button>
       </div>
 
     </div>
@@ -649,63 +105,33 @@ header{position:relative;z-index:10;max-width:1140px;margin:0 auto;padding:24px 
       <div class="scard">
         <div class="scard-title">🧪 Need testers now</div>
         <div class="nti-item">
-          <span class="nti-emoji">📄</span>
-          <div><div class="nti-name">Solvo</div><div class="nti-status">PDF generation on mobile</div></div>
-          <button class="btn-nti" onclick="openFeedback('Solvo','test')">Test</button>
-        </div>
-        <div class="nti-item">
           <span class="nti-emoji">🧠</span>
           <div><div class="nti-name">LEA</div><div class="nti-status">Romanian offline AI</div></div>
           <button class="btn-nti" onclick="openFeedback('LEA','test')">Test</button>
         </div>
         <div class="nti-item">
-          <span class="nti-emoji">🎮</span>
-          <div><div class="nti-name">Pixel Realm</div><div class="nti-status">Combat system</div></div>
-          <button class="btn-nti" onclick="openFeedback('Pixel Realm','test')">Test</button>
+          <span class="nti-emoji">◈</span>
+          <div><div class="nti-name">SIGNAL</div><div class="nti-status">Raycaster game</div></div>
+          <button class="btn-nti" onclick="openFeedback('SIGNAL','test')">Test</button>
         </div>
       </div>
 
       <div class="scard">
-        <div class="scard-title">⚡ Top testers this week</div>
-        <div class="lb-item">
-          <div class="lb-rank r1">1</div>
-          <div class="lb-avatar" style="background:rgba(245,158,11,.15)">🦊</div>
-          <div class="lb-info"><div class="lb-name">ana_builds</div><div class="lb-badges">52 tests · 14 bugs</div></div>
-          <div class="lb-xp">2,840 XP</div>
-        </div>
-        <div class="lb-item">
-          <div class="lb-rank r2">2</div>
-          <div class="lb-avatar" style="background:rgba(148,163,184,.12)">🦁</div>
-          <div class="lb-info"><div class="lb-name">radu_dev</div><div class="lb-badges">38 tests · 8 bugs</div></div>
-          <div class="lb-xp">1,920 XP</div>
-        </div>
-        <div class="lb-item">
-          <div class="lb-rank r3">3</div>
-          <div class="lb-avatar" style="background:rgba(180,83,9,.12)">🐺</div>
-          <div class="lb-info"><div class="lb-name">ioana_m</div><div class="lb-badges">29 tests · 11 bugs</div></div>
-          <div class="lb-xp">1,540 XP</div>
-        </div>
-        <div class="lb-item">
-          <div class="lb-rank">4</div>
-          <div class="lb-avatar" style="background:rgba(99,102,241,.12)">🦋</div>
-          <div class="lb-info"><div class="lb-name">alex_m</div><div class="lb-badges">18 tests</div></div>
-          <div class="lb-xp">980 XP</div>
-        </div>
+        <div class="scard-title">⚡ Top contributors this week</div>
+        <div style="font-size:12px;color:var(--muted);padding:8px 0 4px;line-height:1.6">No contributors yet.<br><span style="color:var(--accent2);font-weight:600;cursor:pointer" onclick="openFeedback('LEA','test')">Be the first →</span></div>
       </div>
 
       <div class="scard">
         <div class="scard-title">🏷 Explore by tag</div>
         <div style="margin:-3px">
-          <span class="hot-tag">🛠 tools</span>
           <span class="hot-tag">🤖 AI</span>
           <span class="hot-tag">🎮 games</span>
+          <span class="hot-tag">🛠 tools</span>
           <span class="hot-tag">📱 mobile</span>
           <span class="hot-tag">🇷🇴 romania</span>
           <span class="hot-tag">💻 web</span>
-          <span class="hot-tag">📄 docs</span>
           <span class="hot-tag">🔌 offline</span>
           <span class="hot-tag">indie</span>
-          <span class="hot-tag">saas</span>
         </div>
       </div>
 
@@ -713,7 +139,26 @@ header{position:relative;z-index:10;max-width:1140px;margin:0 auto;padding:24px 
   </div>
 </div>
 
-<!-- MODALS -->
+<!-- BUILDER SPACE — full page -->
+<div class="workspace-overlay" id="workspace-modal" style="display:none">
+  <div class="workspace-page">
+    <button class="ws-back-btn" onclick="closeWorkspace()">← Back to builders</button>
+    <div class="ws-page-header">
+      <div class="ws-avatar" id="ws-avatar">?</div>
+      <div>
+        <div class="ws-name" id="ws-name">–</div>
+        <div class="ws-sub" id="ws-sub">–</div>
+      </div>
+      <div class="ws-stats-grid" id="ws-stats-grid"></div>
+    </div>
+    <div class="ws-filter-row">
+      <div class="ws-tabs" id="ws-tabs"></div>
+    </div>
+    <div class="ws-feed" id="ws-feed"></div>
+  </div>
+</div>
+
+<!-- FEEDBACK MODAL -->
 <div class="overlay" id="feedback-modal" style="display:none" onclick="if(event.target===this)closeModal('feedback-modal')">
   <div class="modal">
     <button class="modal-close" onclick="closeModal('feedback-modal')">×</button>
@@ -726,30 +171,42 @@ header{position:relative;z-index:10;max-width:1140px;margin:0 auto;padding:24px 
       <div class="ft-option" onclick="selFT(this,'🆘','Help request')"><div class="ft-icon">🆘</div><div class="ft-name">Help</div></div>
     </div>
     <form onsubmit="submitFeedback(event)">
-      <input type="email" placeholder="your@email.com (optional)">
-      <textarea placeholder="Write your feedback..."></textarea>
+      <textarea placeholder="Write your feedback..." id="fb-text"></textarea>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:10px" id="fb-sender"></div>
       <button class="modal-btn" type="submit">Send feedback →</button>
     </form>
   </div>
 </div>
 
-<!-- ── WELCOME / LEGAL ── -->
+<!-- WELCOME -->
 <div class="overlay" id="welcome-modal" style="display:none">
   <div class="welcome-wrap">
     <div class="welcome-logo">V<span>NEX</span></div>
-    <div class="welcome-tag">Follow projects, not people.</div>
+    <div class="welcome-tag">Follow builders through their projects.</div>
     <div class="welcome-rules">
-      <div class="welcome-rule"><span class="welcome-rule-icon">✓</span> Post what you're building</div>
+      <div class="welcome-rule"><span class="welcome-rule-icon">✓</span> Share what you're building</div>
       <div class="welcome-rule"><span class="welcome-rule-icon">✓</span> Find real testers and feedback</div>
       <div class="welcome-rule"><span class="welcome-rule-icon">✓</span> No spam, no fake projects</div>
       <div class="welcome-rule"><span class="welcome-rule-icon">✓</span> Be respectful to builders</div>
     </div>
-    <div class="welcome-disclaimer">Projects on VNEX are experimental. Features may change. Data may be lost during alpha. Use at your own risk.</div>
-    <button class="welcome-cta" onclick="acceptWelcome()">Accept &amp; Continue →</button>
+    <div class="welcome-disclaimer">Projects on VNEX are experimental. Features may change. Use at your own risk.</div>
+    <button class="welcome-cta" id="welcome-btn-accept" onclick="acceptWelcome()">Accept &amp; Continue →</button>
+    <div id="welcome-step2" style="display:none">
+      <div style="font-size:15px;font-weight:800;margin-bottom:6px;margin-top:4px">Choose your builder name</div>
+      <div style="font-size:12px;color:var(--muted2);margin-bottom:18px">Saved locally. No account needed.</div>
+      <div class="name-suggestions">
+        <div class="name-sug" onclick="pickName(this)">NightFox</div>
+        <div class="name-sug" onclick="pickName(this)">PixelMage</div>
+        <div class="name-sug" onclick="pickName(this)">Dracula</div>
+        <div class="name-sug" onclick="pickName(this)">IronWolf</div>
+      </div>
+      <input class="wl-input" id="builder-name-input" placeholder="Or type your own..." maxlength="20" style="margin-bottom:14px" oninput="clearNameSug()">
+      <button class="welcome-cta" onclick="setBuilderName()">Enter VNEX →</button>
+    </div>
   </div>
 </div>
 
-<!-- ── SETTINGS MODAL ── -->
+<!-- SETTINGS MODAL -->
 <div class="overlay" id="settings-modal" style="display:none" onclick="if(event.target===this)closeSettings()">
   <div class="settings-wrap">
     <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 24px 0">
@@ -763,8 +220,6 @@ header{position:relative;z-index:10;max-width:1140px;margin:0 auto;padding:24px 
       <div class="settings-tab" onclick="showSettingsTab(this,'privacy')">Privacy</div>
     </div>
     <div class="settings-body">
-
-      <!-- PROFILE -->
       <div id="stab-profile" class="settings-section">
         <div class="settings-section-title">Account</div>
         <div class="settings-field"><label class="settings-label">Display Name</label><input class="settings-input" id="s-name" placeholder="Cosmin"></div>
@@ -780,8 +235,6 @@ header{position:relative;z-index:10;max-width:1140px;margin:0 auto;padding:24px 
         </div>
         <button class="settings-save" onclick="saveSettings()">Save changes</button>
       </div>
-
-      <!-- APPEARANCE -->
       <div id="stab-appearance" class="settings-section" style="display:none">
         <div class="settings-section-title">Theme</div>
         <div class="theme-opts">
@@ -798,24 +251,19 @@ header{position:relative;z-index:10;max-width:1140px;margin:0 auto;padding:24px 
         </div>
         <button class="settings-save" style="margin-top:24px" onclick="saveSettings()">Save changes</button>
       </div>
-
-      <!-- NOTIFICATIONS -->
       <div id="stab-notifications" class="settings-section" style="display:none">
         <div class="settings-section-title">Notify me when</div>
-        <div class="notif-row"><span class="notif-label">Someone tested my project</span><div class="toggle on" id="n-tested" onclick="toggleNotif(this)"></div></div>
-        <div class="notif-row"><span class="notif-label">Someone voted on my project</span><div class="toggle on" id="n-voted" onclick="toggleNotif(this)"></div></div>
-        <div class="notif-row"><span class="notif-label">Someone submitted an idea</span><div class="toggle on" id="n-idea" onclick="toggleNotif(this)"></div></div>
-        <div class="notif-row"><span class="notif-label">Someone reported a bug</span><div class="toggle on" id="n-bug" onclick="toggleNotif(this)"></div></div>
-        <div class="notif-row"><span class="notif-label">New early access available</span><div class="toggle" id="n-ea" onclick="toggleNotif(this)"></div></div>
+        <div class="notif-row"><span class="notif-label">Someone tested my project</span><div class="toggle on" onclick="toggleNotif(this)"></div></div>
+        <div class="notif-row"><span class="notif-label">Someone voted on my project</span><div class="toggle on" onclick="toggleNotif(this)"></div></div>
+        <div class="notif-row"><span class="notif-label">Someone submitted an idea</span><div class="toggle on" onclick="toggleNotif(this)"></div></div>
+        <div class="notif-row"><span class="notif-label">Someone reported a bug</span><div class="toggle on" onclick="toggleNotif(this)"></div></div>
+        <div class="notif-row"><span class="notif-label">New early access available</span><div class="toggle" onclick="toggleNotif(this)"></div></div>
         <button class="settings-save" style="margin-top:20px" onclick="saveSettings()">Save changes</button>
       </div>
-
-      <!-- PRIVACY -->
       <div id="stab-privacy" class="settings-section" style="display:none">
         <div class="settings-section-title">Profile visibility</div>
         <div class="notif-row"><span class="notif-label">Show Builder Profile publicly</span><div class="toggle on" onclick="toggleNotif(this)"></div></div>
         <div class="notif-row"><span class="notif-label">Show project history</span><div class="toggle on" onclick="toggleNotif(this)"></div></div>
-        <div class="notif-row"><span class="notif-label">Show archived projects</span><div class="toggle on" onclick="toggleNotif(this)"></div></div>
         <div class="notif-row"><span class="notif-label">Public email</span><div class="toggle" onclick="toggleNotif(this)"></div></div>
         <div class="settings-section-title" style="margin-top:20px">Default project visibility</div>
         <div class="theme-opts">
@@ -825,75 +273,90 @@ header{position:relative;z-index:10;max-width:1140px;margin:0 auto;padding:24px 
         </div>
         <button class="settings-save" style="margin-top:24px" onclick="saveSettings()">Save changes</button>
       </div>
-
     </div>
   </div>
 </div>
 
-<!-- ── SHARE PROJECT MODAL ── -->
+<!-- SHARE PROJECT — step by step -->
 <div class="overlay" id="share-modal" style="display:none" onclick="if(event.target===this)closeShareProject()">
-  <div class="mc-wrap">
+  <div class="share-wrap">
     <button class="modal-close" onclick="closeShareProject()">×</button>
-    <div class="mc-head">What are you building?</div>
-    <div class="mc-sub">Share your project with builders who get it. No filters. No algorithm. Just real work.</div>
-    <form onsubmit="submitShareProject(event)">
-      <div class="mc-field">
-        <label class="mc-label">Project name</label>
-        <input class="mc-input" id="sp-name" placeholder="LEA, Solvo, VNEX..." required>
+    <div class="share-progress">
+      <div class="share-prog-dot done" id="sp-dot-1"></div>
+      <div class="share-prog-dot" id="sp-dot-2"></div>
+      <div class="share-prog-dot" id="sp-dot-3"></div>
+      <div class="share-prog-dot" id="sp-dot-4"></div>
+    </div>
+
+    <!-- Step 1: Type -->
+    <div class="share-step active" id="sp-step-1">
+      <div class="share-step-title">What are you building?</div>
+      <div class="share-step-sub">Choose the type that fits best.</div>
+      <div class="share-type-grid">
+        <div class="share-type-btn" onclick="spSelectType(this,'game')"><div class="share-type-icon">🎮</div><div class="share-type-label">Game</div></div>
+        <div class="share-type-btn" onclick="spSelectType(this,'ai')"><div class="share-type-icon">🧠</div><div class="share-type-label">AI</div></div>
+        <div class="share-type-btn" onclick="spSelectType(this,'app')"><div class="share-type-icon">📱</div><div class="share-type-label">App</div></div>
+        <div class="share-type-btn" onclick="spSelectType(this,'tool')"><div class="share-type-icon">🛠</div><div class="share-type-label">Tool</div></div>
+        <div class="share-type-btn" onclick="spSelectType(this,'website')"><div class="share-type-icon">🌐</div><div class="share-type-label">Website</div></div>
+        <div class="share-type-btn" onclick="spSelectType(this,'experiment')"><div class="share-type-icon">🧪</div><div class="share-type-label">Experiment</div></div>
       </div>
-      <div class="mc-field">
-        <label class="mc-label">What does it do? <span style="color:var(--muted);font-weight:400;text-transform:none">(1-2 sentences)</span></label>
-        <textarea class="mc-textarea" id="sp-desc" placeholder="An offline AI companion that knows you personally. Zero cloud, zero tracking." required style="min-height:70px"></textarea>
+      <div class="share-nav">
+        <button class="share-next" onclick="spNext(2)">Continue →</button>
       </div>
-      <div class="mc-field">
-        <label class="mc-label">Where are you now?</label>
-        <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <div class="mc-opt" onclick="selStatus(this,'building')">🔨 Building</div>
-          <div class="mc-opt" onclick="selStatus(this,'launched')">🚀 Launched</div>
-          <div class="mc-opt" onclick="selStatus(this,'stuck')">🆘 Stuck</div>
-          <div class="mc-opt" onclick="selStatus(this,'idea')">💡 Idea stage</div>
-        </div>
+    </div>
+
+    <!-- Step 2: Stage -->
+    <div class="share-step" id="sp-step-2">
+      <div class="share-step-title">What's the current stage?</div>
+      <div class="share-step-sub">Be honest — that's what makes VNEX real.</div>
+      <div class="share-stages">
+        <div class="share-stage" onclick="spSelectStage(this,'idea')"><div class="share-stage-dot"></div><span class="share-stage-label">💡 Idea — concept, not much built yet</span></div>
+        <div class="share-stage" onclick="spSelectStage(this,'building')"><div class="share-stage-dot"></div><span class="share-stage-label">🔨 Building — actively working on it</span></div>
+        <div class="share-stage" onclick="spSelectStage(this,'testing')"><div class="share-stage-dot"></div><span class="share-stage-label">🧪 Testing — works, needs real users</span></div>
+        <div class="share-stage" onclick="spSelectStage(this,'earlyaccess')"><div class="share-stage-dot"></div><span class="share-stage-label">🔓 Early Access — limited, invite only</span></div>
+        <div class="share-stage" onclick="spSelectStage(this,'live')"><div class="share-stage-dot"></div><span class="share-stage-label">🚀 Live — public and available now</span></div>
       </div>
-      <div class="mc-field">
-        <label class="mc-label">What do you need from the community?</label>
-        <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <div class="mc-opt" onclick="selNeed(this,'testers')">🧪 Testers</div>
-          <div class="mc-opt" onclick="selNeed(this,'feedback')">💬 Feedback</div>
-          <div class="mc-opt" onclick="selNeed(this,'ideas')">💡 Ideas</div>
-          <div class="mc-opt" onclick="selNeed(this,'earlyaccess')">🔓 Early access users</div>
-          <div class="mc-opt" onclick="selNeed(this,'progress')">📈 Progress update</div>
-        </div>
+      <div class="share-nav">
+        <button class="share-back" onclick="spNext(1)">← Back</button>
+        <button class="share-next" onclick="spNext(3)">Continue →</button>
       </div>
-      <div class="mc-row">
-        <div class="mc-field">
-          <label class="mc-label">Link (optional)</label>
-          <input class="mc-input" id="sp-link" type="url" placeholder="https://...">
-        </div>
-        <div class="mc-field">
-          <label class="mc-label">Your email</label>
-          <input class="mc-input" id="sp-email" type="email" placeholder="you@example.com" required>
-        </div>
+    </div>
+
+    <!-- Step 3: Need -->
+    <div class="share-step" id="sp-step-3">
+      <div class="share-step-title">What do you need?</div>
+      <div class="share-step-sub">Select all that apply.</div>
+      <div class="share-needs">
+        <div class="share-need" onclick="spToggleNeed(this,'testers')"><div class="share-need-icon">🧪</div><div class="share-need-label">Testers</div></div>
+        <div class="share-need" onclick="spToggleNeed(this,'ideas')"><div class="share-need-icon">💡</div><div class="share-need-label">Ideas</div></div>
+        <div class="share-need" onclick="spToggleNeed(this,'feedback')"><div class="share-need-icon">💬</div><div class="share-need-label">Feedback</div></div>
+        <div class="share-need" onclick="spToggleNeed(this,'help')"><div class="share-need-icon">🆘</div><div class="share-need-label">Help</div></div>
       </div>
-      <button type="submit" class="mc-submit">Share with builders →</button>
-    </form>
+      <div class="share-nav">
+        <button class="share-back" onclick="spNext(2)">← Back</button>
+        <button class="share-next" onclick="spNext(4)">Continue →</button>
+      </div>
+    </div>
+
+    <!-- Step 4: Show it + Publish -->
+    <div class="share-step" id="sp-step-4">
+      <div class="share-step-title">Show it.</div>
+      <div class="share-step-sub">Name it, describe it, add a link.</div>
+      <input class="mc-input" id="sp-name" placeholder="Project name" style="margin-bottom:10px">
+      <textarea class="mc-textarea" id="sp-desc" placeholder="What does it do? 1-2 sentences." style="min-height:70px;margin-bottom:10px"></textarea>
+      <input class="mc-input" id="sp-link" placeholder="🌐 Website / Demo (optional)" style="margin-bottom:8px">
+      <input class="mc-input" id="sp-github" placeholder="🐙 GitHub (optional)" style="margin-bottom:8px">
+      <input class="mc-input" id="sp-video" placeholder="▶ Video link (optional)" style="margin-bottom:16px">
+      <div class="share-nav">
+        <button class="share-back" onclick="spNext(3)">← Back</button>
+        <button class="share-next" onclick="spPublish()">Publish →</button>
+      </div>
+    </div>
+
   </div>
 </div>
 
-<div class="overlay" id="post-modal" style="display:none" onclick="if(event.target===this)closeModal('post-modal')">
-  <div class="modal">
-    <button class="modal-close" onclick="closeModal('post-modal')">×</button>
-    <h2>Post your project</h2>
-    <div class="modal-sub">VNEX is in early access — we'll add your project manually within 24h.</div>
-    <form onsubmit="submitPost(event)">
-      <input type="text" placeholder="Project name" required>
-      <select><option value="">Status</option><option>⚪ Idea</option><option>🟡 Building</option><option>🔴 Stuck</option><option>🚀 Launched</option><option>💡 Need ideas</option></select>
-      <input type="email" placeholder="your@email.com" required>
-      <textarea placeholder="What are you building? What do you need from the community?"></textarea>
-      <button class="modal-btn" type="submit">Submit project →</button>
-    </form>
-  </div>
-</div>
-
+<!-- WAITLIST MODAL -->
 <div class="overlay" id="waitlist-modal" style="display:none" onclick="if(event.target===this)closeModal('waitlist-modal')">
   <div class="modal">
     <button class="modal-close" onclick="closeModal('waitlist-modal')">×</button>
@@ -908,326 +371,40 @@ header{position:relative;z-index:10;max-width:1140px;margin:0 auto;padding:24px 
   </div>
 </div>
 
+<!-- MY PROFILE MODAL -->
+<div class="overlay" id="profile-modal" style="display:none" onclick="if(event.target===this)closeProfile()">
+  <div class="profile-wrap">
+    <button class="modal-close" onclick="closeProfile()">×</button>
+    <div class="profile-header">
+      <div class="profile-avatar" id="profile-avatar-el">?</div>
+      <div>
+        <div style="font-size:19px;font-weight:900;letter-spacing:-.4px" id="profile-name-el">–</div>
+        <div style="font-size:12px;color:var(--muted2);margin-top:3px" id="profile-rank-el">–</div>
+      </div>
+    </div>
+    <div class="profile-stats-row">
+      <div class="profile-stat-box"><div class="profile-stat-val" id="ps-total">0</div><div class="profile-stat-lbl">Contributions</div></div>
+      <div class="profile-stat-box"><div class="profile-stat-val" id="ps-tests">0</div><div class="profile-stat-lbl">Tests</div></div>
+      <div class="profile-stat-box"><div class="profile-stat-val" id="ps-ideas">0</div><div class="profile-stat-lbl">Ideas</div></div>
+      <div class="profile-stat-box"><div class="profile-stat-val" id="ps-bugs">0</div><div class="profile-stat-lbl">Bugs</div></div>
+    </div>
+    <div class="profile-section" id="ws-projects">
+      <div class="profile-section-title">📁 My Projects</div>
+      <div id="profile-projects-list"></div>
+    </div>
+    <div class="profile-section" id="ws-contributions">
+      <div class="profile-section-title">💬 My Contributions</div>
+      <div id="profile-activity-list"></div>
+    </div>
+    <div class="profile-section" id="ws-testing">
+      <div class="profile-section-title">🧪 My Testing</div>
+      <div id="profile-received-list"></div>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
-<script>
-var FORMSPREE = 'https://formspree.io/f/meepavqj';
-
-// Wall of Progress
-function buildWOP(id, count, type) {
-  var el = document.getElementById(id);
-  if (!el) return;
-  for (var i = 0; i < Math.min(count, 40); i++) {
-    var d = document.createElement('div');
-    d.className = 'wop-dot';
-    var h = 8 + Math.random() * 16;
-    d.style.height = h + 'px';
-    if (i === count - 1) d.classList.add(type || 'active');
-    else if (Math.random() > 0.7) d.classList.add('active');
-    el.appendChild(d);
-  }
-}
-buildWOP('wop-solvo', 18, 'launched');
-buildWOP('wop-lea', 40, 'active');
-
-function scrollFeed(){ document.getElementById('feed-anchor').scrollIntoView({behavior:'smooth'}); }
-
-function setTab(el){
-  document.querySelectorAll('.tab').forEach(function(t){ t.classList.remove('active'); });
-  el.classList.add('active');
-}
-function setTabByName(name){
-  document.querySelectorAll('.tab').forEach(function(t){
-    if (t.textContent.indexOf(name) !== -1) { t.click(); t.scrollIntoView({behavior:'smooth',block:'center'}); }
-  });
-}
-
-function openModal(id){ document.getElementById(id).style.display='flex'; }
-function closeModal(id){ document.getElementById(id).style.display='none'; }
-
-var _currentProject = '';
-var _currentType = '';
-
-function openFeedback(project, type) {
-  _currentProject = project;
-  _currentType = type;
-  document.getElementById('fb-modal-title').textContent = 'Feedback for ' + project;
-  document.getElementById('fb-modal-sub').textContent = 'Your feedback helps the builder improve.';
-  // Select correct type
-  var typeMap = { suggest: 0, bug: 1, test: 2, help: 3, vote: 0 };
-  var idx = typeMap[type] || 0;
-  document.querySelectorAll('.ft-option').forEach(function(o, i){ o.classList.toggle('sel', i === idx); });
-  openModal('feedback-modal');
-}
-
-function selFT(el, icon, name) {
-  document.querySelectorAll('.ft-option').forEach(function(o){ o.classList.remove('sel'); });
-  el.classList.add('sel');
-}
-
-function vote(el, project, idx) {
-  toast('Vote recorded! +10 XP');
-}
-
-function predict(el, choice) {
-  toast(choice === 'yes' ? '✓ Bet placed: Will ship! +20 XP' : '✗ Bet placed: Won\'t ship. +20 XP');
-}
-
-function submitFeedback(e) {
-  e.preventDefault();
-  fetch(FORMSPREE, {
-    method:'POST', headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({ project: _currentProject, type: _currentType, source:'vnex-feedback' })
-  });
-  closeModal('feedback-modal');
-  toast('✓ Feedback sent! +50 XP');
-  e.target.reset();
-}
-
-function submitPost(e) {
-  e.preventDefault();
-  fetch(FORMSPREE, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ type:'project-submit', source:'vnex' }) });
-  closeModal('post-modal');
-  toast('✓ Project submitted! We\'ll add it within 24h.');
-  e.target.reset();
-}
-
-function submitWL(e) {
-  e.preventDefault();
-  var email = document.getElementById('wl-email') || document.getElementById('wl-modal-email');
-  fetch(FORMSPREE, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ email: email ? email.value:'', type:'vnex-waitlist', source:'vnex' }) });
-  closeModal('waitlist-modal');
-  toast('✓ You\'re on the waitlist!');
-  e.target.reset();
-}
-
-function toast(msg){
-  var el = document.getElementById('toast');
-  el.textContent = msg; el.classList.add('show');
-  setTimeout(function(){ el.classList.remove('show'); }, 2800);
-}
-
-// ── WELCOME / LEGAL ──────────────────────────────────────────
-(function(){
-  if (!localStorage.getItem('vnex_welcomed')) {
-    document.getElementById('welcome-modal').style.display = 'flex';
-  }
-})();
-
-function acceptWelcome() {
-  localStorage.setItem('vnex_welcomed', '1');
-  document.getElementById('welcome-modal').style.display = 'none';
-}
-
-// ── SETTINGS ─────────────────────────────────────────────────
-var _vnexSettings = {};
-try { _vnexSettings = JSON.parse(localStorage.getItem('vnex_settings') || '{}'); } catch(e){}
-if (_vnexSettings.theme) applyTheme(_vnexSettings.theme);
-
-function openSettings() {
-  // Populeaza cu valorile salvate
-  if (_vnexSettings.name)     document.getElementById('s-name').value     = _vnexSettings.name;
-  if (_vnexSettings.username) document.getElementById('s-username').value = _vnexSettings.username;
-  if (_vnexSettings.email)    document.getElementById('s-email').value    = _vnexSettings.email;
-  document.getElementById('settings-modal').style.display = 'flex';
-}
-function closeSettings() { document.getElementById('settings-modal').style.display = 'none'; }
-
-function showSettingsTab(el, tab) {
-  document.querySelectorAll('.settings-tab').forEach(function(t){ t.classList.remove('active'); });
-  el.classList.add('active');
-  ['profile','appearance','notifications','privacy'].forEach(function(t){
-    var el = document.getElementById('stab-' + t);
-    if (el) el.style.display = t === tab ? '' : 'none';
-  });
-}
-
-function selSetting(el, group, val) {
-  el.closest('.theme-opts,.lang-opts').querySelectorAll('.theme-opt,.lang-opt').forEach(function(o){ o.classList.remove('sel'); });
-  el.classList.add('sel');
-  _vnexSettings[group] = val;
-  // Tema — singura care functioneaza acum
-  if (group === 'theme') applyTheme(val);
-}
-
-function applyTheme(theme) {
-  var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-  var useDark = theme === 'dark' || (theme === 'system' && prefersDark);
-  if (useDark) {
-    document.documentElement.style.setProperty('--bg','#07070f');
-    document.documentElement.style.setProperty('--s1','#0d0d18');
-    document.documentElement.style.setProperty('--text','#eeeeff');
-    document.documentElement.style.setProperty('--muted','#5a587a');
-  } else {
-    document.documentElement.style.setProperty('--bg','#f4f4f8');
-    document.documentElement.style.setProperty('--s1','#ffffff');
-    document.documentElement.style.setProperty('--text','#1a1a2e');
-    document.documentElement.style.setProperty('--muted','#6b7280');
-  }
-}
-
-function toggleNotif(el) { el.classList.toggle('on'); }
-
-function saveSettings() {
-  _vnexSettings.name     = (document.getElementById('s-name') || {}).value || '';
-  _vnexSettings.username = (document.getElementById('s-username') || {}).value || '';
-  _vnexSettings.email    = (document.getElementById('s-email') || {}).value || '';
-  localStorage.setItem('vnex_settings', JSON.stringify(_vnexSettings));
-  closeSettings();
-  toast('✓ Settings saved.');
-}
-
-// ── SHARE PROJECT ────────────────────────────────────────────
-var _spStatus = '', _spNeed = '';
-
-function openShareProject() { document.getElementById('share-modal').style.display='flex'; }
-function closeShareProject() { document.getElementById('share-modal').style.display='none'; }
-
-function selStatus(el, val) {
-  document.querySelectorAll('#share-modal .mc-opt').forEach(function(o){
-    if(['building','launched','stuck','idea'].some(function(v){return o.getAttribute('onclick') && o.getAttribute('onclick').includes("'"+v+"'");})) o.classList.remove('sel');
-  });
-  el.classList.add('sel'); _spStatus = val;
-}
-function selNeed(el, val) {
-  document.querySelectorAll('#share-modal .mc-opt').forEach(function(o){
-    if(['testers','feedback','ideas','earlyaccess','nothing'].some(function(v){return o.getAttribute('onclick') && o.getAttribute('onclick').includes("'"+v+"'");})) o.classList.remove('sel');
-  });
-  el.classList.add('sel'); _spNeed = val;
-}
-function submitShareProject(e) {
-  e.preventDefault();
-  var payload = {
-    name:   document.getElementById('sp-name').value,
-    desc:   document.getElementById('sp-desc').value,
-    status: _spStatus,
-    need:   _spNeed,
-    link:   document.getElementById('sp-link').value,
-    email:  document.getElementById('sp-email').value,
-    source: 'vnex-share-project'
-  };
-  fetch(FORMSPREE, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
-  closeShareProject();
-  toast('✓ Project shared! We\'ll add it to the feed within 24h.');
-  e.target.reset(); _spStatus=''; _spNeed='';
-}
-
-var _MC_FORMS = {
-  progress: {
-    icon:'📈', title:'Progress Update',
-    sub:'Show the community what moved forward.',
-    html: '<div class="mc-field"><label class="mc-label">Project</label><input class="mc-input" id="mc-project" placeholder="LEA, Solvo, VNEX..." required></div>' +
-          '<div class="mc-field"><label class="mc-label">What moved?</label><textarea class="mc-textarea" id="mc-content" placeholder="Describe what you built, fixed or shipped..." required></textarea></div>' +
-          '<div class="mc-field"><label class="mc-label">Link (optional)</label><input class="mc-input" id="mc-link" type="url" placeholder="https://..."></div>'
-  },
-  launch: {
-    icon:'🚀', title:'Launch Something',
-    sub:'You shipped. Tell the world.',
-    html: '<div class="mc-field"><label class="mc-label">What did you launch?</label><input class="mc-input" id="mc-project" placeholder="LEA v0.8 — offline AI companion" required></div>' +
-          '<div class="mc-field"><label class="mc-label">What\'s new?</label><textarea class="mc-textarea" id="mc-content" placeholder="Key features or changes in this release..." required></textarea></div>' +
-          '<div class="mc-field"><label class="mc-label">Try it →</label><input class="mc-input" id="mc-link" type="url" placeholder="https://..."></div>'
-  },
-  testers: {
-    icon:'🧪', title:'Need Testers',
-    sub:'Real feedback from real people.',
-    html: '<div class="mc-field"><label class="mc-label">What needs testing?</label><input class="mc-input" id="mc-project" placeholder="LEA Mobile — offline memory" required></div>' +
-          '<div class="mc-field"><label class="mc-label">What should testers look for?</label><textarea class="mc-textarea" id="mc-content" placeholder="Focus on: first-time experience, speed, edge cases..." required></textarea></div>' +
-          '<div class="mc-field"><label class="mc-label">Expected time</label><div class="mc-time-opts"><div class="mc-opt" onclick="selOpt(this,\'time\')">1 min</div><div class="mc-opt" onclick="selOpt(this,\'time\')">5 min</div><div class="mc-opt" onclick="selOpt(this,\'time\')">15 min</div><div class="mc-opt" onclick="selOpt(this,\'time\')">30 min</div></div></div>' +
-          '<div class="mc-field"><label class="mc-label">Link to test</label><input class="mc-input" id="mc-link" type="url" placeholder="https://..."></div>'
-  },
-  ideas: {
-    icon:'💡', title:'Need Ideas',
-    sub:'Let the community help you decide.',
-    html: '<div class="mc-field"><label class="mc-label">Project</label><input class="mc-input" id="mc-project" placeholder="VNEX" required></div>' +
-          '<div class="mc-field"><label class="mc-label">Your question</label><input class="mc-input" id="mc-content" placeholder="What should I build next?" required></div>' +
-          '<div class="mc-field"><label class="mc-label">Options (one per line, optional)</label><textarea class="mc-textarea" id="mc-options" placeholder="WhatsApp Share&#10;Invoice Generator&#10;CRM" style="min-height:70px"></textarea></div>'
-  },
-  stuck: {
-    icon:'🆘', title:"I'm Stuck",
-    sub:'Describe the problem clearly. Good help follows.',
-    html: '<div class="mc-field"><label class="mc-label">Project</label><input class="mc-input" id="mc-project" placeholder="LEA" required></div>' +
-          '<div class="mc-field"><label class="mc-label">Problem</label><input class="mc-input" id="mc-content" placeholder="How do I sync memory offline?" required></div>' +
-          '<div class="mc-field"><label class="mc-label">What I\'ve tried</label><textarea class="mc-textarea" id="mc-tried" placeholder="SQLite, JSON files, IndexedDB..." style="min-height:70px"></textarea></div>' +
-          '<div class="mc-field"><label class="mc-label">What I need</label><input class="mc-input" id="mc-need" placeholder="Architecture advice, code example, other approach..."></div>'
-  },
-  earlyaccess: {
-    icon:'🔓', title:'Early Access',
-    sub:'Limited spots. Real builders only.',
-    html: '<div class="mc-field"><label class="mc-label">Product name</label><input class="mc-input" id="mc-project" placeholder="LEA Offline AI" required></div>' +
-          '<div class="mc-row"><div class="mc-field"><label class="mc-label">Spots available</label><input class="mc-input" id="mc-spots" type="number" placeholder="50"></div><div class="mc-field"><label class="mc-label">Requirements</label><input class="mc-input" id="mc-req" placeholder="Windows, 8GB RAM"></div></div>' +
-          '<div class="mc-field"><label class="mc-label">What they get</label><textarea class="mc-textarea" id="mc-content" placeholder="Access before public launch, direct feedback line, lifetime discount..." required></textarea></div>' +
-          '<div class="mc-field"><label class="mc-label">Link or form</label><input class="mc-input" id="mc-link" type="url" placeholder="https://..."></div>'
-  },
-  bugfix: {
-    icon:'🐛', title:'Fixed Bug',
-    sub:'Something that was broken now works.',
-    html: '<div class="mc-field"><label class="mc-label">Project</label><input class="mc-input" id="mc-project" placeholder="VNEX" required></div>' +
-          '<div class="mc-field"><label class="mc-label">What was broken?</label><input class="mc-input" id="mc-content" placeholder="Modal close button unresponsive on mobile" required></div>' +
-          '<div class="mc-field"><label class="mc-label">How did you fix it?</label><textarea class="mc-textarea" id="mc-fix" placeholder="Root cause and solution..." style="min-height:70px"></textarea></div>'
-  },
-  goal: {
-    icon:'🎯', title:'New Goal',
-    sub:'Setting direction. Accountability begins.',
-    html: '<div class="mc-field"><label class="mc-label">Project</label><input class="mc-input" id="mc-project" placeholder="LEA" required></div>' +
-          '<div class="mc-field"><label class="mc-label">Goal</label><input class="mc-input" id="mc-content" placeholder="Ship offline memory by June 30" required></div>' +
-          '<div class="mc-field"><label class="mc-label">Deadline</label><input class="mc-input" id="mc-deadline" type="date"></div>' +
-          '<div class="mc-field"><label class="mc-label">Why this matters</label><textarea class="mc-textarea" id="mc-why" placeholder="Context for the community..." style="min-height:60px"></textarea></div>'
-  }
-};
-
-var _mcType = '';
-
-function openMC() {
-  _mcType = '';
-  document.querySelectorAll('.mc-type').forEach(function(t){ t.classList.remove('sel'); });
-  document.getElementById('mc-s1').style.display = '';
-  document.getElementById('mc-s2').style.display = 'none';
-  document.getElementById('mc-modal').style.display = 'flex';
-}
-
-function closeMC() { document.getElementById('mc-modal').style.display = 'none'; }
-
-function showMCS1() {
-  document.getElementById('mc-s1').style.display = '';
-  document.getElementById('mc-s2').style.display = 'none';
-}
-
-function selectMC(el, type) {
-  document.querySelectorAll('.mc-type').forEach(function(t){ t.classList.remove('sel'); });
-  el.classList.add('sel');
-  _mcType = type;
-  var f = _MC_FORMS[type];
-  if (!f) return;
-  document.getElementById('mc-form-content').innerHTML =
-    '<div class="mc-form-title">' + f.icon + ' ' + f.title + '</div>' +
-    '<div class="mc-form-sub">' + f.sub + '</div>' +
-    f.html +
-    '<button class="mc-submit" onclick="submitMC(event)">Post update</button>';
-  document.getElementById('mc-s1').style.display = 'none';
-  document.getElementById('mc-s2').style.display = '';
-}
-
-function selOpt(el, group) {
-  el.closest('.mc-time-opts, .mc-reward-opts, .mc-time-opts').querySelectorAll('.mc-opt').forEach(function(o){ o.classList.remove('sel'); });
-  el.classList.add('sel');
-}
-
-function submitMC(e) {
-  e.preventDefault ? e.preventDefault() : null;
-  var project = (document.getElementById('mc-project') || {}).value || '';
-  var content = (document.getElementById('mc-content') || {}).value || '';
-  if (!content.trim()) { toast('Please fill in the required fields.'); return; }
-  var payload = { type: _mcType, project: project, content: content, source: 'vnex-mc' };
-  // Optional fields
-  ['mc-link','mc-tried','mc-need','mc-options','mc-spots','mc-req','mc-fix','mc-deadline','mc-why'].forEach(function(id){
-    var el = document.getElementById(id);
-    if (el && el.value) payload[id.replace('mc-','')] = el.value;
-  });
-  fetch(FORMSPREE, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
-  closeMC();
-  toast('✓ Update posted! The community will see it soon.');
-}
-</script>
+<script src="vnex.js"></script>
 </body>
 </html>
-
