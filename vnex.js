@@ -1,5 +1,239 @@
 var FORMSPREE = 'https://formspree.io/f/meepavqj';
 
+// ── MY PROJECTS (localStorage) ───────────────────────────────
+function getMyProjects() {
+  try { return JSON.parse(localStorage.getItem('vnex_my_projects') || '[]'); } catch(e){ return []; }
+}
+
+function saveMyProject(p) {
+  var list = getMyProjects();
+  p.id = Date.now();
+  p.createdAt = Date.now();
+  list.unshift(p);
+  localStorage.setItem('vnex_my_projects', JSON.stringify(list));
+}
+
+function daysAgo(timestamp) {
+  return Math.floor((Date.now() - timestamp) / 86400000) + 1;
+}
+
+function deleteMyProject(id) {
+  var list = getMyProjects().filter(function(p){ return p.id !== id; });
+  localStorage.setItem('vnex_my_projects', JSON.stringify(list));
+}
+
+var _spEditId = null;
+
+function openEditProject(id) {
+  var p = getMyProjects().find(function(x){ return x.id === id; });
+  if (!p) return;
+  _wsFromMySpace = true;
+  spReset();
+  _spEditId = id;
+
+  // Pre-fill type
+  document.querySelectorAll('.share-type-btn').forEach(function(btn){
+    if (btn.getAttribute('onclick') && btn.getAttribute('onclick').includes("'" + p.type + "'")) {
+      btn.classList.add('sel'); _spType = p.type;
+    }
+  });
+
+  // Pre-fill stage
+  document.querySelectorAll('.share-stage').forEach(function(btn){
+    if (btn.getAttribute('onclick') && btn.getAttribute('onclick').includes("'" + p.stage + "'")) {
+      btn.classList.add('sel'); _spStage = p.stage;
+    }
+  });
+
+  // Pre-fill needs
+  _spNeeds = (p.needs || []).slice();
+  document.querySelectorAll('.share-need').forEach(function(btn){
+    var onclick = btn.getAttribute('onclick') || '';
+    _spNeeds.forEach(function(n){
+      if (onclick.includes("'" + n + "'")) btn.classList.add('sel');
+    });
+  });
+
+  // Pre-fill fields — go to step 4
+  spGoTo(4);
+  setTimeout(function(){
+    var nameEl = document.getElementById('sp-name');
+    var descEl = document.getElementById('sp-desc');
+    var linkEl = document.getElementById('sp-link');
+    var ghEl   = document.getElementById('sp-github');
+    var vidEl  = document.getElementById('sp-video');
+    if (nameEl) nameEl.value = p.name  || '';
+    if (descEl) descEl.value = p.desc  || '';
+    if (linkEl) linkEl.value = p.link  || '';
+    if (ghEl)   ghEl.value   = p.github|| '';
+    if (vidEl)  vidEl.value  = p.video || '';
+    if (p.showDays) spToggleDays();
+    // Schimbă titlul și butonul
+    var title = document.querySelector('#sp-step-4 .share-step-title');
+    var btn   = document.querySelector('#sp-step-4 .share-next');
+    if (title) title.textContent = 'Edit project.';
+    if (btn)   btn.textContent   = 'Save changes →';
+  }, 50);
+
+  document.getElementById('share-modal').style.display = 'flex';
+}
+
+function confirmDeleteProject(id) {
+  var project = getMyProjects().find(function(p){ return p.id === id; });
+  var name = project ? project.name : 'this project';
+  if (!confirm('Delete "' + name + '"? This cannot be undone.')) return;
+  deleteMyProject(id);
+  refreshMyCard();
+  updateHeroStats();
+  openMyWorkspace();
+  toast('✓ ' + name + ' deleted.');
+}
+
+// ── BUILDER INBOX ────────────────────────────────────────────
+function getInbox() {
+  try { return JSON.parse(localStorage.getItem('vnex_inbox') || '[]'); } catch(e){ return []; }
+}
+
+function saveInboxItem(item) {
+  var inbox = getInbox();
+  item.id       = Date.now();
+  item.received = new Date().toLocaleDateString('en-GB', {day:'numeric', month:'short', year:'numeric'});
+  item.read     = false;
+  inbox.unshift(item);
+  localStorage.setItem('vnex_inbox', JSON.stringify(inbox));
+}
+
+function deleteInboxItem(id) {
+  var inbox = getInbox().filter(function(i){ return i.id !== id; });
+  localStorage.setItem('vnex_inbox', JSON.stringify(inbox));
+}
+
+function generateFeedbackToken(type, text, project) {
+  var data = { t: type, m: text, p: project || '', ts: Date.now() };
+  try {
+    return 'FBT:' + btoa(unescape(encodeURIComponent(JSON.stringify(data))));
+  } catch(e){ return null; }
+}
+
+function decodeFeedbackToken(token) {
+  try {
+    if (!token.startsWith('FBT:')) return null;
+    var json = decodeURIComponent(escape(atob(token.slice(4))));
+    return JSON.parse(json);
+  } catch(e){ return null; }
+}
+
+function importFeedbackToken() {
+  var input = (document.getElementById('inbox-token-input') || {}).value || '';
+  var token = input.trim();
+  if (!token) return;
+  var data = decodeFeedbackToken(token);
+  if (!data) { toast('Invalid token.'); return; }
+  var typeLabels = { idea:'💡 Idea', bug:'🐛 Bug', test:'🧪 Test Result', help:'🆘 Help' };
+  saveInboxItem({ type: data.t, typeLabel: typeLabels[data.t] || data.t, text: data.m, project: data.p });
+  document.getElementById('inbox-token-input').value = '';
+  renderBuilderInbox();
+  toast('✓ Feedback added to your inbox!');
+}
+
+function renderBuilderInbox() {
+  var existing = document.getElementById('inbox-section');
+  if (existing) existing.remove();
+
+  var inbox = getInbox();
+  var unread = inbox.filter(function(i){ return !i.read; }).length;
+
+  var typeColors = {
+    idea: 'rgba(99,102,241,.15)',
+    bug:  'rgba(239,68,68,.15)',
+    test: 'rgba(34,197,94,.15)',
+    help: 'rgba(234,179,8,.15)'
+  };
+
+  var itemsHtml = inbox.length === 0
+    ? '<div style="font-size:13px;color:var(--muted);padding:16px 0">No feedback yet. Share your feedback token with testers.</div>'
+    : inbox.map(function(item){
+        return '<div class="inbox-item">' +
+          '<div class="inbox-type-badge" style="background:' + (typeColors[item.type]||'rgba(99,102,241,.15)') + '">' +
+            ({idea:'💡',bug:'🐛',test:'🧪',help:'🆘'}[item.type]||'📬') +
+          '</div>' +
+          '<div class="inbox-body">' +
+            (item.project ? '<div class="inbox-project">' + item.project + '</div>' : '') +
+            '<div class="inbox-text">' + item.text + '</div>' +
+            '<div class="inbox-time">' + item.received + '</div>' +
+          '</div>' +
+          '<button class="inbox-del" onclick="deleteInboxItem(' + item.id + ');renderBuilderInbox()" title="Dismiss">×</button>' +
+        '</div>';
+      }).join('');
+
+  var section = document.createElement('div');
+  section.id = 'inbox-section';
+  section.style.cssText = 'margin-top:32px;border-top:1px solid var(--border);padding-top:24px';
+  section.innerHTML =
+    '<div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:16px">' +
+      '📬 Builder Inbox' + (unread ? ' <span style="background:var(--accent);color:#fff;border-radius:100px;padding:1px 7px;font-size:9px;margin-left:4px">' + unread + '</span>' : '') +
+    '</div>' +
+    '<div style="background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:16px;display:flex;gap:8px">' +
+      '<input id="inbox-token-input" placeholder="Paste feedback token here... FBT:..." style="flex:1;background:none;border:none;outline:none;color:var(--text);font-size:13px;font-family:\'Courier New\',monospace">' +
+      '<button onclick="importFeedbackToken()" style="background:var(--accent);color:#fff;border:none;border-radius:8px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">Import →</button>' +
+    '</div>' +
+    '<div id="inbox-items">' + itemsHtml + '</div>';
+
+  document.querySelector('.workspace-page').appendChild(section);
+}
+
+// ── BUILDER LOG ───────────────────────────────────────────────
+function getLog() {
+  try { return JSON.parse(localStorage.getItem('vnex_builder_log') || '[]'); } catch(e){ return []; }
+}
+
+function addLogEntry(text, link, project) {
+  var log = getLog();
+  log.unshift({
+    id:      Date.now(),
+    text:    text,
+    link:    link  || '',
+    project: project || '',
+    date:    new Date().toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' }),
+    ts:      Date.now()
+  });
+  localStorage.setItem('vnex_builder_log', JSON.stringify(log));
+}
+
+function deleteLogEntry(id) {
+  var log = getLog().filter(function(e){ return e.id !== id; });
+  localStorage.setItem('vnex_builder_log', JSON.stringify(log));
+}
+
+// ── GALLERY ──────────────────────────────────────────────────
+function getGallery() {
+  try { return JSON.parse(localStorage.getItem('vnex_gallery') || '[]'); } catch(e){ return []; }
+}
+function addGalleryItem(title, url, project, mood) {
+  var g = getGallery();
+  g.unshift({ id:Date.now(), title:title, url:url, project:project||'', mood:mood||'', date:new Date().toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}) });
+  localStorage.setItem('vnex_gallery', JSON.stringify(g));
+}
+function deleteGalleryItem(id) {
+  var g = getGallery().filter(function(i){ return i.id !== id; });
+  localStorage.setItem('vnex_gallery', JSON.stringify(g));
+}
+
+// ── TIMELINE ─────────────────────────────────────────────────
+function getTimeline() {
+  try { return JSON.parse(localStorage.getItem('vnex_timeline') || '[]'); } catch(e){ return []; }
+}
+function addTimelineEntry(date, text, project) {
+  var tl = getTimeline();
+  tl.unshift({ id:Date.now(), date:date, text:text, project:project||'' });
+  tl.sort(function(a,b){ return new Date(b.date) - new Date(a.date); });
+  localStorage.setItem('vnex_timeline', JSON.stringify(tl));
+}
+function deleteTimelineEntry(id) {
+  var tl = getTimeline().filter(function(e){ return e.id !== id; });
+  localStorage.setItem('vnex_timeline', JSON.stringify(tl));
+}
+
 // ── TABS ─────────────────────────────────────────────────────
 function scrollFeed(){ document.getElementById('feed-anchor').scrollIntoView({behavior:'smooth'}); }
 
@@ -69,18 +303,32 @@ function getStats() {
 
 function submitFeedback(e) {
   e.preventDefault();
-  var name = getBuilderName() || 'Anonymous';
   var text = (document.getElementById('fb-text') || {}).value || '';
-  fetch(FORMSPREE, {
-    method:'POST', headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({ project: _currentProject, type: _currentType, builder: name, text: text, source:'vnex-feedback' })
-  });
-  closeModal('feedback-modal');
+  if (!text.trim()) { toast('Write something first.'); return; }
+
+  var token = generateFeedbackToken(_currentType, text.trim(), _currentProject);
   addStat(_currentType);
-  var xp = addXP(50);
+  var xp   = addXP(50);
   var rank = getBuilderRank(xp);
-  toast('✓ Sent by ' + name + '! +50 XP · ' + rank.label);
-  e.target.reset();
+
+  // Arată token-ul în modal
+  var form = e.target;
+  form.style.display = 'none';
+  var tokenDiv = document.createElement('div');
+  tokenDiv.className = 'token-reveal';
+  tokenDiv.innerHTML =
+    '<div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px">✓ Feedback created! +' + 50 + ' XP</div>' +
+    '<div style="font-size:12px;color:var(--muted2);margin-bottom:10px">Copy this token and give it to the builder to import in their inbox:</div>' +
+    '<div class="token-code">' + token + '</div>' +
+    '<button onclick="navigator.clipboard.writeText(\'' + token + '\').then(function(){document.getElementById(\'copy-token-btn\').textContent=\'✓ Copied!\'}).catch(function(){})" id="copy-token-btn" style="background:var(--accent);color:#fff;border:none;border-radius:8px;padding:8px 20px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:4px">📋 Copy token</button>';
+  form.parentNode.insertBefore(tokenDiv, form.nextSibling);
+
+  setTimeout(function(){
+    tokenDiv.remove();
+    form.style.display = '';
+    closeModal('feedback-modal');
+    form.reset();
+  }, 8000);
 }
 
 function submitPost(e) {
@@ -142,14 +390,27 @@ function updateBuilderBadge() {
   if (!name) return;
   var xp   = getBuilderXP();
   var rank = getBuilderRank(xp);
+
   var badge = document.getElementById('builder-badge');
   if (badge) {
     badge.style.display = 'flex';
     document.getElementById('builder-badge-name').textContent = name;
     document.getElementById('builder-badge-rank').textContent = ' · ' + rank.label;
   }
+
   var senderEl = document.getElementById('fb-sender');
   if (senderEl) senderEl.textContent = 'Sending as ' + name + ' · ' + rank.label;
+
+  // Inițializează cardul userului în feed
+  var myCard = document.getElementById('my-builder-card');
+  var emptyCard = document.getElementById('empty-state-card');
+  if (myCard) {
+    myCard.style.display = '';
+    document.getElementById('my-card-avatar').textContent = name.charAt(0).toUpperCase();
+    document.getElementById('my-card-name').textContent   = name;
+  }
+  if (emptyCard) emptyCard.style.display = 'none';
+  refreshMyCard();
 }
 
 var _pickedName = '';
@@ -166,14 +427,104 @@ function clearNameSug() {
   _pickedName = '';
 }
 
+function generateUserCode() {
+  var chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  var part = function(n){ var s=''; for(var i=0;i<n;i++) s+=chars[Math.floor(Math.random()*chars.length)]; return s; };
+  return 'VNEX-' + part(4) + '-' + part(4) + '-' + part(4);
+}
+
 function setBuilderName() {
   var input = document.getElementById('builder-name-input').value.trim();
-  var name = input || _pickedName;
+  var name  = input || _pickedName;
   if (!name) { toast('Choose a name first.'); return; }
+
+  var code = generateUserCode();
   localStorage.setItem('vnex_builder_name', name);
+  localStorage.setItem('vnex_user_code', code);
   localStorage.setItem('vnex_welcomed', '1');
+
+  // Arată codul înainte de a închide
+  showCodeReveal(name, code);
+}
+
+function showCodeReveal(name, code) {
+  var modal = document.getElementById('welcome-modal');
+  var wrap  = modal.querySelector('.welcome-wrap');
+  wrap.innerHTML =
+    '<div style="font-size:28px;margin-bottom:12px">🔐</div>' +
+    '<div style="font-size:18px;font-weight:900;margin-bottom:6px">Save your access code</div>' +
+    '<div style="font-size:13px;color:var(--muted2);margin-bottom:20px;line-height:1.6">This is the only way to recover your space if you switch browsers or clear your cache. <strong style="color:#f87171">We don\'t store it anywhere.</strong></div>' +
+    '<div style="background:rgba(99,102,241,.1);border:2px solid rgba(99,102,241,.3);border-radius:14px;padding:20px;margin-bottom:20px;text-align:center">' +
+      '<div style="font-size:11px;color:var(--muted);font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">Your VNEX Code</div>' +
+      '<div style="font-size:22px;font-weight:900;color:var(--accent2);letter-spacing:3px;font-family:\'Courier New\',monospace">' + code + '</div>' +
+      '<div style="font-size:11px;color:var(--muted);margin-top:8px">Write it down or screenshot it now.</div>' +
+    '</div>' +
+    '<button onclick="copyCode(\'' + code + '\')" style="width:100%;background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.2);border-radius:10px;padding:11px;font-size:13px;font-weight:600;color:var(--accent2);cursor:pointer;font-family:inherit;margin-bottom:10px">📋 Copy code</button>' +
+    '<button onclick="enterVNEX()" style="width:100%;background:var(--accent);color:#fff;border:none;border-radius:12px;padding:14px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">I saved it — Enter VNEX →</button>';
+}
+
+function copyCode(code) {
+  navigator.clipboard.writeText(code).then(function(){ toast('✓ Code copied!'); }).catch(function(){ toast(code); });
+}
+
+function enterVNEX() {
   document.getElementById('welcome-modal').style.display = 'none';
   updateBuilderBadge();
+}
+
+function restoreWithCode() {
+  var input = (document.getElementById('restore-code-input')||{}).value||'';
+  var code  = input.trim().toUpperCase();
+  if (!code.startsWith('VNEX-') || code.length < 17) {
+    toast('Invalid code. Format: VNEX-XXXX-XXXX-XXXX'); return;
+  }
+  // Codul e valid — restaurăm identitatea
+  localStorage.setItem('vnex_user_code', code);
+  localStorage.setItem('vnex_welcomed', '1');
+  // Dacă nu are nume salvat, îi cerem
+  if (!localStorage.getItem('vnex_builder_name')) {
+    toast('Code accepted. Now choose your builder name.');
+    return;
+  }
+  document.getElementById('welcome-modal').style.display = 'none';
+  updateBuilderBadge();
+  toast('✓ Welcome back!');
+}
+
+function deleteAccount() {
+  if (!confirm('Delete everything? This cannot be undone.')) return;
+  var keys = ['vnex_builder_name','vnex_user_code','vnex_welcomed','vnex_xp','vnex_stats',
+              'vnex_settings','vnex_my_projects','vnex_builder_log','vnex_gallery','vnex_timeline'];
+  keys.forEach(function(k){ localStorage.removeItem(k); });
+  closeSettings();
+  location.reload();
+}
+
+function generateCodeForExisting() {
+  var code = generateUserCode();
+  localStorage.setItem('vnex_user_code', code);
+  var codeEl = document.getElementById('settings-code-display');
+  var genBtn  = document.getElementById('btn-generate-code');
+  if (codeEl) codeEl.textContent = code;
+  if (genBtn) genBtn.style.display = 'none';
+  navigator.clipboard.writeText(code).then(function(){ toast('✓ Code generated & copied! Save it.'); }).catch(function(){ toast('Code: ' + code + ' — save it!'); });
+}
+
+function copyCodeFromSettings() {
+  var code = localStorage.getItem('vnex_user_code') || '';
+  if (!code) { toast('No code found.'); return; }
+  navigator.clipboard.writeText(code).then(function(){ toast('✓ Code copied!'); }).catch(function(){ toast(code); });
+}
+
+function updateHeroStats() {
+  var projects = getMyProjects().length;
+  var logs     = getLog().length;
+  var bEl = document.getElementById('hs-builders');
+  var pEl = document.getElementById('hs-projects');
+  var lEl = document.getElementById('hs-logs');
+  if (bEl) bEl.textContent = getBuilderName() ? 1 : 0;
+  if (pEl) pEl.textContent = projects;
+  if (lEl) lEl.textContent = logs;
 }
 
 // ── WELCOME ──────────────────────────────────────────────────
@@ -183,6 +534,7 @@ function setBuilderName() {
   } else {
     updateBuilderBadge();
   }
+  updateHeroStats();
 })();
 
 function acceptWelcome() {
@@ -200,6 +552,11 @@ function openSettings() {
   if (_vnexSettings.name)     document.getElementById('s-name').value     = _vnexSettings.name;
   if (_vnexSettings.username) document.getElementById('s-username').value = _vnexSettings.username;
   if (_vnexSettings.email)    document.getElementById('s-email').value    = _vnexSettings.email;
+  var existingCode = localStorage.getItem('vnex_user_code');
+  var codeEl = document.getElementById('settings-code-display');
+  var genBtn  = document.getElementById('btn-generate-code');
+  if (codeEl) codeEl.textContent = existingCode || 'No code yet';
+  if (genBtn) genBtn.style.display = existingCode ? 'none' : '';
   document.getElementById('settings-modal').style.display = 'flex';
 }
 function closeSettings() { document.getElementById('settings-modal').style.display = 'none'; }
@@ -259,12 +616,39 @@ function openShareProject() {
 function closeShareProject() { document.getElementById('share-modal').style.display = 'none'; }
 
 function spReset() {
-  _spType = ''; _spStage = ''; _spNeeds = [];
+  _spType = ''; _spStage = ''; _spNeeds = []; _spEditId = null;
   document.querySelectorAll('.share-type-btn,.share-stage,.share-need').forEach(function(el){ el.classList.remove('sel'); });
+  var cb = document.getElementById('sp-days');
+  var dot = document.getElementById('sp-days-dot');
+  var tog = document.getElementById('sp-days-toggle');
+  if (cb) cb.checked = false;
+  if (dot) { dot.textContent=''; dot.style.background='transparent'; dot.style.borderColor='var(--muted)'; }
+  if (tog) { tog.style.borderColor='var(--border)'; tog.style.background='transparent'; }
   ['sp-name','sp-desc','sp-link','sp-github','sp-video'].forEach(function(id){
     var el = document.getElementById(id); if (el) el.value = '';
   });
   spGoTo(1);
+}
+
+function spToggleDays() {
+  var cb     = document.getElementById('sp-days');
+  var dot    = document.getElementById('sp-days-dot');
+  var toggle = document.getElementById('sp-days-toggle');
+  cb.checked = !cb.checked;
+  if (cb.checked) {
+    dot.textContent    = '✓';
+    dot.style.background    = 'var(--accent)';
+    dot.style.borderColor   = 'var(--accent)';
+    dot.style.color         = '#fff';
+    toggle.style.borderColor = 'rgba(99,102,241,.4)';
+    toggle.style.background  = 'rgba(99,102,241,.07)';
+  } else {
+    dot.textContent    = '';
+    dot.style.background    = 'transparent';
+    dot.style.borderColor   = 'var(--muted)';
+    toggle.style.borderColor = 'var(--border)';
+    toggle.style.background  = 'transparent';
+  }
 }
 
 function spGoTo(step) {
@@ -300,109 +684,44 @@ function spToggleNeed(el, need) {
 function spPublish() {
   var name = (document.getElementById('sp-name') || {}).value || '';
   if (!name.trim()) { toast('Add a project name first.'); return; }
-  var payload = {
+  var p = {
     name:   name,
     desc:   (document.getElementById('sp-desc')   || {}).value || '',
-    type:   _spType,
-    stage:  _spStage,
-    needs:  _spNeeds.join(', '),
+    type:   _spType   || 'app',
+    stage:  _spStage  || 'building',
+    needs:  _spNeeds.slice(),
     link:   (document.getElementById('sp-link')   || {}).value || '',
     github: (document.getElementById('sp-github') || {}).value || '',
     video:  (document.getElementById('sp-video')  || {}).value || '',
-    source: 'vnex-share'
+    showDays: !!(document.getElementById('sp-days') && document.getElementById('sp-days').checked)
   };
-  fetch(FORMSPREE, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
-  closeShareProject();
-  toast('✓ ' + name + ' submitted! We\'ll add it to the feed within 24h.');
+  if (_spEditId) {
+    var list = getMyProjects().map(function(existing){
+      if (existing.id === _spEditId) {
+        p.id        = existing.id;
+        p.createdAt = existing.createdAt;
+        return p;
+      }
+      return existing;
+    });
+    localStorage.setItem('vnex_my_projects', JSON.stringify(list));
+    _spEditId = null;
+    closeShareProject();
+    refreshMyCard();
+    if (_wsFromMySpace) openMyWorkspace();
+    toast('✓ ' + name + ' updated!');
+  } else {
+    saveMyProject(p);
+    closeShareProject();
+    refreshMyCard();
+    updateHeroStats();
+    if (_wsFromMySpace) openMyWorkspace();
+    toast('✓ ' + name + ' added to your space!');
+  }
 }
 
 // ── BUILDER SPACE ────────────────────────────────────────────
-var BUILDERS = {
-  cosmin: {
-    name: 'Cosmin', sub: 'VV Hybrid Universe · 180 days building',
-    avatar: 'C', color: 'linear-gradient(135deg,#6366f1,#818cf8)',
-    stats: [
-      { val:4,   lbl:'Projects' },
-      { val:2,   lbl:'Games'    },
-      { val:1,   lbl:'AI'       },
-      { val:1,   lbl:'Tools'    },
-      { val:180, lbl:'Days'     }
-    ],
-    projects: [
-      {
-        type:'ai', emoji:'🧠', name:'LEA', status:'Building', sc:'s-building',
-        desc:'Personal AI companion. Knows you, remembers everything, works fully offline. Zero cloud, zero tracking.',
-        update:'2 days ago — Alexandria 2.0 integrated — 3026 Romanian patterns. Presence Architecture complete.',
-        link:'https://hilea.eu/lea-home.html', linkLabel:'▶ Try now',
-        vote:{ q:'What should LEA learn next?', opts:[{t:'Emotions deeper',p:61},{t:'More languages',p:39}] },
-        needs:['🧪 Testers','💡 Ideas']
-      },
-      {
-        type:'app', emoji:'🌐', name:'VNEX', status:'Building', sc:'s-building',
-        desc:'Platform where builders share real progress. Follow builders through their projects, not just posts.',
-        update:'Today — Builder Space live. Full project cards per builder. Filter by type.',
-        link:null,
-        pred:{ q:'Will VNEX hit 100 waitlist signups before accounts launch?', yes:84, no:16 },
-        needs:['🧪 Testers','💡 Ideas']
-      },
-      {
-        type:'tool', emoji:'📄', name:'Solvo', status:'Launched', sc:'s-launched',
-        desc:'Document builder for tradespeople. Offers, contracts, invoices in 60 seconds. Works offline.',
-        update:'1 week ago — Full document chain live: offer → contract → process verbal → proforma.',
-        link:'https://hilea.eu/solvo.html', linkLabel:'▶ Try now',
-        vote:{ q:'What should we build next?', opts:[{t:'Saved clients',p:64},{t:'Invoice generator',p:36}] },
-        needs:['🐛 Bug reports']
-      },
-      {
-        type:'game', emoji:'◈', name:'SIGNAL', status:'Need testers', sc:'s-launched',
-        desc:'Atmospheric raycaster game. Navigate dark rooms, detect signals, uncover symbols. Single HTML file.',
-        update:'Today — First build. Raycaster engine, ambient audio, 2-room map, pointer lock.',
-        link:'signal.html', linkLabel:'▶ Play now',
-        needs:['🧪 Testers']
-      }
-    ]
-  },
-  mihai: {
-    name: 'Mihai', sub: 'indie dev · 118 days building',
-    avatar: 'M', color: 'linear-gradient(135deg,#22c55e,#4ade80)',
-    stats: [
-      { val:1,   lbl:'Projects'     },
-      { val:1,   lbl:'Games'        },
-      { val:156, lbl:'Followers'    },
-      { val:27,  lbl:'Testers'      },
-      { val:118, lbl:'Days'         }
-    ],
-    projects: [
-      {
-        type:'game', emoji:'🎮', name:'Pixel Realm', status:'Need ideas', sc:'s-needs-ideas',
-        desc:'2D pixel RPG with procedurally generated dungeons. Solo dev, no publisher, no funding. Just building.',
-        update:'Today — Added 3 new dungeon layouts. Community vote for next boss fight.',
-        link:null,
-        vote:{ q:'What boss should come next?', opts:[{t:'Ice Dragon',p:52},{t:'Shadow Witch',p:31},{t:'Lava Golem',p:17}] },
-        needs:['💡 Ideas']
-      }
-    ]
-  },
-  alex: {
-    name: 'Alex', sub: 'freelancer · 34 days building',
-    avatar: 'A', color: 'linear-gradient(135deg,#ef4444,#f87171)',
-    stats: [
-      { val:1,  lbl:'Projects' },
-      { val:1,  lbl:'Tools'    },
-      { val:34, lbl:'Days'     }
-    ],
-    projects: [
-      {
-        type:'tool', emoji:'⚡', name:'QuickInvoice', status:'Stuck', sc:'s-stuck',
-        desc:'Fast invoice generator for freelancers. From zero to PDF in under 30 seconds.',
-        update:'Stuck on EU VAT for digital products without a registered business. Romania specifically.',
-        stuck:'Can\'t figure out how to handle EU VAT for digital products without a PFA. Anyone solved this?',
-        link:null,
-        needs:['🆘 Help']
-      }
-    ]
-  }
-};
+var BUILDERS = {};
 
 var _wsActiveBuilder = null;
 var _wsActiveFilter  = 'all';
@@ -518,6 +837,324 @@ function renderWsFeed(d, filter) {
 
 function closeWorkspace() {
   document.getElementById('workspace-modal').style.display = 'none';
+  _wsFromMySpace = false;
+}
+
+// ── MY WORKSPACE ─────────────────────────────────────────────
+var _wsFromMySpace = false;
+
+function openMyWorkspace() {
+  var name = getBuilderName() || 'Anonymous';
+  var xp   = getBuilderXP();
+  var rank = getBuilderRank(xp);
+  var projects = getMyProjects();
+
+  _wsFromMySpace = true;
+
+  document.getElementById('ws-avatar').textContent = name.charAt(0).toUpperCase();
+  document.getElementById('ws-avatar').style.background = 'linear-gradient(135deg,#6366f1,#818cf8)';
+  document.getElementById('ws-name').textContent = name;
+  var logCount = getLog().length;
+  var firstProject = projects.length ? projects[projects.length - 1] : null;
+  var daysSince = firstProject ? daysAgo(firstProject.createdAt) : 1;
+
+  document.getElementById('ws-sub').textContent = 'Building since Day ' + daysSince;
+
+  document.getElementById('ws-stats-grid').innerHTML =
+    '<div class="ws-stat"><div class="ws-stat-val">' + projects.length + '</div><div class="ws-stat-lbl">Projects</div></div>' +
+    '<div class="ws-stat"><div class="ws-stat-val">' + daysSince + '</div><div class="ws-stat-lbl">Days Building</div></div>' +
+    '<div class="ws-stat"><div class="ws-stat-val">' + logCount + '</div><div class="ws-stat-lbl">Logs</div></div>';
+
+  // Filter tabs based on types
+  var types = ['all'];
+  projects.forEach(function(p){ if (types.indexOf(p.type) === -1) types.push(p.type); });
+  var typeLabels = { all:'All', game:'Games', app:'Apps', ai:'AI', tool:'Tools', website:'Websites', experiment:'Experiments' };
+  document.getElementById('ws-tabs').innerHTML = types.map(function(t){
+    return '<button class="ws-tab' + (t === 'all' ? ' active' : '') + '" onclick="wsMyFilter(\'' + t + '\',this)">' + (typeLabels[t] || t) + '</button>';
+  }).join('') +
+  '<button class="ws-tab" style="background:rgba(99,102,241,.15);color:var(--accent2);margin-left:8px" onclick="openShareFromWorkspace()">+ Add Project</button>';
+
+  renderMyFeed(projects, 'all');
+  renderBuilderInbox();
+  renderBuilderLog();
+  renderGallery();
+  renderTimeline();
+  document.getElementById('workspace-modal').style.display = 'block';
+  window.scrollTo(0, 0);
+}
+
+function renderBuilderLog() {
+  var existing = document.getElementById('builder-log-section');
+  if (existing) existing.remove();
+
+  var log = getLog();
+  var projects = getMyProjects();
+
+  var projectOptions = '<option value="">No specific project</option>' +
+    projects.map(function(p){ return '<option value="' + p.name + '">' + p.name + '</option>'; }).join('');
+
+  var entriesHtml = log.length === 0
+    ? '<div style="font-size:13px;color:var(--muted);padding:16px 0">No entries yet. Start your construction journal.</div>'
+    : log.map(function(e){
+        return '<div style="padding:14px 0;border-bottom:1px solid var(--border);display:flex;gap:12px;align-items:flex-start">' +
+          '<div style="flex-shrink:0;text-align:right;min-width:70px">' +
+            '<div style="font-size:11px;color:var(--muted)">' + e.date + '</div>' +
+            (e.project ? '<div style="font-size:10px;color:var(--accent2);margin-top:2px;font-weight:600">' + e.project + '</div>' : '') +
+          '</div>' +
+          '<div style="flex:1">' +
+            '<div style="font-size:14px;color:var(--text);line-height:1.5">' + e.text + '</div>' +
+            (e.link ? '<a href="' + e.link + '" target="_blank" style="font-size:11px;color:var(--accent2);text-decoration:none;margin-top:4px;display:inline-block">↗ ' + e.link + '</a>' : '') +
+          '</div>' +
+          '<button onclick="deleteLogEntry(' + e.id + ');renderBuilderLog()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;flex-shrink:0;padding:0" title="Delete">×</button>' +
+        '</div>';
+      }).join('');
+
+  var section = document.createElement('div');
+  section.id = 'builder-log-section';
+  section.style.cssText = 'margin-top:32px;border-top:1px solid var(--border);padding-top:24px';
+  section.innerHTML =
+    '<div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:16px">📋 Builder Log</div>' +
+    '<div style="background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:20px">' +
+      '<textarea id="log-text" placeholder="What did you build, test, or start today?" style="width:100%;background:none;border:none;outline:none;color:var(--text);font-size:14px;font-family:inherit;resize:none;min-height:60px;line-height:1.6"></textarea>' +
+      '<div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">' +
+        '<input id="log-link" placeholder="↗ Link (optional)" style="flex:1;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:8px;padding:7px 12px;color:var(--text);font-size:12px;font-family:inherit;outline:none;min-width:120px">' +
+        '<select id="log-project" style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:8px;padding:7px 12px;color:var(--text);font-size:12px;font-family:inherit;outline:none">' + projectOptions + '</select>' +
+        '<button onclick="submitLogEntry()" style="background:var(--accent);color:#fff;border:none;border-radius:8px;padding:7px 18px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">Post →</button>' +
+      '</div>' +
+    '</div>' +
+    '<div id="log-entries">' + entriesHtml + '</div>';
+
+  document.querySelector('.workspace-page').appendChild(section);
+}
+
+function renderGallery() {
+  var existing = document.getElementById('gallery-section');
+  if (existing) existing.remove();
+  var gallery  = getGallery();
+  var projects = getMyProjects();
+  var projOpts = '<option value="">No project</option>' + projects.map(function(p){ return '<option value="'+p.name+'">'+p.name+'</option>'; }).join('');
+  var MOODS = ['flow','breakthrough','stuck','chaotic','focused','exploring','shipping'];
+
+  var itemsHtml = gallery.length === 0
+    ? '<div style="font-size:13px;color:var(--muted);padding:8px 0">No images yet. Add sketches, mockups, or screenshots.</div>'
+    : '<div class="gallery-grid">' + gallery.map(function(item){
+        var img = item.url
+          ? '<img class="gallery-img" src="'+item.url+'" onerror="this.style.display=\'none\';this.nextSibling.style.display=\'flex\'">' +
+            '<div class="gallery-no-img" style="display:none">🖼</div>'
+          : '<div class="gallery-no-img">🖼</div>';
+        return '<div class="gallery-item">' +
+          img +
+          '<div class="gallery-overlay">' +
+            '<div class="gallery-title">'+item.title+'</div>' +
+            '<div class="gallery-meta">' +
+              (item.project?'<span class="gallery-project">'+item.project+'</span>':'') +
+              (item.mood?'<span class="gallery-mood">'+item.mood+'</span>':'') +
+            '</div>' +
+          '</div>' +
+          '<button class="gallery-del" onclick="deleteGalleryItem('+item.id+');renderGallery()" title="Remove">×</button>' +
+        '</div>';
+      }).join('') + '</div>';
+
+  var moodOpts = MOODS.map(function(m){ return '<option value="'+m+'">'+m+'</option>'; }).join('');
+
+  var section = document.createElement('div');
+  section.id = 'gallery-section';
+  section.style.cssText = 'margin-top:32px;border-top:1px solid var(--border);padding-top:24px';
+  section.innerHTML =
+    '<div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:16px">🖼 Gallery</div>' +
+    '<div style="background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:16px">' +
+      '<input id="gal-title" placeholder="Title — what is this?" style="width:100%;background:none;border:none;outline:none;color:var(--text);font-size:14px;font-family:inherit;margin-bottom:10px">' +
+      '<input id="gal-url" placeholder="Image URL (imgur, github, anywhere...)" style="width:100%;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:8px;padding:7px 12px;color:var(--text);font-size:12px;font-family:inherit;outline:none;margin-bottom:10px">' +
+      '<div style="display:flex;gap:8px;flex-wrap:wrap">' +
+        '<select id="gal-project" style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:8px;padding:7px 12px;color:var(--text);font-size:12px;font-family:inherit;outline:none">'+projOpts+'</select>' +
+        '<select id="gal-mood" style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:8px;padding:7px 12px;color:var(--text);font-size:12px;font-family:inherit;outline:none"><option value="">mood (optional)</option>'+moodOpts+'</select>' +
+        '<button onclick="submitGalleryItem()" style="background:var(--accent);color:#fff;border:none;border-radius:8px;padding:7px 18px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;margin-left:auto">Add →</button>' +
+      '</div>' +
+    '</div>' +
+    '<div id="gallery-items">' + itemsHtml + '</div>';
+
+  document.querySelector('.workspace-page').appendChild(section);
+}
+
+function submitGalleryItem() {
+  var title = (document.getElementById('gal-title')||{}).value||'';
+  if (!title.trim()) { toast('Add a title first.'); return; }
+  addGalleryItem(
+    title.trim(),
+    (document.getElementById('gal-url')||{}).value||'',
+    (document.getElementById('gal-project')||{}).value||'',
+    (document.getElementById('gal-mood')||{}).value||''
+  );
+  renderGallery();
+  document.getElementById('gal-title').value = '';
+  document.getElementById('gal-url').value   = '';
+}
+
+function renderTimeline() {
+  var existing = document.getElementById('timeline-section');
+  if (existing) existing.remove();
+  var tl       = getTimeline();
+  var projects = getMyProjects();
+  var projOpts = '<option value="">No project</option>' + projects.map(function(p){ return '<option value="'+p.name+'">'+p.name+'</option>'; }).join('');
+
+  var tlHtml = tl.length === 0
+    ? '<div style="font-size:13px;color:var(--muted);padding:8px 0">No milestones yet. When did this all start?</div>'
+    : '<div class="tl-list">' + tl.map(function(e){
+        return '<div class="tl-item">' +
+          '<div class="tl-date">' + e.date + '</div>' +
+          '<div class="tl-text">' + e.text + '<button class="tl-del" onclick="deleteTimelineEntry('+e.id+');renderTimeline()" title="Delete">×</button></div>' +
+          (e.project?'<div class="tl-project">'+e.project+'</div>':'') +
+        '</div>';
+      }).join('') + '</div>';
+
+  var section = document.createElement('div');
+  section.id = 'timeline-section';
+  section.style.cssText = 'margin-top:32px;border-top:1px solid var(--border);padding-top:24px;padding-bottom:40px';
+  section.innerHTML =
+    '<div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:16px">📅 Timeline</div>' +
+    '<div style="background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:16px">' +
+      '<input id="tl-text" placeholder="What happened? First idea, first build, first launch..." style="width:100%;background:none;border:none;outline:none;color:var(--text);font-size:14px;font-family:inherit;margin-bottom:10px">' +
+      '<div style="display:flex;gap:8px;flex-wrap:wrap">' +
+        '<input id="tl-date" type="month" style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:8px;padding:7px 12px;color:var(--text);font-size:12px;font-family:inherit;outline:none">' +
+        '<select id="tl-project" style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:8px;padding:7px 12px;color:var(--text);font-size:12px;font-family:inherit;outline:none">'+projOpts+'</select>' +
+        '<button onclick="submitTimelineEntry()" style="background:var(--accent);color:#fff;border:none;border-radius:8px;padding:7px 18px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;margin-left:auto">Add →</button>' +
+      '</div>' +
+    '</div>' +
+    '<div id="tl-entries">' + tlHtml + '</div>';
+
+  document.querySelector('.workspace-page').appendChild(section);
+}
+
+function submitTimelineEntry() {
+  var text = (document.getElementById('tl-text')||{}).value||'';
+  if (!text.trim()) { toast('Add a milestone first.'); return; }
+  addTimelineEntry(
+    (document.getElementById('tl-date')||{}).value || new Date().toISOString().slice(0,7),
+    text.trim(),
+    (document.getElementById('tl-project')||{}).value||''
+  );
+  renderTimeline();
+  document.getElementById('tl-text').value = '';
+}
+
+function submitLogEntry() {
+  var text = (document.getElementById('log-text') || {}).value || '';
+  if (!text.trim()) return;
+  var link    = (document.getElementById('log-link')    || {}).value || '';
+  var project = (document.getElementById('log-project') || {}).value || '';
+  addLogEntry(text.trim(), link.trim(), project);
+  renderBuilderLog();
+  document.getElementById('log-text').value = '';
+  document.getElementById('log-link').value = '';
+}
+
+function wsMyFilter(type, el) {
+  document.querySelectorAll('.ws-tab').forEach(function(t){ t.classList.remove('active'); });
+  el.classList.add('active');
+  var projects = type === 'all' ? getMyProjects() : getMyProjects().filter(function(p){ return p.type === type; });
+  renderMyFeed(projects, type);
+}
+
+function openShareFromWorkspace() {
+  _wsFromMySpace = true;
+  spReset();
+  document.getElementById('share-modal').style.display = 'flex';
+}
+
+function renderMyFeed(projects, filter) {
+  var feed = document.getElementById('ws-feed');
+  if (!projects.length) {
+    feed.innerHTML =
+      '<div style="text-align:center;padding:48px 24px;background:rgba(255,255,255,.02);border:1px dashed var(--border);border-radius:18px">' +
+        '<div style="font-size:36px;margin-bottom:14px">🏗</div>' +
+        '<div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:8px">Start your universe.</div>' +
+        '<div style="font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6">Add your first project and begin documenting the journey.</div>' +
+        '<button class="bcard-btn" onclick="openShareFromWorkspace()">+ Add first project</button>' +
+      '</div>';
+    return;
+  }
+
+  var typeIcons = { game:'🎮', app:'📱', ai:'🧠', tool:'🛠', website:'🌐', experiment:'🧪' };
+  var stageMap  = { idea:'💡 Idea', building:'🔨 Building', testing:'🧪 Testing', earlyaccess:'🔓 Early Access', live:'🚀 Live' };
+  var scMap     = { idea:'s-idea', building:'s-building', testing:'s-launched', earlyaccess:'s-launched', live:'s-launched' };
+
+  feed.innerHTML = projects.map(function(p){
+    var icon  = typeIcons[p.type] || '📦';
+    var stage = stageMap[p.stage] || p.stage;
+    var sc    = scMap[p.stage]    || 's-building';
+
+    var linkBtn = p.link
+      ? '<a href="' + p.link + '" target="_blank" style="display:inline-flex;align-items:center;gap:5px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);border-radius:8px;padding:5px 12px;font-size:11px;font-weight:700;color:#4ade80;text-decoration:none">▶ Open</a>'
+      : '';
+
+    var needsHtml = (p.needs || []).map(function(n){
+      var t = n === 'testers' ? 'test' : n === 'ideas' ? 'suggest' : n === 'feedback' ? 'suggest' : 'help';
+      var icons = { testers:'🧪', ideas:'💡', feedback:'💬', help:'🆘' };
+      return '<button class="fb-btn ' + t + '" onclick="openFeedback(\'' + p.name + '\',\'' + t + '\')">' + (icons[n]||'') + ' ' + n + '</button>';
+    }).join('');
+
+    return '<div class="pcard">' +
+      '<div class="pcard-img" style="background:linear-gradient(135deg,#0d0d20,#1a1a35)">' +
+        '<div class="pcard-img-emoji">' + icon + '</div>' +
+        '<div class="pcard-img-overlay"></div>' +
+        '<div class="pcard-status-pin"><span class="status-badge ' + sc + '">' + stage + '</span></div>' +
+      '</div>' +
+      '<div class="pcard-body">' +
+        '<div class="pcard-head">' +
+          '<div><div class="pcard-name">' + p.name + '</div>' +
+          '<div class="pcard-by">' + (p.showDays ? 'Day ' + daysAgo(p.createdAt) : 'Added recently') + '</div></div>' +
+          '<div style="display:flex;gap:6px">' +
+          '<button onclick="openEditProject(' + p.id + ')" style="background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.2);border-radius:7px;color:var(--accent2);font-size:11px;font-weight:700;cursor:pointer;padding:5px 10px;font-family:inherit">✏️ Edit</button>' +
+          '<button onclick="confirmDeleteProject(' + p.id + ')" style="background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:7px;color:#f87171;font-size:11px;font-weight:700;cursor:pointer;padding:5px 10px;font-family:inherit">🗑 Delete</button>' +
+          '</div>' +
+        '</div>' +
+        (p.desc ? '<div class="pcard-desc">' + p.desc + '</div>' : '') +
+        '<div class="feedback-board">' +
+          '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">' +
+            '<div class="fb-label" style="margin-bottom:0">Community feedback</div>' + linkBtn +
+          '</div>' +
+          '<div class="fb-actions">' + needsHtml +
+            '<button class="fb-btn suggest" onclick="openFeedback(\'' + p.name + '\',\'suggest\')">💡 Suggest</button>' +
+            '<button class="fb-btn bug" onclick="openFeedback(\'' + p.name + '\',\'bug\')">🐛 Bug</button>' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function refreshMyCard() {
+  var name = getBuilderName();
+  if (!name) return;
+  var projects = getMyProjects();
+  var myCard = document.getElementById('my-builder-card');
+  if (!myCard) return;
+
+  var isBuilder = projects.length > 0;
+
+  // Proiecte
+  var projHtml = isBuilder
+    ? projects.slice(0,4).map(function(p){
+        var icons = { game:'🎮', app:'📱', ai:'🧠', tool:'🛠', website:'🌐', experiment:'🧪' };
+        return '<span class="bcard-proj">' + (icons[p.type]||'📦') + ' ' + p.name + '</span>';
+      }).join('')
+    : '<span style="font-size:11px;color:var(--muted)">No projects yet — testing mode</span>';
+
+  myCard.querySelector('.bcard-projects').innerHTML = projHtml;
+
+  // Rank
+  myCard.querySelector('.bcard-rank').textContent = isBuilder
+    ? projects.length + ' project' + (projects.length !== 1 ? 's' : '') + ' · ' + getLog().length + ' logs'
+    : 'Exploring VNEX';
+
+  // Update text
+  document.getElementById('my-card-update').textContent = isBuilder
+    ? 'Last added: ' + projects[0].name + ' · ' + projects[0].createdAt
+    : 'Testing projects. No public workspace yet.';
+
+  // Tu pe cardul tău → mereu My Space
+  var btn = myCard.querySelector('.bcard-btn');
+  if (btn) btn.textContent = 'My Space →';
 }
 
 // ── MY PROFILE ───────────────────────────────────────────────
@@ -605,3 +1242,4 @@ function openProfile(section) {
 function closeProfile() {
   document.getElementById('profile-modal').style.display = 'none';
 }
+
