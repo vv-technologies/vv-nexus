@@ -52,12 +52,15 @@ async function fbSaveProfile() {
     var db = window.VDB;
     var f  = window.VFire;
     await f.setDoc(f.doc(db, 'builders', uid), {
-      name:      name,
-      uid:       uid,
-      phrase:    getPhrase(),
-      projects:  getMyProjects(),
-      log:       getLog(),
-      updatedAt: Date.now()
+      name:          name,
+      uid:           uid,
+      phrase:        getPhrase(),
+      projects:      getMyProjects(),
+      log:           getLog(),
+      universeName:  _vnexSettings['universe-name'] || '',
+      about:         _vnexSettings.about || '',
+      tags:          _vnexSettings.tags || [],
+      updatedAt:     Date.now()
     });
   } catch(e){ console.log('fbSaveProfile error', e); }
 }
@@ -1000,7 +1003,7 @@ function openMyWorkspace() {
 
   document.getElementById('ws-avatar').textContent = name.charAt(0).toUpperCase();
   document.getElementById('ws-avatar').style.background = 'linear-gradient(135deg,#6366f1,#818cf8)';
-  document.getElementById('ws-name').textContent = name;
+  document.getElementById('ws-name').textContent = 'My Space';
   var logCount = getLog().length;
   var firstProject = projects.length ? projects[projects.length - 1] : null;
   var daysSince = firstProject ? daysAgo(firstProject.createdAt) : 1;
