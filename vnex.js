@@ -5,44 +5,80 @@ var _fbReady = false;
 
 window.addEventListener('firebase-ready', function() {
   _fbReady = true;
-  var code = localStorage.getItem('vnex_user_code');
-  if (code) fbSyncOnLoad(code);
+  if (localStorage.getItem('vnex_uid')) fbSyncOnLoad();
 });
+
+function generateUID() {
+  return 'uid_' + Date.now() + '_' + Math.random().toString(36).slice(2, 9);
+}
+
+function getUID() {
+  var uid = localStorage.getItem('vnex_uid');
+  if (!uid) {
+    uid = generateUID();
+    localStorage.setItem('vnex_uid', uid);
+  }
+  return uid;
+}
 
 async function fbSaveProfile() {
   if (!_fbReady) return;
-  var code = localStorage.getItem('vnex_user_code');
-  if (!code) return;
+  var uid  = getUID();
+  var name = localStorage.getItem('vnex_builder_name') || '';
+  if (!name) return;
   try {
     var db = window.VDB;
     var f  = window.VFire;
-    await f.setDoc(f.doc(db, 'builders', code), {
-      name:     localStorage.getItem('vnex_builder_name') || '',
-      code:     code,
-      projects: getMyProjects(),
-      log:      getLog(),
+    await f.setDoc(f.doc(db, 'builders', uid), {
+      name:      name,
+      uid:       uid,
+      projects:  getMyProjects(),
+      log:       getLog(),
       updatedAt: Date.now()
     });
   } catch(e){ console.log('fbSaveProfile error', e); }
 }
 
-async function fbSyncOnLoad(code) {
+async function fbSyncOnLoad() {
   if (!_fbReady) return;
+  var uid = localStorage.getItem('vnex_uid');
+  if (!uid) return;
   try {
-    var db = window.VDB;
-    var f  = window.VFire;
-    var snap = await f.getDoc(f.doc(db, 'builders', code));
+    var db   = window.VDB;
+    var f    = window.VFire;
+    var snap = await f.getDoc(f.doc(db, 'builders', uid));
     if (!snap.exists()) return;
     var data = snap.data();
-    if (data.projects && data.projects.length) {
+    if (data.projects && data.projects.length)
       localStorage.setItem('vnex_my_projects', JSON.stringify(data.projects));
-    }
-    if (data.log && data.log.length) {
+    if (data.log && data.log.length)
       localStorage.setItem('vnex_builder_log', JSON.stringify(data.log));
-    }
     refreshMyCard();
     updateHeroStats();
   } catch(e){ console.log('fbSyncOnLoad error', e); }
+}
+
+async function fbRecoverByName(name) {
+  if (!_fbReady) { toast('Connecting... try again in a second.'); return; }
+  try {
+    var db   = window.VDB;
+    var f    = window.VFire;
+    var q    = f.query(f.collection(db, 'builders'), f.where('name', '==', name.trim()));
+    var snap = await f.getDocs(q);
+    if (snap.empty) { toast('No account found for "' + name + '".'); return; }
+    var data = snap.docs[0].data();
+    var uid  = data.uid;
+    localStorage.setItem('vnex_uid',          uid);
+    localStorage.setItem('vnex_builder_name', data.name);
+    localStorage.setItem('vnex_welcomed',     '1');
+    if (data.projects) localStorage.setItem('vnex_my_projects', JSON.stringify(data.projects));
+    if (data.log)      localStorage.setItem('vnex_builder_log', JSON.stringify(data.log));
+    document.getElementById('welcome-modal').style.display = 'none';
+    updateBuilderBadge();
+    refreshMyCard();
+    updateHeroStats();
+    toast('✓ Welcome back, ' + data.name + '!');
+  } catch(e){ toast('Error recovering account.'); console.log(e); }
 }
 
 // ── MY PROJECTS (localStorage) ───────────────────────────────
@@ -484,15 +520,12 @@ function setBuilderName() {
   var input = document.getElementById('builder-name-input').value.trim();
   var name  = input || _pickedName;
   if (!name) { toast('Choose a name first.'); return; }
-
-  var code = generateUserCode();
+  getUID(); // generează UID dacă nu există
   localStorage.setItem('vnex_builder_name', name);
-  localStorage.setItem('vnex_user_code', code);
   localStorage.setItem('vnex_welcomed', '1');
-
-  // Arată codul înainte de a închide
-  showCodeReveal(name, code);
-  setTimeout(fbSaveProfile, 1000);
+  document.getElementById('welcome-modal').style.display = 'none';
+  updateBuilderBadge();
+  setTimeout(fbSaveProfile, 500);
 }
 
 function showCodeReveal(name, code) {
