@@ -990,6 +990,70 @@ function closeWorkspace() {
   _wsFromMySpace = false;
 }
 
+function openProjectDetail(id) {
+  var p = getMyProjects().find(function(x){ return x.id === id; });
+  if (!p) return;
+
+  var stageMap  = { idea:'💡 Idea', building:'🔨 Building', testing:'🧪 Testing', earlyaccess:'🔓 Early Access', live:'🚀 Live' };
+  var typeIcons = { game:'🎮', app:'📱', ai:'🧠', tool:'🛠', website:'🌐', experiment:'🧪' };
+  var scMap     = { idea:'s-idea', building:'s-building', testing:'s-launched', earlyaccess:'s-launched', live:'s-launched' };
+
+  var icon  = typeIcons[p.type] || '📦';
+  var stage = stageMap[p.stage] || p.stage;
+  var sc    = scMap[p.stage] || 's-building';
+  var days  = daysAgo(p.createdAt);
+
+  var projectLogs = getLog().filter(function(e){ return e.project === p.name; });
+  var logsHtml = projectLogs.length
+    ? projectLogs.map(function(e){
+        return '<div class="pd-log-entry">' +
+          '<div class="pd-log-date">' + e.date + '</div>' +
+          '<div class="pd-log-text">' + e.text + '</div>' +
+          (e.link ? '<a href="' + e.link + '" target="_blank" class="pd-log-link">↗ ' + e.link + '</a>' : '') +
+        '</div>';
+      }).join('')
+    : '<div style="font-size:13px;color:var(--muted);padding:8px 0">No log entries yet for this project.</div>';
+
+  var needsHtml = (p.needs || []).map(function(n){
+    var t = n === 'testers' ? 'test' : n === 'ideas' ? 'suggest' : n === 'feedback' ? 'suggest' : 'help';
+    var icons = { testers:'🧪', ideas:'💡', feedback:'💬', bugs:'🐛', help:'🆘' };
+    return '<button class="fb-btn ' + t + '" onclick="openFeedback(\'' + p.name + '\',\'' + t + '\')">' + (icons[n]||'') + ' ' + n + '</button>';
+  }).join('');
+
+  var linksHtml = '';
+  if (p.link)   linksHtml += '<a href="' + p.link   + '" target="_blank" class="pd-link-btn">🌐 Open</a>';
+  if (p.github) linksHtml += '<a href="' + p.github + '" target="_blank" class="pd-link-btn">🐙 GitHub</a>';
+  if (p.video)  linksHtml += '<a href="' + p.video  + '" target="_blank" class="pd-link-btn">▶ Video</a>';
+
+  document.getElementById('pd-content').innerHTML =
+    '<div class="pd-header">' +
+      '<div class="pd-emoji">' + icon + '</div>' +
+      '<div class="pd-meta">' +
+        '<div class="pd-name">' + p.name + '</div>' +
+        '<div class="pd-badges">' +
+          '<span class="status-badge ' + sc + '">' + stage + '</span>' +
+          (p.showDays ? '<span class="pd-days">Day ' + days + '</span>' : '') +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+    (p.desc ? '<div class="pd-desc">' + p.desc + '</div>' : '') +
+    (linksHtml ? '<div class="pd-links">' + linksHtml + '</div>' : '') +
+    '<div class="pd-section-title">Right now</div>' +
+    '<div class="fb-actions" style="margin-bottom:4px">' + needsHtml +
+      '<button class="fb-btn suggest" onclick="openFeedback(\'' + p.name + '\',\'suggest\')">💡 Suggest</button>' +
+      '<button class="fb-btn bug" onclick="openFeedback(\'' + p.name + '\',\'bug\')">🐛 Bug</button>' +
+    '</div>' +
+    '<div class="pd-section-title">Builder Log</div>' +
+    '<div class="pd-logs">' + logsHtml + '</div>';
+
+  document.getElementById('project-detail-modal').style.display = 'block';
+  window.scrollTo(0, 0);
+}
+
+function closeProjectDetail() {
+  document.getElementById('project-detail-modal').style.display = 'none';
+}
+
 // ── MY WORKSPACE ─────────────────────────────────────────────
 var _wsFromMySpace = false;
 
@@ -1251,7 +1315,7 @@ function renderMyFeed(projects, filter) {
       '</div>' +
       '<div class="pcard-body">' +
         '<div class="pcard-head">' +
-          '<div><div class="pcard-name">' + p.name + '</div>' +
+          '<div><div class="pcard-name" style="cursor:pointer" onclick="openProjectDetail(' + p.id + ')">' + p.name + '</div>' +
           '<div class="pcard-by">' + (p.showDays ? 'Day ' + daysAgo(p.createdAt) : 'Added recently') + '</div></div>' +
           '<div style="display:flex;gap:6px">' +
           '<button onclick="openEditProject(' + p.id + ')" style="background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.2);border-radius:7px;color:var(--accent2);font-size:11px;font-weight:700;cursor:pointer;padding:5px 10px;font-family:inherit">✏️ Edit</button>' +
