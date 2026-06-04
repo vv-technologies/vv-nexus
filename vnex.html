@@ -417,6 +417,26 @@
 
 <div class="toast" id="toast"></div>
 
+<!-- Firebase -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
+  import { getFirestore, doc, setDoc, getDoc, collection, addDoc, getDocs, deleteDoc, query, where, orderBy } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCwvV9fyei-ONuSLHNelgyr7IvLRerKoMA",
+    authDomain: "vnex-7de9d.firebaseapp.com",
+    projectId: "vnex-7de9d",
+    storageBucket: "vnex-7de9d.firebasestorage.app",
+    messagingSenderId: "537440898427",
+    appId: "1:537440898427:web:ed692da009858e472dc1de"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db  = getFirestore(app);
+  window.VDB = db;
+  window.VFire = { doc, setDoc, getDoc, collection, addDoc, getDocs, deleteDoc, query, where, orderBy };
+  window.dispatchEvent(new Event('firebase-ready'));
+</script>
 <script src="vnex.js"></script>
 </body>
 </html>
