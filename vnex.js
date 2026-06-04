@@ -1,4 +1,4 @@
-var FORMSPREE = 'https://formspree.io/f/meepavqj';
+﻿var FORMSPREE = 'https://formspree.io/f/meepavqj';
 
 // ── FIREBASE SYNC ─────────────────────────────────────────────
 var _fbReady = false;
@@ -672,14 +672,18 @@ try { _vnexSettings = JSON.parse(localStorage.getItem('vnex_settings') || '{}');
 if (_vnexSettings.theme) applyTheme(_vnexSettings.theme);
 
 function openSettings() {
-  if (_vnexSettings.name)     document.getElementById('s-name').value     = _vnexSettings.name;
-  if (_vnexSettings.username) document.getElementById('s-username').value = _vnexSettings.username;
-  if (_vnexSettings.email)    document.getElementById('s-email').value    = _vnexSettings.email;
-  var existingCode = localStorage.getItem('vnex_user_code');
-  var codeEl = document.getElementById('settings-code-display');
-  var genBtn  = document.getElementById('btn-generate-code');
-  if (codeEl) codeEl.textContent = existingCode || 'No code yet';
-  if (genBtn) genBtn.style.display = existingCode ? 'none' : '';
+  var uname = document.getElementById('s-universe-name');
+  var about = document.getElementById('s-about');
+  if (uname && _vnexSettings['universe-name']) uname.value = _vnexSettings['universe-name'];
+  if (about && _vnexSettings.about) about.value = _vnexSettings.about;
+  var savedTags = _vnexSettings.tags || [];
+  document.querySelectorAll('#s-tags-group .tag-opt').forEach(function(el) {
+    el.classList.toggle('sel', savedTags.indexOf(el.getAttribute('data-tag') || el.textContent.toLowerCase()) > -1);
+  });
+  var savedVis = _vnexSettings.visibility || 'hybrid';
+  document.querySelectorAll('.vis-opt').forEach(function(el) {
+    el.classList.toggle('sel', el.getAttribute('data-vis') === savedVis);
+  });
   document.getElementById('settings-modal').style.display = 'flex';
 }
 function closeSettings() { document.getElementById('settings-modal').style.display = 'none'; }
@@ -719,12 +723,32 @@ function applyTheme(theme) {
 function toggleNotif(el) { el.classList.toggle('on'); }
 
 function saveSettings() {
-  _vnexSettings.name     = (document.getElementById('s-name') || {}).value || '';
-  _vnexSettings.username = (document.getElementById('s-username') || {}).value || '';
-  _vnexSettings.email    = (document.getElementById('s-email') || {}).value || '';
+  var uname = document.getElementById('s-universe-name');
+  var about = document.getElementById('s-about');
+  if (uname) _vnexSettings['universe-name'] = uname.value.trim();
+  if (about) _vnexSettings.about = about.value.trim();
+  var selTags = [];
+  document.querySelectorAll('#s-tags-group .tag-opt.sel').forEach(function(el) {
+    selTags.push(el.getAttribute('data-tag') || el.textContent.toLowerCase());
+  });
+  _vnexSettings.tags = selTags;
+  var visEl = document.querySelector('.vis-opt.sel');
+  if (visEl) _vnexSettings.visibility = visEl.getAttribute('data-vis') || 'public';
   localStorage.setItem('vnex_settings', JSON.stringify(_vnexSettings));
   closeSettings();
-  toast('✓ Settings saved.');
+  toast('✓ Saved.');
+}
+
+function toggleTag(el, val) {
+  el.setAttribute('data-tag', val);
+  el.classList.toggle('sel');
+}
+
+function selVisibility(el, val) {
+  el.setAttribute('data-vis', val);
+  el.closest('.visibility-opts').querySelectorAll('.vis-opt').forEach(function(o) { o.classList.remove('sel'); });
+  el.classList.add('sel');
+  _vnexSettings.visibility = val;
 }
 
 // ── SHARE FLOW ───────────────────────────────────────────────
