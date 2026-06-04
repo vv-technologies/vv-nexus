@@ -12,6 +12,28 @@ function generateUID() {
   return 'uid_' + Date.now() + '_' + Math.random().toString(36).slice(2, 9);
 }
 
+var PHRASE_WORDS = [
+  'silver','forest','signal','ocean','tiger','stone','river','cloud','ember','blade',
+  'echo','frost','amber','cedar','delta','flint','grove','haven','iris','jade',
+  'kite','lumen','maple','north','orbit','pine','quest','raven','storm','terra',
+  'ultra','valor','whale','xenon','yield','zenith','arc','bolt','cave','drift',
+  'eagle','flame','glow','hawk','iron','jump','keen','lake','mist','noble'
+];
+
+function generatePhrase() {
+  var words = PHRASE_WORDS.slice();
+  var result = [];
+  for (var i = 0; i < 3; i++) {
+    var idx = Math.floor(Math.random() * words.length);
+    result.push(words.splice(idx, 1)[0]);
+  }
+  return result.join('-');
+}
+
+function getPhrase() {
+  return localStorage.getItem('vnex_phrase') || '';
+}
+
 function getUID() {
   var uid = localStorage.getItem('vnex_uid');
   if (!uid) {
@@ -32,6 +54,7 @@ async function fbSaveProfile() {
     await f.setDoc(f.doc(db, 'builders', uid), {
       name:      name,
       uid:       uid,
+      phrase:    getPhrase(),
       projects:  getMyProjects(),
       log:       getLog(),
       updatedAt: Date.now()
@@ -58,18 +81,20 @@ async function fbSyncOnLoad() {
   } catch(e){ console.log('fbSyncOnLoad error', e); }
 }
 
-async function fbRecoverByName(name) {
+async function fbRecoverByName(name, phrase) {
   if (!_fbReady) { toast('Connecting... try again in a second.'); return; }
+  if (!name || !phrase) { toast('Enter both your name and recovery phrase.'); return; }
   try {
     var db   = window.VDB;
     var f    = window.VFire;
-    var q    = f.query(f.collection(db, 'builders'), f.where('name', '==', name.trim()));
+    var q    = f.query(f.collection(db, 'builders'), f.where('name', '==', name.trim()), f.where('phrase', '==', phrase.trim()));
     var snap = await f.getDocs(q);
-    if (snap.empty) { toast('No account found for "' + name + '".'); return; }
+    if (snap.empty) { toast('Name or phrase incorrect. Try again.'); return; }
     var data = snap.docs[0].data();
     var uid  = data.uid;
     localStorage.setItem('vnex_uid',          uid);
     localStorage.setItem('vnex_builder_name', data.name);
+    localStorage.setItem('vnex_phrase',       data.phrase || '');
     localStorage.setItem('vnex_welcomed',     '1');
     if (data.projects) localStorage.setItem('vnex_my_projects', JSON.stringify(data.projects));
     if (data.log)      localStorage.setItem('vnex_builder_log', JSON.stringify(data.log));
@@ -520,12 +545,29 @@ function setBuilderName() {
   var input = document.getElementById('builder-name-input').value.trim();
   var name  = input || _pickedName;
   if (!name) { toast('Choose a name first.'); return; }
-  getUID(); // generează UID dacă nu există
+  getUID();
+  var phrase = generatePhrase();
   localStorage.setItem('vnex_builder_name', name);
+  localStorage.setItem('vnex_phrase', phrase);
   localStorage.setItem('vnex_welcomed', '1');
-  document.getElementById('welcome-modal').style.display = 'none';
-  updateBuilderBadge();
+  showPhraseReveal(name, phrase);
   setTimeout(fbSaveProfile, 500);
+}
+
+function showPhraseReveal(name, phrase) {
+  var wrap = document.querySelector('#welcome-modal .welcome-wrap');
+  wrap.innerHTML =
+    '<div style="font-size:28px;margin-bottom:12px">🔐</div>' +
+    '<div style="font-size:18px;font-weight:900;margin-bottom:6px">Save your recovery phrase</div>' +
+    '<div style="font-size:13px;color:var(--muted2);margin-bottom:20px;line-height:1.6">If you switch devices or lose access, you\'ll need your <strong style="color:var(--text)">name + these 3 words</strong>. We don\'t store this.</div>' +
+    '<div style="background:rgba(99,102,241,.1);border:2px solid rgba(99,102,241,.3);border-radius:14px;padding:20px;margin-bottom:16px;text-align:center">' +
+      '<div style="font-size:11px;color:var(--muted);font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px">Recovery Phrase</div>' +
+      '<div style="font-size:11px;color:var(--muted2);margin-bottom:6px">' + name + '</div>' +
+      '<div style="font-size:22px;font-weight:900;color:var(--accent2);letter-spacing:2px">' + phrase + '</div>' +
+      '<div style="font-size:11px;color:var(--muted);margin-top:10px">Write these 3 words down. Screenshot them.</div>' +
+    '</div>' +
+    '<button onclick="navigator.clipboard.writeText(\'' + name + ' / ' + phrase + '\').then(function(){toast(\'✓ Copied!\')}).catch(function(){})" style="width:100%;background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.2);border-radius:10px;padding:11px;font-size:13px;font-weight:600;color:var(--accent2);cursor:pointer;font-family:inherit;margin-bottom:10px">📋 Copy phrase</button>' +
+    '<button onclick="enterVNEX()" style="width:100%;background:var(--accent);color:#fff;border:none;border-radius:12px;padding:14px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">I saved it — Enter VNEX →</button>';
 }
 
 function showCodeReveal(name, code) {
