@@ -1,5 +1,50 @@
 var FORMSPREE = 'https://formspree.io/f/meepavqj';
 
+// ── FIREBASE SYNC ─────────────────────────────────────────────
+var _fbReady = false;
+
+window.addEventListener('firebase-ready', function() {
+  _fbReady = true;
+  var code = localStorage.getItem('vnex_user_code');
+  if (code) fbSyncOnLoad(code);
+});
+
+async function fbSaveProfile() {
+  if (!_fbReady) return;
+  var code = localStorage.getItem('vnex_user_code');
+  if (!code) return;
+  try {
+    var db = window.VDB;
+    var f  = window.VFire;
+    await f.setDoc(f.doc(db, 'builders', code), {
+      name:     localStorage.getItem('vnex_builder_name') || '',
+      code:     code,
+      projects: getMyProjects(),
+      log:      getLog(),
+      updatedAt: Date.now()
+    });
+  } catch(e){ console.log('fbSaveProfile error', e); }
+}
+
+async function fbSyncOnLoad(code) {
+  if (!_fbReady) return;
+  try {
+    var db = window.VDB;
+    var f  = window.VFire;
+    var snap = await f.getDoc(f.doc(db, 'builders', code));
+    if (!snap.exists()) return;
+    var data = snap.data();
+    if (data.projects && data.projects.length) {
+      localStorage.setItem('vnex_my_projects', JSON.stringify(data.projects));
+    }
+    if (data.log && data.log.length) {
+      localStorage.setItem('vnex_builder_log', JSON.stringify(data.log));
+    }
+    refreshMyCard();
+    updateHeroStats();
+  } catch(e){ console.log('fbSyncOnLoad error', e); }
+}
+
 // ── MY PROJECTS (localStorage) ───────────────────────────────
 function getMyProjects() {
   try { return JSON.parse(localStorage.getItem('vnex_my_projects') || '[]'); } catch(e){ return []; }
@@ -11,6 +56,7 @@ function saveMyProject(p) {
   p.createdAt = Date.now();
   list.unshift(p);
   localStorage.setItem('vnex_my_projects', JSON.stringify(list));
+  fbSaveProfile();
 }
 
 function daysAgo(timestamp) {
@@ -198,6 +244,7 @@ function addLogEntry(text, link, project) {
     ts:      Date.now()
   });
   localStorage.setItem('vnex_builder_log', JSON.stringify(log));
+  fbSaveProfile();
 }
 
 function deleteLogEntry(id) {
@@ -445,6 +492,7 @@ function setBuilderName() {
 
   // Arată codul înainte de a închide
   showCodeReveal(name, code);
+  setTimeout(fbSaveProfile, 1000);
 }
 
 function showCodeReveal(name, code) {
