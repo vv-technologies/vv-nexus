@@ -240,6 +240,18 @@ header{position:relative;z-index:10;max-width:1140px;margin:0 auto;padding:24px 
 .toggle.on::after{transform:translateX(16px)}
 .settings-save{width:100%;background:var(--accent);color:#fff;border:none;border-radius:11px;padding:12px;font-size:13px;font-weight:700;cursor:pointer;margin-top:4px;font-family:inherit;transition:all .2s}
 .settings-save:hover{background:var(--accent2)}
+.tag-opts{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px}
+.tag-opt{padding:6px 14px;border-radius:100px;font-size:12px;font-weight:600;color:var(--muted2);border:1px solid var(--border2);cursor:pointer;transition:all .2s}
+.tag-opt:hover{border-color:rgba(99,102,241,.4);color:var(--accent2)}
+.tag-opt.sel{background:rgba(99,102,241,.12);border-color:rgba(99,102,241,.45);color:var(--accent2)}
+.visibility-opts{display:flex;flex-direction:column;gap:8px}
+.vis-opt{padding:14px 16px;border:1.5px solid var(--border);border-radius:13px;cursor:pointer;transition:all .2s}
+.vis-opt:hover{border-color:rgba(99,102,241,.3)}
+.vis-opt.sel{border-color:rgba(99,102,241,.5);background:rgba(99,102,241,.07)}
+.vis-opt-top{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+.vis-icon{font-size:15px}
+.vis-name{font-size:13px;font-weight:700;color:var(--text)}
+.vis-desc{font-size:11px;color:var(--muted2);line-height:1.5;padding-left:25px}
 
 /* ── WELCOME ── */
 .welcome-wrap{background:var(--s1);border:1px solid rgba(99,102,241,.3);border-radius:22px;padding:40px 36px;width:100%;max-width:440px;text-align:center}
