@@ -165,25 +165,24 @@ function openEditProject(id) {
     });
   });
 
-  // Pre-fill fields — go to step 4
-  spGoTo(4);
+  // Pre-fill fields
   setTimeout(function(){
     var nameEl = document.getElementById('sp-name');
     var descEl = document.getElementById('sp-desc');
     var linkEl = document.getElementById('sp-link');
     var ghEl   = document.getElementById('sp-github');
     var vidEl  = document.getElementById('sp-video');
-    if (nameEl) nameEl.value = p.name  || '';
-    if (descEl) descEl.value = p.desc  || '';
-    if (linkEl) linkEl.value = p.link  || '';
-    if (ghEl)   ghEl.value   = p.github|| '';
-    if (vidEl)  vidEl.value  = p.video || '';
+    var imgEl  = document.getElementById('sp-image');
+    if (nameEl) nameEl.value = p.name   || '';
+    if (descEl) descEl.value = p.desc   || '';
+    if (linkEl) linkEl.value = p.link   || '';
+    if (ghEl)   ghEl.value   = p.github || '';
+    if (vidEl)  vidEl.value  = p.video  || '';
+    if (imgEl)  { imgEl.value = p.image || ''; spPreviewImage(p.image || ''); }
     if (p.showDays) spToggleDays();
-    // Schimbă titlul și butonul
-    var title = document.querySelector('#sp-step-4 .share-step-title');
-    var btn   = document.querySelector('#sp-step-4 .share-next');
-    if (title) title.textContent = 'Edit project.';
-    if (btn)   btn.textContent   = 'Save changes →';
+    if (p.lang) spSelLang(document.getElementById('sp-lang-' + p.lang) || document.getElementById('sp-lang-ro'), p.lang);
+    var pwTitle = document.getElementById('pw-title'); if (pwTitle) pwTitle.textContent = 'Edit Project';
+    var pwBtn = document.getElementById('pw-save-btn'); if (pwBtn) pwBtn.textContent = 'Save changes →';
   }, 50);
 
   document.getElementById('share-modal').style.display = 'flex';
@@ -930,9 +929,13 @@ function spSelLang(el, lang) {
 
 function spReset() {
   _spType = ''; _spStage = ''; _spNeeds = []; _spLang = 'ro'; _spEditId = null;
-  document.querySelectorAll('.share-type-btn,.share-stage,.share-need').forEach(function(el){ el.classList.remove('sel'); });
+  document.querySelectorAll('.share-type-btn,.pw-type-btn,.share-stage,.share-need').forEach(function(el){ el.classList.remove('sel'); });
   var roEl = document.getElementById('sp-lang-ro');
   if (roEl) { ['sp-lang-ro','sp-lang-en','sp-lang-both'].forEach(function(id){var e=document.getElementById(id);if(e)e.classList.remove('sel');}); roEl.classList.add('sel'); }
+  var imgEl = document.getElementById('sp-image'); if (imgEl) imgEl.value = '';
+  var prev = document.getElementById('sp-image-preview'); if (prev) prev.innerHTML = '';
+  var pwTitle = document.getElementById('pw-title'); if (pwTitle) pwTitle.textContent = 'Add Project';
+  var pwBtn = document.getElementById('pw-save-btn'); if (pwBtn) pwBtn.textContent = 'Publică →';
   var cb = document.getElementById('sp-days');
   var dot = document.getElementById('sp-days-dot');
   var tog = document.getElementById('sp-days-toggle');
@@ -978,9 +981,20 @@ function spGoTo(step) {
 function spNext(step) { spGoTo(step); }
 
 function spSelectType(el, type) {
-  document.querySelectorAll('.share-type-btn').forEach(function(b){ b.classList.remove('sel'); });
+  document.querySelectorAll('.share-type-btn,.pw-type-btn').forEach(function(b){ b.classList.remove('sel'); });
   el.classList.add('sel');
   _spType = type;
+}
+
+function spPreviewImage(url) {
+  var el = document.getElementById('sp-image-preview');
+  if (!el) return;
+  if (url && url.trim()) {
+    el.className = 'pw-img-preview';
+    el.innerHTML = '<img src="' + url.trim() + '" onerror="this.parentElement.innerHTML=\'\';">';
+  } else {
+    el.innerHTML = '';
+  }
 }
 
 function spSelectStage(el, stage) {
@@ -1009,7 +1023,8 @@ function spPublish() {
     github: (document.getElementById('sp-github') || {}).value || '',
     video:  (document.getElementById('sp-video')  || {}).value || '',
     showDays: !!(document.getElementById('sp-days') && document.getElementById('sp-days').checked),
-    lang: _spLang || 'ro'
+    lang:  _spLang || 'ro',
+    image: (document.getElementById('sp-image') || {}).value || ''
   };
   if (_spEditId) {
     var list = getMyProjects().map(function(existing){
