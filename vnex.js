@@ -790,7 +790,7 @@ function openVisitorSpace(uid) {
         '</div>' +
         '<div class="pcard-body">' +
           '<div class="pcard-head"><div><div class="pcard-name">' + p.name + '</div>' +
-          '<div class="pcard-by">by ' + b.name + '</div></div></div>' +
+          '<div class="pcard-by">by ' + b.name + (p.lang ? ' · ' + (p.lang==='ro'?'🇷🇴':p.lang==='en'?'🇬🇧':'🌐') : '') + '</div></div></div>' +
           (p.desc ? '<div class="pcard-desc">' + p.desc + '</div>' : '') +
           '<div class="feedback-board"><div class="fb-actions">' + needHtml +
             '<button class="fb-btn suggest" onclick="openFeedback(\'' + p.name + '\',\'suggest\')">💡 Suggest</button>' +
@@ -912,6 +912,7 @@ function selVisibility(el, val) {
 var _spType  = '';
 var _spStage = '';
 var _spNeeds = [];
+var _spLang  = 'ro';
 
 function openShareProject() {
   spReset();
@@ -919,9 +920,19 @@ function openShareProject() {
 }
 function closeShareProject() { document.getElementById('share-modal').style.display = 'none'; }
 
+function spSelLang(el, lang) {
+  _spLang = lang;
+  ['sp-lang-ro','sp-lang-en','sp-lang-both'].forEach(function(id){
+    var e = document.getElementById(id); if (e) e.classList.remove('sel');
+  });
+  el.classList.add('sel');
+}
+
 function spReset() {
-  _spType = ''; _spStage = ''; _spNeeds = []; _spEditId = null;
+  _spType = ''; _spStage = ''; _spNeeds = []; _spLang = 'ro'; _spEditId = null;
   document.querySelectorAll('.share-type-btn,.share-stage,.share-need').forEach(function(el){ el.classList.remove('sel'); });
+  var roEl = document.getElementById('sp-lang-ro');
+  if (roEl) { ['sp-lang-ro','sp-lang-en','sp-lang-both'].forEach(function(id){var e=document.getElementById(id);if(e)e.classList.remove('sel');}); roEl.classList.add('sel'); }
   var cb = document.getElementById('sp-days');
   var dot = document.getElementById('sp-days-dot');
   var tog = document.getElementById('sp-days-toggle');
@@ -997,7 +1008,8 @@ function spPublish() {
     link:   (document.getElementById('sp-link')   || {}).value || '',
     github: (document.getElementById('sp-github') || {}).value || '',
     video:  (document.getElementById('sp-video')  || {}).value || '',
-    showDays: !!(document.getElementById('sp-days') && document.getElementById('sp-days').checked)
+    showDays: !!(document.getElementById('sp-days') && document.getElementById('sp-days').checked),
+    lang: _spLang || 'ro'
   };
   if (_spEditId) {
     var list = getMyProjects().map(function(existing){
@@ -1470,7 +1482,7 @@ function renderMyFeed(projects, filter) {
       '<div class="pcard-body">' +
         '<div class="pcard-head">' +
           '<div><div class="pcard-name" style="cursor:pointer" onclick="openProjectDetail(' + p.id + ')">' + p.name + '</div>' +
-          '<div class="pcard-by">' + (p.showDays ? 'Day ' + daysAgo(p.createdAt) : 'Added recently') + '</div></div>' +
+          '<div class="pcard-by">' + (p.showDays ? 'Day ' + daysAgo(p.createdAt) : 'Added recently') + (p.lang ? ' · ' + (p.lang==='ro'?'🇷🇴':p.lang==='en'?'🇬🇧':'🌐') : '') + '</div></div>' +
           '<div style="display:flex;gap:6px">' +
           '<button onclick="openEditProject(' + p.id + ')" style="background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.2);border-radius:7px;color:var(--accent2);font-size:11px;font-weight:700;cursor:pointer;padding:5px 10px;font-family:inherit">✏️ Edit</button>' +
           '<button onclick="confirmDeleteProject(' + p.id + ')" style="background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:7px;color:#f87171;font-size:11px;font-weight:700;cursor:pointer;padding:5px 10px;font-family:inherit">🗑 Delete</button>' +
