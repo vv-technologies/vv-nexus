@@ -6,6 +6,7 @@ var _fbReady = false;
 window.addEventListener('firebase-ready', function() {
   _fbReady = true;
   if (localStorage.getItem('vnex_uid')) fbSyncOnLoad();
+  fbLoadFeed();
 });
 
 function generateUID() {
@@ -351,6 +352,13 @@ function scrollFeed(){ document.getElementById('feed-anchor').scrollIntoView({be
 function setTab(el){
   document.querySelectorAll('.tab').forEach(function(t){ t.classList.remove('active'); });
   el.classList.add('active');
+  var txt = el.textContent.toLowerCase();
+  var filter = 'all';
+  if (txt.indexOf('testers') !== -1) filter = 'testers';
+  else if (txt.indexOf('help') !== -1) filter = 'help';
+  else if (txt.indexOf('ideas') !== -1) filter = 'ideas';
+  else if (txt.indexOf('launched') !== -1) filter = 'launched';
+  renderFeed(filter);
 }
 function setTabByName(name){
   document.querySelectorAll('.tab').forEach(function(t){
@@ -648,9 +656,155 @@ function updateHeroStats() {
   var bEl = document.getElementById('hs-builders');
   var pEl = document.getElementById('hs-projects');
   var lEl = document.getElementById('hs-logs');
-  if (bEl) bEl.textContent = getBuilderName() ? 1 : 0;
+  var total = _allBuilders.length + (getBuilderName() ? 1 : 0);
+  if (bEl) bEl.textContent = total || (getBuilderName() ? 1 : 0);
   if (pEl) pEl.textContent = projects;
   if (lEl) lEl.textContent = logs;
+}
+
+// ── FEED — LOAD & FILTER ─────────────────────────────────────
+var _allBuilders = [];
+var _activeFilter = 'all';
+
+async function fbLoadFeed() {
+  if (!_fbReady) return;
+  try {
+    var db = window.VDB, f = window.VFire;
+    var myUid = localStorage.getItem('vnex_uid') || '';
+    var snap = await f.getDocs(f.collection(db, 'builders'));
+    _allBuilders = [];
+    snap.forEach(function(doc) {
+      var d = doc.data();
+      if (d.uid !== myUid && d.name) _allBuilders.push(d);
+    });
+    renderFeed(_activeFilter);
+    updateHeroStats();
+  } catch(e) { console.log('fbLoadFeed error', e); }
+}
+
+function renderFeed(filter) {
+  _activeFilter = filter || 'all';
+  var feed = document.getElementById('builders-feed');
+  feed.querySelectorAll('.bcard.dynamic').forEach(function(c){ c.remove(); });
+
+  var myCard = document.getElementById('my-builder-card');
+  var emptyCard = document.getElementById('empty-state-card');
+
+  var ICONS = { game:'🎮', app:'📱', ai:'🧠', tool:'🛠', website:'🌐', experiment:'🧪' };
+  var STAGE = { idea:'💡 Idea', building:'🔨 Building', testing:'🧪 Testing', earlyaccess:'🔓 Early Access', live:'🚀 Live' };
+  var NEED_LABELS = { testers:'🧪 Testers', feedback:'💬 Feedback', ideas:'💡 Ideas', bugs:'🐛 Bugs', help:'🆘 Help' };
+
+  var visible = 0;
+  _allBuilders.forEach(function(b) {
+    // Filter
+    var needs = [];
+    (b.projects || []).forEach(function(p){ (p.needs||[]).forEach(function(n){ if(needs.indexOf(n)===-1)needs.push(n); }); });
+    var stage = (b.projects||[]).some(function(p){ return p.stage==='live'||p.stage==='earlyaccess'; });
+
+    if (filter === 'testers' && needs.indexOf('testers') === -1) return;
+    if (filter === 'help'    && needs.indexOf('help') === -1)    return;
+    if (filter === 'ideas'   && needs.indexOf('ideas') === -1)   return;
+    if (filter === 'launched' && !stage)                          return;
+
+    visible++;
+    var displayName = b.universeName || b.name;
+    var avatar = displayName.charAt(0).toUpperCase();
+    var projHtml = (b.projects||[]).slice(0,4).map(function(p){
+      return '<span class="bcard-proj">' + (ICONS[p.type]||'📦') + ' ' + p.name + '</span>';
+    }).join('') || '<span style="font-size:11px;color:var(--muted)">No projects yet</span>';
+
+    var needHtml = needs.slice(0,3).map(function(n){
+      return '<span class="bcard-need">' + (NEED_LABELS[n]||n) + '</span>';
+    }).join('');
+
+    var lastProj = b.projects && b.projects[0];
+    var updateTxt = lastProj
+      ? 'Building: ' + lastProj.name + ' · ' + (STAGE[lastProj.stage]||lastProj.stage)
+      : (b.about || 'Active builder');
+
+    var card = document.createElement('div');
+    card.className = 'bcard dynamic';
+    card.setAttribute('data-uid', b.uid);
+    card.setAttribute('data-needs', needs.join(','));
+    card.innerHTML =
+      '<div class="bcard-top">' +
+        '<div class="bcard-avatar" style="background:linear-gradient(135deg,#818cf8,#6366f1)">' + avatar + '</div>' +
+        '<div>' +
+          '<div class="bcard-name">' + displayName + '</div>' +
+          '<div class="bcard-rank">' + (b.projects||[]).length + ' projects' + (b.about ? '' : '') + '</div>' +
+        '</div>' +
+      '</div>' +
+      (b.about ? '<div style="font-size:12px;color:var(--muted2);margin-bottom:8px;line-height:1.5">' + b.about + '</div>' : '') +
+      '<div class="bcard-projects">' + projHtml + '</div>' +
+      '<div class="bcard-update">' + updateTxt + '</div>' +
+      '<div class="bcard-footer">' +
+        '<span>' + needHtml + '</span>' +
+        '<button class="bcard-btn" onclick="openVisitorSpace(\'' + b.uid + '\')">Enter Universe →</button>' +
+      '</div>';
+
+    feed.insertBefore(card, emptyCard || null);
+  });
+
+  if (emptyCard) emptyCard.style.display = visible === 0 && !getBuilderName() ? '' : 'none';
+}
+
+// ── VISITOR UNIVERSE VIEW ─────────────────────────────────────
+function openVisitorSpace(uid) {
+  var b = _allBuilders.find(function(x){ return x.uid === uid; });
+  if (!b) { toast('Universe not found.'); return; }
+
+  var displayName = b.universeName || b.name;
+  var avatar = displayName.charAt(0).toUpperCase();
+
+  document.getElementById('ws-avatar').textContent = avatar;
+  document.getElementById('ws-avatar').style.background = 'linear-gradient(135deg,#818cf8,#6366f1)';
+  document.getElementById('ws-name').textContent = displayName + ' Universe';
+  document.getElementById('ws-sub').textContent  = b.about || 'Builder on VNEX';
+
+  var projects = b.projects || [];
+  var logs     = b.log || [];
+
+  document.getElementById('ws-stats-grid').innerHTML =
+    '<div class="ws-stat"><div class="ws-stat-val">' + projects.length + '</div><div class="ws-stat-lbl">Projects</div></div>' +
+    '<div class="ws-stat"><div class="ws-stat-val">' + logs.length + '</div><div class="ws-stat-lbl">Logs</div></div>' +
+    '<div class="ws-stat"><div class="ws-stat-val">' + (b.tags||[]).length + '</div><div class="ws-stat-lbl">Tags</div></div>';
+
+  var ICONS  = { game:'🎮', app:'📱', ai:'🧠', tool:'🛠', website:'🌐', experiment:'🧪' };
+  var STAGES = { idea:'💡 Idea', building:'🔨 Building', testing:'🧪 Testing', earlyaccess:'🔓 Early Access', live:'🚀 Live' };
+  var NEED_L = { testers:'🧪 Testers', feedback:'💬 Feedback', ideas:'💡 Ideas', bugs:'🐛 Bugs', help:'🆘 Help' };
+
+  var feed = document.getElementById('ws-feed');
+  if (!projects.length) {
+    feed.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted);font-size:13px">No projects shared yet.</div>';
+  } else {
+    feed.innerHTML = projects.map(function(p) {
+      var needHtml = (p.needs||[]).map(function(n){
+        return '<button class="fb-btn test" onclick="openFeedback(\'' + p.name + '\',\'test\')">' + (NEED_L[n]||n) + '</button>';
+      }).join('');
+      var linkBtn = p.link ? '<a href="' + p.link + '" target="_blank" style="display:inline-flex;align-items:center;gap:5px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);border-radius:8px;padding:5px 12px;font-size:11px;font-weight:700;color:#4ade80;text-decoration:none">▶ Open</a>' : '';
+      return '<div class="pcard" style="margin-bottom:14px">' +
+        '<div class="pcard-img" style="background:linear-gradient(135deg,#0d0d20,#1a1a35)">' +
+          '<div class="pcard-img-emoji">' + (ICONS[p.type]||'📦') + '</div>' +
+          '<div class="pcard-img-overlay"></div>' +
+          '<div class="pcard-status-pin"><span class="status-badge s-building">' + (STAGES[p.stage]||p.stage) + '</span></div>' +
+        '</div>' +
+        '<div class="pcard-body">' +
+          '<div class="pcard-head"><div><div class="pcard-name">' + p.name + '</div>' +
+          '<div class="pcard-by">by ' + b.name + '</div></div></div>' +
+          (p.desc ? '<div class="pcard-desc">' + p.desc + '</div>' : '') +
+          '<div class="feedback-board"><div class="fb-actions">' + needHtml +
+            '<button class="fb-btn suggest" onclick="openFeedback(\'' + p.name + '\',\'suggest\')">💡 Suggest</button>' +
+            '<button class="fb-btn bug" onclick="openFeedback(\'' + p.name + '\',\'bug\')">🐛 Bug</button>' +
+            linkBtn +
+          '</div></div>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  document.getElementById('ws-tabs').innerHTML = '';
+  document.getElementById('workspace-modal').style.display = 'block';
+  window.scrollTo(0, 0);
 }
 
 // ── WELCOME ──────────────────────────────────────────────────
