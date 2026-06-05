@@ -383,96 +383,75 @@
   </div>
 </div>
 
-<!-- SHARE PROJECT — step by step -->
+<!-- SHARE PROJECT — Single Workspace -->
 <div class="overlay" id="share-modal" style="display:none" onclick="if(event.target===this)closeShareProject()">
-  <div class="share-wrap">
-    <button class="modal-close" onclick="closeShareProject()">×</button>
-    <div class="share-progress">
-      <div class="share-prog-dot done" id="sp-dot-1"></div>
-      <div class="share-prog-dot" id="sp-dot-2"></div>
-      <div class="share-prog-dot" id="sp-dot-3"></div>
-      <div class="share-prog-dot" id="sp-dot-4"></div>
+  <div class="proj-workspace">
+    <div class="pw-head">
+      <div><div class="pw-title" id="pw-title">Add Project</div><div class="pw-sub">Spune builders-ilor ce construiești.</div></div>
+      <button class="modal-close" style="position:static" onclick="closeShareProject()">×</button>
     </div>
-
-    <!-- Step 1: Type -->
-    <div class="share-step active" id="sp-step-1">
-      <div class="share-step-title">What are you building?</div>
-      <div class="share-step-sub">Choose the type that fits best.</div>
-      <div class="share-type-grid">
-        <div class="share-type-btn" onclick="spSelectType(this,'ai')"><div class="share-type-icon">🧠</div><div class="share-type-label">AI</div></div>
-        <div class="share-type-btn" onclick="spSelectType(this,'game')"><div class="share-type-icon">🎮</div><div class="share-type-label">Game</div></div>
-        <div class="share-type-btn" onclick="spSelectType(this,'app')"><div class="share-type-icon">📱</div><div class="share-type-label">App</div></div>
-        <div class="share-type-btn" onclick="spSelectType(this,'tool')"><div class="share-type-icon">🛠</div><div class="share-type-label">Tool</div></div>
-        <div class="share-type-btn" onclick="spSelectType(this,'platform')"><div class="share-type-icon">🌐</div><div class="share-type-label">Platform</div></div>
-        <div class="share-type-btn" onclick="spSelectType(this,'research')"><div class="share-type-icon">🔬</div><div class="share-type-label">Research</div></div>
-        <div class="share-type-btn" onclick="spSelectType(this,'creator')"><div class="share-type-icon">🎨</div><div class="share-type-label">Creator Tool</div></div>
-        <div class="share-type-btn" onclick="spSelectType(this,'system')"><div class="share-type-icon">⚙️</div><div class="share-type-label">System</div></div>
+    <div class="pw-body">
+      <div class="pw-left">
+        <div class="pw-label">Type</div>
+        <div class="pw-type-grid">
+          <div class="pw-type-btn" onclick="spSelectType(this,'ai')"><div class="pw-type-icon">🧠</div><div class="pw-type-label">AI</div></div>
+          <div class="pw-type-btn" onclick="spSelectType(this,'game')"><div class="pw-type-icon">🎮</div><div class="pw-type-label">Game</div></div>
+          <div class="pw-type-btn" onclick="spSelectType(this,'app')"><div class="pw-type-icon">📱</div><div class="pw-type-label">App</div></div>
+          <div class="pw-type-btn" onclick="spSelectType(this,'tool')"><div class="pw-type-icon">🛠</div><div class="pw-type-label">Tool</div></div>
+          <div class="pw-type-btn" onclick="spSelectType(this,'platform')"><div class="pw-type-icon">🌐</div><div class="pw-type-label">Platform</div></div>
+          <div class="pw-type-btn" onclick="spSelectType(this,'research')"><div class="pw-type-icon">🔬</div><div class="pw-type-label">Research</div></div>
+          <div class="pw-type-btn" onclick="spSelectType(this,'creator')"><div class="pw-type-icon">🎨</div><div class="pw-type-label">Creator</div></div>
+          <div class="pw-type-btn" onclick="spSelectType(this,'system')"><div class="pw-type-icon">⚙️</div><div class="pw-type-label">System</div></div>
+        </div>
+        <div class="pw-label" style="margin-top:16px">Status</div>
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <div class="share-stage" onclick="spSelectStage(this,'idea')"><div class="share-stage-dot"></div><span class="share-stage-label">💡 Idea</span></div>
+          <div class="share-stage" onclick="spSelectStage(this,'building')"><div class="share-stage-dot"></div><span class="share-stage-label">🔨 Building</span></div>
+          <div class="share-stage" onclick="spSelectStage(this,'testing')"><div class="share-stage-dot"></div><span class="share-stage-label">🧪 Testing</span></div>
+          <div class="share-stage" onclick="spSelectStage(this,'earlyaccess')"><div class="share-stage-dot"></div><span class="share-stage-label">🔓 Early Access</span></div>
+          <div class="share-stage" onclick="spSelectStage(this,'live')"><div class="share-stage-dot"></div><span class="share-stage-label">🚀 Live</span></div>
+        </div>
+        <div class="pw-label" style="margin-top:16px">Looking for</div>
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <div class="share-need" onclick="spToggleNeed(this,'testers')"><div class="share-need-icon">🧪</div><div class="share-need-label">Testers</div></div>
+          <div class="share-need" onclick="spToggleNeed(this,'feedback')"><div class="share-need-icon">💬</div><div class="share-need-label">Feedback</div></div>
+          <div class="share-need" onclick="spToggleNeed(this,'ideas')"><div class="share-need-icon">💡</div><div class="share-need-label">Ideas</div></div>
+          <div class="share-need" onclick="spToggleNeed(this,'bugs')"><div class="share-need-icon">🐛</div><div class="share-need-label">Bug reports</div></div>
+          <div class="share-need" onclick="spToggleNeed(this,'help')"><div class="share-need-icon">🆘</div><div class="share-need-label">Help</div></div>
+        </div>
+        <div class="pw-label" style="margin-top:16px">Language</div>
+        <div style="display:flex;flex-direction:column;gap:5px" id="sp-lang-group">
+          <div class="share-stage sel" id="sp-lang-ro"   onclick="spSelLang(this,'ro')">  <div class="share-stage-dot"></div><span class="share-stage-label">🇷🇴 Română</span></div>
+          <div class="share-stage"     id="sp-lang-en"   onclick="spSelLang(this,'en')">  <div class="share-stage-dot"></div><span class="share-stage-label">🇬🇧 Engleză</span></div>
+          <div class="share-stage"     id="sp-lang-both" onclick="spSelLang(this,'both')"><div class="share-stage-dot"></div><span class="share-stage-label">🌐 Ambele</span></div>
+        </div>
       </div>
-      <div class="share-nav">
-        <button class="share-next" onclick="spNext(2)">Continue →</button>
-      </div>
-    </div>
-
-    <!-- Step 2: Stage -->
-    <div class="share-step" id="sp-step-2">
-      <div class="share-step-title">What's the current stage?</div>
-      <div class="share-step-sub">Be honest — that's what makes VNEX real.</div>
-      <div class="share-stages">
-        <div class="share-stage" onclick="spSelectStage(this,'idea')"><div class="share-stage-dot"></div><span class="share-stage-label">💡 Idea — concept, not much built yet</span></div>
-        <div class="share-stage" onclick="spSelectStage(this,'building')"><div class="share-stage-dot"></div><span class="share-stage-label">🔨 Building — actively working on it</span></div>
-        <div class="share-stage" onclick="spSelectStage(this,'testing')"><div class="share-stage-dot"></div><span class="share-stage-label">🧪 Testing — works, needs real users</span></div>
-        <div class="share-stage" onclick="spSelectStage(this,'earlyaccess')"><div class="share-stage-dot"></div><span class="share-stage-label">🔓 Early Access — limited, invite only</span></div>
-        <div class="share-stage" onclick="spSelectStage(this,'live')"><div class="share-stage-dot"></div><span class="share-stage-label">🚀 Live — public and available now</span></div>
-      </div>
-      <div class="share-nav">
-        <button class="share-back" onclick="spNext(1)">← Back</button>
-        <button class="share-next" onclick="spNext(3)">Continue →</button>
-      </div>
-    </div>
-
-    <!-- Step 3: Need -->
-    <div class="share-step" id="sp-step-3">
-      <div class="share-step-title">What do you need?</div>
-      <div class="share-step-sub">Select all that apply.</div>
-      <div class="share-needs">
-        <div class="share-need" onclick="spToggleNeed(this,'testers')"><div class="share-need-icon">🧪</div><div class="share-need-label">Testers</div></div>
-        <div class="share-need" onclick="spToggleNeed(this,'ideas')"><div class="share-need-icon">💡</div><div class="share-need-label">Ideas</div></div>
-        <div class="share-need" onclick="spToggleNeed(this,'feedback')"><div class="share-need-icon">💬</div><div class="share-need-label">Feedback</div></div>
-        <div class="share-need" onclick="spToggleNeed(this,'bugs')"><div class="share-need-icon">🐛</div><div class="share-need-label">Bug reports</div></div>
-        <div class="share-need" onclick="spToggleNeed(this,'help')"><div class="share-need-icon">🆘</div><div class="share-need-label">Help</div></div>
-      </div>
-      <div class="share-nav">
-        <button class="share-back" onclick="spNext(2)">← Back</button>
-        <button class="share-next" onclick="spNext(4)">Continue →</button>
+      <div class="pw-right">
+        <input class="pw-name-input" id="sp-name" placeholder="Numele proiectului" maxlength="60">
+        <div class="pw-label" style="margin-top:16px">Descriere</div>
+        <textarea class="mc-input mc-textarea" id="sp-desc" placeholder="Ce face? Ce problemă rezolvă? 1-3 propoziții." style="min-height:80px"></textarea>
+        <div class="pw-label" style="margin-top:16px">Links</div>
+        <input class="mc-input" id="sp-link"   placeholder="🌐 Website / Demo (opțional)" style="margin-bottom:7px">
+        <input class="mc-input" id="sp-github" placeholder="🐙 GitHub (opțional)"         style="margin-bottom:7px">
+        <input class="mc-input" id="sp-video"  placeholder="▶ Video (opțional)">
+        <div class="pw-label" style="margin-top:16px">Media</div>
+        <input class="mc-input" id="sp-image" placeholder="🖼 URL imagine — screenshot, concept, UI..." oninput="spPreviewImage(this.value)" style="margin-bottom:7px">
+        <div id="sp-image-preview"></div>
+        <div id="sp-days-toggle" onclick="spToggleDays()" style="display:flex;align-items:center;gap:10px;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;cursor:pointer;transition:all .2s;margin-top:10px">
+          <div id="sp-days-dot" style="width:16px;height:16px;border-radius:4px;border:2px solid var(--muted);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .2s;font-size:11px"></div>
+          <span style="font-size:13px;color:var(--muted2)">📅 Afișează contor zile <span style="color:var(--muted);font-size:11px">— Day 1, Day 45...</span></span>
+        </div>
+        <input type="checkbox" id="sp-days" style="display:none">
       </div>
     </div>
-
-    <!-- Step 4: Show it + Publish -->
-    <div class="share-step" id="sp-step-4">
-      <div class="share-step-title">Show it.</div>
-      <div class="share-step-sub">Name it, describe it, add a link.</div>
-      <input class="mc-input" id="sp-name" placeholder="Project name" style="margin-bottom:10px">
-      <textarea class="mc-textarea" id="sp-desc" placeholder="What does it do? 1-2 sentences." style="min-height:70px;margin-bottom:10px"></textarea>
-      <input class="mc-input" id="sp-link" placeholder="🌐 Website / Demo (opțional)" style="margin-bottom:8px">
-      <input class="mc-input" id="sp-github" placeholder="🐙 GitHub (opțional)" style="margin-bottom:8px">
-      <input class="mc-input" id="sp-video" placeholder="▶ Link video (opțional)" style="margin-bottom:12px">
-      <div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Limbă</div>
-      <div style="display:flex;gap:8px;margin-bottom:12px" id="sp-lang-group">
-        <div class="share-stage sel" id="sp-lang-ro" onclick="spSelLang(this,'ro')" style="flex:1;justify-content:center"><div class="share-stage-dot"></div><span class="share-stage-label">🇷🇴 Română</span></div>
-        <div class="share-stage" id="sp-lang-en" onclick="spSelLang(this,'en')" style="flex:1;justify-content:center"><div class="share-stage-dot"></div><span class="share-stage-label">🇬🇧 Engleză</span></div>
-        <div class="share-stage" id="sp-lang-both" onclick="spSelLang(this,'both')" style="flex:1;justify-content:center"><div class="share-stage-dot"></div><span class="share-stage-label">🌐 Ambele</span></div>
-      </div>
-      <div id="sp-days-toggle" onclick="spToggleDays()" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:1.5px solid var(--border);border-radius:10px;cursor:pointer;transition:all .2s;margin-bottom:4px">
-        <div id="sp-days-dot" style="width:18px;height:18px;border-radius:5px;border:2px solid var(--muted);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .2s;font-size:12px"></div>
-        <span style="font-size:13px;color:var(--muted2)">📅 Show day counter <span style="color:var(--muted);font-size:11px">— Day 1, Day 45... counts from today</span></span>
-      </div>
-      <input type="checkbox" id="sp-days" style="display:none">
-      <div class="share-nav">
-        <button class="share-back" onclick="spNext(3)">← Back</button>
-        <button class="share-next" onclick="spPublish()">Publish →</button>
-      </div>
+    <div class="pw-footer">
+      <span style="font-size:12px;color:var(--muted)">Salvat local · sync Firebase</span>
+      <button class="pw-save" id="pw-save-btn" onclick="spPublish()">Publică →</button>
     </div>
-
+  </div>
+  <!-- removed steps below, kept for JS compat -->
+  <div style="display:none" id="sp-dot-1"></div><div style="display:none" id="sp-dot-2"></div><div style="display:none" id="sp-dot-3"></div><div style="display:none" id="sp-dot-4"></div>
+  <div style="display:none" id="sp-step-1"></div><div style="display:none" id="sp-step-2"></div><div style="display:none" id="sp-step-3"></div><div style="display:none" id="sp-step-4"></div>
   </div>
 </div>
 
