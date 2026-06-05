@@ -36,10 +36,19 @@
 
 <div class="page-wrap" id="feed-anchor">
 
+  <div id="ro-banner" style="background:rgba(99,102,241,.07);border:1px solid rgba(99,102,241,.2);border-radius:12px;padding:13px 18px;margin-bottom:14px;display:flex;align-items:center;gap:10px">
+    <span style="font-size:16px">🇷🇴</span>
+    <div style="flex:1">
+      <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:2px">Early Access — disponibil momentan doar în română.</div>
+      <div style="font-size:11px;color:var(--muted2)">Testăm platforma cu primii builders români înainte de a ne extinde internațional.</div>
+    </div>
+    <button onclick="document.getElementById('ro-banner').style.display='none'" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px;flex-shrink:0;padding:0;line-height:1">×</button>
+  </div>
+
   <div style="background:var(--s1);border:1px solid rgba(34,197,94,.2);border-radius:12px;padding:14px 18px;margin-bottom:20px;display:flex;align-items:center;gap:10px">
     <span style="font-size:16px">🧪</span>
-    <span style="font-size:13px;color:var(--muted2)"><strong style="color:#4ade80">LEA</strong> and <strong style="color:#4ade80">SIGNAL</strong> need real testers. Be the first.</span>
-    <button class="bcard-btn" style="margin-left:auto" onclick="openFeedback('LEA','test')">Test LEA →</button>
+    <span style="font-size:13px;color:var(--muted2)"><strong style="color:#4ade80">LEA</strong> și <strong style="color:#4ade80">SIGNAL</strong> au nevoie de testeri reali. Fii primul.</span>
+    <button class="bcard-btn" style="margin-left:auto" onclick="openFeedback('LEA','test')">Testează LEA →</button>
   </div>
 
   <div class="filter-row">
@@ -341,12 +350,14 @@
       <div class="share-step-title">What are you building?</div>
       <div class="share-step-sub">Choose the type that fits best.</div>
       <div class="share-type-grid">
-        <div class="share-type-btn" onclick="spSelectType(this,'game')"><div class="share-type-icon">🎮</div><div class="share-type-label">Game</div></div>
         <div class="share-type-btn" onclick="spSelectType(this,'ai')"><div class="share-type-icon">🧠</div><div class="share-type-label">AI</div></div>
+        <div class="share-type-btn" onclick="spSelectType(this,'game')"><div class="share-type-icon">🎮</div><div class="share-type-label">Game</div></div>
         <div class="share-type-btn" onclick="spSelectType(this,'app')"><div class="share-type-icon">📱</div><div class="share-type-label">App</div></div>
         <div class="share-type-btn" onclick="spSelectType(this,'tool')"><div class="share-type-icon">🛠</div><div class="share-type-label">Tool</div></div>
-        <div class="share-type-btn" onclick="spSelectType(this,'website')"><div class="share-type-icon">🌐</div><div class="share-type-label">Website</div></div>
-        <div class="share-type-btn" onclick="spSelectType(this,'experiment')"><div class="share-type-icon">🧪</div><div class="share-type-label">Experiment</div></div>
+        <div class="share-type-btn" onclick="spSelectType(this,'platform')"><div class="share-type-icon">🌐</div><div class="share-type-label">Platform</div></div>
+        <div class="share-type-btn" onclick="spSelectType(this,'research')"><div class="share-type-icon">🔬</div><div class="share-type-label">Research</div></div>
+        <div class="share-type-btn" onclick="spSelectType(this,'creator')"><div class="share-type-icon">🎨</div><div class="share-type-label">Creator Tool</div></div>
+        <div class="share-type-btn" onclick="spSelectType(this,'system')"><div class="share-type-icon">⚙️</div><div class="share-type-label">System</div></div>
       </div>
       <div class="share-nav">
         <button class="share-next" onclick="spNext(2)">Continue →</button>
@@ -393,9 +404,15 @@
       <div class="share-step-sub">Name it, describe it, add a link.</div>
       <input class="mc-input" id="sp-name" placeholder="Project name" style="margin-bottom:10px">
       <textarea class="mc-textarea" id="sp-desc" placeholder="What does it do? 1-2 sentences." style="min-height:70px;margin-bottom:10px"></textarea>
-      <input class="mc-input" id="sp-link" placeholder="🌐 Website / Demo (optional)" style="margin-bottom:8px">
-      <input class="mc-input" id="sp-github" placeholder="🐙 GitHub (optional)" style="margin-bottom:8px">
-      <input class="mc-input" id="sp-video" placeholder="▶ Video link (optional)" style="margin-bottom:12px">
+      <input class="mc-input" id="sp-link" placeholder="🌐 Website / Demo (opțional)" style="margin-bottom:8px">
+      <input class="mc-input" id="sp-github" placeholder="🐙 GitHub (opțional)" style="margin-bottom:8px">
+      <input class="mc-input" id="sp-video" placeholder="▶ Link video (opțional)" style="margin-bottom:12px">
+      <div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Limbă</div>
+      <div style="display:flex;gap:8px;margin-bottom:12px" id="sp-lang-group">
+        <div class="share-stage sel" id="sp-lang-ro" onclick="spSelLang(this,'ro')" style="flex:1;justify-content:center"><div class="share-stage-dot"></div><span class="share-stage-label">🇷🇴 Română</span></div>
+        <div class="share-stage" id="sp-lang-en" onclick="spSelLang(this,'en')" style="flex:1;justify-content:center"><div class="share-stage-dot"></div><span class="share-stage-label">🇬🇧 Engleză</span></div>
+        <div class="share-stage" id="sp-lang-both" onclick="spSelLang(this,'both')" style="flex:1;justify-content:center"><div class="share-stage-dot"></div><span class="share-stage-label">🌐 Ambele</span></div>
+      </div>
       <div id="sp-days-toggle" onclick="spToggleDays()" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:1.5px solid var(--border);border-radius:10px;cursor:pointer;transition:all .2s;margin-bottom:4px">
         <div id="sp-days-dot" style="width:18px;height:18px;border-radius:5px;border:2px solid var(--muted);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .2s;font-size:12px"></div>
         <span style="font-size:13px;color:var(--muted2)">📅 Show day counter <span style="color:var(--muted);font-size:11px">— Day 1, Day 45... counts from today</span></span>
