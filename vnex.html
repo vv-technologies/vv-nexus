@@ -9,25 +9,19 @@
 </head>
 <body>
 
-<div id="ro-top-bar" style="background:rgba(99,102,241,.12);border-bottom:1px solid rgba(99,102,241,.2);padding:9px 20px;display:flex;align-items:center;gap:12px;z-index:20">
-  <span style="font-size:14px;flex-shrink:0">🇷🇴</span>
-  <span style="font-size:12px;color:var(--muted2);flex:1;text-align:center"><strong style="color:var(--accent2)">Early Access</strong> — VNEX este momentan disponibil doar în română. Testăm cu primii builders înainte de a ne extinde internațional.</span>
-  <a href="#international" onclick="document.getElementById('ro-top-bar').style.display='none'" style="font-size:12px;font-weight:700;color:var(--accent2);text-decoration:none;white-space:nowrap;flex-shrink:0;background:rgba(99,102,241,.15);border:1px solid rgba(99,102,241,.3);border-radius:6px;padding:4px 10px">🇬🇧 English ↓</a>
-  <button onclick="document.getElementById('ro-top-bar').style.display='none'" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px;line-height:1;padding:0;flex-shrink:0">×</button>
-</div>
 
 <header>
   <div class="logo">V<span>NEX</span><div class="logo-badge">ALPHA</div></div>
   <div class="nav-links">
     <div class="builder-badge" id="builder-badge" style="display:none;cursor:pointer" onclick="openMyWorkspace()" title="My Space"><span id="builder-badge-name"></span><span class="builder-rank" id="builder-badge-rank"></span></div>
-    <button class="btn-nav" onclick="openSettings()" title="Settings">⚙️</button>
+    <button class="btn-nav" onclick="openSettings()">Settings</button>
     <button class="btn-nav" onclick="openShareProject()">+ Share project</button>
     <button class="btn-nav-accent" onclick="openModal('waitlist-modal')">Get early access</button>
   </div>
 </header>
 
 <div class="hero">
-  <div class="hero-tag"><div class="live-dot"></div>&nbsp;Day 1 — building in public</div>
+  <div class="hero-tag"><div class="live-dot"></div>Day 1 — building in public</div>
   <h1>Follow builders<br>through their projects.</h1>
   <p>Not a feed of projects. A window into the people building them — what they're making, where they're stuck, what they need.</p>
   <div class="hero-cta">
@@ -38,34 +32,18 @@
     <div class="stat-item"><div class="stat-val" id="hs-builders">0</div><div class="stat-label">Builders</div></div>
     <div class="stat-item"><div class="stat-val" id="hs-projects">0</div><div class="stat-label">Projects</div></div>
     <div class="stat-item"><div class="stat-val" id="hs-logs">0</div><div class="stat-label">Log entries</div></div>
-    <div class="stat-item"><div class="stat-val">Day 1</div><div class="stat-label">VNEX is live</div></div>
   </div>
 </div>
 
 <div class="page-wrap" id="feed-anchor">
 
-  <div id="ro-banner" style="background:rgba(99,102,241,.07);border:1px solid rgba(99,102,241,.2);border-radius:12px;padding:13px 18px;margin-bottom:14px;display:flex;align-items:center;gap:10px">
-    <span style="font-size:16px">🇷🇴</span>
-    <div style="flex:1">
-      <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:2px">Early Access — disponibil momentan doar în română.</div>
-      <div style="font-size:11px;color:var(--muted2)">Testăm platforma cu primii builders români înainte de a ne extinde internațional.</div>
-    </div>
-    <button onclick="document.getElementById('ro-banner').style.display='none'" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px;flex-shrink:0;padding:0;line-height:1">×</button>
-  </div>
-
-  <div style="background:var(--s1);border:1px solid rgba(34,197,94,.2);border-radius:12px;padding:14px 18px;margin-bottom:20px;display:flex;align-items:center;gap:10px">
-    <span style="font-size:16px">🧪</span>
-    <span style="font-size:13px;color:var(--muted2)"><strong style="color:#4ade80">LEA</strong> și <strong style="color:#4ade80">SIGNAL</strong> au nevoie de testeri reali. Fii primul.</span>
-    <button class="bcard-btn" style="margin-left:auto" onclick="openFeedback('LEA','test')">Testează LEA →</button>
-  </div>
-
   <div class="filter-row">
     <div class="tabs">
-      <button class="tab active" onclick="setTab(this)">👥 All builders</button>
-      <button class="tab" onclick="setTab(this)">🧪 Need testers</button>
-      <button class="tab" onclick="setTab(this)">🆘 Need help</button>
-      <button class="tab" onclick="setTab(this)">💡 Need ideas</button>
-      <button class="tab" onclick="setTab(this)">🚀 Just launched</button>
+      <button class="tab active" onclick="setTab(this)">All builders</button>
+      <button class="tab" onclick="setTab(this)">Need testers</button>
+      <button class="tab" onclick="setTab(this)">Need help</button>
+      <button class="tab" onclick="setTab(this)">Need ideas</button>
+      <button class="tab" onclick="setTab(this)">Just launched</button>
     </div>
     <div class="filter-right">
       <button class="sort-btn">Sort: Latest</button>
@@ -104,44 +82,23 @@
 
     </div>
 
-    <!-- SIDEBAR -->
+    <!-- SIDEBAR — hidden, kept for JS compat -->
     <div class="sidebar">
-
       <div class="waitlist-box">
-        <div class="wl-title">Join VNEX early access</div>
-        <div class="wl-sub">First 100 get permanent Early Builder badge + tester XP head start.</div>
         <form onsubmit="submitWL(event)">
           <input class="wl-input" type="email" id="wl-email" placeholder="your@email.com" required>
-          <button class="btn-wl" type="submit">Get early access →</button>
         </form>
-        <div class="wl-note">No spam. Just project updates.</div>
       </div>
-
-      <div class="scard">
-        <div class="scard-title">🧪 Need testers now</div>
-        <div style="font-size:12px;color:var(--muted);padding:8px 0 4px;line-height:1.6">No projects need testers yet.<br><span style="color:var(--accent2);font-weight:600;cursor:pointer" onclick="openOrSetupProfile()">Add your project →</span></div>
-      </div>
-
-      <div class="scard">
-        <div class="scard-title">⚡ Top contributors this week</div>
-        <div style="font-size:12px;color:var(--muted);padding:8px 0 4px;line-height:1.6">No contributors yet.<br><span style="color:var(--accent2);font-weight:600;cursor:pointer" onclick="openFeedback('LEA','test')">Be the first →</span></div>
-      </div>
-
-      <div class="scard">
-        <div class="scard-title">🏷 Explore by tag</div>
-        <div style="margin:-3px">
-          <span class="hot-tag">🤖 AI</span>
-          <span class="hot-tag">🎮 games</span>
-          <span class="hot-tag">🛠 tools</span>
-          <span class="hot-tag">📱 mobile</span>
-          <span class="hot-tag">🇷🇴 romania</span>
-          <span class="hot-tag">💻 web</span>
-          <span class="hot-tag">🔌 offline</span>
-          <span class="hot-tag">indie</span>
-        </div>
-      </div>
-
     </div>
+  </div>
+</div>
+
+<!-- LAPTOP FIRST NOTICE -->
+<div style="border-top:1px solid var(--border);padding:28px 32px;text-align:center">
+  <div style="max-width:1080px;margin:0 auto;display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap">
+    <span style="font-size:13px;color:var(--muted2)">💻 <strong style="color:var(--text);font-weight:600">Laptop first.</strong> Mobile version coming later.</span>
+    <span style="color:var(--border2)">·</span>
+    <span style="font-size:13px;color:var(--muted)">🇷🇴 Currently in Romanian Early Access</span>
   </div>
 </div>
 
