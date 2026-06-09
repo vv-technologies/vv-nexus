@@ -9,45 +9,11 @@
 </head>
 <body>
 
-<!-- GLASS NOTICE — RO + EN, dismissible -->
-<div id="lang-notice">
-  <div class="ln-wrap">
-    <div class="ln-content">
-      <span class="ln-flag">🇷🇴</span>
-      <span class="ln-text"><strong>Early Access</strong> — disponibil în română</span>
-      <span class="ln-sep">·</span>
-      <span class="ln-flag">🌐</span>
-      <span class="ln-text">International version <strong>coming soon</strong></span>
-      <span class="ln-sep">·</span>
-      <span class="ln-text">💻 Laptop first</span>
-    </div>
-    <button class="ln-close" onclick="dismissLangNotice()" title="Close">×</button>
-  </div>
-</div>
-
-<script>
-(function(){
-  if(localStorage.getItem('vnex_ln_v2')) return;
-  setTimeout(function(){
-    var el = document.getElementById('lang-notice');
-    el.style.display = 'flex';
-    requestAnimationFrame(function(){
-      requestAnimationFrame(function(){ el.classList.add('ln-show'); });
-    });
-  }, 900);
-})();
-function dismissLangNotice(){
-  var el = document.getElementById('lang-notice');
-  el.classList.remove('ln-show');
-  setTimeout(function(){ el.style.display='none'; }, 380);
-  localStorage.setItem('vnex_ln_v2','1');
-}
-</script>
-
 <header>
   <div class="logo">V<span>NEX</span><div class="logo-badge">ALPHA</div></div>
   <div class="nav-links">
     <div class="builder-badge" id="builder-badge" style="display:none;cursor:pointer" onclick="openMyWorkspace()" title="My Space"><span id="builder-badge-name"></span><span class="builder-rank" id="builder-badge-rank"></span></div>
+    <button class="btn-info-globe" onclick="openInfoPopup()" title="About VNEX">🌐</button>
     <button class="btn-nav" onclick="openSettings()">Settings</button>
     <button class="btn-nav" onclick="openShareProject()">+ Share project</button>
     <button class="btn-nav-accent" onclick="openModal('waitlist-modal')">Get early access</button>
@@ -455,6 +421,55 @@ function dismissLangNotice(){
     <div id="pd-content"></div>
   </div>
 </div>
+
+<!-- INFO POPUP — RO / EN bilingv -->
+<div class="overlay" id="info-popup" style="display:none" onclick="if(event.target===this)closeInfoPopup()">
+  <div class="info-glass">
+    <button class="modal-close" onclick="closeInfoPopup()">×</button>
+
+    <div class="ig-lang-row">
+      <button class="ig-lang active" onclick="switchInfoLang(this,'ro')">🇷🇴 Română</button>
+      <button class="ig-lang" onclick="switchInfoLang(this,'en')">🇬🇧 English</button>
+    </div>
+
+    <div id="ig-ro">
+      <div class="ig-badge">Early Access · Disponibil în România</div>
+      <div class="ig-title">VNEX — Un loc pentru builders.</div>
+      <p class="ig-body">O platformă unde indie builders, developeri și creatori documentează și testează proiecte în public — cu control total asupra ce rămâne privat.</p>
+      <div class="ig-items">
+        <div class="ig-item"><span>🔨</span><div><strong>Urmărești proiecte, nu oameni.</strong> Progresul contează mai mult decât popularitatea.</div></div>
+        <div class="ig-item"><span>💬</span><div><strong>Feedback real.</strong> Găsești testeri, primești idei, rezolvi bug-uri concrete.</div></div>
+        <div class="ig-item"><span>⚡</span><div><strong>Hybrid by default.</strong> Tu decizi ce e public. Restul rămâne al tău.</div></div>
+        <div class="ig-item"><span>💻</span><div><strong>Laptop first.</strong> Versiunea mobilă urmează după validare.</div></div>
+      </div>
+      <div class="ig-note">Momentan testăm cu primii builders din România. Lansare internațională — în curând.</div>
+    </div>
+
+    <div id="ig-en" style="display:none">
+      <div class="ig-badge">Early Access · Romania only, for now</div>
+      <div class="ig-title">VNEX — A place for builders.</div>
+      <p class="ig-body">A platform where indie builders, developers and makers document and share their projects in public — while keeping full control over what stays private.</p>
+      <div class="ig-items">
+        <div class="ig-item"><span>🔨</span><div><strong>Follow projects, not people.</strong> Progress matters more than popularity.</div></div>
+        <div class="ig-item"><span>💬</span><div><strong>Real feedback.</strong> Find testers, get ideas, receive actual bug reports.</div></div>
+        <div class="ig-item"><span>⚡</span><div><strong>Hybrid by default.</strong> You decide what is public. Everything else stays yours.</div></div>
+        <div class="ig-item"><span>💻</span><div><strong>Laptop first.</strong> Mobile version coming after validation.</div></div>
+      </div>
+      <div class="ig-note">Currently testing with our first Romanian builders. International launch coming soon — not a social network, a builder platform.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+function openInfoPopup(){ document.getElementById('info-popup').style.display='flex'; }
+function closeInfoPopup(){ document.getElementById('info-popup').style.display='none'; }
+function switchInfoLang(btn, lang){
+  document.querySelectorAll('#info-popup .ig-lang').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  document.getElementById('ig-ro').style.display = lang==='ro' ? 'block' : 'none';
+  document.getElementById('ig-en').style.display = lang==='en' ? 'block' : 'none';
+}
+</script>
 
 <div class="toast" id="toast"></div>
 
