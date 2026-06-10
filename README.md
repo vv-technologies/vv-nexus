@@ -60,6 +60,8 @@ VV Nexus is part of the `VV Hybrid Universe`.
 
 Related repositories:
 
+- [vv-hybrid-univers-manifesto](https://github.com/vv-technologies/vv-hybrid-univers-manifesto)
+- [vv-hi-framework](https://github.com/vv-technologies/vv-hi-framework)
 - [vv-technologies](https://github.com/vv-technologies/vv-technologies)
 - [vv-lea](https://github.com/vv-technologies/vv-lea)
 - [vv-pulse](https://github.com/vv-technologies/vv-pulse)
