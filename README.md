@@ -32,6 +32,21 @@ Key areas currently visible in this repository include:
 - `vv-ceo-panel.html`
 - `VV_HYBRID_UNIVERSE.html`
 
+## Core IP And Invention Record
+
+This repository also contains core invention and framework documents that matter beyond product screens.
+
+Start here:
+
+- [`VV_INVENTIONS_INDEX.md`](./VV_INVENTIONS_INDEX.md)
+- [`VV_LANGUAGE_SPEC.md`](./VV_LANGUAGE_SPEC.md)
+
+These documents separate:
+
+- the `VV Hi Framework` invention layer
+- the internal architecture and founder logic
+- the implementation files that already express parts of the system
+
 ## Status
 
 Active core repository.
@@ -49,4 +64,3 @@ Related repositories:
 - [vv-lea](https://github.com/vv-technologies/vv-lea)
 - [vv-pulse](https://github.com/vv-technologies/vv-pulse)
 - [vv-team](https://github.com/vv-technologies/vv-team)
-
