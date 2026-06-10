@@ -181,7 +181,7 @@ function openEditProject(id) {
     if (imgEl)  { imgEl.value = p.image || ''; spPreviewImage(p.image || ''); }
     if (p.showDays) spToggleDays();
     if (p.lang) spSelLang(document.getElementById('sp-lang-' + p.lang) || document.getElementById('sp-lang-ro'), p.lang);
-    var pwTitle = document.getElementById('pw-title'); if (pwTitle) pwTitle.textContent = 'Edit Project';
+    var pwTitle = document.getElementById('pw-title'); if (pwTitle) pwTitle.textContent = 'Edit Work';
     var pwBtn = document.getElementById('pw-save-btn'); if (pwBtn) pwBtn.textContent = 'Save changes →';
   }, 50);
 
@@ -281,7 +281,7 @@ function renderBuilderInbox() {
   section.style.cssText = 'margin-top:32px;border-top:1px solid var(--border);padding-top:24px';
   section.innerHTML =
     '<div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:16px">' +
-      '📬 Builder Inbox' + (unread ? ' <span style="background:var(--accent);color:#fff;border-radius:100px;padding:1px 7px;font-size:9px;margin-left:4px">' + unread + '</span>' : '') +
+      '📬 Access Inbox' + (unread ? ' <span style="background:var(--accent);color:#fff;border-radius:100px;padding:1px 7px;font-size:9px;margin-left:4px">' + unread + '</span>' : '') +
     '</div>' +
     '<div style="background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:16px;display:flex;gap:8px">' +
       '<input id="inbox-token-input" placeholder="Paste feedback token here... FBT:..." style="flex:1;background:none;border:none;outline:none;color:var(--text);font-size:13px;font-family:\'Courier New\',monospace">' +
@@ -348,15 +348,17 @@ function deleteTimelineEntry(id) {
 // ── TABS ─────────────────────────────────────────────────────
 function scrollFeed(){ document.getElementById('feed-anchor').scrollIntoView({behavior:'smooth'}); }
 
-function setTab(el){
+function setTab(el, explicitFilter){
   document.querySelectorAll('.tab').forEach(function(t){ t.classList.remove('active'); });
   el.classList.add('active');
   var txt = el.textContent.toLowerCase();
-  var filter = 'all';
-  if (txt.indexOf('testers') !== -1) filter = 'testers';
-  else if (txt.indexOf('help') !== -1) filter = 'help';
-  else if (txt.indexOf('ideas') !== -1) filter = 'ideas';
-  else if (txt.indexOf('launched') !== -1) filter = 'launched';
+  var filter = explicitFilter || 'all';
+  if (!explicitFilter) {
+    if (txt.indexOf('testers') !== -1) filter = 'testers';
+    else if (txt.indexOf('feedback') !== -1) filter = 'feedback';
+    else if (txt.indexOf('access') !== -1) filter = 'access';
+    else if (txt.indexOf('launched') !== -1 || txt.indexOf('release') !== -1) filter = 'launched';
+  }
   renderFeed(filter);
 }
 function setTabByName(name){
@@ -377,7 +379,7 @@ function openFeedback(project, type) {
   _currentProject = project;
   _currentType = type;
   document.getElementById('fb-modal-title').textContent = 'Feedback for ' + project;
-  document.getElementById('fb-modal-sub').textContent = 'Your feedback helps the builder improve.';
+  document.getElementById('fb-modal-sub').textContent = 'Your feedback helps the creator improve the work.';
   var typeMap = { suggest: 0, bug: 1, test: 2, help: 3, vote: 0 };
   var idx = typeMap[type] || 0;
   document.querySelectorAll('.ft-option').forEach(function(o, i){ o.classList.toggle('sel', i === idx); });
@@ -436,7 +438,7 @@ function submitFeedback(e) {
   tokenDiv.className = 'token-reveal';
   tokenDiv.innerHTML =
     '<div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px">✓ Feedback created! +' + 50 + ' XP</div>' +
-    '<div style="font-size:12px;color:var(--muted2);margin-bottom:10px">Copy this token and give it to the builder to import in their inbox:</div>' +
+    '<div style="font-size:12px;color:var(--muted2);margin-bottom:10px">Copy this token and give it to the creator to import in their inbox:</div>' +
     '<div class="token-code">' + token + '</div>' +
     '<button onclick="navigator.clipboard.writeText(\'' + token + '\').then(function(){document.getElementById(\'copy-token-btn\').textContent=\'✓ Copied!\'}).catch(function(){})" id="copy-token-btn" style="background:var(--accent);color:#fff;border:none;border-radius:8px;padding:8px 20px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:4px">📋 Copy token</button>';
   form.parentNode.insertBefore(tokenDiv, form.nextSibling);
@@ -477,7 +479,7 @@ var RANKS = [
   { min:0,   label:'Visitor'      },
   { min:10,  label:'Tester'       },
   { min:50,  label:'Contributor'  },
-  { min:100, label:'Core Builder' }
+  { min:100, label:'Core Creator' }
 ];
 
 function getBuilderName() {
@@ -577,7 +579,7 @@ function showPhraseReveal(name, phrase) {
       '<div style="font-size:11px;color:var(--muted);margin-top:10px">Write these 3 words down. Screenshot them.</div>' +
     '</div>' +
     '<button onclick="navigator.clipboard.writeText(\'' + name + ' / ' + phrase + '\').then(function(){toast(\'✓ Copied!\')}).catch(function(){})" style="width:100%;background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.2);border-radius:10px;padding:11px;font-size:13px;font-weight:600;color:var(--accent2);cursor:pointer;font-family:inherit;margin-bottom:10px">📋 Copy phrase</button>' +
-    '<button onclick="enterVNEX()" style="width:100%;background:var(--accent);color:#fff;border:none;border-radius:12px;padding:14px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">I saved it — Enter VNEX →</button>';
+    '<button onclick="enterVNEX()" style="width:100%;background:var(--accent);color:#fff;border:none;border-radius:12px;padding:14px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">I saved it - Enter VNEX →</button>';
 }
 
 function showCodeReveal(name, code) {
@@ -593,7 +595,7 @@ function showCodeReveal(name, code) {
       '<div style="font-size:11px;color:var(--muted);margin-top:8px">Write it down or screenshot it now.</div>' +
     '</div>' +
     '<button onclick="copyCode(\'' + code + '\')" style="width:100%;background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.2);border-radius:10px;padding:11px;font-size:13px;font-weight:600;color:var(--accent2);cursor:pointer;font-family:inherit;margin-bottom:10px">📋 Copy code</button>' +
-    '<button onclick="enterVNEX()" style="width:100%;background:var(--accent);color:#fff;border:none;border-radius:12px;padding:14px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">I saved it — Enter VNEX →</button>';
+    '<button onclick="enterVNEX()" style="width:100%;background:var(--accent);color:#fff;border:none;border-radius:12px;padding:14px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">I saved it - Enter VNEX →</button>';
 }
 
 function copyCode(code) {
@@ -616,7 +618,7 @@ function restoreWithCode() {
   localStorage.setItem('vnex_welcomed', '1');
   // Dacă nu are nume salvat, îi cerem
   if (!localStorage.getItem('vnex_builder_name')) {
-    toast('Code accepted. Now choose your builder name.');
+    toast('Code accepted. Now choose your VNEX name.');
     return;
   }
   document.getElementById('welcome-modal').style.display = 'none';
@@ -700,17 +702,17 @@ function renderFeed(filter) {
     (b.projects || []).forEach(function(p){ (p.needs||[]).forEach(function(n){ if(needs.indexOf(n)===-1)needs.push(n); }); });
     var stage = (b.projects||[]).some(function(p){ return p.stage==='live'||p.stage==='earlyaccess'; });
 
-    if (filter === 'testers' && needs.indexOf('testers') === -1) return;
-    if (filter === 'help'    && needs.indexOf('help') === -1)    return;
-    if (filter === 'ideas'   && needs.indexOf('ideas') === -1)   return;
-    if (filter === 'launched' && !stage)                          return;
+    if (filter === 'testers'  && needs.indexOf('testers') === -1) return;
+    if (filter === 'feedback' && needs.indexOf('feedback') === -1) return;
+    if (filter === 'access'   && !(b.projects||[]).some(function(p){ return p.stage==='earlyaccess'; })) return;
+    if (filter === 'launched' && !stage) return;
 
     visible++;
     var displayName = b.universeName || b.name;
     var avatar = displayName.charAt(0).toUpperCase();
     var projHtml = (b.projects||[]).slice(0,4).map(function(p){
       return '<span class="bcard-proj">' + (ICONS[p.type]||'📦') + ' ' + p.name + '</span>';
-    }).join('') || '<span style="font-size:11px;color:var(--muted)">No projects yet</span>';
+    }).join('') || '<span style="font-size:11px;color:var(--muted)">No works yet</span>';
 
     var needHtml = needs.slice(0,3).map(function(n){
       return '<span class="bcard-need">' + (NEED_LABELS[n]||n) + '</span>';
@@ -718,8 +720,8 @@ function renderFeed(filter) {
 
     var lastProj = b.projects && b.projects[0];
     var updateTxt = lastProj
-      ? 'Building: ' + lastProj.name + ' · ' + (STAGE[lastProj.stage]||lastProj.stage)
-      : (b.about || 'Active builder');
+      ? 'Open work: ' + lastProj.name + ' · ' + (STAGE[lastProj.stage]||lastProj.stage)
+      : (b.about || 'Active creator');
 
     var card = document.createElement('div');
     card.className = 'bcard dynamic';
@@ -730,7 +732,7 @@ function renderFeed(filter) {
         '<div class="bcard-avatar" style="background:linear-gradient(135deg,#818cf8,#6366f1)">' + avatar + '</div>' +
         '<div>' +
           '<div class="bcard-name">' + displayName + '</div>' +
-          '<div class="bcard-rank">' + (b.projects||[]).length + ' projects' + (b.about ? '' : '') + '</div>' +
+          '<div class="bcard-rank">' + (b.projects||[]).length + ' works' + (b.about ? '' : '') + '</div>' +
         '</div>' +
       '</div>' +
       (b.about ? '<div style="font-size:12px;color:var(--muted2);margin-bottom:8px;line-height:1.5">' + b.about + '</div>' : '') +
@@ -738,7 +740,7 @@ function renderFeed(filter) {
       '<div class="bcard-update">' + updateTxt + '</div>' +
       '<div class="bcard-footer">' +
         '<span>' + needHtml + '</span>' +
-        '<button class="bcard-btn" onclick="openVisitorSpace(\'' + b.uid + '\')">Enter Universe →</button>' +
+        '<button class="bcard-btn" onclick="openVisitorSpace(\'' + b.uid + '\')">Open Space →</button>' +
       '</div>';
 
     feed.insertBefore(card, emptyCard || null);
@@ -750,22 +752,22 @@ function renderFeed(filter) {
 // ── VISITOR UNIVERSE VIEW ─────────────────────────────────────
 function openVisitorSpace(uid) {
   var b = _allBuilders.find(function(x){ return x.uid === uid; });
-  if (!b) { toast('Universe not found.'); return; }
+  if (!b) { toast('Space not found.'); return; }
 
   var displayName = b.universeName || b.name;
   var avatar = displayName.charAt(0).toUpperCase();
 
   document.getElementById('ws-avatar').textContent = avatar;
   document.getElementById('ws-avatar').style.background = 'linear-gradient(135deg,#818cf8,#6366f1)';
-  document.getElementById('ws-name').textContent = displayName + ' Universe';
-  document.getElementById('ws-sub').textContent  = b.about || 'Builder on VNEX';
+  document.getElementById('ws-name').textContent = displayName + ' Space';
+  document.getElementById('ws-sub').textContent  = b.about || 'Creator on VNEX';
 
   var projects = b.projects || [];
   var logs     = b.log || [];
 
   document.getElementById('ws-stats-grid').innerHTML =
-    '<div class="ws-stat"><div class="ws-stat-val">' + projects.length + '</div><div class="ws-stat-lbl">Projects</div></div>' +
-    '<div class="ws-stat"><div class="ws-stat-val">' + logs.length + '</div><div class="ws-stat-lbl">Logs</div></div>' +
+    '<div class="ws-stat"><div class="ws-stat-val">' + projects.length + '</div><div class="ws-stat-lbl">Works</div></div>' +
+    '<div class="ws-stat"><div class="ws-stat-val">' + logs.length + '</div><div class="ws-stat-lbl">Updates</div></div>' +
     '<div class="ws-stat"><div class="ws-stat-val">' + (b.tags||[]).length + '</div><div class="ws-stat-lbl">Tags</div></div>';
 
   var ICONS  = { game:'🎮', app:'📱', ai:'🧠', tool:'🛠', website:'🌐', experiment:'🧪' };
@@ -774,7 +776,7 @@ function openVisitorSpace(uid) {
 
   var feed = document.getElementById('ws-feed');
   if (!projects.length) {
-    feed.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted);font-size:13px">No projects shared yet.</div>';
+    feed.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted);font-size:13px">No works shared yet.</div>';
   } else {
     feed.innerHTML = projects.map(function(p) {
       var needHtml = (p.needs||[]).map(function(n){
@@ -934,8 +936,8 @@ function spReset() {
   if (roEl) { ['sp-lang-ro','sp-lang-en','sp-lang-both'].forEach(function(id){var e=document.getElementById(id);if(e)e.classList.remove('sel');}); roEl.classList.add('sel'); }
   var imgEl = document.getElementById('sp-image'); if (imgEl) imgEl.value = '';
   var prev = document.getElementById('sp-image-preview'); if (prev) prev.innerHTML = '';
-  var pwTitle = document.getElementById('pw-title'); if (pwTitle) pwTitle.textContent = 'Add Project';
-  var pwBtn = document.getElementById('pw-save-btn'); if (pwBtn) pwBtn.textContent = 'Publică →';
+  var pwTitle = document.getElementById('pw-title'); if (pwTitle) pwTitle.textContent = 'Start a Work';
+  var pwBtn = document.getElementById('pw-save-btn'); if (pwBtn) pwBtn.textContent = 'Publish →';
   var cb = document.getElementById('sp-days');
   var dot = document.getElementById('sp-days-dot');
   var tog = document.getElementById('sp-days-toggle');
@@ -1012,7 +1014,7 @@ function spToggleNeed(el, need) {
 
 function spPublish() {
   var name = (document.getElementById('sp-name') || {}).value || '';
-  if (!name.trim()) { toast('Add a project name first.'); return; }
+  if (!name.trim()) { toast('Add a work title first.'); return; }
   var p = {
     name:   name,
     desc:   (document.getElementById('sp-desc')   || {}).value || '',
@@ -1099,13 +1101,13 @@ function renderWsFeed(d, filter) {
   var feed = document.getElementById('ws-feed');
 
   if (!projects.length) {
-    feed.innerHTML = '<div class="ws-empty">No ' + filter + ' projects yet.</div>';
+    feed.innerHTML = '<div class="ws-empty">No ' + filter + ' works yet.</div>';
     return;
   }
 
   feed.innerHTML = projects.map(function(p){
     var stuckBlock = p.stuck
-      ? '<div class="stuck-block"><div class="stuck-block-title">🔴 Builder is stuck — can you help?</div><div class="stuck-block-text">' + p.stuck + '</div></div>'
+      ? '<div class="stuck-block"><div class="stuck-block-title">🔴 Creator is blocked - can you help?</div><div class="stuck-block-text">' + p.stuck + '</div></div>'
       : '';
 
     var updateBlock = '<div class="last-update"><div class="lu-label">Latest update</div><div class="lu-text">' + p.update + '</div></div>';
@@ -1193,7 +1195,7 @@ function openProjectDetail(id) {
           (e.link ? '<a href="' + e.link + '" target="_blank" class="pd-log-link">↗ ' + e.link + '</a>' : '') +
         '</div>';
       }).join('')
-    : '<div style="font-size:13px;color:var(--muted);padding:8px 0">No log entries yet for this project.</div>';
+    : '<div style="font-size:13px;color:var(--muted);padding:8px 0">No updates yet for this work.</div>';
 
   var needsHtml = (p.needs || []).map(function(n){
     var t = n === 'testers' ? 'test' : n === 'ideas' ? 'suggest' : n === 'feedback' ? 'suggest' : 'help';
@@ -1224,7 +1226,7 @@ function openProjectDetail(id) {
       '<button class="fb-btn suggest" onclick="openFeedback(\'' + p.name + '\',\'suggest\')">💡 Suggest</button>' +
       '<button class="fb-btn bug" onclick="openFeedback(\'' + p.name + '\',\'bug\')">🐛 Bug</button>' +
     '</div>' +
-    '<div class="pd-section-title">Builder Log</div>' +
+    '<div class="pd-section-title">Space Log</div>' +
     '<div class="pd-logs">' + logsHtml + '</div>';
 
   document.getElementById('project-detail-modal').style.display = 'block';
@@ -1256,9 +1258,9 @@ function openMyWorkspace() {
   document.getElementById('ws-sub').textContent = 'Building since Day ' + daysSince;
 
   document.getElementById('ws-stats-grid').innerHTML =
-    '<div class="ws-stat"><div class="ws-stat-val">' + projects.length + '</div><div class="ws-stat-lbl">Projects</div></div>' +
+    '<div class="ws-stat"><div class="ws-stat-val">' + projects.length + '</div><div class="ws-stat-lbl">Works</div></div>' +
     '<div class="ws-stat"><div class="ws-stat-val">' + daysSince + '</div><div class="ws-stat-lbl">Days Building</div></div>' +
-    '<div class="ws-stat"><div class="ws-stat-val">' + logCount + '</div><div class="ws-stat-lbl">Logs</div></div>';
+    '<div class="ws-stat"><div class="ws-stat-val">' + logCount + '</div><div class="ws-stat-lbl">Updates</div></div>';
 
   // Filter tabs based on types
   var types = ['all'];
@@ -1267,7 +1269,7 @@ function openMyWorkspace() {
   document.getElementById('ws-tabs').innerHTML = types.map(function(t){
     return '<button class="ws-tab' + (t === 'all' ? ' active' : '') + '" onclick="wsMyFilter(\'' + t + '\',this)">' + (typeLabels[t] || t) + '</button>';
   }).join('') +
-  '<button class="ws-tab" style="background:rgba(99,102,241,.15);color:var(--accent2);margin-left:8px" onclick="openShareFromWorkspace()">+ Add Project</button>';
+  '<button class="ws-tab" style="background:rgba(99,102,241,.15);color:var(--accent2);margin-left:8px" onclick="openShareFromWorkspace()">+ Add Work</button>';
 
   renderMyFeed(projects, 'all');
   renderBuilderInbox();
@@ -1285,11 +1287,11 @@ function renderBuilderLog() {
   var log = getLog();
   var projects = getMyProjects();
 
-  var projectOptions = '<option value="">No specific project</option>' +
+  var projectOptions = '<option value="">No specific work</option>' +
     projects.map(function(p){ return '<option value="' + p.name + '">' + p.name + '</option>'; }).join('');
 
   var entriesHtml = log.length === 0
-    ? '<div style="font-size:13px;color:var(--muted);padding:16px 0">No entries yet. Start your construction journal.</div>'
+    ? '<div style="font-size:13px;color:var(--muted);padding:16px 0">No updates yet. Start your work journal.</div>'
     : log.map(function(e){
         return '<div style="padding:14px 0;border-bottom:1px solid var(--border);display:flex;gap:12px;align-items:flex-start">' +
           '<div style="flex-shrink:0;text-align:right;min-width:70px">' +
@@ -1308,9 +1310,9 @@ function renderBuilderLog() {
   section.id = 'builder-log-section';
   section.style.cssText = 'margin-top:32px;border-top:1px solid var(--border);padding-top:24px';
   section.innerHTML =
-    '<div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:16px">📋 Builder Log</div>' +
+    '<div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:16px">📋 Space Log</div>' +
     '<div style="background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:20px">' +
-      '<textarea id="log-text" placeholder="What did you build, test, or start today?" style="width:100%;background:none;border:none;outline:none;color:var(--text);font-size:14px;font-family:inherit;resize:none;min-height:60px;line-height:1.6"></textarea>' +
+      '<textarea id="log-text" placeholder="What changed today? What did you test, fix, release or learn?" style="width:100%;background:none;border:none;outline:none;color:var(--text);font-size:14px;font-family:inherit;resize:none;min-height:60px;line-height:1.6"></textarea>' +
       '<div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">' +
         '<input id="log-link" placeholder="↗ Link (optional)" style="flex:1;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:8px;padding:7px 12px;color:var(--text);font-size:12px;font-family:inherit;outline:none;min-width:120px">' +
         '<select id="log-project" style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:8px;padding:7px 12px;color:var(--text);font-size:12px;font-family:inherit;outline:none">' + projectOptions + '</select>' +
@@ -1327,7 +1329,7 @@ function renderGallery() {
   if (existing) existing.remove();
   var gallery  = getGallery();
   var projects = getMyProjects();
-  var projOpts = '<option value="">No project</option>' + projects.map(function(p){ return '<option value="'+p.name+'">'+p.name+'</option>'; }).join('');
+  var projOpts = '<option value="">No work</option>' + projects.map(function(p){ return '<option value="'+p.name+'">'+p.name+'</option>'; }).join('');
   var MOODS = ['flow','breakthrough','stuck','chaotic','focused','exploring','shipping'];
 
   var itemsHtml = gallery.length === 0
@@ -1390,7 +1392,7 @@ function renderTimeline() {
   if (existing) existing.remove();
   var tl       = getTimeline();
   var projects = getMyProjects();
-  var projOpts = '<option value="">No project</option>' + projects.map(function(p){ return '<option value="'+p.name+'">'+p.name+'</option>'; }).join('');
+  var projOpts = '<option value="">No work</option>' + projects.map(function(p){ return '<option value="'+p.name+'">'+p.name+'</option>'; }).join('');
 
   var tlHtml = tl.length === 0
     ? '<div style="font-size:13px;color:var(--muted);padding:8px 0">No milestones yet. When did this all start?</div>'
@@ -1462,9 +1464,9 @@ function renderMyFeed(projects, filter) {
     feed.innerHTML =
       '<div style="text-align:center;padding:48px 24px;background:rgba(255,255,255,.02);border:1px dashed var(--border);border-radius:18px">' +
         '<div style="font-size:36px;margin-bottom:14px">🏗</div>' +
-        '<div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:8px">Start your universe.</div>' +
-        '<div style="font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6">Add your first project and begin documenting the journey.</div>' +
-        '<button class="bcard-btn" onclick="openShareFromWorkspace()">+ Add first project</button>' +
+        '<div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:8px">Start your space.</div>' +
+        '<div style="font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6">Add your first work and begin documenting the journey.</div>' +
+        '<button class="bcard-btn" onclick="openShareFromWorkspace()">+ Add first work</button>' +
       '</div>';
     return;
   }
@@ -1533,19 +1535,19 @@ function refreshMyCard() {
         var icons = { game:'🎮', app:'📱', ai:'🧠', tool:'🛠', website:'🌐', experiment:'🧪' };
         return '<span class="bcard-proj">' + (icons[p.type]||'📦') + ' ' + p.name + '</span>';
       }).join('')
-    : '<span style="font-size:11px;color:var(--muted)">No projects yet — testing mode</span>';
+    : '<span style="font-size:11px;color:var(--muted)">No works yet - testing mode</span>';
 
   myCard.querySelector('.bcard-projects').innerHTML = projHtml;
 
   // Rank
   myCard.querySelector('.bcard-rank').textContent = isBuilder
-    ? projects.length + ' project' + (projects.length !== 1 ? 's' : '') + ' · ' + getLog().length + ' logs'
-    : 'Exploring VNEX';
+    ? projects.length + ' work' + (projects.length !== 1 ? 's' : '') + ' · ' + getLog().length + ' updates'
+    : 'Explorer';
 
   // Update text
   document.getElementById('my-card-update').textContent = isBuilder
-    ? 'Last added: ' + projects[0].name + ' · ' + projects[0].createdAt
-    : 'Testing projects. No public workspace yet.';
+    ? 'Latest work: ' + projects[0].name + ' · ' + projects[0].createdAt
+    : 'Exploring early work. No public space yet.';
 
   // Tu pe cardul tău → mereu My Space
   var btn = myCard.querySelector('.bcard-btn');

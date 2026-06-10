@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>VNEX — Follow builders through their projects.</title>
+<title>VNEX - Make work real before it goes public.</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%235b5ef5'/><text x='5' y='24' font-size='18' font-weight='900' font-family='system-ui,sans-serif' fill='white'>VN</text></svg>">
 <link rel="stylesheet" href="vnex.css">
 </head>
@@ -15,23 +15,23 @@
     <div class="builder-badge" id="builder-badge" style="display:none;cursor:pointer" onclick="openMyWorkspace()" title="My Space"><span id="builder-badge-name"></span><span class="builder-rank" id="builder-badge-rank"></span></div>
     <button class="btn-info-globe" onclick="openInfoPopup()" title="About VNEX">🌐</button>
     <button class="btn-nav" onclick="openSettings()">Settings</button>
-    <button class="btn-nav" onclick="openShareProject()">+ Share project</button>
-    <button class="btn-nav-accent" onclick="openModal('waitlist-modal')">Get early access</button>
+    <button class="btn-nav" onclick="openShareProject()">+ Start a work</button>
+    <button class="btn-nav-accent" onclick="openModal('waitlist-modal')">Request access</button>
   </div>
 </header>
 
 <div class="hero">
-  <div class="hero-tag"><div class="live-dot"></div>Day 1 — building in public</div>
-  <h1>Follow builders<br>through their projects.</h1>
-  <p>Not a feed of projects. A window into the people building them — what they're making, where they're stuck, what they need.</p>
+  <div class="hero-tag"><div class="live-dot"></div>Hybrid product platform</div>
+  <h1>Make work real<br>before it goes public.</h1>
+  <p>VNEX helps creators open products, music, AI, games and experiments with controlled visibility, early access and real feedback.</p>
   <div class="hero-cta">
-    <button class="btn-explore" onclick="scrollFeed()">See who's building ↓</button>
-    <button class="btn-post" onclick="openShareProject()">Share what you're building →</button>
+    <button class="btn-explore" onclick="scrollFeed()">Explore live work &darr;</button>
+    <button class="btn-post" onclick="openShareProject()">Start a work &rarr;</button>
   </div>
   <div class="stats-bar" id="hero-stats-bar">
-    <div class="stat-item"><div class="stat-val" id="hs-builders">0</div><div class="stat-label">Builders</div></div>
-    <div class="stat-item"><div class="stat-val" id="hs-projects">0</div><div class="stat-label">Projects</div></div>
-    <div class="stat-item"><div class="stat-val" id="hs-logs">0</div><div class="stat-label">Log entries</div></div>
+    <div class="stat-item"><div class="stat-val" id="hs-builders">0</div><div class="stat-label">Spaces</div></div>
+    <div class="stat-item"><div class="stat-val" id="hs-projects">0</div><div class="stat-label">Works</div></div>
+    <div class="stat-item"><div class="stat-val" id="hs-logs">0</div><div class="stat-label">Updates</div></div>
   </div>
 </div>
 
@@ -39,11 +39,11 @@
 
   <div class="filter-row">
     <div class="tabs">
-      <button class="tab active" onclick="setTab(this)">All builders</button>
-      <button class="tab" onclick="setTab(this)">Need testers</button>
-      <button class="tab" onclick="setTab(this)">Need help</button>
-      <button class="tab" onclick="setTab(this)">Need ideas</button>
-      <button class="tab" onclick="setTab(this)">Just launched</button>
+      <button class="tab active" onclick="setTab(this,'all')">All works</button>
+      <button class="tab" onclick="setTab(this,'testers')">Need testers</button>
+      <button class="tab" onclick="setTab(this,'feedback')">Need feedback</button>
+      <button class="tab" onclick="setTab(this,'access')">Open access</button>
+      <button class="tab" onclick="setTab(this,'launched')">Fresh releases</button>
     </div>
     <div class="filter-right">
       <button class="sort-btn">Sort: Latest</button>
@@ -53,36 +53,33 @@
   <div class="grid">
     <div class="feed" id="builders-feed">
 
-<!-- MY CARD — dinamic din localStorage -->
       <div class="bcard" id="my-builder-card" style="display:none;border-color:rgba(99,102,241,.25)">
         <div class="bcard-top">
           <div class="bcard-avatar" id="my-card-avatar" style="background:linear-gradient(135deg,#6366f1,#818cf8)">?</div>
           <div>
-            <div class="bcard-name" id="my-card-name">–</div>
-            <div class="bcard-rank" id="my-card-rank">Visitor · 0 projects</div>
+            <div class="bcard-name" id="my-card-name">-</div>
+            <div class="bcard-rank" id="my-card-rank">Explorer · 0 works</div>
           </div>
         </div>
         <div class="bcard-projects" id="my-card-projects">
-          <span style="font-size:11px;color:var(--muted)">No projects yet</span>
+          <span style="font-size:11px;color:var(--muted)">No works yet</span>
         </div>
-        <div class="bcard-update" id="my-card-update">Your space. Add your first project.</div>
+        <div class="bcard-update" id="my-card-update">Your space. Start your first work.</div>
         <div class="bcard-footer">
           <span class="bcard-need" id="my-card-need"></span>
-          <button class="bcard-btn" onclick="openMyWorkspace()">My Space →</button>
+          <button class="bcard-btn" onclick="openMyWorkspace()">My Space &rarr;</button>
         </div>
       </div>
 
-      <!-- EMPTY STATE -->
       <div style="border-bottom:1px solid var(--border);padding:40px 0;text-align:center" id="empty-state-card">
-        <div style="font-size:28px;margin-bottom:12px">🏗</div>
-        <div style="font-size:14px;font-weight:700;color:var(--muted2);margin-bottom:6px">Be the next builder here.</div>
-        <div style="font-size:12px;color:var(--muted);margin-bottom:18px;line-height:1.6">Enter VNEX, create your space, add your projects.</div>
-        <button class="bcard-btn" onclick="openOrSetupProfile()">Create your space →</button>
+        <div style="font-size:28px;margin-bottom:12px">✦</div>
+        <div style="font-size:14px;font-weight:700;color:var(--muted2);margin-bottom:6px">No live works yet.</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:18px;line-height:1.6">Enter VNEX, create your space and open your first work with controlled visibility.</div>
+        <button class="bcard-btn" onclick="openOrSetupProfile()">Create your space &rarr;</button>
       </div>
 
     </div>
 
-    <!-- SIDEBAR — hidden, kept for JS compat -->
     <div class="sidebar">
       <div class="waitlist-box">
         <form onsubmit="submitWL(event)">
@@ -93,20 +90,18 @@
   </div>
 </div>
 
-<!-- FOOTER -->
 <div style="border-top:1px solid var(--border);padding:32px;text-align:center">
   <div style="font-size:12px;color:var(--muted)">Built by <strong style="color:var(--muted2);font-weight:600">Cosmin Toma</strong> · VV Hybrid Universe · Romania</div>
 </div>
 
-<!-- BUILDER SPACE — full page -->
 <div class="workspace-overlay" id="workspace-modal" style="display:none">
   <div class="workspace-page">
-    <button class="ws-back-btn" onclick="closeWorkspace()">← Back to builders</button>
+    <button class="ws-back-btn" onclick="closeWorkspace()">&larr; Back to works</button>
     <div class="ws-page-header">
       <div class="ws-avatar" id="ws-avatar">?</div>
       <div>
-        <div class="ws-name" id="ws-name">–</div>
-        <div class="ws-sub" id="ws-sub">–</div>
+        <div class="ws-name" id="ws-name">-</div>
+        <div class="ws-sub" id="ws-sub">-</div>
       </div>
       <div class="ws-stats-grid" id="ws-stats-grid"></div>
     </div>
@@ -117,12 +112,11 @@
   </div>
 </div>
 
-<!-- FEEDBACK MODAL -->
 <div class="overlay" id="feedback-modal" style="display:none" onclick="if(event.target===this)closeModal('feedback-modal')">
   <div class="modal">
     <button class="modal-close" onclick="closeModal('feedback-modal')">×</button>
     <h2 id="fb-modal-title">Leave feedback</h2>
-    <div class="modal-sub" id="fb-modal-sub">Choose feedback type</div>
+    <div class="modal-sub" id="fb-modal-sub">Choose the kind of response you want to send.</div>
     <div class="feedback-types" id="fb-types">
       <div class="ft-option sel" onclick="selFT(this,'💡','Suggestion')"><div class="ft-icon">💡</div><div class="ft-name">Suggest</div></div>
       <div class="ft-option" onclick="selFT(this,'🐛','Bug report')"><div class="ft-icon">🐛</div><div class="ft-name">Bug</div></div>
@@ -132,26 +126,25 @@
     <form onsubmit="submitFeedback(event)">
       <textarea placeholder="Write your feedback..." id="fb-text"></textarea>
       <div style="font-size:11px;color:var(--muted);margin-bottom:10px" id="fb-sender"></div>
-      <button class="modal-btn" type="submit">Send feedback →</button>
+      <button class="modal-btn" type="submit">Send feedback &rarr;</button>
     </form>
   </div>
 </div>
 
-<!-- WELCOME -->
 <div class="overlay" id="welcome-modal" style="display:none">
   <div class="welcome-wrap">
     <div class="welcome-logo">V<span>NEX</span></div>
-    <div class="welcome-tag">Follow builders through their projects.</div>
+    <div class="welcome-tag">Work before release. Access before launch.</div>
     <div class="welcome-rules">
-      <div class="welcome-rule"><span class="welcome-rule-icon">✓</span> Share what you're building</div>
-      <div class="welcome-rule"><span class="welcome-rule-icon">✓</span> Find real testers and feedback</div>
-      <div class="welcome-rule"><span class="welcome-rule-icon">✓</span> No spam, no fake projects</div>
-      <div class="welcome-rule"><span class="welcome-rule-icon">✓</span> Be respectful to builders</div>
+      <div class="welcome-rule"><span class="welcome-rule-icon">✓</span> Start a work, not just a post</div>
+      <div class="welcome-rule"><span class="welcome-rule-icon">✓</span> Open testers, feedback or early access</div>
+      <div class="welcome-rule"><span class="welcome-rule-icon">✓</span> No spam, no fake launches</div>
+      <div class="welcome-rule"><span class="welcome-rule-icon">✓</span> Respect creators, explorers and access rules</div>
     </div>
-    <div class="welcome-disclaimer">Projects on VNEX are experimental. Features may change. Use at your own risk.</div>
-    <button class="welcome-cta" id="welcome-btn-accept" onclick="acceptWelcome()">Accept &amp; Continue →</button>
+    <div class="welcome-disclaimer">Works on VNEX may be unfinished, private-by-default or access-limited. Things can change quickly.</div>
+    <button class="welcome-cta" id="welcome-btn-accept" onclick="acceptWelcome()">Accept &amp; Continue &rarr;</button>
     <div id="welcome-step2" style="display:none">
-      <div style="font-size:15px;font-weight:800;margin-bottom:6px;margin-top:4px">Choose your builder name</div>
+      <div style="font-size:15px;font-weight:800;margin-bottom:6px;margin-top:4px">Choose your VNEX name</div>
       <div style="font-size:12px;color:var(--muted2);margin-bottom:18px">Saved locally. No account needed.</div>
       <div class="name-suggestions">
         <div class="name-sug" onclick="pickName(this)">NightFox</div>
@@ -160,20 +153,19 @@
         <div class="name-sug" onclick="pickName(this)">IronWolf</div>
       </div>
       <input class="wl-input" id="builder-name-input" placeholder="Or type your own..." maxlength="20" style="margin-bottom:14px" oninput="clearNameSug()">
-      <button class="welcome-cta" onclick="setBuilderName()">Enter VNEX →</button>
+      <button class="welcome-cta" onclick="setBuilderName()">Enter VNEX &rarr;</button>
       <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
         <div style="font-size:12px;color:var(--muted);margin-bottom:10px">Returning from another device?</div>
-        <input id="recover-name-input" class="wl-input" placeholder="Your builder name" style="margin-bottom:8px">
+        <input id="recover-name-input" class="wl-input" placeholder="Your VNEX name" style="margin-bottom:8px">
         <div style="display:flex;gap:8px">
           <input id="recover-phrase-input" class="wl-input" placeholder="silver-forest-signal" style="margin-bottom:0;font-family:'Courier New',monospace;font-size:12px">
-          <button onclick="fbRecoverByName(document.getElementById('recover-name-input').value, document.getElementById('recover-phrase-input').value)" style="background:rgba(99,102,241,.15);border:1px solid rgba(99,102,241,.3);border-radius:9px;padding:10px 16px;font-size:12px;font-weight:700;color:var(--accent2);cursor:pointer;font-family:inherit;white-space:nowrap">Recover →</button>
+          <button onclick="fbRecoverByName(document.getElementById('recover-name-input').value, document.getElementById('recover-phrase-input').value)" style="background:rgba(99,102,241,.15);border:1px solid rgba(99,102,241,.3);border-radius:9px;padding:10px 16px;font-size:12px;font-weight:700;color:var(--accent2);cursor:pointer;font-family:inherit;white-space:nowrap">Recover &rarr;</button>
         </div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- SETTINGS MODAL -->
 <div class="overlay" id="settings-modal" style="display:none" onclick="if(event.target===this)closeSettings()">
   <div class="settings-wrap">
     <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 24px 0">
@@ -181,22 +173,21 @@
       <button class="modal-close" style="position:static" onclick="closeSettings()">×</button>
     </div>
     <div class="settings-tabs">
-      <div class="settings-tab active" onclick="showSettingsTab(this,'profile')">Universe</div>
+      <div class="settings-tab active" onclick="showSettingsTab(this,'profile')">Space</div>
       <div class="settings-tab" onclick="showSettingsTab(this,'appearance')">Appearance</div>
       <div class="settings-tab" onclick="showSettingsTab(this,'notifications')">Notifications</div>
       <div class="settings-tab" onclick="showSettingsTab(this,'privacy')">Privacy</div>
     </div>
     <div class="settings-body">
 
-      <!-- UNIVERSE TAB -->
       <div id="stab-profile" class="settings-section">
-        <div class="settings-section-title">Your Universe</div>
+        <div class="settings-section-title">Your Space</div>
         <div class="settings-field">
-          <label class="settings-label">Universe Name</label>
+          <label class="settings-label">Space Name</label>
           <input class="settings-input" id="s-universe-name" placeholder="CEO_VV" maxlength="30">
         </div>
         <div class="settings-field">
-          <label class="settings-label">About your universe</label>
+          <label class="settings-label">About your space</label>
           <textarea class="settings-input" id="s-about" placeholder="Building LEA, VNEX and local-first AI systems." style="resize:none;min-height:68px;line-height:1.6;padding-top:10px"></textarea>
         </div>
         <div class="settings-field">
@@ -209,9 +200,9 @@
             <div class="tag-opt" onclick="toggleTag(this,'research')">Research</div>
           </div>
         </div>
-        <div class="settings-section-title" style="margin-top:22px">Builder Defaults</div>
+        <div class="settings-section-title" style="margin-top:22px">Work Defaults</div>
         <div class="settings-field">
-          <label class="settings-label">Default project stage</label>
+          <label class="settings-label">Default work stage</label>
           <div class="theme-opts">
             <div class="theme-opt sel" onclick="selSetting(this,'def-stage','building')">🔨 Building</div>
             <div class="theme-opt" onclick="selSetting(this,'def-stage','launched')">🚀 Launched</div>
@@ -219,7 +210,7 @@
           </div>
         </div>
         <div class="settings-field">
-          <label class="settings-label">Default Need</label>
+          <label class="settings-label">Default access need</label>
           <div class="theme-opts" id="s-need-group">
             <div class="theme-opt" onclick="selSetting(this,'def-need','testers')">🧪 Testers</div>
             <div class="theme-opt" onclick="selSetting(this,'def-need','feedback')">💬 Feedback</div>
@@ -230,13 +221,12 @@
         <button class="settings-save" onclick="saveSettings()">Save changes</button>
         <div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--border)">
           <div class="settings-section-title" style="margin-bottom:10px">Recovery</div>
-          <div style="font-size:12px;color:var(--muted2);margin-bottom:16px;line-height:1.6">If you switch devices, use your <strong style="color:var(--text)">builder name</strong> to recover your space. That's it.</div>
+          <div style="font-size:12px;color:var(--muted2);margin-bottom:16px;line-height:1.6">If you switch devices, use your <strong style="color:var(--text)">VNEX name</strong> to recover your space. That's it.</div>
           <div class="settings-section-title" style="color:#f87171">Danger Zone</div>
-          <button onclick="deleteAccount()" style="width:100%;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:10px;padding:11px;font-size:13px;font-weight:700;color:#f87171;cursor:pointer;font-family:inherit">Delete my universe &amp; all data</button>
+          <button onclick="deleteAccount()" style="width:100%;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:10px;padding:11px;font-size:13px;font-weight:700;color:#f87171;cursor:pointer;font-family:inherit">Delete my space &amp; all data</button>
         </div>
       </div>
 
-      <!-- APPEARANCE TAB -->
       <div id="stab-appearance" class="settings-section" style="display:none">
         <div class="settings-section-title">Theme</div>
         <div class="theme-opts">
@@ -251,7 +241,7 @@
           <div class="lang-opt" onclick="selSetting(this,'lang','es')">🇪🇸 Spanish</div>
           <div class="lang-opt" onclick="selSetting(this,'lang','de')">🇩🇪 German</div>
         </div>
-        <div class="settings-section-title" style="margin-top:24px">Builder Mode</div>
+        <div class="settings-section-title" style="margin-top:24px">View Mode</div>
         <div class="theme-opts" id="s-mode-group">
           <div class="theme-opt sel" onclick="selSetting(this,'builder-mode','minimal')">Minimal</div>
           <div class="theme-opt" onclick="selSetting(this,'builder-mode','explorer')">Explorer</div>
@@ -260,32 +250,30 @@
         <button class="settings-save" style="margin-top:24px" onclick="saveSettings()">Save changes</button>
       </div>
 
-      <!-- NOTIFICATIONS TAB -->
       <div id="stab-notifications" class="settings-section" style="display:none">
         <div class="settings-section-title">Notify me when</div>
-        <div class="notif-row"><span class="notif-label">Someone tested my project</span><div class="toggle on" onclick="toggleNotif(this)"></div></div>
-        <div class="notif-row"><span class="notif-label">Someone voted on my project</span><div class="toggle on" onclick="toggleNotif(this)"></div></div>
-        <div class="notif-row"><span class="notif-label">Someone submitted an idea</span><div class="toggle on" onclick="toggleNotif(this)"></div></div>
+        <div class="notif-row"><span class="notif-label">Someone tested my work</span><div class="toggle on" onclick="toggleNotif(this)"></div></div>
+        <div class="notif-row"><span class="notif-label">Someone reacted to my work</span><div class="toggle on" onclick="toggleNotif(this)"></div></div>
+        <div class="notif-row"><span class="notif-label">Someone sent an idea</span><div class="toggle on" onclick="toggleNotif(this)"></div></div>
         <div class="notif-row"><span class="notif-label">Someone reported a bug</span><div class="toggle on" onclick="toggleNotif(this)"></div></div>
-        <div class="notif-row"><span class="notif-label">New early access available</span><div class="toggle" onclick="toggleNotif(this)"></div></div>
+        <div class="notif-row"><span class="notif-label">New early access is available</span><div class="toggle" onclick="toggleNotif(this)"></div></div>
         <button class="settings-save" style="margin-top:20px" onclick="saveSettings()">Save changes</button>
       </div>
 
-      <!-- PRIVACY TAB -->
       <div id="stab-privacy" class="settings-section" style="display:none">
-        <div class="settings-section-title">Universe Visibility</div>
+        <div class="settings-section-title">Space Visibility</div>
         <div class="visibility-opts">
           <div class="vis-opt" data-vis="public" onclick="selVisibility(this,'public')">
             <div class="vis-opt-top"><span class="vis-icon">🌐</span><span class="vis-name">Public</span></div>
-            <div class="vis-desc">Everything you post appears on VNEX.</div>
+            <div class="vis-desc">Everything you open appears on VNEX.</div>
           </div>
           <div class="vis-opt" data-vis="private" onclick="selVisibility(this,'private')">
             <div class="vis-opt-top"><span class="vis-icon">🔒</span><span class="vis-name">Private</span></div>
-            <div class="vis-desc">Only you can see your universe.</div>
+            <div class="vis-desc">Only you can see your space.</div>
           </div>
           <div class="vis-opt sel" data-vis="hybrid" onclick="selVisibility(this,'hybrid')">
             <div class="vis-opt-top"><span class="vis-icon">⚡</span><span class="vis-name">Hybrid</span></div>
-            <div class="vis-desc">Keep local. Share selected projects only.</div>
+            <div class="vis-desc">Keep local. Open selected works only.</div>
           </div>
         </div>
         <button class="settings-save" style="margin-top:24px" onclick="saveSettings()">Save changes</button>
@@ -295,11 +283,10 @@
   </div>
 </div>
 
-<!-- SHARE PROJECT — Single Workspace -->
 <div class="overlay" id="share-modal" style="display:none" onclick="if(event.target===this)closeShareProject()">
   <div class="proj-workspace">
     <div class="pw-head">
-      <div><div class="pw-title" id="pw-title">Add Project</div><div class="pw-sub">Spune builders-ilor ce construiești.</div></div>
+      <div><div class="pw-title" id="pw-title">Start a Work</div><div class="pw-sub">Open something in progress with the amount of visibility you want.</div></div>
       <button class="modal-close" style="position:static" onclick="closeShareProject()">×</button>
     </div>
     <div class="pw-body">
@@ -315,15 +302,15 @@
           <div class="pw-type-btn" onclick="spSelectType(this,'creator')"><div class="pw-type-icon">🎨</div><div class="pw-type-label">Creator</div></div>
           <div class="pw-type-btn" onclick="spSelectType(this,'system')"><div class="pw-type-icon">⚙️</div><div class="pw-type-label">System</div></div>
         </div>
-        <div class="pw-label" style="margin-top:16px">Status</div>
+        <div class="pw-label" style="margin-top:16px">Stage</div>
         <div style="display:flex;flex-direction:column;gap:5px">
           <div class="share-stage" onclick="spSelectStage(this,'idea')"><div class="share-stage-dot"></div><span class="share-stage-label">💡 Idea</span></div>
-          <div class="share-stage" onclick="spSelectStage(this,'building')"><div class="share-stage-dot"></div><span class="share-stage-label">🔨 Building</span></div>
+          <div class="share-stage" onclick="spSelectStage(this,'building')"><div class="share-stage-dot"></div><span class="share-stage-label">🔨 In Progress</span></div>
           <div class="share-stage" onclick="spSelectStage(this,'testing')"><div class="share-stage-dot"></div><span class="share-stage-label">🧪 Testing</span></div>
-          <div class="share-stage" onclick="spSelectStage(this,'earlyaccess')"><div class="share-stage-dot"></div><span class="share-stage-label">🔓 Early Access</span></div>
-          <div class="share-stage" onclick="spSelectStage(this,'live')"><div class="share-stage-dot"></div><span class="share-stage-label">🚀 Live</span></div>
+          <div class="share-stage" onclick="spSelectStage(this,'earlyaccess')"><div class="share-stage-dot"></div><span class="share-stage-label">🔓 Open Access</span></div>
+          <div class="share-stage" onclick="spSelectStage(this,'live')"><div class="share-stage-dot"></div><span class="share-stage-label">🚀 Released</span></div>
         </div>
-        <div class="pw-label" style="margin-top:16px">Looking for</div>
+        <div class="pw-label" style="margin-top:16px">Need</div>
         <div style="display:flex;flex-direction:column;gap:5px">
           <div class="share-need" onclick="spToggleNeed(this,'testers')"><div class="share-need-icon">🧪</div><div class="share-need-label">Testers</div></div>
           <div class="share-need" onclick="spToggleNeed(this,'feedback')"><div class="share-need-icon">💬</div><div class="share-need-label">Feedback</div></div>
@@ -333,64 +320,60 @@
         </div>
         <div class="pw-label" style="margin-top:16px">Language</div>
         <div style="display:flex;flex-direction:column;gap:5px" id="sp-lang-group">
-          <div class="share-stage sel" id="sp-lang-ro"   onclick="spSelLang(this,'ro')">  <div class="share-stage-dot"></div><span class="share-stage-label">🇷🇴 Română</span></div>
-          <div class="share-stage"     id="sp-lang-en"   onclick="spSelLang(this,'en')">  <div class="share-stage-dot"></div><span class="share-stage-label">🇬🇧 Engleză</span></div>
-          <div class="share-stage"     id="sp-lang-both" onclick="spSelLang(this,'both')"><div class="share-stage-dot"></div><span class="share-stage-label">🌐 Ambele</span></div>
+          <div class="share-stage sel" id="sp-lang-ro" onclick="spSelLang(this,'ro')"><div class="share-stage-dot"></div><span class="share-stage-label">🇷🇴 Romanian</span></div>
+          <div class="share-stage" id="sp-lang-en" onclick="spSelLang(this,'en')"><div class="share-stage-dot"></div><span class="share-stage-label">🇬🇧 English</span></div>
+          <div class="share-stage" id="sp-lang-both" onclick="spSelLang(this,'both')"><div class="share-stage-dot"></div><span class="share-stage-label">🌐 Both</span></div>
         </div>
       </div>
       <div class="pw-right">
-        <input class="pw-name-input" id="sp-name" placeholder="Numele proiectului" maxlength="60">
-        <div class="pw-label" style="margin-top:16px">Descriere</div>
-        <textarea class="mc-input mc-textarea" id="sp-desc" placeholder="Ce face? Ce problemă rezolvă? 1-3 propoziții." style="min-height:80px"></textarea>
+        <input class="pw-name-input" id="sp-name" placeholder="Work title" maxlength="60">
+        <div class="pw-label" style="margin-top:16px">Summary</div>
+        <textarea class="mc-input mc-textarea" id="sp-desc" placeholder="What is it? Why does it matter? Keep it to 1-3 short sentences." style="min-height:80px"></textarea>
         <div class="pw-label" style="margin-top:16px">Links</div>
-        <input class="mc-input" id="sp-link"   placeholder="🌐 Website / Demo (opțional)" style="margin-bottom:7px">
-        <input class="mc-input" id="sp-github" placeholder="🐙 GitHub (opțional)"         style="margin-bottom:7px">
-        <input class="mc-input" id="sp-video"  placeholder="▶ Video (opțional)">
+        <input class="mc-input" id="sp-link" placeholder="🌐 Website / Demo (optional)" style="margin-bottom:7px">
+        <input class="mc-input" id="sp-github" placeholder="🐙 GitHub (optional)" style="margin-bottom:7px">
+        <input class="mc-input" id="sp-video" placeholder="▶ Video (optional)">
         <div class="pw-label" style="margin-top:16px">Media</div>
-        <input class="mc-input" id="sp-image" placeholder="🖼 URL imagine — screenshot, concept, UI..." oninput="spPreviewImage(this.value)" style="margin-bottom:7px">
+        <input class="mc-input" id="sp-image" placeholder="🖼 Image URL - screenshot, concept, cover..." oninput="spPreviewImage(this.value)" style="margin-bottom:7px">
         <div id="sp-image-preview"></div>
         <div id="sp-days-toggle" onclick="spToggleDays()" style="display:flex;align-items:center;gap:10px;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;cursor:pointer;transition:all .2s;margin-top:10px">
           <div id="sp-days-dot" style="width:16px;height:16px;border-radius:4px;border:2px solid var(--muted);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .2s;font-size:11px"></div>
-          <span style="font-size:13px;color:var(--muted2)">📅 Afișează contor zile <span style="color:var(--muted);font-size:11px">— Day 1, Day 45...</span></span>
+          <span style="font-size:13px;color:var(--muted2)">📅 Show day counter <span style="color:var(--muted);font-size:11px">- Day 1, Day 45...</span></span>
         </div>
         <input type="checkbox" id="sp-days" style="display:none">
       </div>
     </div>
     <div class="pw-footer">
-      <span style="font-size:12px;color:var(--muted)">Salvat local · sync Firebase</span>
-      <button class="pw-save" id="pw-save-btn" onclick="spPublish()">Publică →</button>
+      <span style="font-size:12px;color:var(--muted)">Saved locally · Firebase sync</span>
+      <button class="pw-save" id="pw-save-btn" onclick="spPublish()">Publish &rarr;</button>
     </div>
   </div>
-  <!-- removed steps below, kept for JS compat -->
   <div style="display:none" id="sp-dot-1"></div><div style="display:none" id="sp-dot-2"></div><div style="display:none" id="sp-dot-3"></div><div style="display:none" id="sp-dot-4"></div>
   <div style="display:none" id="sp-step-1"></div><div style="display:none" id="sp-step-2"></div><div style="display:none" id="sp-step-3"></div><div style="display:none" id="sp-step-4"></div>
-  </div>
 </div>
 
-<!-- WAITLIST MODAL -->
 <div class="overlay" id="waitlist-modal" style="display:none" onclick="if(event.target===this)closeModal('waitlist-modal')">
   <div class="modal">
     <button class="modal-close" onclick="closeModal('waitlist-modal')">×</button>
-    <h2>Get early access</h2>
-    <div class="modal-sub">First 100 builders get permanent Early Builder badge, tester XP boost, and the ability to post projects before public launch.</div>
+    <h2>Request early access</h2>
+    <div class="modal-sub">Early users get priority entry into the first VNEX testing wave for creators and explorers.</div>
     <form onsubmit="submitWL(event)">
       <input type="text" placeholder="Your name" required>
       <input type="email" id="wl-modal-email" placeholder="your@email.com" required>
-      <textarea placeholder="What are you building? (optional)"></textarea>
-      <button class="modal-btn" type="submit">Join waitlist →</button>
+      <textarea placeholder="What kind of work do you want to open or explore? (optional)"></textarea>
+      <button class="modal-btn" type="submit">Join waitlist &rarr;</button>
     </form>
   </div>
 </div>
 
-<!-- MY PROFILE MODAL -->
 <div class="overlay" id="profile-modal" style="display:none" onclick="if(event.target===this)closeProfile()">
   <div class="profile-wrap">
     <button class="modal-close" onclick="closeProfile()">×</button>
     <div class="profile-header">
       <div class="profile-avatar" id="profile-avatar-el">?</div>
       <div>
-        <div style="font-size:19px;font-weight:900;letter-spacing:-.4px" id="profile-name-el">–</div>
-        <div style="font-size:12px;color:var(--muted2);margin-top:3px" id="profile-rank-el">–</div>
+        <div style="font-size:19px;font-weight:900;letter-spacing:-.4px" id="profile-name-el">-</div>
+        <div style="font-size:12px;color:var(--muted2);margin-top:3px" id="profile-rank-el">-</div>
       </div>
     </div>
     <div class="profile-stats-row">
@@ -400,62 +383,60 @@
       <div class="profile-stat-box"><div class="profile-stat-val" id="ps-bugs">0</div><div class="profile-stat-lbl">Bugs</div></div>
     </div>
     <div class="profile-section" id="ws-projects">
-      <div class="profile-section-title">📁 My Projects</div>
+      <div class="profile-section-title">My Works</div>
       <div id="profile-projects-list"></div>
     </div>
     <div class="profile-section" id="ws-contributions">
-      <div class="profile-section-title">💬 My Contributions</div>
+      <div class="profile-section-title">My Contributions</div>
       <div id="profile-activity-list"></div>
     </div>
     <div class="profile-section" id="ws-testing">
-      <div class="profile-section-title">🧪 My Testing</div>
+      <div class="profile-section-title">My Testing</div>
       <div id="profile-received-list"></div>
     </div>
   </div>
 </div>
 
-<!-- PROJECT DETAIL -->
 <div class="workspace-overlay" id="project-detail-modal" style="display:none">
   <div class="workspace-page">
-    <button class="ws-back-btn" onclick="closeProjectDetail()">← Back to My Space</button>
+    <button class="ws-back-btn" onclick="closeProjectDetail()">&larr; Back to My Space</button>
     <div id="pd-content"></div>
   </div>
 </div>
 
-<!-- INFO POPUP — RO / EN bilingv -->
 <div class="overlay" id="info-popup" style="display:none" onclick="if(event.target===this)closeInfoPopup()">
   <div class="info-glass">
     <button class="modal-close" onclick="closeInfoPopup()">×</button>
 
     <div class="ig-lang-row">
-      <button class="ig-lang active" onclick="switchInfoLang(this,'ro')">🇷🇴 Română</button>
+      <button class="ig-lang active" onclick="switchInfoLang(this,'ro')">🇷🇴 Romana</button>
       <button class="ig-lang" onclick="switchInfoLang(this,'en')">🇬🇧 English</button>
     </div>
 
     <div id="ig-ro">
-      <div class="ig-badge">Early Access · Disponibil în România</div>
-      <div class="ig-title">VNEX — Un loc pentru builders.</div>
-      <p class="ig-body">O platformă unde indie builders, developeri și creatori documentează și testează proiecte în public — cu control total asupra ce rămâne privat.</p>
+      <div class="ig-badge">Early Access · Disponibil in Romania</div>
+      <div class="ig-title">VNEX - platforma hibrida pentru work in progress.</div>
+      <p class="ig-body">Un loc unde creatori si exploratori pot deschide produse, muzica, AI, jocuri si experimente cu control real asupra a ce ramane privat, hibrid sau public.</p>
       <div class="ig-items">
-        <div class="ig-item"><span>🔨</span><div><strong>Urmărești proiecte, nu oameni.</strong> Progresul contează mai mult decât popularitatea.</div></div>
-        <div class="ig-item"><span>💬</span><div><strong>Feedback real.</strong> Găsești testeri, primești idei, rezolvi bug-uri concrete.</div></div>
-        <div class="ig-item"><span>⚡</span><div><strong>Hybrid by default.</strong> Tu decizi ce e public. Restul rămâne al tău.</div></div>
-        <div class="ig-item"><span>💻</span><div><strong>Laptop first.</strong> Versiunea mobilă urmează după validare.</div></div>
+        <div class="ig-item"><span>✦</span><div><strong>Work first.</strong> Nu postezi doar continut. Deschizi work real, cu stare, nevoie si access.</div></div>
+        <div class="ig-item"><span>⚡</span><div><strong>Hybrid by design.</strong> Tu alegi ce se vede, cine intra si cat de devreme.</div></div>
+        <div class="ig-item"><span>💬</span><div><strong>Feedback in context.</strong> Testeri, ascultatori si early users intra acolo unde conteaza.</div></div>
+        <div class="ig-item"><span>💻</span><div><strong>Laptop first.</strong> Focus pe experienta premium si controlata.</div></div>
       </div>
-      <div class="ig-note">Momentan testăm cu primii builders din România. Lansare internațională — în curând.</div>
+      <div class="ig-note">Momentan testam cu primii useri din Romania. Lansarea internationala vine dupa validarea produsului.</div>
     </div>
 
     <div id="ig-en" style="display:none">
-      <div class="ig-badge">Early Access · Romania only, for now</div>
-      <div class="ig-title">VNEX — A place for builders.</div>
-      <p class="ig-body">A platform where indie builders, developers and makers document and share their projects in public — while keeping full control over what stays private.</p>
+      <div class="ig-badge">Early Access · Romania first, for now</div>
+      <div class="ig-title">VNEX - a hybrid platform for work in progress.</div>
+      <p class="ig-body">A place where creators and explorers can open products, music, AI, games and experiments with real control over what stays private, hybrid or public.</p>
       <div class="ig-items">
-        <div class="ig-item"><span>🔨</span><div><strong>Follow projects, not people.</strong> Progress matters more than popularity.</div></div>
-        <div class="ig-item"><span>💬</span><div><strong>Real feedback.</strong> Find testers, get ideas, receive actual bug reports.</div></div>
-        <div class="ig-item"><span>⚡</span><div><strong>Hybrid by default.</strong> You decide what is public. Everything else stays yours.</div></div>
-        <div class="ig-item"><span>💻</span><div><strong>Laptop first.</strong> Mobile version coming after validation.</div></div>
+        <div class="ig-item"><span>✦</span><div><strong>Work first.</strong> You do not just post content. You open real work with stage, need and access.</div></div>
+        <div class="ig-item"><span>⚡</span><div><strong>Hybrid by design.</strong> You choose what is visible, who gets in and how early.</div></div>
+        <div class="ig-item"><span>💬</span><div><strong>Feedback in context.</strong> Testers, listeners and early users enter where they actually matter.</div></div>
+        <div class="ig-item"><span>💻</span><div><strong>Laptop first.</strong> Built for a controlled premium experience.</div></div>
       </div>
-      <div class="ig-note">Currently testing with our first Romanian builders. International launch coming soon — not a social network, a builder platform.</div>
+      <div class="ig-note">Currently testing with our first Romanian users. International launch comes after product validation - not a social feed, a work-and-access platform.</div>
     </div>
   </div>
 </div>
@@ -473,7 +454,6 @@ function switchInfoLang(btn, lang){
 
 <div class="toast" id="toast"></div>
 
-<!-- Firebase -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
   import { getFirestore, doc, setDoc, getDoc, collection, addDoc, getDocs, deleteDoc, query, where, orderBy } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js";
