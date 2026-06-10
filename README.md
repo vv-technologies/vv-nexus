@@ -35,6 +35,9 @@ Key areas currently visible in this repository include:
 For the current VNEX role framing, use:
 
 - [`VNEX_USER_MODEL.md`](./VNEX_USER_MODEL.md)
+- [`VNEX_GOVERNANCE_MODEL.md`](./VNEX_GOVERNANCE_MODEL.md)
+- [`VNEX_OWNERSHIP_AND_ACCESS_RULES.md`](./VNEX_OWNERSHIP_AND_ACCESS_RULES.md)
+- [`VNEX_LEGAL_SKELETON.md`](./VNEX_LEGAL_SKELETON.md)
 
 ## Core IP And Invention Record
 
