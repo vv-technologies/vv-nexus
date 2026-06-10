@@ -53,12 +53,39 @@ For the current LEA web implementation inside `vv-nexus`, use:
 
 - [`LEA_SOURCE_MAP.md`](./LEA_SOURCE_MAP.md)
 - [`VV_ECOSYSTEM_MODEL.md`](./VV_ECOSYSTEM_MODEL.md)
+- [`STATUS.md`](./STATUS.md)
+- [`PUBLIC_IP_BOUNDARY.md`](./PUBLIC_IP_BOUNDARY.md)
 
 Current rule:
 
 - repository root = canonical LEA source
 - `lea/` = mirrored copy
 - `VV LEA STUDIOS/` = divergent variant, not the main source of truth
+
+## Ecosystem Diagram
+
+```mermaid
+flowchart LR
+    A["VV Pulse<br/>Field validation backbone"] --> B["VV Pulse Map<br/>Spatial truth layer"]
+    B --> C["VV NOW<br/>Contextual search layer"]
+    C --> D["LEA<br/>Human interface"]
+    E["VVhi<br/>Internal intelligence"] --> D
+    F["Nexus<br/>System motor and orchestration"] --> C
+    F --> D
+    G["Personal Shelves<br/>Private user pattern layer"] --> D
+    D --> H["VV Me<br/>Personal identity layer"]
+    D --> I["VV Studio<br/>Creative environment"]
+    D --> J["LEA Homme<br/>Laptop-side deeper presence"]
+```
+
+## Repository Reading Guide
+
+Use these files together:
+
+- [`STATUS.md`](./STATUS.md) for active, beta, internal, transitional, and concept reading
+- [`PUBLIC_IP_BOUNDARY.md`](./PUBLIC_IP_BOUNDARY.md) for the framework/product/public boundary
+- [`VV_ECOSYSTEM_MODEL.md`](./VV_ECOSYSTEM_MODEL.md) for the system model
+- [`LEA_SOURCE_MAP.md`](./LEA_SOURCE_MAP.md) for LEA source truth
 
 ## Status
 
