@@ -1,10 +1,11 @@
-# VV Hi Framework — Intellectual Property Declaration
+# VV Hi Framework
+## Public Declaration And Intellectual Property Record
 ### VV HiS · VV HiG · VV HiB · VV HiA · VV HiL · VV HiC · VV HiX
-**Version 3.0 · Updated: 20 May 2026 · First Publication: 19 May 2026**
+**Version 3.1 · Updated: 10 June 2026 · First Publication: 19 May 2026**
 
 ---
 
-> **© 2026 Cosmin Toma · VV Technologies · VV Hybrid Universe**
+> **© 2026 Cosmin Toma · VV Hybrid Universe**
 > All rights reserved. Unauthorized reproduction or commercial use is prohibited.
 > Contact: vv.ep.team@gmail.com
 
@@ -12,12 +13,41 @@
 
 ## Authorship
 
-**Inventor:** Cosmin Toma
-**Organization:** VV Technologies · VV Hybrid Universe
-**Date of first conception and implementation:** 19–20 May 2026
-**Country of origin:** Romania
-**Public record:** This document was committed to a public Git repository on 19 May 2026.
+**Inventor:** Cosmin Toma  
+**Ecosystem:** VV Hybrid Universe  
+**Public GitHub publisher:** `vv-technologies`  
+**Date of first conception and implementation:** 19–20 May 2026  
+**Country of origin:** Romania  
+**Public record:** This document was committed to a public Git repository on 19 May 2026.  
 The Git commit hash constitutes cryptographic, timestamped proof of prior art.
+
+---
+
+## Positioning
+
+To keep the public structure clean:
+
+- `VV Hybrid Universe` is the ecosystem
+- `VV Nexus` is the system core
+- `VV Hi Framework` is the invention layer
+- `LEA`, `VNEX`, `VV Pulse`, and related surfaces are products built on top
+
+This document describes the invention layer, not the full product catalog.
+
+---
+
+## Table of Contents
+
+- Overview
+- VV HiS
+- VV HiG
+- VV HiB
+- VV HiA
+- VV HiL
+- VV HiC
+- VV HiX
+- Prior Art & Proof of Authorship
+- Copyright & Usage
 
 ---
 
@@ -47,7 +77,7 @@ VV HiX  ·  VV Hybrid Intelligence Exchange  ·  the network
 - VV HiX connects all nodes into a collective intelligence network
 
 No other AI framework in existence as of May 2026 addresses all seven dimensions
-simultaneously as a unified, language-level invention.
+simultaneously as a unified, language-level invention in this structure.
 
 ---
 
@@ -328,7 +358,7 @@ VV HiB as a local-first AI deployment architecture.
 
 Each node is complete. Each node survives alone.
 
-When the supply line is cut — when Nexus goes offline, when VV Technologies
+When the supply line is cut — when Nexus goes offline, when the core ecosystem
 ceases to exist, when any central server disappears — every user's AI
 continues to function. Fully. Permanently.
 
@@ -499,7 +529,7 @@ The network is the users. The users are the network.
 - **The first AI knowledge network that cannot be shut down** — no center to attack
 - **Privacy-preserving by architecture** — only anonymous aggregates travel the wire
 - **Self-healing** — if nodes go offline, the network routes around them
-- **Zero infrastructure cost** — VV Technologies pays nothing to run this network
+- **Zero infrastructure cost** — the ecosystem pays nothing to run this network
 - **Emergent intelligence** — what any one user learns, eventually all users benefit from
 
 **Planned extensions:** P2P mesh protocol · Node discovery · Offline-first sync · Corpus signing (verify corpus integrity without revealing source)
@@ -514,11 +544,12 @@ The network is the users. The users are the network.
 | This file v2.0 | Updated 20 May 2026 — VV HiG and VV HiB added |
 | This file v2.1 | Updated 20 May 2026 — VV HiA added |
 | This file v3.0 | Updated 20 May 2026 — VV HiL, VV HiC, VV HiX added |
+| This file v3.1 | Updated 10 June 2026 — public positioning and publication structure refined |
 | Git history | `github.com/vv-technologies/vv-nexus/commits` |
 | Working implementation | Live at `vv-technologies.github.io/vv-nexus/lea.html` |
 | Public browser demo | Live at `vv-technologies.github.io/vv-nexus/lea-public.html` |
 | Internal founder document | `VV_HYBRID_UNIVERSE.html` — dated May 2026 |
-| Language spec internal | `LIMBAJ_VV.md` — dated 19 May 2026 |
+| Public inventions index | `VV_INVENTIONS_INDEX.md` — added 10 June 2026 |
 
 The Git commit hash of this file is a cryptographic timestamp recognized
 internationally as proof of prior art. It cannot be altered retroactively.
@@ -528,7 +559,7 @@ internationally as proof of prior art. It cannot be altered retroactively.
 ## Copyright & Usage
 
 ```
-© 2026 Cosmin Toma · VV Technologies · VV Hybrid Universe
+© 2026 Cosmin Toma · VV Hybrid Universe
 Romania
 
 VV HiS, VV HiG, VV HiB, VV HiA, VV HiL, VV HiC, VV HiX,
@@ -558,7 +589,7 @@ Permission is NOT granted for:
 
 For licensing inquiries:
   vv.ep.team@gmail.com
-  VV Technologies · VV Hybrid Universe
+  VV Hybrid Universe
   Romania · Founded May 2026
 ```
 
