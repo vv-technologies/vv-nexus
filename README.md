@@ -32,6 +32,10 @@ Key areas currently visible in this repository include:
 - `vv-ceo-panel.html`
 - `VV_HYBRID_UNIVERSE.html`
 
+For the current VNEX role framing, use:
+
+- [`VNEX_USER_MODEL.md`](./VNEX_USER_MODEL.md)
+
 ## Core IP And Invention Record
 
 This repository also contains core invention and framework documents that matter beyond product screens.
