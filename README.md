@@ -47,6 +47,19 @@ These documents separate:
 - the internal architecture and founder logic
 - the implementation files that already express parts of the system
 
+## LEA Source Map
+
+For the current LEA web implementation inside `vv-nexus`, use:
+
+- [`LEA_SOURCE_MAP.md`](./LEA_SOURCE_MAP.md)
+- [`VV_ECOSYSTEM_MODEL.md`](./VV_ECOSYSTEM_MODEL.md)
+
+Current rule:
+
+- repository root = canonical LEA source
+- `lea/` = mirrored copy
+- `VV LEA STUDIOS/` = divergent variant, not the main source of truth
+
 ## Status
 
 Active core repository.
